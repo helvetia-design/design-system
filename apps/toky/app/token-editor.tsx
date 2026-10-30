@@ -4789,6 +4789,16 @@ export function TokenEditor({
     return () => window.removeEventListener('keydown', handleSearchShortcut)
   }, [])
 
+  // Seeds the search box from ?filter= once on mount, e.g. a link ending in
+  // ?filter=badge lands straight on that component's tokens — the param is
+  // never written back to (typing afterward doesn't touch the URL), and the
+  // value flows through the same searchText/query pipeline as typing, so the
+  // usual 3-char minimum still applies.
+  useEffect(() => {
+    const filter = new URLSearchParams(window.location.search).get('filter')
+    if (filter) setSearchText(filter)
+  }, [])
+
   // Keeps tableHeaderHeight in sync with the column header row's actual
   // rendered height (see the ref's declaration) — observed rather than
   // read once, since it can change (e.g. the layer tabs wrapping at a

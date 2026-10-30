@@ -11,7 +11,7 @@
 
 ## Skill location
 
-`.claude/skills/ds-figma-component` — a project skill (like `ds-create-component`,
+`.claude/skills/ds-code-to-figma` — a project skill (like `ds-create-component`,
 `ds-lint-component`, etc.), **not** shipped via `packages/skills`. This skill depends on the
 Figma MCP, this monorepo's component source, the token architecture, and the Playwright visual
 screenshots — none of which exist in a consumer repo, so it can't be a `packages/skills` payload.
@@ -49,7 +49,7 @@ packages/core/src/components/<category>/<name>/<name>.figma.md
 
 ## Shared knowledge base: `CONVENTIONS.md`
 
-`.claude/skills/ds-figma-component/CONVENTIONS.md` — accumulates mapping heuristics across
+`.claude/skills/ds-code-to-figma/CONVENTIONS.md` — accumulates mapping heuristics across
 components over time, e.g.:
 
 - Free-text props (like `label`) never become Figma variant properties — they map to instance

@@ -53,38 +53,62 @@ before anything is built.
      hover    [cell]    [cell]
      active   [cell]    [cell]
      ```
-   - **3 axes**: don't try to flatten three axes into one table. Pick the two axes with the most
-     "shape" similarity (state × size is the common pair) as the one grid's rows/columns, and let
-     the third same-layers axis (e.g. `color`) repeat the whole grid once per option — one 2-axis
-     grid per color, each stacked on the same frame under its own title label naming that option:
-     ```
-     Primary
-                sm        base
-     default  [cell]    [cell]
-     hover    [cell]    [cell]
-
-     Secondary
-                sm        base
-     default  [cell]    [cell]
-     hover    [cell]    [cell]
-     ```
-   - **4+ axes, or any axis that is structural rather than same-layer** (different layers/shape
-     per option, not just a different token on an identical shape — same test as the enum-prop
-     rule above, and the same treatment `inverted` already gets in Phase 4): stop stacking grids.
-     That axis is a top-level split signal, not another grid dimension — split it into separate
-     top-level components (Instance Swap), and sketch each split component's own grid separately,
-     each with its own frame/title, same as `inverted`'s light/dark two-frame layout.
-   - State which case applies to this component (2-axis / repeated-grid / top-level-split) before
+   - **3+ same-layer axes (Primer-style nested matrix)**: don't stack repeated 2-axis grids — fold
+     every same-layer axis into one matrix with nested, bracket-grouped labels on rows and/or
+     columns, the way GitHub's Primer design system lays out its own Button variant grid (multiple
+     axes nested on each side, not one grid per option). Assign axes by a fixed rule, no per-component
+     judgment call:
+     - `size` always stays the single, innermost **column** axis.
+     - Every other same-layer axis goes on **rows**, nested outer→inner ordered by **ascending
+       option count outward** — the axis with the _fewest_ distinct options is the outermost
+       grouping, the axis with the _most_ options is innermost (closest to the cell). This keeps
+       the matrix growing taller, not wider, as axes are added, and generalizes the existing
+       `state`-on-rows convention: a `state` axis usually has the fewest options among a
+       component's same-layer axes, so it naturally lands outermost anyway.
+     - No height-based rebalancing — every non-size axis goes on rows regardless of how tall the
+       resulting table gets. Simpler and more predictable than a threshold that would need
+       recomputing per component.
+     - In the plain-ASCII sketch, the outermost row axis's label prints once per group with blank
+       cells underneath for the rest of that group (merged-cell convention) rather than repeating
+       on every row.
+     - Worked example — a component with same-layer axes `size` (sm/lg), `color` (6 options),
+       `pulse` (2 options): `pulse` has fewer options than `color`, so it's the outer row grouping;
+       `color` nests inside it; `size` stays on columns.
+       ```
+                         sm      lg
+       false   default  [cell]  [cell]
+               disabled [cell]  [cell]
+               info     [cell]  [cell]
+               danger   [cell]  [cell]
+               warning  [cell]  [cell]
+               success  [cell]  [cell]
+       true    default  [cell]  [cell]
+               disabled [cell]  [cell]
+               info     [cell]  [cell]
+               danger   [cell]  [cell]
+               warning  [cell]  [cell]
+               success  [cell]  [cell]
+       ```
+   - **Any axis that is structural rather than same-layer** (different layers/shape per option,
+     not just a different token on an identical shape — same test as the enum-prop rule above, and
+     the same treatment `inverted` already gets in Phase 4), regardless of how many same-layer axes
+     exist alongside it: that axis is a top-level split signal, not another matrix dimension —
+     split it into separate top-level components (Instance Swap), and sketch each split
+     component's own nested matrix separately, each with its own frame/title, same as `inverted`'s
+     light/dark two-frame layout.
+   - State which case applies to this component (2-axis / nested-matrix / top-level-split) before
      moving to step 4's approval ask, so the user is confirming an actual layout, not just a
      property list.
    - **Worked example — `ds-spinner`'s real, confirmed layout** (see `spinner.figma.md`'s "Major
-     rebuild — Main components split into two titled grids" section): it has 4 axes —
-     `variation` (logo/circle), `size` (sm/base), `labelPosition` (right/bottom), `inverted`
-     (false/true). `inverted` is structural (case 3) → split into two top-level component sets,
+     rebuild — Main components split into two titled grids" section). Predates the nested-matrix
+     rule above — kept here as the historical record of what was actually built, not as the
+     pattern to follow for a new 3+-axis component going forward (today it'd fold `variation` into
+     the matrix as an outer-row grouping instead of stacking two separate titled grids). It has 4
+     axes — `variation` (logo/circle), `size` (sm/base), `labelPosition` (right/bottom), `inverted`
+     (false/true). `inverted` is structural → split into two top-level component sets,
      `Spinner/Primary` and `Spinner/Inverted`, each on its own full frame. Within each frame, 3
-     axes remain → `variation` is the repeated-grid axis (case 2): one titled grid per
-     `variation` value, each grid being a 2-axis table (case 1) of `labelPosition` (rows:
-     Bottom/Right) × `size` (columns: Base/SM):
+     axes remain, built as stacked 2-axis grids — one titled grid per `variation` value, each grid
+     being a 2-axis table of `labelPosition` (rows: Bottom/Right) × `size` (columns: Base/SM):
      ```
      Spinner/Primary                        Spinner/Inverted
      Logo                                   Logo

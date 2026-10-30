@@ -89,14 +89,46 @@ component's code and produces the draft mapping that Phase 2 proposes a grouping
      no matching variable exists, treat it exactly like a missing CSS-var token: stop, report it,
      and ask the user to pick an existing token or explicitly accept a one-off hardcoded value —
      never silently build it with an assumed or Figma-default value.
+   - 5a. **Detect responsive (device-mode) bindings.** Scan `<name>.host.scss` for breakpoint
+     mixins — `@include mobile`, `tablet`, `desktop`, `touch`, `from(...)`, `until(...)`,
+     `between(...)`, `desktop-only`, etc. (the full set lives in
+     `packages/styles/src/scss/mixins/breakpoint.mixin.scss`). For each one found, check whether it
+     reassigns a custom property (`--mod-*`, `--_*`, or a bare `--ds-*`) that is **also set to a
+     different `--ds-*` token outside the block** (its unconditional/base value, or another
+     breakpoint's value) — e.g. `logo.host.scss`'s `:host { @include vars.local(logo-height,
+var(--ds-logo-size-base-mobile)); @include desktop { --mod-logo-height:
+var(--ds-logo-size-base-desktop); } }`. **Only flag this when the token genuinely differs
+     across the breakpoint** — a breakpoint block that doesn't touch a `--ds-*`-bound value (pure
+     layout: grid columns, flex direction, etc.) is not a responsiveness case, skip it. This check
+     applies to **any** property kind, not just size — width, height, padding, gap, radius, color,
+     whatever the breakpoint actually overrides.
+     - **Only `mobile`/`tablet`/`desktop` map onto real Figma modes** — the `Design Responsive
+Tokens` collection has exactly those three. Any other mixin (`desktop-lg`, `desktop-xl`,
+       `touch`, `from`/`until`/`between` at an arbitrary breakpoint, etc.) is a **hard stop**, same
+       as a missing token above: report it and ask the user to collapse it into the nearest of the
+       3 modes, accept a static value for that breakpoint, or extend the Figma collection with a
+       4th mode — never guess or silently collapse it yourself.
+     - If code only overrides one breakpoint (e.g. `logo.host.scss` only has `@include desktop` —
+       no `@include tablet`), the token for the mode that was never explicitly overridden falls
+       through to the next-lower breakpoint's real value (here, Tablet uses the same token as
+       Mobile) — record it as such, matching actual rendered behavior; don't invent a distinct
+       Tablet-specific token that doesn't exist in code.
+     - Record every responsive binding found in the draft's `device:` section — see `SKILL.md`'s
+       mapping file schema. A component with no breakpoint-driven token differences has no
+       `device:` section at all, same as `anatomy:`/`states:` being omitted when not applicable.
+     - Phase 3 is what actually creates/reuses the Figma routing variable and binds nodes to it —
+       this step only needs to identify and record which bindings are responsive and what each
+       mode's real token is.
    - 5b. Before writing the draft file, build an explicit **completeness checklist**: list every
      node the Figma build will need (every text-bearing part, every filled/stroked shape, every
      spacing gap) and, for each one, every visual attribute it needs (text: family, size, weight,
      line-height, letter-spacing, color, decoration; shape: fill, stroke color/width, corner
      radius, dimensions, spacing). Cross-check each attribute against the tokens resolved in steps
-     3 and 5 — any attribute with no corresponding entry is a gap, not an assumption to fill in
-     during Phase 3. Surface every gap now, as a batch, using the same hard-stop flow as step 5,
-     rather than discovering missing tokens one at a time mid-build.
+     3, 5, and 5a — any attribute with no corresponding entry is a gap, not an assumption to fill in
+     during Phase 3. For an attribute flagged responsive in step 5a, the checklist entry points at
+     its `device:` binding rather than a single static token. Surface every gap now, as a batch,
+     using the same hard-stop flow as step 5, rather than discovering missing tokens one at a time
+     mid-build.
 6. Write all of the above into `<name>.figma.md` (create it if it doesn't exist) as a draft, per
    the schema in `SKILL.md`'s "Mapping file format" section. Include the `specs:` list —
    the values (fixed or min width/height, padding/gaps, fixed sizes of nested elements, radius,

@@ -1,3 +1,0 @@
-- layout check
-- badge min-width failed
-- if componet set is 3 dimesional propose second compoent set like tag a tag-closable.

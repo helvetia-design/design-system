@@ -1,14 +1,16 @@
 ---
-name: ds-figma-component
+name: ds-code-to-figma
 description: Push a Helvetia Design System component from code into the Figma component library — resolving props/variants/states to Figma variant properties bound to existing Figma variables (tokens), reusing existing Figma components for nested children. Use when the user wants to create, add, or push a DS component (or a specific component like ds-spinner) into Figma.
 ---
 
-# ds-figma-component
+# ds-code-to-figma
 
-Creates a Figma component (one dedicated page per component) from an existing Stencil
-component's code. Code is always the source of truth — this skill never invents a hardcoded
-value, a new design token, or a Figma-side detail that doesn't trace back to the component's
-actual props, states, and resolvable design tokens.
+Creates a Figma component from an existing Stencil component's code, landing it on a shared,
+**per-category** Figma page (e.g. `Core / Indicators` holds every indicator component — badge,
+hint, progress-bar, spinner, tag) rather than a dedicated page per component. Code is always the
+source of truth — this skill never invents a hardcoded value, a new design token, or a Figma-side
+detail that doesn't trace back to the component's actual props, states, and resolvable design
+tokens.
 
 **v1 scope — create-only.** This skill pushes a component into Figma for the first time. It does
 not update or reconcile an already-pushed component, and it does not generate Code Connect
@@ -67,14 +69,14 @@ flowchart TD
 
     subgraph P4G["Phase 4 — Documentation page"]
         direction LR
-        P4a["Read PHASE-4-DOCUMENT.md<br/>+ inspect the canonical live page"]:::code --> P4b["Build blue Header /<br/>2-col: Copy me, Anatomy, Specs,<br/>Variants / Component Set"]:::figma
+        P4a["Read PHASE-4-DOCUMENT.md<br/>+ inspect the canonical live page"]:::code --> P4b["Build purple Header /<br/>2-col: Copy me, Anatomy, Specs<br/>/ Component Set"]:::figma
     end
 
     P4G --> P5G
 
     subgraph P5G["Phase 5 — Review"]
         direction LR
-        P5a["Capture Figma<br/>screenshots"]:::figma --> P5b["Compare against real<br/>*.visual.play.ts-snapshots PNGs"]:::code
+        P5a["Start dev server,<br/>read Figma get_variable_defs"]:::figma --> P5b["Diff live getComputedStyle<br/>against resolved token values"]:::code
         P5b --> P5c{{"User judges<br/>the findings"}}:::human
         P5c -->|real bug found| P5d["Fix code / code docs"]:::code
     end
@@ -87,8 +89,9 @@ flowchart TD
 🟡 **human** — a required stop-and-wait checkpoint; never assume approval and keep going.
 
 The three human checkpoints (Phase 1's anatomy review, Phase 2's mapping confirmation, Phase 3's
-first-variant screenshot) are the only places this skill pauses for a decision — everything else is
-read/write work it does on its own between them.
+first-variant screenshot) are the only _required_ stops — everything else is read/write work it
+does on its own between them. For the full list of every checkpoint and hard-stop condition across
+all five phases in one place, see [`DECISIONS.md`](DECISIONS.md).
 
 ## Prerequisites
 
@@ -113,10 +116,13 @@ have produced, and closes with an explicit `Next:` pointer to the following file
 2. [`PHASE-2-PROPOSE.md`](PHASE-2-PROPOSE.md) — turn the draft into a concrete Figma
    variant-grouping proposal (variant vs. instance-swap vs. top-level split, grid sketch, 500-variant
    budget check) and get the user's explicit sign-off before anything is built.
-3. [`PHASE-3-BUILD.md`](PHASE-3-BUILD.md) — build the real Figma `COMPONENT_SET` incrementally:
-   one confirmed variant combination first, then fan out the rest.
-4. [`PHASE-4-DOCUMENT.md`](PHASE-4-DOCUMENT.md) — build the per-component documentation page
-   (header, Copy me, Anatomy, Specs, Variants, Component Set) from the fixed page template.
+3. [`PHASE-3-BUILD.md`](PHASE-3-BUILD.md) — find or create the component's shared category page
+   (`Core / <Category>`), build the real Figma `COMPONENT_SET` incrementally (one confirmed
+   variant combination first, then fan out the rest), and append its master set into that page's
+   masters row.
+4. [`PHASE-4-DOCUMENT.md`](PHASE-4-DOCUMENT.md) — build the per-component documentation frame
+   (header, Copy me, Anatomy, Specs, Component Set) from the fixed page template, and
+   append it into the same category page's documentation-frames row.
 5. [`PHASE-5-REVIEW.md`](PHASE-5-REVIEW.md) — compare the built Figma output against real visual
    regression baselines and report findings; this is the last phase in this skill's v1 scope.
 
@@ -131,7 +137,19 @@ and the output record Phase 3 writes back into.
 
 \`\`\`yaml
 figmaComponentKey: null # filled in by Phase 3 on success
-figmaPage: <Name>
+figmaPage: Core / <Category> # the shared category page, e.g. "Core / Indicators" — NOT this
+
+# component's own name; multiple components share one page (see CONVENTIONS.md's category table)
+
+figmaMasterNodeId: null # this component's master COMPONENT_SET node id (referenced from inside
+
+# its own documentation frame's "🔒 Component Set" panel — there's no separate masters row)
+
+figmaDocFrameNodeId: null # this component's "<Component> Documentation" frame id within the
+
+# documentation-frames row — both filled in by Phase 3/4 on success, since the page itself no
+
+# longer uniquely identifies a single component's content
 
 anatomy:
 
@@ -165,7 +183,25 @@ props:
 - childTag: ds-icon
   childMappingFile: ../icon/icon.figma.md
   figmaComponentKey: <resolved from icon.figma.md>
-  tokens:
+  device: # omit entirely if Phase 1 step 5a found no breakpoint-driven token differences.
+  # One entry per responsive binding — the single place that owns the mechanism detail (which
+  # routing variable, its per-mode aliases, why this component needed it). tokens:/specs: entries
+  # for the same binding just reference the routing variable by name, no restating the breakdown.
+  responsiveBindings:
+  - cssVar: [--ds-logo-size-base-mobile, --ds-logo-size-base-desktop] # every real --ds-* token
+    # involved across the component's breakpoints, in mobile→desktop order
+    routingVariable: 🧩 Component/Logo/Size/Base/Device # created/reused by Phase 3 in the file's
+    # `Design Responsive Tokens` collection; deterministic name, see PHASE-3-BUILD.md
+    modes:
+    mobile: 🧩 Component/Logo/Size/Base/Mobile # real scripts/figma-sync-managed variable this
+    # mode's alias points at
+    tablet: 🧩 Component/Logo/Size/Base/Mobile # falls through to Mobile's token — code has no
+    # @include tablet override for this property, so Tablet renders the same as Mobile
+    desktop: 🧩 Component/Logo/Size/Base/Desktop
+    risk: "Hand-created by this skill, not emitted by scripts/figma-sync — if the underlying
+    per-breakpoint variables are ever renamed/removed, this alias goes stale with no automatic
+    fix. Feeding this pattern into the sync pipeline itself is real follow-up work, not yet done."
+    tokens:
 - cssVar: --ds-alias-background-color-sky
   figmaVariable: Alias/Background Color/Sky
   resolved: true
@@ -173,6 +209,10 @@ props:
   figmaVariable: null
   resolved: false
   resolution: "<decision made with the user — pick a token or accept hardcoded>"
+- cssVar: [--ds-logo-size-base-mobile, --ds-logo-size-base-desktop]
+  figmaVariable: 🧩 Component/Logo/Size/Base/Device # see device: above — responsive, not a
+  # single static token
+  resolved: true
   specs: # one entry per option of the Variants axis, shown in Phase 4's "📐 Specs" section
   base:
   - kind: size # size | icon | spacing | radius (| type, once added)
@@ -184,6 +224,12 @@ props:
     px: 5 # actual value used (marker + legend Value)
     token: 🧩 Component/Close/Padding/Base
     calc: '(10px) ÷ 2' # only when px is calculated from the variable; shown in the legend
+  - kind: size
+    label: Height
+    px: 32 # Desktop-mode value, shown as the reference figure — see device: above for the
+    # full mobile/tablet/desktop breakdown
+    token: 🧩 Component/Logo/Size/Base/Device # the routing variable, not a static token — see
+    # device: above
     \`\`\`
 
 Notes on this mapping, open questions, and rationale for any non-obvious grouping decision go
@@ -203,7 +249,13 @@ here as prose, below the YAML block.
 
 - [`code-to-figma.md`](../../../code-to-figma.md) — the full plan and the reasoning behind every
   scope decision in this skill.
-- [`CONVENTIONS.md`](CONVENTIONS.md) — accumulated mapping heuristics across components.
+- [`CONVENTIONS.md`](CONVENTIONS.md) — current mapping heuristics, indexed by topic into
+  [`conventions/`](conventions/) (tokens & props, variant grouping, page structure, Component Set
+  rendering, general build mechanics).
+- [`DECISIONS.md`](DECISIONS.md) — every checkpoint and hard-stop condition across all five
+  phases, in one place.
+- [`CHANGELOG.md`](CHANGELOG.md) — superseded approaches and the "caught a bug, fixed it" history
+  behind today's rules. Not needed to execute a run; read it only for the _why_.
 - `PHASE-1-ANALYZE.md` / `PHASE-2-PROPOSE.md` / `PHASE-3-BUILD.md` / `PHASE-4-DOCUMENT.md` /
   `PHASE-5-REVIEW.md` — the full workflow, one file per phase (see "## Workflow" above).
 - [`packages/tokens/CONTEXT.md`](../../../packages/tokens/CONTEXT.md) — token layers and naming.
