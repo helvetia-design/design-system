@@ -1,6 +1,6 @@
-# Conventions — Component Set labeling, sizing, and rendering (Phase 4, §6)
+# Conventions — Component Set labeling, sizing, and rendering (Phase 8)
 
-Relevant to Phase 4's "🔒 Component Set" section specifically. See `../CONVENTIONS.md` for the
+Relevant to Phase 8's "🔒 Component Set" section specifically. See `../CONVENTIONS.md` for the
 index; see `../CHANGELOG.md` for the reverted "2-axis or fewer skips labels" exemption and the
 old inside-the-box label placement.
 
@@ -11,8 +11,8 @@ old inside-the-box label placement.
   this is a required check, not an optional judgment call — skipped twice already (`ds-spinner`,
   then `ds-logo`), both caught by the user after shipping unlabeled. The full structure (Row
   Labels, Column Labels, Grid overlay, sizing rules) is specified in
-  `PHASE-4-DOCUMENT.md`'s "6. Component Set" section — read it before building this section, don't
-  rebuild from memory of a prior run.
+  `PHASE-8-DOCUMENT-COMPONENT-SET.md`'s "6. Component Set" section — read it before building this
+  section, don't rebuild from memory of a prior run.
 - **Build the Grid overlay as plain `x`/`y` children of a `layoutMode: 'NONE'` wrapper frame
   around the `COMPONENT_SET`, not as an `ABSOLUTE`-positioned child of an auto-layout parent.**
   Sidesteps the `ABSOLUTE`-positioning pitfalls below entirely, since a `NONE`-mode frame's

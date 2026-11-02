@@ -1,6 +1,6 @@
 # Decision path — every stop-and-wait point in this skill
 
-A single index of every place this skill must pause for a human decision, across all five phases.
+A single index of every place this skill must pause for a human decision, across all nine phases.
 Check this file when you're unsure whether you're at a checkpoint — it exists so that doesn't
 require re-reading full phase prose to confirm.
 
@@ -55,21 +55,44 @@ Two kinds of pause, treated differently:
   default/base combination before fanning out the rest of the matrix — catches a structural
   mistake once, before it's replicated across every variant.
 
-## Phase 4 — Document
+## Phase 4 — Document: Layout
 
-- 🟡 **Layout iteration before done** (step 8): iterate on the documentation page with the user
-  (screenshot checkpoints) before considering Phase 4 finished — same discipline as Phase 3's
-  variant-matrix checkpoint.
+- 🟡 **Layout iteration before moving on**: iterate on the header/2-column shell with the user
+  (screenshot checkpoint) before starting Phase 5 — same discipline as Phase 3's variant-matrix
+  checkpoint.
 - 🛑 **Unresolvable link URL** (Header section): if a build can't resolve one of the three header
   links (Storybook/Toky/GitHub) — stop and ask rather than silently shipping that row dead.
 - 🛑 **Missing category copy** (page-level structure): a category folder with no seeded
   title/lead in `CONVENTIONS.md`'s table — stop and ask before building that category's page.
 
-## Phase 5 — Review
+## Phase 5 — Document: Copy me
+
+- 🟡 **Iteration before moving on**: confirm "Copy me" with the user before starting Phase 6.
+
+## Phase 6 — Document: Anatomy
+
+- No checkpoints beyond the standing iteration discipline. **Skip condition**: the component's
+  `<name>.figma.md` has no `anatomy:` list (no `@part` tags) — skip this phase entirely, go
+  straight to Phase 7.
+
+## Phase 7 — Document: Specs
+
+- 🟡 **Iteration before moving on**: confirm Specs with the user before starting Phase 8.
+
+## Phase 8 — Document: Component Set
+
+- 🟡 **Axis-count check** (required, not optional): count the real crossed axes on the set before
+  deciding on row/column labels — skipping this has shipped unlabeled sets twice (`ds-spinner`,
+  `ds-logo`).
+- 🟡 **Final layout iteration before done**: iterate on the finished documentation frame with the
+  user (screenshot checkpoints) before considering the whole documentation page finished and
+  moving on to Phase 9 — same discipline as Phase 3's variant-matrix checkpoint.
+
+## Phase 9 — Review
 
 - No checkpoints or hard stops — this phase only reports. Findings (token mismatches, uncovered
   gaps, a wrong code-doc comment) are advisory; the user decides what, if anything, gets fixed.
-  See `PHASE-5-REVIEW.md` §3 for the one exception where this skill fixes something on its own
+  See `PHASE-9-REVIEW.md` §3 for the one exception where this skill fixes something on its own
   authority: a confirmed-wrong _code doc comment_ gets corrected in the same pass, since code is
   this system's own source of truth for documentation copy.
 

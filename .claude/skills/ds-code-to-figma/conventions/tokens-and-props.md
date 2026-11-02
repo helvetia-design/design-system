@@ -1,10 +1,19 @@
-# Conventions — token resolution & prop analysis (Phase 1 / Phase 5)
+# Conventions — token resolution & prop analysis (Phase 1 / Phase 9)
 
-Relevant to Phase 1's analysis and Phase 5's review. See `../CONVENTIONS.md` for the index and
+Relevant to Phase 1's analysis and Phase 9's review. See `../CONVENTIONS.md` for the index and
 baseline rules; see `../CHANGELOG.md` for superseded approaches.
 
 ## Resolving tokens
 
+- **Resolve a CSS var to its Figma variable id locally, from `Base.tokens.json`, not by
+  enumerating Figma's variable collections.** Every token already pushed to Figma carries its
+  real variable id in `$extensions["com.figma.variableId"]` — `scripts/figma-sync/lib/css-token-lookup.mjs`
+  turns that into a direct `--ds-*` → id lookup with zero Figma API calls (see
+  `PHASE-1-ANALYZE.md` step 5). Reserve a live Figma search (`search_design_system`,
+  `get_variable_defs`) for the one case this can't cover: finding an existing token for a value
+  with no CSS-var binding at all (a hardcoded literal, or an inherited attribute) — and even then,
+  remember those tools only search published libraries, while the real tokens are local to the
+  component-library file.
 - **No visual attribute is ever assumed — every value on every Figma node needs an explicit,
   resolved design token, even if the component's own SCSS never sets that attribute at all.** An
   inherited attribute (e.g. `color`/`font-size` on a text part that relies on Shadow DOM
@@ -44,7 +53,7 @@ baseline rules; see `../CHANGELOG.md` for superseded approaches.
   square's axis-aligned bounding box is naturally larger than its own side length at any angle
   other than 0/90/180/270°. Prefer `getComputedStyle(el).width` over the rendered bounding box for
   anything with a running CSS `animation`, or measure a paused instance. (From: `ds-spinner`'s
-  circle Phase 5 sweep, which read ~30px for a token that's actually exactly 24px.)
+  circle Phase 9 sweep, which read ~30px for a token that's actually exactly 24px.)
 - **When a library recolors nested SVG content dynamically (e.g. `lottie-colorify`), querying the
   first matching `path`/`g` can land on an unstyled wrapper, not the actual colored leaf
   element** — its computed `fill` then reads the SVG spec's initial value (`black`), not the real

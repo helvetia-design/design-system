@@ -4,10 +4,6 @@ Heuristics the `ds-code-to-figma` skill uses when proposing a variant grouping i
 building Phase 3/4. This file (and its `conventions/*.md` topic files) are only ever changed by
 the skill _proposing_ an addition and the user _approving_ it — never auto-appended.
 
-**Current rules only.** Superseded approaches, reverted experiments, and "caught a bug and fixed
-it" narratives live in [`CHANGELOG.md`](CHANGELOG.md) — read that file for the _why_ behind a
-rule, not this one.
-
 ## Index
 
 - **Baseline rules** (below) — seeded, not learned: free-text/state/enum prop mapping, the
@@ -18,9 +14,10 @@ rule, not this one.
   the wrapper + Instance Swap pattern for open-ended content props, the 500-variant threshold's
   mitigations (Phase 2).
 - [`conventions/page-structure.md`](conventions/page-structure.md) — category pages, the
-  one-documentation-frame-per-component invariant, the `inverted`-axis handling (Phase 3/4).
+  one-documentation-frame-per-component invariant, the `inverted`-axis handling (Phase 3 / Phase 4
+  / Phase 8).
 - [`conventions/component-set-rendering.md`](conventions/component-set-rendering.md) — Component
-  Set axis labeling, sizing/grid mechanics, screenshot reliability for this section (Phase 4 §6).
+  Set axis labeling, sizing/grid mechanics, screenshot reliability for this section (Phase 8).
 - [`conventions/build-mechanics.md`](conventions/build-mechanics.md) — general Figma Plugin API
   gotchas that apply across any phase: platform limits, variant-set mechanics, auto-layout
   sizing, vector import, color/paint, focus states.
@@ -60,7 +57,7 @@ rule, not this one.
 - **Components are grouped onto one shared Figma page per code category, not one page per
   component — `Core / <Category>`, Title Case, plural, matching the code folder name exactly, no
   `⏳`/`✅` emoji prefix.** The seven categories and their fixed title/lead copy for the shared
-  category-page header (see `PHASE-4-DOCUMENT.md`'s "Page-level structure" section) — **never
+  category-page header (see `PHASE-4-DOCUMENT-LAYOUT.md`'s "Page-level structure" section) — **never
   invent category copy on the fly, this table is the source of truth**:
 
   | Category (folder) | Page name           | Title      | Lead                                                                                   |

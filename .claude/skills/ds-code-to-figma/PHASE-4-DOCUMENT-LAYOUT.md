@@ -1,10 +1,18 @@
-# Phase 4 — Document (documentation presentation)
+# Phase 4 — Document: Layout (header, page shell, body columns)
 
 **You are here:** assumes [`PHASE-3-BUILD.md`](PHASE-3-BUILD.md) has built and confirmed the full
 variant matrix as a real Figma `COMPONENT_SET`, with its key written back to `<name>.figma.md`.
-This phase builds the per-component **documentation page** — build it after Phase 3 confirms the
-variant matrix looks right, before [`PHASE-5-REVIEW.md`](PHASE-5-REVIEW.md)'s review, so that
-review covers the documentation page too, not just the raw component set.
+This phase is the first of five documentation sub-phases that together build the per-component
+**documentation page**: this phase lays the foundation — the category page shell, the outer frame,
+the purple header, and the 2-column body skeleton — that
+[`PHASE-5-DOCUMENT-COPY-ME.md`](PHASE-5-DOCUMENT-COPY-ME.md),
+[`PHASE-6-DOCUMENT-ANATOMY.md`](PHASE-6-DOCUMENT-ANATOMY.md),
+[`PHASE-7-DOCUMENT-SPECS.md`](PHASE-7-DOCUMENT-SPECS.md), and
+[`PHASE-8-DOCUMENT-COMPONENT-SET.md`](PHASE-8-DOCUMENT-COMPONENT-SET.md) then fill in. Build this
+after Phase 3 confirms the variant matrix looks right — don't start it on an unconfirmed or
+partially-built component set. The full five-sub-phase sequence must finish before
+[`PHASE-9-REVIEW.md`](PHASE-9-REVIEW.md)'s review, so that review covers the documentation page
+too, not just the raw component set.
 
 ## What this is, and why we have it
 
@@ -23,7 +31,8 @@ section built from two shared Annotations components — `Section` and a real-sl
 and grouped with every other component in its category onto one shared `Core / <Category>` page
 (see [Page-level structure](#page-level-structure-once-per-category) below). A true
 `inverted`/dark-context axis gets exactly **one** documentation frame, never two (see
-[Handling an `inverted` axis](#handling-an-inverted-axis-one-frame-stacked-component-sets)).
+[`PHASE-8-DOCUMENT-COMPONENT-SET.md`](PHASE-8-DOCUMENT-COMPONENT-SET.md)'s "Handling an `inverted`
+axis" section).
 
 This template went through five revisions on 2026-10-29–30 to reach this state (single-column →
 blue-header-2-column → dark page + real slots → shared category pages → dropping a redundant
@@ -33,23 +42,20 @@ an existing not-yet-migrated page should be brought up to date). `ds-close`, `ds
 `ds-icon`, and `ds-badge`'s original pages still use an older layout and are not yet migrated —
 see `CONVENTIONS.md`/`CHANGELOG.md` for which.
 
+This phase, and the four that follow it, share one canonical live reference and one page-level
+grouping mechanism — both described below, once, since every sub-phase builds against the same
+nodes.
+
 ## Table of contents
 
 - [Canonical reference — inspect before you build](#canonical-reference--inspect-before-you-build)
 - [When to use this](#when-to-use-this)
 - [What to do](#what-to-do)
-- [Document structure](#document-structure)
-  - [Page-level structure (once per category)](#page-level-structure-once-per-category)
-  - [Page and outer frame](#page-and-outer-frame)
-  - [0. Shared `Section`/`Preview`/`Title` components](#0-shared-sectionpreviewtitle-components)
-  - [1. Header](#1-header)
-  - [2. Body — 2-column layout and column sizing](#2-body--2-column-layout-and-column-sizing)
-  - [3. "👉 Copy me"](#3--copy-me)
-  - [4. "🏗️ Anatomy"](#4--anatomy)
-  - [5. "📐 Specs"](#5--specs)
-  - [6. "🔒 Component Set"](#6--component-set)
-- [Handling an `inverted` axis (one frame, stacked component sets)](#handling-an-inverted-axis-one-frame-stacked-component-sets)
-- [Handling an open-ended content-selection prop (wrapper + Instance Swap library)](#handling-an-open-ended-content-selection-prop-wrapper--instance-swap-library)
+- [Page-level structure (once per category)](#page-level-structure-once-per-category)
+- [Page and outer frame](#page-and-outer-frame)
+- [0. Shared `Section`/`Preview`/`Title` components](#0-shared-sectionpreviewtitle-components)
+- [1. Header](#1-header)
+- [2. Body — 2-column layout and column sizing](#2-body--2-column-layout-and-column-sizing)
 - [Cross-cutting build pitfalls](#cross-cutting-build-pitfalls)
 
 ## Canonical reference — inspect before you build
@@ -102,8 +108,9 @@ the canonical node IDs change.
 ## When to use this
 
 Build this after Phase 3 confirms the variant matrix looks right — don't start it on an unconfirmed
-or partially-built component set. Finish it before Phase 5's visual-regression review, so that
-review covers the documentation page too, not just the raw component set.
+or partially-built component set. This phase (and the four sub-phases that follow it) must finish
+before Phase 9's visual-regression review, so that review covers the documentation page too, not
+just the raw component set.
 
 ## What to do
 
@@ -116,31 +123,16 @@ At a high level, in order:
    [Page-level structure](#page-level-structure-once-per-category) below.
 1. Build the outer bordered frame for this component's own documentation frame (see
    [Page and outer frame](#page-and-outer-frame)) — this is the "<Component> Documentation" frame
-   that gets appended into the category page's `Documentation Frames` row at the very end (step 9
-   below), not a page of its own.
+   that gets appended into the category page's `Documentation Frames` row at the very end of
+   [`PHASE-8-DOCUMENT-COMPONENT-SET.md`](PHASE-8-DOCUMENT-COMPONENT-SET.md), not a page of its own.
 2. Build the [Header](#1-header) — instance the shared `Header` component (`🧰 Annotations` page,
    node `2180:17`) and override its text, don't rebuild it from scratch.
 3. Build the [body's 2-column shell](#2-body--2-column-layout-and-column-sizing) — a left
    "documentation" column and a right "component" column, each independently sized.
-4. In the left column, in order: build [Copy me](#3--copy-me), build
-   [Anatomy](#4--anatomy) (skip entirely if the component's `<name>.figma.md` has no `anatomy:`
-   list — no `@part` tags found in Phase 1), build [Specs](#5--specs).
-5. In the right column, build [🔒 Component Set](#6--component-set) — **count the real crossed
-   axes first** and add row/column labels for any 3+-axis set (never skip this check).
-6. If the component has a true `inverted`/dark-context axis, build the normal single frame above
-   from the `Primary` set's instances, then apply
-   [the stacked-component-sets handling](#handling-an-inverted-axis-one-frame-stacked-component-sets)
-   to "🔒 Component Set" only — never build a second frame.
-7. If the component has an open-ended content-selection prop (many options, e.g. an icon `name`),
-   apply the [wrapper + Instance Swap library handling](#handling-an-open-ended-content-selection-prop-wrapper--instance-swap-library)
-   instead of a single plain component set.
-8. Iterate on the layout with the user before considering this phase done — the exact structure is
-   something to confirm visually (screenshot checkpoints), same as the variant matrix itself in
-   Phase 3.
-9. **Append the finished frame into the category page's `Documentation Frames` row**
-   (`framesRow.appendChild(outerFrame)`), always at the end — never inserted at an
-   alphabetically-correct position, never repositioning a sibling component's already-built frame.
-   Write the frame's node id back into `<name>.figma.md` (`figmaDocFrameNodeId`).
+4. Iterate on the header/shell layout with the user (screenshot checkpoint) before moving on —
+   the exact structure is something to confirm visually, same as the variant matrix itself in
+   Phase 3. The remaining content (Copy me, Anatomy, Specs, Component Set) is filled in by the
+   next four phases, in order.
 
 ## Document structure
 
@@ -339,7 +331,7 @@ assumed:**
   stacked below the next), each nested `Preview`'s slot holding that option's own
   preview+legend card.
 - **Component Set**: **not** a `Section`/`Preview` at all — see
-  [6. "🔒 Component Set"](#6--component-set) below. Just a bare `Title` instance
+  [`PHASE-8-DOCUMENT-COMPONENT-SET.md`](PHASE-8-DOCUMENT-COMPONENT-SET.md). Just a bare `Title` instance
   (`kind=component-set`) directly in the right column, followed by the real `COMPONENT_SET` with
   its own dashed border — the real variant grid should never sit inside another bordered `Preview`
   box.
@@ -357,15 +349,17 @@ radius. All sections now share one chrome via `Preview`, composed through `Secti
 ### 1. Header
 
 **Don't build the header from scratch per component — it's a real, reusable Figma component now.**
-A shared `Header` master lives on the `🧰 Annotations` page as a `COMPONENT_SET` (node `2389:15007`)
-with **two variants that must be kept in sync**: `Eigenschaft 1=Standard` (`2180:17`, dark navy
-surface, white text/icons) and `Eigenschaft 1=Variante2` (`2389:15008`, light purple surface, dark
-navy text/icons via a different bound color variable). Any structural change to one — e.g. the
-`links` row addition below — must be applied to both; per-component instances only ever use one
-variant at a time, but a future documentation build could pick either. Create an `INSTANCE` of
-whichever variant the page needs (`headerComponent.createInstance()`), `appendChild` it as the outer
-frame's first child, set `layoutSizingHorizontal = 'FILL'`, then override its text nodes directly
-(same
+It's called the **component documentation header** (not "navy header" — that name is stale, see
+below) and lives on the `🧰 Annotations` page as a `COMPONENT_SET` (node `2389:15007`) with **two
+variants that must be kept in sync**: `Variant=Purple` (`2180:17`, purple surface, white
+text/icons — **this is the one to use for building doc frames**; formerly named
+`Eigenschaft 1=Standard`, renamed from the old German property name) and `Variant=Primary`
+(`2389:15008`, navy surface; formerly `Eigenschaft 1=Variante2`). Any structural change to one —
+e.g. the `links` row addition below — must be applied to both; per-component instances only ever
+use one variant at a time, but **default to `Variant=Purple`** for every new/rebuilt documentation
+page. Create an `INSTANCE` of the `Variant=Purple` variant (`headerComponent.createInstance()`),
+`appendChild` it as the outer frame's first child, set `layoutSizingHorizontal = 'FILL'`, then
+override its text nodes directly (same
 instance-text-override technique used everywhere else in this template — find each node by name
 via `instance.findOne`/`findAll` and set `.characters`, no component properties involved):
 
@@ -391,7 +385,16 @@ linkText.characters.length, { type: 'URL', value: <url> })` — the master has n
   since all three are component-specific and every one of them is mechanically derivable from
   inputs this skill already has (component name, category, Storybook story ID), so there's no
   reason any of the three should ever ship blank:
-  - **Storybook** (`link-storybook`) → the story URL, same as before.
+  - **Storybook** (`link-storybook`) →
+    `https://helvetia-design.vercel.app/?path=/docs/<storyId>` — base URL confirmed live
+    2026-10-30 (`ds-logo`'s build; previously unknown, left blank on `ds-spinner`'s page as a
+    result). `<storyId>` is the `Overview` tab's `storyId` in the component's own
+    `apps/storybook/src/components/<category>/<name>/<name>.doc-config.ts`
+    (`<NAME>_DOC_CONFIG.tabs[0].storyId`, e.g. `components-media-logo-logo--logo` for Logo) — read
+    it from that file, never guess/derive it from the component name alone (the kebab-cased
+    `<category>-<name>-<name>--<name>` pattern happens to hold for Logo but isn't guaranteed for
+    every component). If `doc-config.ts` doesn't exist yet for this component, this is the one
+    case still allowed to stop and ask per the standing rule above.
   - **Toky** (`link-toky`) → `https://helvetia-toky.vercel.app?filter=<component name, lowercase>`
     — e.g. `?filter=badge` for Badge. Matches the component name exactly as it appears in token
     names (`🧩 Component.Badge...`); Toky's search already normalizes case/separators, so the exact
@@ -425,14 +428,16 @@ instance across every component's page picks it up automatically; don't fork a o
 single component. If you do need to change the master, update this document's description of its
 structure below to match, same discipline as every other shared annotation component.
 
-The rest of this section documents the header's internal structure for reference (e.g. when editing
-the shared master itself) — confirmed live on the `Header` master component's own node tree:
+The rest of this section documents the `Variant=Purple` component documentation header's internal
+structure for reference (e.g. when editing the shared master itself) — confirmed live on the
+`Header` master component's own node tree:
 
 - **Fill**: bind to `🌐 Global/🌈 Color/Purple/3` (`VariableID:137:2756`) — **not**
-  `🔗 Alias/🎨 Surface/Primary` (the navy token still used elsewhere in this template as the "dark
-  preview surface," e.g. the `inverted`-axis section below, which is unrelated and unaffected by
-  this). A fresh `createInstance()` now correctly starts purple with no override needed — don't
-  reintroduce navy here (see `CHANGELOG.md` for the drift this corrected).
+  `🔗 Alias/🎨 Surface/Primary` (the navy token used on `Variant=Primary`, and elsewhere in this
+  template as the "dark preview surface," e.g. the `inverted`-axis section below, which is
+  unrelated and unaffected by this). A fresh `createInstance()` of `Variant=Purple` now correctly
+  starts purple with no override needed — don't reintroduce navy here (see `CHANGELOG.md` for the
+  drift this corrected).
 - **Layout**: `HORIZONTAL`, padding `40` on all four sides, `itemSpacing: 16`,
   `primaryAxisAlignItems: 'SPACE_BETWEEN'` (pushes the title block left and the info block right),
   `counterAxisAlignItems: 'MIN'` (top-aligned), `primaryAxisSizingMode: 'FIXED'` (spans the full
@@ -497,11 +502,13 @@ the shared master itself) — confirmed live on the `Header` master component's 
       Its vector fill ships as a flat library color, not white — override the instance's vector
       fill to `🔗 Alias/🔤 Text/Color/White` (same variable the link text uses) per instance, since
       imported library instances don't auto-match the dark header surface.
-    - **On `Eigenschaft 1=Variante2`** (the light purple variant), all of the above is identical
-      except the color: both icon types' vector fills bind to `VariableID:137:288` (the same dark
-      navy variable `link`'s own text already uses on that variant) instead of
-      `🔗 Alias/🔤 Text/Color/White` — don't reuse the white variable there, it'd be invisible on
-      the light surface. Only recolor the leaf `VECTOR` nodes inside each icon instance, never the
+    - **On `Variant=Primary`** (the navy variant, formerly `Eigenschaft 1=Variante2`), all of the
+      above is identical except the color: both icon types' vector fills bind to
+      `VariableID:137:288` (the same variable `link`'s own text already uses on that variant)
+      instead of `🔗 Alias/🔤 Text/Color/White` — this is **not** the variant this skill builds
+      against by default (see section 1's header note — always use `Variant=Purple`), so re-verify
+      this variable live against the master before relying on it. Only recolor the leaf `VECTOR`
+      nodes inside each icon instance, never the
       instance/frame container itself — same `fills = []` gotcha as the row/wrapper frames above,
       just one level deeper: a blanket recursive recolor that also paints the instance's own
       bounding-box fill turns the whole icon into a flat colored square instead of the logo/mark
@@ -535,378 +542,10 @@ narrower than 1000px but grows automatically if a larger `COMPONENT_SET` genuine
 room. The left `Documentation` column keeps the original 764px floor. **Give the `Component Sets`
 column symmetric 40px padding on all four sides** (top/left/right/bottom) — an earlier pass in
 this revision only set top/left, leaving the real `COMPONENT_SET` (which itself uses
-`layoutSizingHorizontal: 'FILL'`, see [6. "🔒 Component Set"](#6--component-set) below) flush
+`layoutSizingHorizontal: 'FILL'`, see [`PHASE-8-DOCUMENT-COMPONENT-SET.md`](PHASE-8-DOCUMENT-COMPONENT-SET.md)) flush
 against the right/bottom edges; add the missing `paddingRight`/`paddingBottom` to match. The outer
 frame and header both `HUG`/stay `FIXED` to whatever total width the two columns produce, so a
 wide right column widens the whole page, including the header band.
-
-### 3. "👉 Copy me"
-
-**Instance the shared `Section` component in `Default` variant** (see
-[0. Shared `Section`/`Preview`/`Title` components](#0-shared-sectionpreviewtitle-components)) with
-its `Title` set to `kind=copy-me`. Insert one real, representative **instance** (the default/base
-combination) **directly into the `Preview`'s slot** — no further nesting — the single "drag this
-into your design" example. Use a Figma `INSTANCE` (`variant.createInstance()`) of the finished
-component-set variant — never the variant node itself. If the component has any boolean "Show X"
-property (per Phase 2's conditional-render rule), override it to `true` on this instance for
-readability, while the component set's own default stays whatever matches code.
-
-### 4. "🏗️ Anatomy"
-
-Mostly unchanged in diagram/legend content from the prior template — only its position in the page
-moved (now second in the left column, still skipped entirely when the component's
-`<name>.figma.md` has no `anatomy:` list). **Structure: a `Section` instance in `Flat` variant**
-(`Title` set to `kind=anatomy`) **as the outer zero-inset container, with one nested `Preview`
-instance in `Default` variant inside that outer slot** — the real diagram/circle/leader-line/legend
-content goes into the _nested_ `Preview`'s own slot, not the outer `Section`'s slot directly.
-Confirmed live on `Documentaion`: the Anatomy `Section`'s `Preview` slot has zero inset and
-contains exactly one nested `Preview` instance, which itself has the usual 14px inset holding the
-real `Anatomy box` content. See the prior revision of this document (or `ds-close`) for the full
-diagram/circle/leader-line construction rules — those didn't change.
-
-**Two content fixes (per explicit user correction, not yet reflected on the `Documentaion`
-reference — treat these as this document's own specification going forward):**
-
-- **Both `diagram-area` and `legend` are `layoutSizingHorizontal: 'FILL'`, not a fixed width.**
-  They're children of the nested `Default`-variant `Preview`'s auto-layout slot — set `FILL` on
-  each (after appending, per the usual append-before-FILL ordering) so they stretch to the slot's
-  real width instead of staying at a hardcoded `608`/`293`px.
-- **In each legend line (`"A · badge — The badge element itself."`), the letter and the part name
-  are Bold — the rest of the sentence stays Regular.** Use `setRangeFontName` on two sub-ranges of
-  the same text node: the single letter (`0` to `1`), and the part-name word located via
-  `characters.indexOf(partName, 1)` (e.g. `"badge"` in `"A · badge — ..."`) — both to `Baloise
-Create Text` **Bold**, leaving the `" · "`, `" — "`, and trailing description in Regular. Don't
-  build the letter/part-name as separate text nodes to bold them — the whole line stays one text
-  node with mixed-range formatting, same technique as any other partial-bold text in this file.
-- **The legend line's fill binds to `🔗 Alias/🔤 Text/Color/Primary` (`VariableID:137:288`)** —
-  same rule as every other skill-authored label, see `conventions/build-mechanics.md`'s
-  "Color and paint" section; don't hardcode a near-black literal even if it looks indistinguishable.
-
-### 5. "📐 Specs"
-
-**Moved from its old end-of-page position to directly after Anatomy, now the last left-column
-section (the "🛠 Variants" section that used to follow it has been retired), per explicit
-request (2026-10-29).** The developer-handoff reference content itself (dimensions, padding/gaps,
-radius, typography annotations) is otherwise unchanged from the prior template — one card per
-Variants-axis option, using the shared `Spec/*` annotation components on the `🧰 Annotations` page
-(node `2046:5`).
-
-**Structure: a `Section` instance in `Flat` variant** (`Title` set to `kind=specs`) **as the outer
-zero-inset container, with one nested `Preview` instance in `Default` variant per Variants-axis
-option**, stacked vertically inside that outer slot (confirmed live on `Documentaion`: three
-nested `Preview`s for `ds-badge`'s `base`/`lg`/`sm`). Each nested `Preview`'s own slot holds that
-option's `preview`/`stage`/`legend` card — same annotation-component table, marker-order rule, and
-legend-row rules as before, just nested one level deeper than Anatomy's single nested panel. **Each
-card's own title text (`"base"`/`"sm"`/`"lg"`) binds its fill to `🔗 Alias/🔤 Text/Color/Primary`
-(`VariableID:137:288`)** — same rule as every other skill-authored label, see
-`conventions/build-mechanics.md`'s "Color and paint" section.
-
-**Every nested `Preview` here uses `layoutSizingHorizontal = 'FILL'`** (per the standing rule in
-[0. Shared `Section`/`Preview`/`Title` components](#0-shared-sectionpreviewtitle-components)), and
-**the card frame built inside each nested `Preview`'s own slot must be resized to match that
-slot's real width (`resize(656, ...)`, `x = 0`) — don't leave it at a wider literal width from an
-earlier fixed-size workaround.** A wider card frame gets auto-centered by the slot, pushing its
-`x` negative and clipping the card's own label text (`"base"`/`"lg"`/`"sm"`) off the left edge —
-confirmed as a real regression during this template's dry run, caused by exactly this mismatch
-after switching the nested `Preview` from a fixed `resize()` to `FILL`. **Each nested `Preview`'s
-own height must end up `layoutSizingVertical: 'HUG'`, not `FIXED`** — see the flexible-height
-sequence (`resize()` then `primaryAxisSizingMode = 'AUTO'; layoutSizingVertical = 'HUG'`) in
-[0. Shared `Section`/`Preview`/`Title` components](#0-shared-sectionpreviewtitle-components) above;
-apply it to every one of the per-option nested `Preview`s here, not just the first.
-
-**Specs always uses the `Primary` set's instances/values**, even on an `inverted`-split component
-— an `inverted` split changes colors, not geometry, so showing `Inverted`-set numbers here would
-just repeat identical figures. There's only one frame/one Specs section per component now either
-way (see [the stacked-component-sets handling](#handling-an-inverted-axis-one-frame-stacked-component-sets)).
-
-**The "last child of the outer frame" positioning rule from the old spec no longer applies** — since
-Specs now sits inside the left `documentation` column as a normal stacked child (same as every other
-left-column section), not as the final child of the whole outer frame.
-
-### 6. "🔒 Component Set"
-
-**Replaces "🔒 Main components" — renamed, and radically simplified: no table chrome at all. Not a
-`Section`/`Preview` instance either** — just a bare `Title` instance (`kind=component-set`) plus
-the real set. Confirmed live on `Documentaion`'s right column (`Component Sets` →
-`Badge`, node `2129:84`):
-
-- **Before building this section, count the real axes on the set being displayed** (every crossed
-  variant property — `size`, `state`, `variation`, whatever Phase 2 settled on — not counting a
-  structural `inverted`/`brand`/etc. split, which doesn't live on the set itself). **This is a
-  required check, not an optional judgment call** — skipping it is a real, confirmed mistake,
-  twice over: `ds-spinner`'s Component Set panel (3 real axes: `variation` × `size` ×
-  `labelPosition`) first shipped with no labels at all because this check was skipped, caught when
-  the user compared it against the `🧰 Annotations` page's own `github example` reference; then
-  `ds-logo` (a single `size` axis, one row of 3 variants per top-level set) shipped the same way a
-  second time, caught again by the user pointing at the `ds-spinner` precedent. **If the component
-  has an `inverted`/`brand`/etc. split (see
-  [the stacked-component-sets handling](#handling-an-inverted-axis-one-frame-stacked-component-sets)
-  below), count axes and decide on labels independently for each display clone — every clone needs
-  the same labels since every clone has the same axis count.**
-- **Every `COMPONENT_SET` display in this section gets row/column labels and dashed internal grid
-  dividers — no axis count is ever exempt, not even a single-axis set.** An earlier revision of this
-  rule skipped labeling entirely for a "2-axis or fewer" set, reasoning that Figma's own native
-  variant grid plus its selection-inspector property picker already made the axes legible without
-  manual chrome. **This was reversed after `ds-logo` (one axis, `size`) shipped with no labels and
-  the user flagged it, pointing back at `ds-spinner`'s labeled panel as the standard every
-  component should match** — the inspector's property picker only shows axis names when a variant
-  is actively selected in the Figma UI, not in a passive screenshot/read of the documentation page,
-  so an unlabeled set is illegible outside an editing session. **Always build the labeled structure
-  below, for 1, 2, or 3+ axes alike** — the only thing that changes by axis count is which sides
-  get labels (see "Row Labels"/"Column Labels" below: a lone column axis like `ds-logo`'s `size`
-  gets Column Labels only, no Row Labels, since there's nothing varying across rows).
-- **For a 3+-axis component (the Primer-style nested-matrix case from `PHASE-2-PROPOSE.md`), the
-  same labeled structure gets real row/column labels and a dashed internal grid around the
-  `COMPONENT_SET`** — nesting is illegible without it. Originally modeled on this file's own
-  `github example` reference frame (Badge page, a rebuild of Primer's own Button variant grid),
-  then substantially revised after a full build-and-review pass on `ds-spinner`'s real 3-axis set
-  (`variation` × `size` × `labelPosition`) surfaced several corrections — **this is the current,
-  confirmed mechanism; the `github example` frame is background/inspiration only, not a literal
-  structural template anymore.**
-
-  **Overall structure — labels live outside the box, in a real auto-layout wrapper, not overlaid
-  on top of it:**
-
-  ```
-  Labeled Set              (HORIZONTAL auto-layout, itemSpacing 16, counterAxisAlignItems MIN, HUG)
-  ├─ Row Labels            (FIXED 140w × [40 + box height]h, plain frame, manual child x/y)
-  └─ Column + Box          (VERTICAL auto-layout, itemSpacing 0, HUG both axes)
-     ├─ Column Labels      (FIXED width = box's own width, 40h, plain frame, manual child x/y)
-     ├─ <the COMPONENT_SET itself>   (HUG width — see sizing note below)
-     └─ Grid               (ABSOLUTE-positioned overlay, same w/h as the box, clipsContent: false)
-  ```
-
-  `Labeled Set` is what gets appended in place of a bare `COMPONENT_SET` wherever this section
-  would otherwise just drop the set in directly (e.g. inside `main-component`, or inside each
-  display clone's position in the stacked-sets panel below) — **always**, regardless of axis count,
-  per the "every display gets labels" rule above. For a lone column axis (no row axis at all, e.g.
-  `ds-logo`'s single `size` row), the `Row Labels` child is simply omitted — `Labeled Set` then has
-  just one child, `Column + Box`.
-
-  **The `COMPONENT_SET` itself hugs its real content width — never `FILL`.** An earlier revision of
-  this section set `layoutSizingHorizontal = 'FILL'` on labeled sets (stretching them to fill the
-  panel's `minWidth` column), which left a large empty strip to the right of the real content once
-  labels moved outside the box — explicitly reversed per user correction. **This "hug, don't
-  stretch" rule applies to every labeled set now, at any axis count** — since every `COMPONENT_SET`
-  display is labeled (see above), there is no remaining case that still uses `FILL`. Since a
-  `COMPONENT_SET` can't genuinely auto-hug (`layoutMode: 'NONE'`, see
-  `conventions/component-set-rendering.md`'s stale-bounding-box note), compute the real content
-  width/height from its variant children's
-  `x`/`y`/`width`/`height` and `resize()` it explicitly, with `layoutSizingHorizontal = 'FIXED'`
-  (not `'HUG'`, which only auto-layout frames or their text children can take) — don't leave it at
-  whatever default width `combineAsVariants()` or the panel's own `FILL` happened to produce.
-
-  **Build the `Grid` overlay as real sibling children of a plain `layoutMode: 'NONE'` wrapper frame
-  around the `COMPONENT_SET`, not as an `ABSOLUTE`-positioned child of an auto-layout parent.**
-  Wrap the real `COMPONENT_SET` and the divider rectangles together in one small `Box` frame
-  (`figma.createFrame()`, `layoutMode: 'NONE'`, resized to the set's own real content
-  width/height, `fills: []`, `clipsContent: false`); append the `COMPONENT_SET` first, then each
-  divider rectangle (so dividers render on top), both using plain `x`/`y` — a `NONE`-mode frame's
-  children position freely without needing `layoutPositioning = 'ABSOLUTE'` at all, sidestepping
-  every pitfall `conventions/component-set-rendering.md` documents for that property (the
-  same-script-rollback-on-later-error gotcha, the "must be an auto-layout frame or child of one"
-  structural requirement). This is
-  simpler and more robust than the older `ABSOLUTE`-overlay-inside-auto-layout technique the ASCII
-  sketch above still names (`Grid` as a sibling of `COMPONENT_SET` inside `Column + Box`) — prefer
-  the plain-`NONE`-wrapper approach for any new build. (From: `ds-logo`'s Component Set panel,
-  2026-10-30 — built this way from the start, no `ABSOLUTE`-overlay issues hit.)
-
-  **Getting the real grid positions — prefer Figma's native `GRID` auto-layout mode, with a manual
-  fallback:**
-  - Setting `set.layoutMode = 'GRID'` on an already-built, `NONE`-mode variant set can trigger a
-    one-time "smart conversion" that auto-arranges the existing variant children into a clean,
-    evenly-spaced grid (uniform padding, uniform row/column gap) — confirmed live: converting
-    `ds-spinner`'s `Primary` set this way produced `padding: 24` all sides, `gridRowGap: 91`,
-    `gridColumnGap: 180`, `gridRowCount: 4`, `gridColumnCount: 2`, with every child repositioned
-    onto clean column x-anchors (`26`, `270`) and row y-anchors (`26`, `181`, `336`, `451`) — far
-    more reliable than manually computing a packing layout by hand.
-  - **This conversion is not reliable — confirmed non-deterministic in the same session.** It
-    worked once on `ds-spinner`'s `Primary` set, then failed to reflow on the structurally-identical
-    `Inverted` set across many retries (toggling `NONE`→`GRID`, explicitly setting
-    `gridRowCount`/`gridColumnCount`, even a freshly-cloned copy) — `layoutMode` reported `'GRID'`
-    with no thrown error each time, but children stayed at their old `NONE`-mode positions. **Don't
-    burn more than a couple of retries on this.** Fallback: manually set each remaining set's
-    children to the exact same `x`/`y` values the first, successfully-converted set ended up with
-    (same variant names → same relative position, since both sets share the same variant property
-    structure) — then set that set's own `layoutMode` back to `NONE` (manual positions) and
-    `resize()` it to the same final `width`/`height` the converted one reported. Visually identical
-    result either way; native `GRID` mode is a nice-to-have for ease of computation, not a
-    requirement for correctness. (From: `ds-spinner`'s Component Set panel, 2026-10-29.)
-  - Whichever path is used, treat the resulting real child `x`/`y`/`width`/`height` values (not a
-    hand-sketched idealized spacing) as the source of truth for every label/grid-line position
-    computed below.
-
-  **Column/row label positions — symmetric midpoint of each region, not the raw content bounding
-  box.** Compute each divider's position first (see Grid below), then center each label within the
-  region its divider boundaries define — e.g. column 1's label centers between the box's own left
-  padding edge and the column divider; column 2's label centers between that divider and the box's
-  right padding edge. Same for row groups. This reads as evenly spaced even when the real content
-  in different columns/rows has different widths/heights (as `ds-spinner`'s `size=base`/`size=sm`
-  content does).
-
-  **A component with only one axis total (e.g. `ds-logo`'s lone `size` axis) has no row axis at
-  all — omit `Row Labels` entirely** (don't build an empty/placeholder bracket column) and lay the
-  variants out in a single row, with just `Column Labels` above it and dashed vertical dividers
-  between cells; no horizontal divider is needed since there's only one row.
-
-  **Row Labels** (`Baloise`-free — this label system intentionally uses `Inter Medium`, `12px`,
-  matching the `github example` reference's own typography, not this file's usual Baloise
-  families): for each outer-axis value (e.g. `Logo`, `Circle`), one text label plus one `Bracket`
-  — a `FRAME`, no fill, `strokeAlign: 'INSIDE'`, **`top`/`bottom`/`left` strokes at weight `2`**
-  (matching the `COMPONENT_SET`'s own 2px dashed outer border — not `1`, corrected per explicit
-  request), `right` at `0` (opens toward the content). For each inner-axis value (e.g. `Right`,
-  `Bottom`), text only, no bracket, positioned at that row's own center. **Where two adjacent outer
-  brackets meet at a shared boundary (e.g. `Logo`'s bottom edge and `Circle`'s top edge), leave a
-  4px gap instead of letting them touch or form one continuous line** — shorten each bracket by 2px
-  on its facing edge. All label/bracket colors: `{r: 0.592, g: 0.278, b: 1}` literal purple (Primary
-  display), `{r: 0.745, g: 0.51, b: 0.98}` literal lighter purple (Inverted display, for contrast
-  against the dark fill) — not yet bound Figma Variables; bind one if/when this label system gets a
-  token owner.
-
-  **Column Labels**: one text label per column value (e.g. `Base`, `SM`), no bracket (a single-level
-  column axis never gets one — see the standing rule below), centered per the symmetric-midpoint
-  rule above, in a `40`px-tall strip directly above the box.
-
-  **Grid — dashed internal separators only, stretched edge-to-edge with the box, no separate outer
-  perimeter.** The `COMPONENT_SET`'s own existing 2px dashed border already frames the whole grid —
-  don't draw a second perimeter around the internal cells. Build only the internal dividers (one
-  per boundary between adjacent rows/columns), each stretched to **meet the box's own edges with
-  zero gap** (full box width for horizontal dividers, full box height for the vertical divider) —
-  not inset by any margin. All dividers: **2px** weight (matching the outer border and the row
-  brackets — not `1`), `dashPattern: [10, 5]`, same literal purple as the labels.
-  - **Build the vertical divider as a thin stroked `RECTANGLE`, never a rotated `LINE`.** A rotated
-    `LINE` node (`resize()` to its length, then `rotation = -90`) can silently fail to render inside
-    this overlay even when its `absoluteTransform` is independently verified mathematically correct
-    (confirmed: checked start/end coordinates matched the intended vertical segment exactly, yet
-    the line was invisible across five identical re-screenshots) — suspected pre-rotation
-    bounding-box clip-testing bug. **Working alternative**: a `RECTANGLE` with `fills: []`, a near-
-    zero `width` (e.g. `0.01`), the divider's real height, and only `strokeLeftWeight` set (others
-    `0`) — draws identically to a vertical dashed line with none of the rotated-`LINE` rendering
-    risk. Horizontal dividers render fine as plain (non-rotated) `LINE` nodes — this issue is
-    specific to rotation. (From: `ds-spinner`'s Component Set panel, 2026-10-29.)
-  - The `Grid` overlay frame itself needs `clipsContent: false` — its own bounding box is sized to
-    match the box exactly, so anything drawn right at its edges (per the "meet the box's own edges
-    with zero gap" rule above) sits exactly on the clip boundary and can get inconsistently
-    clipped otherwise.
-  - **Inner axes never get a bracket** — text only, positioned at that axis value's row/column
-    center. Only the single outermost axis per side (the one Phase 2 placed furthest out in the
-    nesting order) gets the bracket treatment, sized to span its whole group's row/column extent
-    (with the 4px meeting-gap rule above applied between adjacent outer groups).
-  - **A 2-axis component's single row axis and single column axis don't get brackets either** —
-    a bracket signals "these rows/columns are grouped under me," which only means something once
-    there's an inner axis nested beneath it. One axis per side still gets a plain text label (no
-    bracket) if its value isn't otherwise obvious from the cells themselves, same visual weight as
-    an inner axis label in the 3+-axis case.
-  - **Labelling individual cells (not just axis rows/columns) remains out of scope** — this is
-    row/column-header labelling only, not a return to full per-cell table chrome.
-  - **For a stacked `inverted` panel** (see
-    [the stacked-component-sets handling](#handling-an-inverted-axis-one-frame-stacked-component-sets)
-    below), build the full `Labeled Set` wrapper independently for both the `Primary` and
-    `Inverted` display clones — both need identical labels/grid geometry, since `inverted` only
-    changes color, never which axes exist or where variants sit.
-
-- **The section wrapper (`main-component`)**: `VERTICAL` auto-layout, padding `40` on all sides,
-  `itemSpacing: 16`, `primaryAxisSizingMode: 'AUTO'` (hug height), two children: the section heading
-  (`"🔒 Component Set"`, 28px Bold `Baloise Create Headline`, `Alias/Text/Color/Primary` — same
-  heading style as every other section) and the real `COMPONENT_SET` directly below it.
-- **The real master `COMPONENT_SET` is placed as a normal, non-absolute auto-layout child** —
-  confirmed live: `layoutPositioning: 'AUTO'`, `layoutSizingHorizontal: 'FILL'`,
-  `layoutSizingVertical: 'FIXED'` (resized to its real content height, `540` on `ds-badge`). This is
-  a major simplification over the old template's `ABSOLUTE`-auto-layout-child-overlaid-on-table-
-  chrome mechanism (see `CHANGELOG.md`'s "Old table-overlay mechanics" section for that history) —
-  there is no table to align against anymore, so the set just flows normally as the wrapper's second
-  child. `appendChild` the real set into `main-component`, then `set.layoutSizingHorizontal =
-'FILL'` and `set.resize(set.width, set.height)` (or a deliberately chosen height) as needed.
-- **Visual chrome lives on the set itself, not a separate wrapper box**: fill white, **2px dashed**
-  stroke (`dashPattern: [10, 5]`) bound to `🌐 Global/🌈 Color/Purple/4`, `cornerRadius: 5`. Set these
-  directly on the `COMPONENT_SET` node — there is no separate dashed-border frame wrapping it.
-- **Internal arrangement of the set's variant children is whatever `combineAsVariants()` produced
-  natively** (Figma's own default variant grid — one axis stepping across x, the other stepping down
-  y, in property-definition order) — don't compute or bake any custom cell-centering math for this
-  section anymore, unlike the old template's one-time-baked local positions. If the set's children
-  need repositioning for readability, treat it as adjusting the real master set's own layout, not as
-  a documentation-page concern.
-- **The `COMPONENT_SET` stays unlocked** — this is a change from the old template, which locked
-  the set once to stop a human dragging the whole grid out of alignment inside hand-built table
-  chrome. That protection no longer applies: there's no table geometry to misalign, the set is
-  just a normal auto-layout child of its section wrapper, and leaving it unlocked lets a human
-  select, inspect, or rearrange individual variants directly in the Figma UI. Don't set
-  `locked: true` on it when building or editing this section.
-- **Still apply the standing rules that don't depend on table chrome**: never move a variant out
-  of its own set (`figma.combineAsVariants()` + manual `key=value` renaming if a round-trip is
-  ever needed), and re-verify the set's own `width`/`height` explicitly after any repositioning of
-  its children (a `COMPONENT_SET` never auto-rehugs — see `conventions/component-set-rendering.md`).
-- **The set's `FILL` width (step above) is what the `Component Sets` column's own `minWidth=1000`
-  sizing (see "2. Body — 2-column layout and column sizing") exists to support** — the column
-  `HUG`s to its content with a 1000px floor and symmetric 40px padding on all sides, so the set's
-  `FILL` width always has real room to flow into (`920` at the floor, `1000 - 40 - 40`) and grows
-  automatically alongside the column if the real set ever needs more than 1000px. Don't hardcode a
-  width on the set itself to "make room" — that's the column's job, not this section's. **This
-  `FILL` rule is for the plain, unlabeled (2-axis) case only** — a labeled 3+-axis set uses `HUG`
-  instead, per the "hug, don't stretch" rule above; the two cases intentionally size differently.
-- **If the component has an open-ended content-selection prop** (see
-  [wrapper + Instance Swap library](#handling-an-open-ended-content-selection-prop-wrapper--instance-swap-library)),
-  this section shows the real wrapper set's own native arrangement the same way — not N separate
-  per-option tables, same as before, just without any table chrome now either.
-
-## Handling an `inverted` axis (one frame, stacked component sets)
-
-**SUPERSEDED, 2026-10-29, same day as the category-page rebuild — a component with a true
-`inverted`/dark-context axis still gets exactly ONE documentation frame, never two.** An earlier
-revision of this section (built once, live on `ds-spinner`, then explicitly reversed per user
-correction) tried a two-frame side-by-side split, each frame independently getting the full
-header + 2-column body. **This is wrong and must not be repeated**: under the category-page
-scheme, "one documentation frame per component" is a hard invariant — a second full frame for
-`inverted` broke it, showing up as two separate cards in the `Documentation Frames` row for what
-is still conceptually one component. Confirmed corrected live on `ds-spinner`.
-
-**`inverted` still must not be a Figma variant property on one shared component set** — split any
-component with a true `inverted`/dark-context axis into **two separate top-level component sets**
-(`<Component>/Primary` and `<Component>/Inverted`), same reasoning as always (different token
-values across every text/fill layer, not just one swappable paint). What changed is **where those
-two sets are shown**: both live inside the **same single documentation frame's "🔒 Component Set"
-panel**, stacked vertically, each under its own small sub-label — not two separate frames.
-
-- Build the documentation frame exactly like any other component — **once** — using the `Primary`
-  set's real instances for Copy me/Anatomy/Specs (the `Inverted` set's instances don't get
-  their own copies of these sections; geometry and content are identical, only Component Set colors
-  differ).
-- In "🔒 Component Set", after the `Title` instance, append: a plain text sub-label **`Primary`**
-  (`Baloise Create Text` Bold, 14px, fill bound to `🔗 Alias/🔤 Text/Color/Primary` —
-  `VariableID:137:288`, never a hardcoded black/navy literal, see `conventions/build-mechanics.md`'s
-  "Color and paint" section) directly above the `Primary` display clone (white fill,
-  dashed-purple chrome, same as the plain case), then a second sub-label **`Inverted`** directly
-  above the `Inverted` display clone — **the only element that uses the dark
-  `Alias/Surface/Primary` (`VariableID:137:2764`) background in this whole scheme**, swapped
-  directly onto the cloned `COMPONENT_SET`'s own `fills` (dashed-purple stroke unchanged). Both
-  sub-labels get `layoutSizingHorizontal = 'HUG'`. **Every display clone, at any axis count
-  (including a single `size`-only axis), is wrapped in its own full `Labeled Set` structure**
-  (row/column labels as applicable, dashed internal grid — see
-  [6. "🔒 Component Set"](#6--component-set) above), and that wrapper `HUG`s its own real content
-  width rather than `FILL`ing the panel. `Primary` and `Inverted` (or any other structural split,
-  e.g. `ds-logo`'s `brand` × `color`) use identical sizing mode and identical label/grid geometry
-  across every clone — only color differs between them.
-- **No other section gets a dark-preview-surface treatment anymore** — Copy me, Anatomy, and Specs
-  all stay on their normal light `Preview` chrome, showing only `Primary`-variant
-  instances. The old "minimal-dark-theming" rule (swap the Copy me box to
-  dark too) is dropped along with the two-frame split it was built for.
-- The frame's header `kicker` stays the plain `"Core / <Category>"` — no `" · Inverted"` suffix,
-  since there's no second frame to disambiguate from anymore.
-
-This also surfaces the same real bug worth checking for every time: does the master component's own
-`inverted=true` variant actually have every text element recolored for dark-context contrast? Fix
-any such gap in the master component, not with a per-instance override.
-
-## Handling an open-ended content-selection prop (wrapper + Instance Swap library)
-
-Unchanged by the 2026-10-29 restructure — see `conventions/variant-grouping.md`'s
-"Open-ended content-selection props" section for the full wrapper-`COMPONENT_SET` + Instance Swap library
-pattern, its fallback (N separate top-level sets), and every build pitfall (multi-vector glyph
-flattening, `<clipPath>` stripping, per-row dark-preview backgrounds for invisible token-swap
-options). The only change under the new template: "🔒 Component Set" (ⁿée "Main components") shows
-the real wrapper set's own native arrangement with no table chrome, same as the plain case above —
-and the separate "🖼️ \<Plural noun\> names" browsing section for the content axis itself still gets
-built, in the right column below "🔒 Component Set", same mechanism as before.
 
 ## Cross-cutting build pitfalls
 
@@ -923,5 +562,5 @@ These apply to building any frame/section in this template, not one specific sec
   non-deterministically. Confirmed by observing this fail silently on one build and succeed by luck
   on another with the exact same fire-and-forget pattern.
 
-**Next: [`PHASE-5-REVIEW.md`](PHASE-5-REVIEW.md)** — once the documentation page is built and
-iterated on with the user (step 8 above).
+**Next: [`PHASE-5-DOCUMENT-COPY-ME.md`](PHASE-5-DOCUMENT-COPY-ME.md)** — once the header and
+2-column body shell are built and iterated on with the user (step 4 above).

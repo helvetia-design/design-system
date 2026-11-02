@@ -1,28 +1,46 @@
 ---
 name: ds-code-to-figma
-description: Push a Helvetia Design System component from code into the Figma component library — resolving props/variants/states to Figma variant properties bound to existing Figma variables (tokens), reusing existing Figma components for nested children. Use when the user wants to create, add, or push a DS component (or a specific component like ds-spinner) into Figma.
+description: Push a Helvetia Design System component from code into the Figma component library — resolving props/variants/states to Figma variant properties bound to existing Figma variables (tokens), reusing existing Figma components for nested children.
 ---
 
 # ds-code-to-figma
 
-Creates a Figma component from an existing Stencil component's code, landing it on a shared,
-**per-category** Figma page (e.g. `Core / Indicators` holds every indicator component — badge,
-hint, progress-bar, spinner, tag) rather than a dedicated page per component. Code is always the
-source of truth — this skill never invents a hardcoded value, a new design token, or a Figma-side
-detail that doesn't trace back to the component's actual props, states, and resolvable design
-tokens.
+## Goal
 
-**v1 scope — create-only.** This skill pushes a component into Figma for the first time. It does
-not update or reconcile an already-pushed component, and it does not generate Code Connect
-mappings (use the separate `figma-code-connect` skill for that, using this skill's output as
-reference). See [`code-to-figma.md`](../../../code-to-figma.md) at the repo root for the full
-background and rationale behind these decisions.
+Generate Figma components that accurately represent the existing Web Components and reuse existing design system resources.
 
-Load `figma-use` alongside this skill before any `use_figma` call (mandatory per that skill's own
-rule). Load `figma-generate-library` for its guidance on binding values to Figma variables and
-reusing existing components, since the same discipline applies here.
+## Workflow
 
-## Workflow at a glance
+Each phase lives in its own file — read the current phase's file when you reach it, don't load
+all nine up front. Each file opens with a "you are here" line naming what the prior phase must
+have produced, and closes with an explicit `Next:` pointer to the following file.
+
+1. [`PHASE-1-ANALYZE.md`](PHASE-1-ANALYZE.md) — read the component's code (props, anatomy,
+   pseudo-states, text attributes) and resolve every value to a Figma design token, hard-stopping
+   on anything that can't be resolved. Writes the draft `<name>.figma.md`.
+2. [`PHASE-2-PROPOSE.md`](PHASE-2-PROPOSE.md) — turn the draft into a concrete Figma
+   variant-grouping proposal (variant vs. instance-swap vs. top-level split, grid sketch, 500-variant
+   budget check) and get the user's explicit sign-off before anything is built.
+3. [`PHASE-3-BUILD.md`](PHASE-3-BUILD.md) — find or create the component's shared category page
+   (`Core / <Category>`), build the real Figma `COMPONENT_SET` incrementally (one confirmed
+   variant combination first, then fan out the rest), and append its master set into that page's
+   masters row.
+4. [`PHASE-4-DOCUMENT-LAYOUT.md`](PHASE-4-DOCUMENT-LAYOUT.md) — build the per-component
+   documentation frame's layout from the fixed page template: the category page shell (once per
+   category), the outer frame, the purple header, and the 2-column body shell.
+5. [`PHASE-5-DOCUMENT-COPY-ME.md`](PHASE-5-DOCUMENT-COPY-ME.md) — build "👉 Copy me", the first
+   section of the left column.
+6. [`PHASE-6-DOCUMENT-ANATOMY.md`](PHASE-6-DOCUMENT-ANATOMY.md) — build "🏗️ Anatomy", the second
+   section of the left column (skipped entirely when the component has no `@part` tags).
+7. [`PHASE-7-DOCUMENT-SPECS.md`](PHASE-7-DOCUMENT-SPECS.md) — build "📐 Specs", the last section of
+   the left column.
+8. [`PHASE-8-DOCUMENT-COMPONENT-SET.md`](PHASE-8-DOCUMENT-COMPONENT-SET.md) — build "🔒 Component
+   Set" in the right column (handling an `inverted` axis or an open-ended content-selection prop as
+   needed), then append the finished frame into the category page's documentation-frames row.
+9. [`PHASE-9-REVIEW.md`](PHASE-9-REVIEW.md) — compare the built Figma output against real visual
+   regression baselines and report findings; this is the last phase in this skill's v1 scope.
+
+### Graph
 
 ```mermaid
 flowchart TD
@@ -67,21 +85,51 @@ flowchart TD
 
     P3G --> P4G
 
-    subgraph P4G["Phase 4 — Documentation page"]
+    subgraph P4G["Phase 4 — Layout"]
         direction LR
-        P4a["Read PHASE-4-DOCUMENT.md<br/>+ inspect the canonical live page"]:::code --> P4b["Build purple Header /<br/>2-col: Copy me, Anatomy, Specs<br/>/ Component Set"]:::figma
+        P4a["Read PHASE-4-DOCUMENT-LAYOUT.md<br/>+ inspect the canonical live page"]:::code --> P4b["Build category page shell,<br/>outer frame, purple Header,<br/>2-col body shell"]:::figma
     end
 
     P4G --> P5G
 
-    subgraph P5G["Phase 5 — Review"]
+    subgraph P5G["Phase 5 — Copy me"]
         direction LR
-        P5a["Start dev server,<br/>read Figma get_variable_defs"]:::figma --> P5b["Diff live getComputedStyle<br/>against resolved token values"]:::code
-        P5b --> P5c{{"User judges<br/>the findings"}}:::human
-        P5c -->|real bug found| P5d["Fix code / code docs"]:::code
+        P5a["Instance Section (Default),<br/>insert one representative<br/>instance into the slot"]:::figma
     end
 
-    P5G --> Done(["Done: component live in Figma"]):::phase
+    P5G --> P6G
+
+    subgraph P6G["Phase 6 — Anatomy"]
+        direction LR
+        P6a{{"Component has<br/>@part tags?"}}:::human -->|no, skip| P6s(["skip"]):::phase
+        P6a -->|yes| P6b["Build diagram +<br/>bold-letter legend"]:::figma
+    end
+
+    P6G --> P7G
+
+    subgraph P7G["Phase 7 — Specs"]
+        direction LR
+        P7a["Build one spec card<br/>per Variants-axis option"]:::figma
+    end
+
+    P7G --> P8G
+
+    subgraph P8G["Phase 8 — Component Set"]
+        direction LR
+        P8a["Count real axes, build<br/>labeled Component Set<br/>(handle inverted / open-ended)"]:::figma --> P8b{{"User reviews<br/>finished frame"}}:::human
+        P8b --> P8c["Append frame into category<br/>page's Documentation Frames row"]:::code
+    end
+
+    P8G --> P9G
+
+    subgraph P9G["Phase 9 — Review"]
+        direction LR
+        P9a["Start dev server,<br/>read Figma get_variable_defs"]:::figma --> P9b["Diff live getComputedStyle<br/>against resolved token values"]:::code
+        P9b --> P9c{{"User judges<br/>the findings"}}:::human
+        P9c -->|real bug found| P9d["Fix code / code docs"]:::code
+    end
+
+    P9G --> Done(["Done: component live in Figma"]):::phase
 ```
 
 🔵 **code** — reads or writes a file in this repo (`.tsx`/`.scss`, `name.figma.md`, `CONVENTIONS.md`, test snapshots).
@@ -91,7 +139,21 @@ flowchart TD
 The three human checkpoints (Phase 1's anatomy review, Phase 2's mapping confirmation, Phase 3's
 first-variant screenshot) are the only _required_ stops — everything else is read/write work it
 does on its own between them. For the full list of every checkpoint and hard-stop condition across
-all five phases in one place, see [`DECISIONS.md`](DECISIONS.md).
+all nine phases in one place, see [`DECISIONS.md`](DECISIONS.md).
+
+## Rules
+
+- NEVER generate Code Connect mappings
+- NEVER update an existing Figma component
+- NEVER invent a hardcoded value — always resolve to a Figma variable (design token)
+- NEVER commit — leave changes unstaged for the user to review
+- MUST treat a hard stop (missing token, missing nested child mapping) as a checkpoint, not a failure to work around — surface it and wait for the user's decision
+
+## Instructions
+
+Load `figma-use` alongside this skill before any `use_figma` call (mandatory per that skill's own
+rule). Load `figma-generate-library` for its guidance on binding values to Figma variables and
+reusing existing components, since the same discipline applies here.
 
 ## Prerequisites
 
@@ -104,160 +166,37 @@ all five phases in one place, see [`DECISIONS.md`](DECISIONS.md).
   doesn't, stop and tell the user to run this skill on the child component first — do not
   recreate the child or fall back to a plain shape.
 
-## Workflow
+## References
 
-Each phase lives in its own file — read the current phase's file when you reach it, don't load
-all five up front. Each file opens with a "you are here" line naming what the prior phase must
-have produced, and closes with an explicit `Next:` pointer to the following file.
+Read only the documentation needed for the task:
 
-1. [`PHASE-1-ANALYZE.md`](PHASE-1-ANALYZE.md) — read the component's code (props, anatomy,
-   pseudo-states, text attributes) and resolve every value to a Figma design token, hard-stopping
-   on anything that can't be resolved. Writes the draft `<name>.figma.md`.
-2. [`PHASE-2-PROPOSE.md`](PHASE-2-PROPOSE.md) — turn the draft into a concrete Figma
-   variant-grouping proposal (variant vs. instance-swap vs. top-level split, grid sketch, 500-variant
-   budget check) and get the user's explicit sign-off before anything is built.
-3. [`PHASE-3-BUILD.md`](PHASE-3-BUILD.md) — find or create the component's shared category page
-   (`Core / <Category>`), build the real Figma `COMPONENT_SET` incrementally (one confirmed
-   variant combination first, then fan out the rest), and append its master set into that page's
-   masters row.
-4. [`PHASE-4-DOCUMENT.md`](PHASE-4-DOCUMENT.md) — build the per-component documentation frame
-   (header, Copy me, Anatomy, Specs, Component Set) from the fixed page template, and
-   append it into the same category page's documentation-frames row.
-5. [`PHASE-5-REVIEW.md`](PHASE-5-REVIEW.md) — compare the built Figma output against real visual
-   regression baselines and report findings; this is the last phase in this skill's v1 scope.
-
-## Mapping file format
-
-`<name>.figma.md` lives at `packages/core/src/components/<category>/<name>/<name>.figma.md`,
-co-located with the component's other files. It's both the input spec you confirm in Phases 1–2
-and the output record Phase 3 writes back into.
-
-```markdown
-# <name> → Figma mapping
-
-\`\`\`yaml
-figmaComponentKey: null # filled in by Phase 3 on success
-figmaPage: Core / <Category> # the shared category page, e.g. "Core / Indicators" — NOT this
-
-# component's own name; multiple components share one page (see CONVENTIONS.md's category table)
-
-figmaMasterNodeId: null # this component's master COMPONENT_SET node id (referenced from inside
-
-# its own documentation frame's "🔒 Component Set" panel — there's no separate masters row)
-
-figmaDocFrameNodeId: null # this component's "<Component> Documentation" frame id within the
-
-# documentation-frames row — both filled in by Phase 3/4 on success, since the page itself no
-
-# longer uniquely identifies a single component's content
-
-anatomy:
-
-- letter: A
-  part: label
-  description: "The text label wrapper (<span>)."
-- letter: B
-  part: icon
-  description: "The leading icon wrapper (or the brand icon wrapper when brandIcon is set)."
-
-# Omit this whole `anatomy:` key if the component has no @part tags at all.
-
-props:
-
-- name: size
-  type: enum
-  options: [sm, base]
-  figmaProperty: size
-  figmaPropertyType: variant
-- name: label
-  type: string
-  figmaProperty: null
-  figmaPropertyType: instance-text-override
-  states:
-  figmaProperty: state
-  options: [default, hover, focus, active, disabled]
-  sources:
-  hover: ":hover (spinner.host.scss)"
-  disabled: "disabled prop"
-  nested:
-- childTag: ds-icon
-  childMappingFile: ../icon/icon.figma.md
-  figmaComponentKey: <resolved from icon.figma.md>
-  device: # omit entirely if Phase 1 step 5a found no breakpoint-driven token differences.
-  # One entry per responsive binding — the single place that owns the mechanism detail (which
-  # routing variable, its per-mode aliases, why this component needed it). tokens:/specs: entries
-  # for the same binding just reference the routing variable by name, no restating the breakdown.
-  responsiveBindings:
-  - cssVar: [--ds-logo-size-base-mobile, --ds-logo-size-base-desktop] # every real --ds-* token
-    # involved across the component's breakpoints, in mobile→desktop order
-    routingVariable: 🧩 Component/Logo/Size/Base/Device # created/reused by Phase 3 in the file's
-    # `Design Responsive Tokens` collection; deterministic name, see PHASE-3-BUILD.md
-    modes:
-    mobile: 🧩 Component/Logo/Size/Base/Mobile # real scripts/figma-sync-managed variable this
-    # mode's alias points at
-    tablet: 🧩 Component/Logo/Size/Base/Mobile # falls through to Mobile's token — code has no
-    # @include tablet override for this property, so Tablet renders the same as Mobile
-    desktop: 🧩 Component/Logo/Size/Base/Desktop
-    risk: "Hand-created by this skill, not emitted by scripts/figma-sync — if the underlying
-    per-breakpoint variables are ever renamed/removed, this alias goes stale with no automatic
-    fix. Feeding this pattern into the sync pipeline itself is real follow-up work, not yet done."
-    tokens:
-- cssVar: --ds-alias-background-color-sky
-  figmaVariable: Alias/Background Color/Sky
-  resolved: true
-- cssVar: --ds-spinner-color-one-off
-  figmaVariable: null
-  resolved: false
-  resolution: "<decision made with the user — pick a token or accept hardcoded>"
-- cssVar: [--ds-logo-size-base-mobile, --ds-logo-size-base-desktop]
-  figmaVariable: 🧩 Component/Logo/Size/Base/Device # see device: above — responsive, not a
-  # single static token
-  resolved: true
-  specs: # one entry per option of the Variants axis, shown in Phase 4's "📐 Specs" section
-  base:
-  - kind: size # size | icon | spacing | radius (| type, once added)
-    label: Size # Size (width = height, same variable) | Width | Height | Min width | Min height | Padding | Gap | Radius | …
-    px: 24
-    token: 🧩 Component/Close/Size/Base # exact Figma variable name
-  - kind: spacing
-    label: Padding
-    px: 5 # actual value used (marker + legend Value)
-    token: 🧩 Component/Close/Padding/Base
-    calc: '(10px) ÷ 2' # only when px is calculated from the variable; shown in the legend
-  - kind: size
-    label: Height
-    px: 32 # Desktop-mode value, shown as the reference figure — see device: above for the
-    # full mobile/tablet/desktop breakdown
-    token: 🧩 Component/Logo/Size/Base/Device # the routing variable, not a static token — see
-    # device: above
-    \`\`\`
-
-Notes on this mapping, open questions, and rationale for any non-obvious grouping decision go
-here as prose, below the YAML block.
-```
-
-## Notes
-
-- This skill never commits — leave `<name>.figma.md`, `figma.config.json`, and
-  `CONVENTIONS.md` changes unstaged for the user to review, same as every other skill in this
-  repo.
-- First real run target: `ds-spinner` (`packages/core/src/components/indicators/spinner/`).
-- A hard stop (missing token, missing nested child mapping) is not a failure to work around —
-  surface it and wait for the user's decision.
-
-## See Also
-
-- [`code-to-figma.md`](../../../code-to-figma.md) — the full plan and the reasoning behind every
-  scope decision in this skill.
 - [`CONVENTIONS.md`](CONVENTIONS.md) — current mapping heuristics, indexed by topic into
   [`conventions/`](conventions/) (tokens & props, variant grouping, page structure, Component Set
   rendering, general build mechanics).
-- [`DECISIONS.md`](DECISIONS.md) — every checkpoint and hard-stop condition across all five
+- [`DECISIONS.md`](DECISIONS.md) — every checkpoint and hard-stop condition across all nine
   phases, in one place.
-- [`CHANGELOG.md`](CHANGELOG.md) — superseded approaches and the "caught a bug, fixed it" history
-  behind today's rules. Not needed to execute a run; read it only for the _why_.
-- `PHASE-1-ANALYZE.md` / `PHASE-2-PROPOSE.md` / `PHASE-3-BUILD.md` / `PHASE-4-DOCUMENT.md` /
-  `PHASE-5-REVIEW.md` — the full workflow, one file per phase (see "## Workflow" above).
+- `PHASE-1-ANALYZE.md` / `PHASE-2-PROPOSE.md` / `PHASE-3-BUILD.md` / `PHASE-4-DOCUMENT-LAYOUT.md` /
+  `PHASE-5-DOCUMENT-COPY-ME.md` / `PHASE-6-DOCUMENT-ANATOMY.md` / `PHASE-7-DOCUMENT-SPECS.md` /
+  `PHASE-8-DOCUMENT-COMPONENT-SET.md` / `PHASE-9-REVIEW.md` — the full workflow, one file per
+  phase (see "## Workflow" above).
 - [`packages/tokens/CONTEXT.md`](../../../packages/tokens/CONTEXT.md) — token layers and naming.
 - [`packages/core/CONTEXT.md`](../../../packages/core/CONTEXT.md) — component categories and
   structure.
+- [`examples/mapping-file-format.md`](examples/mapping-file-format.md) — code to figma mapping format.
+
+## Validation
+
+- All applicable styles must use design tokens.
+- Nested components must use existing instances.
+- Report unresolved mappings.
+- All Figma component keys must be written back to `<name>.figma.md` for future reference.
+
+## Output
+
+Provide:
+
+- `<name>.figma.md` lives at `packages/core/src/components/<category>/<name>/<name>.figma.md`.
+- `CONVENTIONS.md` is updated only when the user approves a new rule addition.
+- Created Figma component — documentation frames and component set
+- Validation results
+- Unresolved issues

@@ -9535,11 +9535,23 @@
       "Selection": {
         "Color": {
           "$type": "color",
-          "$value": "{🔗 Alias.🔤 Text.Color.Primary}"
+          "$value": "{🔗 Alias.🔤 Text.Color.Primary}",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2648:11750",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
         },
         "Surface": {
           "$type": "color",
-          "$value": "{🔗 Alias.🎨 Surface.Selected}"
+          "$value": "{🔗 Alias.🎨 Surface.Selected}",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2648:11751",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
         }
       }
     },
@@ -12941,15 +12953,37 @@
         },
         "Border": {
           "$type": "border",
-          "$value": "{🔗 Alias.▭ Border.Composite.Grey}"
+          "$value": "{🔗 Alias.▭ Border.Composite.Grey}",
+          "$extensions": {
+            "com.figma.variableId": {
+              "color": "VariableID:2648:11752",
+              "width": "VariableID:2648:11753",
+              "style": "VariableID:2648:11754"
+            },
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
         },
         "Radius": {
           "$type": "dimension",
-          "$value": "{🔗 Alias.🔵 Radius.MD}"
+          "$value": "{🔗 Alias.🔵 Radius.MD}",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2648:11755",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
         },
         "Padding": {
           "$type": "dimension",
-          "$value": "{🔗 Alias.↔️ Space.Padding.2XS}"
+          "$value": "{🔗 Alias.↔️ Space.Padding.2XS}",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2648:11756",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
         }
       },
       "Search": {
@@ -17643,7 +17677,8 @@
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
-              ]
+              ],
+              "com.figma.variableId": "VariableID:2648:11757"
             }
           }
         }
@@ -17819,7 +17854,8 @@
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
-                ]
+                ],
+                "com.figma.variableId": "VariableID:2648:11758"
               }
             }
           }
@@ -17965,7 +18001,8 @@
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
-              ]
+              ],
+              "com.figma.variableId": "VariableID:2648:11759"
             }
           }
         }
@@ -18141,7 +18178,8 @@
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
-                ]
+                ],
+                "com.figma.variableId": "VariableID:2648:11760"
               }
             }
           }
@@ -18287,7 +18325,8 @@
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
-              ]
+              ],
+              "com.figma.variableId": "VariableID:2648:11761"
             }
           }
         }
@@ -18473,7 +18512,8 @@
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
-                ]
+                ],
+                "com.figma.variableId": "VariableID:2648:11762"
               }
             },
             "Tick": {
@@ -18482,7 +18522,8 @@
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
-                ]
+                ],
+                "com.figma.variableId": "VariableID:2648:11763"
               }
             }
           }
@@ -18573,7 +18614,8 @@
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
-                ]
+                ],
+                "com.figma.variableId": "VariableID:2648:11764"
               }
             },
             "Tick": {
@@ -18582,7 +18624,8 @@
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
-                ]
+                ],
+                "com.figma.variableId": "VariableID:2648:11765"
               }
             }
           }
@@ -19642,7 +19685,13 @@
           },
           "Done": {
             "$type": "color",
-            "$value": "{🔗 Alias.🔤 Text.Color.Primary}"
+            "$value": "{🔗 Alias.🔤 Text.Color.Primary}",
+            "$extensions": {
+              "com.figma.variableId": "VariableID:2648:11766",
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
           }
         },
         "Typo": {
@@ -21220,7 +21269,13 @@
           "Empty": {
             "$type": "dimension",
             "$value": "{🔗 Alias.🔵 Radius.Base}",
-            "$description": "Border radius of the country flag placeholder when no country is selected."
+            "$description": "Border radius of the country flag placeholder when no country is selected.",
+            "$extensions": {
+              "com.figma.variableId": "VariableID:2648:11767",
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
           }
         },
         "Background": {
@@ -21228,7 +21283,13 @@
             "Empty": {
               "$type": "color",
               "$value": "{🔗 Alias.🎨 Surface.GreyDark}",
-              "$description": "Background color of the country flag placeholder when no country is selected."
+              "$description": "Background color of the country flag placeholder when no country is selected.",
+              "$extensions": {
+                "com.figma.variableId": "VariableID:2648:11768",
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
+              }
             }
           }
         }
@@ -21238,23 +21299,51 @@
           "Background": {
             "$type": "color",
             "$value": "{🔗 Alias.🎨 Surface.White}",
-            "$description": "Background color of the country picker popup."
+            "$description": "Background color of the country picker popup.",
+            "$extensions": {
+              "com.figma.variableId": "VariableID:2648:11774",
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
           }
         },
         "Padding": {
           "$type": "dimension",
           "$value": "{🔗 Alias.↔️ Space.Padding.2XS}",
-          "$description": "Padding of the country picker popup."
+          "$description": "Padding of the country picker popup.",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2648:11769",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
         },
         "Radius": {
           "$type": "dimension",
           "$value": "{🔗 Alias.🔵 Radius.MD}",
-          "$description": "Border radius of the country picker popup."
+          "$description": "Border radius of the country picker popup.",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2648:11770",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
         },
         "Border": {
           "$type": "border",
           "$value": "{🔗 Alias.▭ Border.Composite.Grey}",
-          "$description": "Border of the country picker popup."
+          "$description": "Border of the country picker popup.",
+          "$extensions": {
+            "com.figma.variableId": {
+              "color": "VariableID:2648:11771",
+              "width": "VariableID:2648:11772",
+              "style": "VariableID:2648:11773"
+            },
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
         }
       },
       "Filter": {
@@ -21262,7 +21351,13 @@
           "Placeholder": {
             "$type": "color",
             "$value": "{🔗 Alias.🔤 Text.Color.Placeholder}",
-            "$description": "Placeholder text color of the country filter input."
+            "$description": "Placeholder text color of the country filter input.",
+            "$extensions": {
+              "com.figma.variableId": "VariableID:2648:11775",
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
           }
         }
       },
@@ -21270,24 +21365,48 @@
         "Color": {
           "$type": "color",
           "$value": "{🔗 Alias.▭ Border.Color.GreyLight}",
-          "$description": "Color of the country list scrollbar thumb."
+          "$description": "Color of the country list scrollbar thumb.",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2648:11776",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
         },
         "Radius": {
           "$type": "dimension",
           "$value": "{🔗 Alias.🔵 Radius.Rounded}",
-          "$description": "Border radius of the country list scrollbar thumb."
+          "$description": "Border radius of the country list scrollbar thumb.",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2648:11777",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
         },
         "BorderWidth": {
           "$type": "dimension",
           "$value": "{🔗 Alias.▭ Border.Width.Base}",
-          "$description": "Border width of the country list scrollbar thumb."
+          "$description": "Border width of the country list scrollbar thumb.",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2648:11778",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
         }
       },
       "Option": {
         "Radius": {
           "$type": "dimension",
           "$value": "{🔗 Alias.🔵 Radius.Base}",
-          "$description": "Border radius of a country option."
+          "$description": "Border radius of a country option.",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2648:11779",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
         }
       }
     }

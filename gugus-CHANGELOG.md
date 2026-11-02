@@ -4,12 +4,12 @@ This file is the historical record for `ds-code-to-figma`: every approach that w
 reverted or replaced, plus the "caught a bug, fixed it" narratives that produced today's rules.
 **Nothing here is current instruction.** If you're building a component, you don't need this file
 — read `CONVENTIONS.md` (and its `conventions/*.md` topic files) for the current rule, and
-`PHASE-1..5` for the current workflow. Read this file only when you need the *why* behind a rule,
+`PHASE-1..9` for the current workflow. Read this file only when you need the _why_ behind a rule,
 or when deciding whether an old pattern on an existing Figma page should be migrated.
 
 Entries are grouped by the area they affected, each roughly chronological within its group.
 
-## Documentation page template (Phase 4)
+## Documentation page template (Phases 4–8)
 
 - **Original template (superseded on `ds-badge`'s request → superseded again 2026-10-29):** the
   very first Phase 4 template was a single-column stack — bordered outer frame → Header → "Copy
@@ -33,11 +33,11 @@ Entries are grouped by the area they affected, each roughly chronological within
   me: borderless 4px radius; Anatomy: 2px border + 6px radius; Variants: 2px border, no radius).
   - First build attempt of the slot pattern tried `preview.createInstance()` then
     `instance.appendChild(contentFrame)` — **throws**: `"Cannot move node. New parent is an
-    instance or is inside of an instance"`, since an `INSTANCE`'s root only accepts overrides of
+instance or is inside of an instance"`, since an `INSTANCE`'s root only accepts overrides of
     structure the master already defines, not arbitrary new children. The next attempt
     `detachInstance()`'d the preview to work around this — **wrong fix**: it produces a
     look-alike frame severed from the master (invisible as `Preview` in the layers panel). Correct
-    pattern (now in `PHASE-4-DOCUMENT.md`'s section 0) was adopted the same day: insert real
+    pattern (now in `PHASE-4-DOCUMENT-LAYOUT.md`'s section 0) was adopted the same day: insert real
     content directly into the master's actual `SLOT` node.
 - **2026-10-29, third pass:** components grouped onto a shared `Core / <Category>` page instead of
   one page per component, with a `Category Header` instance and a `Documentation Frames` row —
@@ -46,7 +46,7 @@ Entries are grouped by the area they affected, each roughly chronological within
   reusable, slot-based `Category Frame` master component (mirroring `Section`/`Preview`) plus a
   separate "Masters" overview row (one dashed master `COMPONENT_SET` per component, parked above
   the documentation frames). Both were reverted:
-  - Figma hard-rejects moving a subtree that itself contains `SLOT` instances into *another*
+  - Figma hard-rejects moving a subtree that itself contains `SLOT` instances into _another_
     slot's contents (`Cannot move node. Node is not allowed SLOT node`) — a documentation frame is
     already 2 slot-levels deep internally (Anatomy/Specs each nest a `Preview` inside a `Preview`)
     before it ever reaches a category-level slot. This is a real, current platform constraint —
@@ -74,7 +74,7 @@ Entries are grouped by the area they affected, each roughly chronological within
 - **Open-ended content-selection props (e.g. `ds-icon`'s `name`) originally became one crossed
   Figma variant property on a single shared set.** For `ds-icon`, after splitting `name` into 79
   top-level components, the user initially required `size`/`color` to be real crossed variant
-  *properties* on each of the 79 — 2,370 components total. Flagged as unmanageable; replaced with
+  _properties_ on each of the 79 — 2,370 components total. Flagged as unmanageable; replaced with
   the current wrapper-`COMPONENT_SET` + Instance Swap library pattern (see
   `conventions/variant-grouping.md`), reducing `ds-icon` to 109 components (30 + 79) with no loss
   of capability.
@@ -90,12 +90,12 @@ Entries are grouped by the area they affected, each roughly chronological within
   now that "🔒 Component Set" shows the wrapper set's native arrangement directly with no table
   chrome at all.
 
-## Component Set labeling and rendering (Phase 4, §6)
+## Component Set labeling and rendering (Phase 8)
 
 - **A 3+-axis `COMPONENT_SET` shipped once on `ds-spinner` with no row/column labels**, even
   though the labeling mechanism was already documented — the axis-count check was simply skipped.
   Caught by the user comparing the live panel against the `🧰 Annotations` page's own `github
-  example` reference. Fixed, and `PHASE-4-DOCUMENT.md` now opens its labeling section with an
+example` reference. Fixed, and `PHASE-8-DOCUMENT-COMPONENT-SET.md` now opens its labeling section with an
   explicit "count axes first, this is required" line because of this miss.
 - **2026-10-30, labeling exemption removed:** an earlier rule exempted "2-axis or fewer" sets from
   labeling, reasoning that Figma's own variant-property picker already made a simple axis legible.
@@ -120,7 +120,7 @@ row-label column, grid-line rectangles). **None of this applies to the current t
 is no table to overlay against anymore. Kept only because an already-pushed component's
 not-yet-migrated page might still use this structure.
 
-- A master `COMPONENT_SET` overlaid on a documentation frame had to be the page's *last* child, or
+- A master `COMPONENT_SET` overlaid on a documentation frame had to be the page's _last_ child, or
   it rendered invisibly behind the frame's opaque fill (page-level z-order follows child array
   order).
 - A master variant overlaid on a table with one-time absolute coordinates didn't move if anything
@@ -131,6 +131,31 @@ not-yet-migrated page might still use this structure.
   moved automatically whenever the table did.
 - This template locked the overlaid master set to stop a human dragging it out of alignment —
   dropped along with the table itself; the current template never locks any node it builds.
+
+## Token resolution (Phase 1 / Phase 3)
+
+- **2026-10-30 — token resolution moved from live Figma enumeration to a local lookup.** Phase 1
+  originally resolved every `--ds-*` CSS var by having `use_figma` enumerate the entire `Design
+Tokens`/`Design Responsive Tokens` collections (1,900+ variables combined) and loosely
+  name-matching against the repo's `path.join('/')` convention — slow, expensive on context, and
+  prone to truncated results on a large read (surfaced directly: a real run had to re-filter down
+  to "just logo-related variables" after an initial read came back too large to use). Replaced
+  with `scripts/figma-sync/lib/css-token-lookup.mjs`, which reads the same answer straight out of
+  `packages/tokens/tokens/Base.tokens.json` — every synced token already carries its real Figma
+  variable id in `$extensions["com.figma.variableId"]`, written there by `scripts/figma-sync`
+  itself on push (`docs/adr/0017-direct-commit-variableid-backfill.md`). Phase 1 now resolves
+  with zero Figma calls, and Phase 3 binds directly by id
+  (`getVariableByIdAsync(figmaVariableId)`) instead of re-searching by name at build time. Live
+  Figma search is still used for the one case the local JSON can't answer: finding an existing
+  token for a value with no CSS-var binding at all.
+- The lookup script also resolves a responsive-dimension token's `-mobile`/`-tablet`/`-desktop`
+  breakpoint-suffixed CSS vars to each sibling's own id directly, and — for a token that's
+  already "Device-eligible" (MVP-scoped in `scripts/figma-sync`) — surfaces its real routing
+  variable id too, letting Phase 3 skip hand-creating a duplicate routing variable in that case.
+  As of 2026-10-30 no `Component.*`-layer token is Device-eligible yet (only `Device.*`-layer
+  tokens are), so every component-level responsive binding pushed so far still goes through
+  Phase 3's hand-built routing variable — this is forward-looking, not yet exercised for a real
+  component.
 
 ## Retired sections
 

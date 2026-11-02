@@ -311,24 +311,44 @@ async function main() {
   }
 
   const { newIds, removedIds } = await writePull(resolved, figmaToken, figmaFileKey)
-  if (process.env.GITHUB_OUTPUT) {
-    // docs/adr/0017-direct-commit-variableid-backfill.md's write-back step reads these. The JSON
-    // payload itself goes to a file, not the output directly — a full-tree first sync can produce
-    // thousands of entries, and passing that much JSON through as a step output turns into an
-    // environment variable for the next step; GitHub Actions/the OS both cap how much an env var
-    // (and total env) can hold, and this blows past it ("Argument list too long" spawning the next
-    // step's shell). A file path is always short enough to pass safely.
-    const outDir = process.env.RUNNER_TEMP ?? tmpdir()
-    if (newIds.length > 0) {
-      const newIdsFile = resolve(outDir, 'figma-sync-new-ids.json')
-      writeFileSync(newIdsFile, JSON.stringify(newIds))
-      appendFileSync(process.env.GITHUB_OUTPUT, `new_ids_file=${newIdsFile}\n`)
-    }
-    if (removedIds.length > 0) {
-      const removedIdsFile = resolve(outDir, 'figma-sync-removed-ids.json')
-      writeFileSync(removedIdsFile, JSON.stringify(removedIds))
-      appendFileSync(process.env.GITHUB_OUTPUT, `removed_ids_file=${removedIdsFile}\n`)
-    }
+
+  // docs/adr/0017-direct-commit-variableid-backfill.md's write-back step reads these. The JSON
+  // payload itself goes to a file, not an output/env var directly — a full-tree first sync can
+  // produce thousands of entries, and passing that much JSON through as a step output turns into
+  // an environment variable for the next step; GitHub Actions/the OS both cap how much an env var
+  // (and total env) can hold, and this blows past it ("Argument list too long" spawning the next
+  // step's shell). A file path is always short enough to pass safely.
+  //
+  // Written unconditionally (not just when GITHUB_OUTPUT is set) — this used to be CI-only, which
+  // meant a local `DRY_RUN=false` run computed newIds/removedIds, logged a count, and then
+  // silently discarded them on exit: `figma-sync:backfill:local` had nothing to read, every time,
+  // by construction. Base.tokens.json/.figma-sync-state.json never got patched locally, so the
+  // same tokens looked "newly created" again on the next run (harmless, thanks to pull.mjs's own
+  // name-fallback match in writePull, but it meant the ids never made it into git).
+  const outDir = process.env.RUNNER_TEMP ?? tmpdir()
+  const newIdsFile = resolve(outDir, 'figma-sync-new-ids.json')
+  const removedIdsFile = resolve(outDir, 'figma-sync-removed-ids.json')
+
+  if (newIds.length > 0) {
+    writeFileSync(newIdsFile, JSON.stringify(newIds))
+    if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `new_ids_file=${newIdsFile}\n`)
+  }
+  if (removedIds.length > 0) {
+    writeFileSync(removedIdsFile, JSON.stringify(removedIds))
+    if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `removed_ids_file=${removedIdsFile}\n`)
+  }
+
+  if (!process.env.GITHUB_OUTPUT && (newIds.length > 0 || removedIds.length > 0)) {
+    console.log('\nTo write these back to Base.tokens.json / .figma-sync-state.json locally, run:')
+    console.log(
+      `  NEW_IDS_FILE=${newIds.length > 0 ? newIdsFile : ''} REMOVED_IDS_FILE=${
+        removedIds.length > 0 ? removedIdsFile : ''
+      } TOKENS_DIR_OVERRIDE=packages/tokens/tokens node scripts/figma-sync/backfill-commit.mjs`.replace(/\s+/g, ' '),
+    )
+    console.log(
+      '  (TOKENS_DIR_OVERRIDE is required here — without it, backfill-commit.mjs tries a direct\n' +
+        '  remote commit to GitHub via the REST API instead of writing local files.)',
+    )
   }
 }
 

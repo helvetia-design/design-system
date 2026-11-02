@@ -1,6 +1,6 @@
-# Conventions — category pages & documentation-frame structure (Phase 3 / Phase 4)
+# Conventions — category pages & documentation-frame structure (Phase 3 / Phases 4–8)
 
-Relevant to Phase 3's category-page setup and Phase 4's documentation frame. See
+Relevant to Phase 3's category-page setup and Phases 4–8's documentation frame. See
 `../CONVENTIONS.md` for the index, baseline rules, and the seeded category copy table. See
 `../CHANGELOG.md` for every reverted approach to this page's structure (slotted Category Frame
 master, separate Masters row, two-frame `inverted` split).
@@ -26,8 +26,8 @@ master, separate Masters row, two-frame `inverted` split).
   the _same_ single frame's Component Set panel, each under its own plain text sub-label, with
   only the `Inverted` display clone's `fills` swapped to the dark `Alias/Surface/Primary`
   background. Every other section (Copy me, Anatomy, Specs) is built once, from the `Primary`
-  set's instances only. See `PHASE-4-DOCUMENT.md`'s "Handling an `inverted` axis" section for the
-  full mechanism.
+  set's instances only. See `PHASE-8-DOCUMENT-COMPONENT-SET.md`'s "Handling an `inverted` axis"
+  section for the full mechanism.
 - **Never lock any Figma node this skill builds** — no master `COMPONENT_SET`, no display clone,
   no documentation-frame content, nothing. The current template has no table geometry for a human
   to accidentally misalign, so locking only gets in the way of inspecting/selecting/rearranging

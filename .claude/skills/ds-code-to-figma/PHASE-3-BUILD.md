@@ -15,6 +15,10 @@ real Figma component set from that confirmed mapping.
    variant property at its default value, state at `default`). Wire up:
    - The component's shape/layout.
    - Every styled value bound to its resolved Figma variable from Phase 1 (never a literal).
+     **Bind directly by id** — `figma.variables.getVariableByIdAsync(figmaVariableId)` using the
+     id `<name>.figma.md`'s `tokens:` list already recorded from `css-token-lookup.mjs` — never
+     re-resolve a token by searching Figma's variable collections by name at build time; that
+     search was already done once, locally, in Phase 1.
    - Every nested component as an **instance of the existing Figma component** resolved in
      Phase 1, step 4 — never redrawn from scratch.
 4. Take a screenshot of this first combination (`get_screenshot`) and show it to the user as a
@@ -43,34 +47,47 @@ real Figma component set from that confirmed mapping.
      property write on that node then requires that exact font to be loaded first
      (`figma.loadFontAsync`), even if a different font (e.g. Inter) was loaded earlier in the
      same script — load the _resolved_ font family, not just a default.
-   - **Responsive (`device:`) bindings — create or reuse the routing variable, then bind once.**
-     For every entry in `<name>.figma.md`'s `device:` section (from Phase 1 step 5a):
-     1. Look up the routing variable by its exact deterministic name (e.g.
-        `🧩 Component/Logo/Size/Base/Device`) in the file's `Design Responsive Tokens` collection
-        first — **reuse it if it already exists** rather than creating a duplicate (this makes a
-        later rebuild of the same component idempotent). If reusing, verify its Mobile/Tablet/
-        Desktop mode values still resolve (via `getVariableByIdAsync`, walking any
-        `VARIABLE_ALIAS` chain) to the exact real per-breakpoint variables recorded in `device:` —
-        if they've drifted, fix the alias rather than trusting the name match alone.
-     2. If it doesn't exist, create it in `Design Responsive Tokens` (same collection, so it
-        inherits the Mobile/Tablet/Desktop modes already defined there) and set each mode's value
-        to a `VARIABLE_ALIAS` pointing at the real, `scripts/figma-sync`-managed variable recorded
-        for that mode in `device:` — including the fall-through case (e.g. Tablet aliasing to the
-        same real variable as Mobile when code has no distinct tablet override).
-     3. Bind the node's property (height/width/padding/gap/whatever `device:` recorded) to this
+   - **Responsive (`device:`) bindings — check for an already-synced routing variable before
+     hand-creating one.** For every entry in `<name>.figma.md`'s `device:` section (from Phase 1
+     step 5a):
+     1. Re-run the _bare_ (non-breakpoint-suffixed) CSS var through `css-token-lookup.mjs` (same
+        tool as Phase 1 step 5). **If its `variableId` object already has a `device` key**, the
+        token is already "Device-eligible" (MVP-scoped) and `scripts/figma-sync` already manages
+        a real routing variable for it in `Design Responsive Tokens` — fetch it directly via
+        `getVariableByIdAsync(variableId.device)` and bind to that. Don't hand-create a duplicate.
+        As of this writing no `Component.*` token is Device-eligible yet (only `Device.*` layer
+        tokens are, e.g. `Device.Space.*`) — this case is a check for future-proofing, not
+        something to assume absent.
+     2. **Otherwise** (today's common case for a component-level responsive binding, e.g.
+        `ds-logo`'s `Component.Logo.Size.Base`), look up a hand-built routing variable by its
+        exact deterministic name (e.g. `🧩 Component/Logo/Size/Base/Device`) in `Design
+Responsive Tokens` first — **reuse it if it already exists** rather than creating a
+        duplicate (this makes a later rebuild of the same component idempotent). If reusing,
+        verify its Mobile/Tablet/Desktop mode values still resolve (via `getVariableByIdAsync`,
+        walking any `VARIABLE_ALIAS` chain) to the exact real per-breakpoint ids recorded in
+        `device:` — if they've drifted, fix the alias rather than trusting the name match alone.
+     3. If no routing variable exists yet (neither the Device-eligible id nor a hand-built one),
+        create it in `Design Responsive Tokens` (same collection, so it inherits the
+        Mobile/Tablet/Desktop modes already defined there) and set each mode's value to a
+        `VARIABLE_ALIAS` pointing at the real per-breakpoint id Phase 1 resolved for that mode
+        (via the breakpoint-suffixed CSS var lookup, e.g. `--ds-logo-size-base-mobile`) —
+        including the fall-through case (e.g. Tablet aliasing to the same id as Mobile when code
+        has no distinct tablet override).
+     4. Bind the node's property (height/width/padding/gap/whatever `device:` recorded) to this
         routing variable **once**, via `setBoundVariable`/`setRangeBoundVariable` as normal —
         never bind directly to one of the three real per-breakpoint variables. The file's own
         Mobile/Tablet/Desktop mode switcher then changes the rendered value natively; don't create
         a `device` crossed variant property or separate instances per breakpoint.
-     4. Flag the risk noted in `device:` (hand-created, not sync-managed) in `<name>.figma.md` if
-        it isn't already recorded there from Phase 1.
+     5. Flag the risk noted in `device:` (hand-created, not sync-managed) in `<name>.figma.md` if
+        it isn't already recorded there from Phase 1 — skip this for the Device-eligible case in
+        step 1, which carries no such risk.
 5. On confirmation, fan out: build the remaining variant/state combinations as a Figma component
    set, reusing the same bindings and nested instances.
 6. **Ensure the component's category page exists** (see [Category pages](#category-pages) below)
    — the master set itself doesn't park anywhere on this page; it's referenced from inside the
-   component's own documentation frame (Phase 4's "🔒 Component Set" section), same as the
+   component's own documentation frame (Phase 8's "🔒 Component Set" section), same as the
    single-page-per-component template. There is no separate masters-overview row to append into
-   (dropped — see `PHASE-4-DOCUMENT.md`'s page-level structure section for why).
+   (dropped — see `PHASE-4-DOCUMENT-LAYOUT.md`'s page-level structure section for why).
 7. Write the resulting Figma component key/node-id and the category page name back into
    `<name>.figma.md`.
 
@@ -100,12 +117,12 @@ deliberate piece of work — don't do it opportunistically.
    new scheme — build the whole page shell before appending anything component-specific:**
    - Create the page, name it `Core / <Category>`, set `page.backgrounds` to literal solid
      `#1e1e1e` (same dark-page convention as the per-component template — see
-     `PHASE-4-DOCUMENT.md`'s "Page and outer frame" section).
+     `PHASE-4-DOCUMENT-LAYOUT.md`'s "Page and outer frame" section).
    - Build one top-level `VERTICAL` auto-layout frame (`Category Frame`, hand-built fresh — **not**
-     an instance of a shared master, see `PHASE-4-DOCUMENT.md`'s page-level structure section for
+     an instance of a shared master, see `PHASE-4-DOCUMENT-LAYOUT.md`'s page-level structure section for
      why), `HUG` both axes, `400`px padding on all sides, `itemSpacing: 200`, `cornerRadius: 24`,
      `clipsContent: false`, fill a two-stop navy `GRADIENT_LINEAR` (literal values, not a bound
-     token — see `PHASE-4-DOCUMENT.md` for the exact stops/transform). This is the only top-level
+     token — see `PHASE-4-DOCUMENT-LAYOUT.md` for the exact stops/transform). This is the only top-level
      frame on the page — everything else nests inside it.
    - **Category Header** (first child): instance the shared `Category Header` master component
      (`🧰 Annotations` page, node `2412:1247` — a lightweight sibling of `Header`/`Title`/
@@ -117,16 +134,17 @@ deliberate piece of work — don't do it opportunistically.
      title/lead text before continuing, same hard-stop discipline as a missing design token.
    - **Documentation-frames row** (second child): a `HORIZONTAL` auto-layout frame
      (`Documentation Frames`), `HUG` both axes, `itemSpacing: 200`, no fill, `FILL` width. Starts
-     empty — the first component's documentation frame (built in Phase 4) is the first thing
+     empty — the first component's documentation frame (built in Phases 4–8) is the first thing
      appended into it. **There is no separate "Masters" overview row** — an earlier revision of
      this scheme had one (one dashed master `COMPONENT_SET` per component, parked above this row);
      it was dropped as redundant with each documentation frame's own "🔒 Component Set" panel, and
      also because Figma disallows moving a slot-bearing subtree (which every documentation frame
      is) into another component's slot, ruling out a shared slotted master for this row anyway.
-3. **Appending a component's documentation frame** happens in Phase 4, same append-only rule,
-   into the `Documentation Frames` row — see `PHASE-4-DOCUMENT.md`'s page-level structure section.
+3. **Appending a component's documentation frame** happens at the end of Phase 8, same
+   append-only rule, into the `Documentation Frames` row — see `PHASE-4-DOCUMENT-LAYOUT.md`'s
+   page-level structure section.
 
-**Next: [`PHASE-4-DOCUMENT.md`](PHASE-4-DOCUMENT.md)** — once the full variant matrix is built,
-the category page exists, and the component key is written back. Build the documentation page
-before Phase 5's review, so that review covers the documentation page too, not just the raw
-component set.
+**Next: [`PHASE-4-DOCUMENT-LAYOUT.md`](PHASE-4-DOCUMENT-LAYOUT.md)** — once the full variant
+matrix is built, the category page exists, and the component key is written back. Build the
+documentation page (Phases 4–8) before Phase 9's review, so that review covers the documentation
+page too, not just the raw component set.

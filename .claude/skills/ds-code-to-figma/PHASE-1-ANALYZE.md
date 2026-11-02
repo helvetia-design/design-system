@@ -1,9 +1,26 @@
 # Phase 1 — Analyze
 
-**You are here:** the first phase. Starting fresh from the user naming a component to push into
-Figma — nothing in `<name>.figma.md` exists yet (or if it does, treat this as a from-scratch
-re-analysis; this skill is create-only, see `SKILL.md`'s v1-scope note). This phase reads the
-component's code and produces the draft mapping that Phase 2 proposes a grouping against.
+## Objective
+
+Read the component's code and produce the draft mapping that Phase 2 proposes a grouping against.
+
+## Inputs
+
+- Component source: `packages/core/src/components/<category>/<name>/<name>.tsx`
+- Component styles: `<name>.host.scss`
+- Design tokens: `packages/tokens/tokens/Base.tokens.json`
+- Figma Variables: `.claude/skills/ds-code-to-figma/references/figma-tokens/Base.tokens.json`
+- Any nested DS components' already-written `<child>.figma.md` files
+
+## References
+
+- `SKILL.md` — mapping file schema, Prerequisites section
+- `scripts/figma-sync/lib/css-token-lookup.mjs` — local CSS-var → Figma variable id resolver
+- `docs/adr/0017-direct-commit-variableid-backfill.md` — why variable ids already live in
+  `Base.tokens.json`
+- `packages/styles/src/scss/mixins/breakpoint.mixin.scss` — full breakpoint mixin set, for detecting responsive bindings
+
+## Instructions
 
 1. Read `packages/core/src/components/<category>/<name>/<name>.tsx` and extract every **public
    `@Prop()`** — ignore `@Method`, `@Event`, and private `@State`. Note each prop's type
@@ -21,7 +38,7 @@ component's code and produces the draft mapping that Phase 2 proposes a grouping
    `@part` tags at all, skip the anatomy section entirely (note why in the draft; this is not a
    gap to flag).
 3. Read the component's `<name>.host.scss` and scan for **pseudo-class states** —
-   `:hover`, `:focus`, `:active`, `:disabled`, `:read-only`, and any loading-related
+   `:hover`, `:focus`, `:active`, `:disabled`, and any loading-related
    class/attribute selector. These don't show up as props but still need a Figma
    representation (see Phase 2, rule 3).
    - Also scan **every text-bearing part for every attribute a Figma text node needs**: font
@@ -44,41 +61,46 @@ component's code and produces the draft mapping that Phase 2 proposes a grouping
    each one, read its `<child>.figma.md` and pull the recorded Figma component key. If missing,
    stop per `SKILL.md`'s Prerequisites section above.
 5. For every value the component's SCSS binds to a CSS custom property (`var(--ds-...)`),
-   resolve it to the matching Figma variable.
-   - **The real token variables are LOCAL to the component-library file, not a published
-     library.** They're pushed directly into the file by the GitHub workflow
-     (`scripts/figma-sync`) as two local variable collections: `Design Tokens` (Alias/Component
-     layer values, e.g. `🧩 Component/Spinner/Logo/Size/MD`, modes are brand modes — binding is
-     brand-agnostic per the project's token architecture, don't reason about which mode) and
-     `Design Responsive Tokens` (Device layer, modes `Mobile`/`Tablet`/`Desktop`).
-   - `search_design_system` and `get_variable_defs` only search/read **published libraries** —
-     they will not find these local collections, and can return misleading look-alike results
-     from unrelated org libraries (e.g. old sandbox files that happen to use similar naming).
-     **Do not use them for token resolution.** Any library attached to the file via
-     `get_libraries` other than the file's own local variables (`Brand Assets`, `🧩 Components`,
-     `Grid`, `Spacing`, `🖋 Typography`, `🎨 Colors`, `TokyTest` as of this writing) is legacy —
-     ignore it for token resolution.
-   - Resolve via `use_figma` (load `figma-use` first) instead:
-     ```js
-     const collections = await figma.variables.getLocalVariableCollectionsAsync()
-     const designTokens = collections.find(c => c.name === 'Design Tokens')
-     const names = []
-     for (const id of designTokens.variableIds) {
-       const v = await figma.variables.getVariableByIdAsync(id)
-       if (v) names.push(v.name)
-     }
-     return names // then match against the component's --ds-* vars
+   resolve it to the matching Figma variable **id** — resolve this entirely locally, no Figma
+   call needed for the common case.
+   - **Every token this repo has already pushed to Figma carries its real Figma variable id
+     right in `packages/tokens/tokens/Base.tokens.json`**, under
+     `$extensions["com.figma.variableId"]` — that's what `scripts/figma-sync` writes back after
+     a push (`docs/adr/0017-direct-commit-variableid-backfill.md`). There is no need to
+     enumerate Figma's `Design Tokens`/`Design Responsive Tokens` collections (1,900+ variables)
+     through `use_figma` to answer "does a variable exist for this CSS var" — the answer is
+     already sitting in this repo's own JSON, and a live enumeration is slow, burns a large
+     amount of context on a big collection, and risks a truncated/partial result on a large read.
+   - **Resolve with `scripts/figma-sync/lib/css-token-lookup.mjs`** (pure Node, no Figma call):
+     ```bash
+     node scripts/figma-sync/lib/css-token-lookup.mjs packages/tokens/tokens/Base.tokens.json \
+       --var --ds-spinner-circle-primary-background \
+       --var --ds-spinner-logo-size-md
      ```
-     Do the same against the `Design Responsive Tokens` collection for any `--ds-device-*` var.
-   - Token → Figma variable name follows this repo's `path.join('/')` convention (mirrors
-     `scripts/figma-sync/lib/write.mjs`), e.g. `--ds-spinner-circle-primary-background` →
-     `🧩 Component/Spinner/Circle/Primary/Background`. Emoji segment prefixes (`🔗`, `🧩`, `📱`,
-     `↔️`, `🔤`, `▭`) are part of the real names — match loosely (strip/ignore emoji) rather than
-     requiring an exact character match.
-   - **Any value with no matching Figma variable is a hard stop.** Report it immediately — do
-     not guess, do not push a hardcoded value, do not invent a new token. Ask the user whether
-     to use a different existing token or explicitly accept a one-off hardcoded value for this
-     specific case. Resolve this now, before Phase 2, not mid-build in Phase 3.
+     Pass every `--ds-*` var found in the component's SCSS as its own `--var`. Each result is
+     `null` (no token exists under that name — see the hard-stop rule below) or
+     `{ path, cssVar, variableId, figmaScopes, type, description }`, where `variableId` is the
+     real `VariableID:...` string to bind against in Phase 3 — write it straight into
+     `<name>.figma.md`'s `tokens:` list (see `SKILL.md`'s mapping-file schema), no further lookup
+     needed. A breakpoint-suffixed var (`--ds-logo-size-base-mobile`/`-tablet`/`-desktop`)
+     resolves to that one breakpoint's own id directly; the bare, un-suffixed var resolves to the
+     full `{ mobile, tablet, desktop[, device] }` object — see `PHASE-3-BUILD.md` step 4's
+     responsive-binding mechanics for what `device` is and when it's present.
+   - **This still requires `search_design_system`/`get_variable_defs`/live enumeration for
+     exactly one case: a value with no CSS-var binding at all** (a hardcoded literal in the
+     component's `.tsx`, or an inherited attribute the component's own code never sets — see step 3) that you need to find an _existing_ token for by browsing, since there's no `--ds-*` name
+     to look up. Even then, remember those two tools only search/read **published libraries** —
+     the real token variables are **local** to the component-library file, pushed directly by
+     `scripts/figma-sync`, so a live Figma search can return misleading look-alike results from
+     an unrelated published library (e.g. old sandbox files with similar naming). Prefer browsing
+     `Base.tokens.json` itself (it's just JSON) for a token with the right semantic value before
+     reaching for a Figma-side search.
+   - **Any CSS var that resolves to `null`** (a real `--ds-*` var in the component's SCSS with no
+     matching entry in `Base.tokens.json` at all — a token that was renamed, or never
+     synced) **is a hard stop.** Report it immediately — do not guess, do not push a hardcoded
+     value, do not invent a new token. Ask the user whether to use a different existing token or
+     explicitly accept a one-off hardcoded value for this specific case. Resolve this now, before
+     Phase 2, not mid-build in Phase 3.
    - A value with no CSS-var binding in the component's own SCSS (e.g. a hardcoded literal in
      the component's `.tsx`, or an attribute the component's code never sets at all and instead
      inherits — see step 3's text-attribute scan) is **not exempt from token resolution — it
@@ -116,6 +138,9 @@ Tokens` collection has exactly those three. Any other mixin (`desktop-lg`, `desk
      - Record every responsive binding found in the draft's `device:` section — see `SKILL.md`'s
        mapping file schema. A component with no breakpoint-driven token differences has no
        `device:` section at all, same as `anatomy:`/`states:` being omitted when not applicable.
+       Resolve each mode's real variable id by running the breakpoint-suffixed CSS var (e.g.
+       `--ds-logo-size-base-mobile`) through `css-token-lookup.mjs` from step 5 above — same one
+       call, no separate lookup mechanism for this case.
      - Phase 3 is what actually creates/reuses the Figma routing variable and binds nodes to it —
        this step only needs to identify and record which bindings are responsive and what each
        mode's real token is.
@@ -132,10 +157,33 @@ Tokens` collection has exactly those three. Any other mixin (`desktop-lg`, `desk
 6. Write all of the above into `<name>.figma.md` (create it if it doesn't exist) as a draft, per
    the schema in `SKILL.md`'s "Mapping file format" section. Include the `specs:` list —
    the values (fixed or min width/height, padding/gaps, fixed sizes of nested elements, radius,
-   border width, typography) per option of the Variants axis that Phase 4's "📐 Specs" section
+   border width, typography) per option of the Variants axis that Phase 7's "📐 Specs" section
    will show, each pointing at its Figma variable. It's a view onto the completeness checklist
    from step 5b, not new analysis. Leave out calculated inner content sizes and the radius of a
-   circle (see `PHASE-4-DOCUMENT.md` → "6. 📐 Specs").
+   circle (see `PHASE-7-DOCUMENT-SPECS.md`).
 
-**Next: [`PHASE-2-PROPOSE.md`](PHASE-2-PROPOSE.md)** — once the draft `<name>.figma.md` (props,
-anatomy, states, resolved tokens, completeness checklist) exists.
+## Output
+
+A draft `<name>.figma.md`, written per `SKILL.md`'s mapping file schema, containing:
+
+- Extracted public props (type, default)
+- Lettered anatomy (`@part` tags cross-checked against `render()`)
+- Pseudo-class states from `<name>.host.scss`
+- Resolved token/variable id for every CSS-var binding, including responsive `device:` bindings
+- Nested DS component references (their Figma component keys)
+- The completeness checklist and the `specs:` list
+
+## Completion Criteria
+
+- Every public prop is extracted and typed.
+- Every `@part` tag matches a real `part="..."` attribute in `render()` (or the mismatch was
+  resolved with the user).
+- Every CSS-var token resolves to a real Figma variable id, or was explicitly flagged as a hard
+  stop and resolved with the user — none left as a guess or silent default.
+- Responsive (device-mode) bindings are identified and recorded under `device:`.
+- The completeness checklist has no unresolved gaps.
+
+## Next Phase
+
+Proceed to [`PHASE-2-PROPOSE.md`](PHASE-2-PROPOSE.md) only once the draft `<name>.figma.md`
+(props, anatomy, states, resolved tokens, completeness checklist) exists.
