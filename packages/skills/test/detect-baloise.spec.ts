@@ -186,7 +186,9 @@ describe('detectBaloise', () => {
       version: '20.0.0',
       aliases: {
         '@helvetia-design/react': '20.0.0',
+        '@helvetia-design/core': '20.0.0',
         '@helvetia-design/styles': '20.0.0',
+        '@helvetia-design/tokens': '20.0.0',
       },
     })
   })
@@ -207,7 +209,9 @@ describe('detectBaloise', () => {
       version: '20.1.0',
       aliases: {
         '@helvetia-design/react': '20.1.0',
+        '@helvetia-design/core': '20.1.0',
         '@helvetia-design/styles': '20.1.0',
+        '@helvetia-design/tokens': '20.1.0',
       },
     })
   })
@@ -256,7 +260,9 @@ describe('detectBaloise', () => {
       dependencies: ['@baloise/ds-styles'],
       aliases: {
         '@helvetia-design/core': '20.0.1',
+        '@helvetia-design/core': '20.0.1',
         '@helvetia-design/styles': '20.0.1',
+        '@helvetia-design/tokens': '20.0.1',
       },
     })
   })
@@ -295,7 +301,9 @@ describe('detectBaloise', () => {
       packageJsonPath: 'package.json',
       aliases: {
         '@helvetia-design/angular': '20.0.1',
+        '@helvetia-design/core': '20.0.1',
         '@helvetia-design/styles': '20.0.1',
+        '@helvetia-design/tokens': '20.0.1',
       },
       imports: [
         {
@@ -410,5 +418,46 @@ describe('readNpmDistTags', () => {
 
     expect(calls).toEqual([['npm', ['view', '@helvetia-design/core', 'dist-tags', '--json']]])
     expect(distTags).toEqual({ latest: '19.10.2', snapshot: '0.0.5-snapshot.1-abc1234' })
+  })
+})
+
+describe('aliasesFor declares every package the migration makes the consumer import', () => {
+  async function aliasesForDeps(dependencies: Record<string, string>) {
+    const root = createScratchDir()
+    write(root, 'package.json', JSON.stringify({ dependencies }))
+    write(root, 'src/entry.ts', "import '@baloise/ds-styles/css/normalize.css'\n")
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.0') })
+    return Object.keys((result as { aliases: Record<string, string> }).aliases).sort()
+  }
+
+  // Init writes an `@helvetia-design/tokens/css/base` import into the consumer's entry file, and
+  // the controller and option types (`AlertController`, `Alert`, `ModalController`, `ModalOptions`)
+  // are imported from `@helvetia-design/core` even in a React or Angular app. Both resolve
+  // transitively under npm's flat node_modules but not under pnpm's strict layout, so Init has to
+  // declare them.
+  it('declares tokens and core for a React app', async () => {
+    expect(await aliasesForDeps({ '@baloise/ds-react': '19.0.0', 'react': '19.0.0' })).toEqual([
+      '@helvetia-design/core',
+      '@helvetia-design/react',
+      '@helvetia-design/styles',
+      '@helvetia-design/tokens',
+    ])
+  })
+
+  it('declares tokens and core for an Angular app', async () => {
+    expect(await aliasesForDeps({ '@baloise/ds-angular': '19.0.0', '@angular/core': '18.0.0' })).toEqual([
+      '@helvetia-design/angular',
+      '@helvetia-design/core',
+      '@helvetia-design/styles',
+      '@helvetia-design/tokens',
+    ])
+  })
+
+  it('declares tokens for a plain HTML app, which already had core', async () => {
+    expect(await aliasesForDeps({ '@baloise/ds-core': '19.0.0' })).toEqual([
+      '@helvetia-design/core',
+      '@helvetia-design/styles',
+      '@helvetia-design/tokens',
+    ])
   })
 })
