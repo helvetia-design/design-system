@@ -8,9 +8,9 @@
 # Components to test
 
 - spinner
-- logo
-- button
-- pagination
-- input
 - close
+- logo (responsive)
+- button (variants + nested)
+- pagination (top layer split)
+- input
 - card
