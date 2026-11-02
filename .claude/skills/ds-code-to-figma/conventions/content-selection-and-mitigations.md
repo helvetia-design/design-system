@@ -1,30 +1,17 @@
-# Conventions — variant grouping (Phase 2)
+# Conventions — content-selection props and threshold mitigations (Phase 2, Phase 8)
 
-Relevant to Phase 2's grouping proposal. See `../CONVENTIONS.md` for the index and baseline rules
-(the core "same layers → variant, different layers → top-level split" test lives there); see
+Relevant to Phase 2's grouping proposal when a component has an open-ended content prop or
+exceeds the variant threshold, and to Phase 8 when documenting wrapper sets. See `../CONVENTIONS.md` for the index
+(the core "same layers → variant, different layers → top-level split" test lives in
+`../PHASE-2-PROPOSE.md` step 1); see
 `../CHANGELOG.md` for superseded approaches (crossed-variant content-selection props, the
 2,370-component `ds-icon` attempt).
 
 ## Prop-to-variant mapping
 
-- **A boolean prop with no static visual effect is excluded from the Figma mapping entirely.**
-  Figma components are inherently static — a prop that only toggles animation playback (e.g.
-  `ds-spinner`'s `deactivated`) has nothing for a Figma variant property to represent.
-- **A prop whose visual effect is conditional on another prop still gets its own independent
-  variant axis**, rather than being collapsed or special-cased — simplicity over eliminating
-  visually-redundant combinations. E.g. `ds-spinner`'s `labelPosition` only has a visible effect
-  when `label` is non-empty, but stays its own axis regardless.
-- **An `instance-text-override` prop (e.g. `label`) ships with placeholder text on every variant
-  member, not left empty** — standard component-library practice; consumers clear or override it.
-  The exception is when a specific member is meant to demonstrate the true code default and that
-  default is an empty string — ask the user which policy applies rather than assuming.
-- **A free-text prop whose presence is conditionally rendered in code** (e.g. `hasValue(label) &&
-<span>`) needs a paired boolean "Show X" component property controlling the layer's `visible`
-  via `componentPropertyReferences`, not just relying on empty text — Figma doesn't collapse an
-  auto-layout gap/width for an empty-but-present text layer the way code's conditional render omits
-  the element entirely. Default the boolean to match code's real default. Check every
-  `instance-text-override` prop for this during Phase 1/2, don't wait to discover it after the
-  build.
+The prop-to-variant mapping rules (no-static-effect booleans excluded, conditional props keep their
+own axis, placeholder text on text-override props, paired "Show X" boolean for conditionally
+rendered text) are canonical in `../PHASE-2-PROPOSE.md` step 1 — not duplicated here.
 
 ## Open-ended content-selection props (current rule)
 
@@ -56,13 +43,7 @@ Relevant to Phase 2's grouping proposal. See `../CONVENTIONS.md` for the index a
 
 ## The 500-variant threshold
 
-- **Total variant count is checked against a hard-stop ceiling of 500 before any grouping is
-  presented for approval** — this skill's own conservative limit, not a number Figma enforces.
-  Count = sum, across every top-level split, of the product of that split's own crossed
-  variant-property option counts (every property, including `state`). Lightweight Instance Swap
-  library members are excluded from the count. If the count exceeds 500, stop before presenting
-  the grouping; recompute and re-check after every mitigation choice, looping until under
-  threshold.
+- The count formula and hard-stop loop are canonical in `../PHASE-2-PROPOSE.md` step 3.
 - **When over threshold, a token-swap axis** (same layers, only a different bound-Variable value —
   color is the common case, but this generalizes to border-width, elevation, or any
   variable-bound attribute) **can be resolved via a per-instance Figma Variable override** instead

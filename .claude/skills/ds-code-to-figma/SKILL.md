@@ -63,14 +63,14 @@ flowchart TD
 
     subgraph P2G["Phase 2 — Propose grouping"]
         direction LR
-        P2a["Read CONVENTIONS.md"]:::code --> P2b["Draft variant grid sketch<br/>in name.figma.md"]:::code
+        P2a["Apply inline rules<br/>(conventions/content-selection-and-mitigations.md<br/>only if needed)"]:::code --> P2b["Draft variant grid sketch<br/>in name.figma.md"]:::code
         P2b --> P2v["Compute total variant count"]:::code
         P2v --> P2check{{"Count ≤500?"}}:::human
         P2check -->|over threshold| P2w["Hard stop: recommend<br/>mitigation by axis type"]:::code
         P2w --> P2x{{"User picks<br/>mitigation"}}:::human
         P2x --> P2v
         P2check -->|under threshold| P2c{{"User confirms<br/>the mapping"}}:::human
-        P2c -->|approved| P2d["Optional: append a new<br/>rule to CONVENTIONS.md"]:::code
+        P2c -->|approved| P2d["Optional: add a new<br/>rule to the Phase 2 table"]:::code
     end
 
     P2G --> P3G
@@ -170,8 +170,8 @@ reusing existing components, since the same discipline applies here.
 
 Read only the documentation needed for the task:
 
-- [`CONVENTIONS.md`](CONVENTIONS.md) — current mapping heuristics, indexed by topic into
-  [`conventions/`](conventions/) (tokens & props, variant grouping, page structure, Component Set
+- [`CONVENTIONS.md`](CONVENTIONS.md) — cross-phase rules (category copy, no-lock, no assumed attributes), indexed by topic into
+  [`conventions/`](conventions/) (tokens & props, content-selection & mitigations, page structure, Component Set
   rendering, general build mechanics).
 - [`DECISIONS.md`](DECISIONS.md) — every checkpoint and hard-stop condition across all nine
   phases, in one place.
@@ -196,7 +196,7 @@ Read only the documentation needed for the task:
 Provide:
 
 - `<name>.figma.md` lives at `packages/core/src/components/<category>/<name>/<name>.figma.md`.
-- `CONVENTIONS.md` is updated only when the user approves a new rule addition.
+- `PHASE-2-PROPOSE.md`'s mapping table, `CONVENTIONS.md` and `conventions/*.md` are updated only when the user approves a new rule addition.
 - Created Figma component — documentation frames and component set
 - Validation results
 - Unresolved issues

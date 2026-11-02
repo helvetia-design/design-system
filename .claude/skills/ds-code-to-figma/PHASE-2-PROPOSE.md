@@ -11,192 +11,128 @@ user sign-off on it — before anything is built.
 
 ## References
 
-- `CONVENTIONS.md` — heuristics learned from prior components.
+- `conventions/content-selection-and-mitigations.md` — wrapper + Instance Swap pattern and
+  over-threshold mitigation mechanics. Read only if the component has an open-ended content prop
+  or the step 3 count exceeds 500.
+- `CONVENTIONS.md` — cross-phase rules; not a required read in this phase.
 
 ## Instructions
 
-1. Read `CONVENTIONS.md` in this skill's folder for heuristics learned from prior components.
-2. Draft how the analyzed props/states collapse into Figma variant properties:
-   - An enum prop (`@OneOf([...])`) → one Figma variant property, same name, same options — but
-     only when every option re-skins the **same layers** (a different token value on an
-     otherwise identical shape, e.g. `size: sm/base` scaling the same shape, or a badge `color`
-     swapping a fill token on the same pill). If the options instead require **different
-     layers/structure** — e.g. a button `color`/`type` prop where `primary` is a solid fill,
-     `ghost` is a transparent fill + border, `link` is text-only with an underline — don't force
-     it into one variant set. Split it into separate top-level components instead, swapped via
-     Figma's native Instance Swap, same treatment as the `inverted` axis (Phase 8) and an
-     open-ended content-selection prop like icon `name`. Confirmed against the TapTap Design
-     System's own Button, which models exactly this (`Button/Primary`, `Button/Ghost`,
-     `Button/Link`, `Button/Outline` as separate top-level components, never a shared "style"
-     variant). **The test is never the prop's name or whether it's an enum — it's: same layers,
-     different token → variant; different layers/structure → top-level split via instance swap.**
-   - A plain boolean prop with no state/interaction meaning → one boolean Figma property.
-   - A free-text prop (e.g. `label`) → never a variant property; it maps to an instance text
-     override. **Check the component's `render()` for a conditional guard around it** (e.g.
-     `hasValue(label) && <span>...`) — if the element only renders when the prop is non-empty,
-     add a paired boolean component property (`addComponentProperty('Show <name>', 'BOOLEAN',
-<code's real default>)`) bound to that layer's `visible` via `componentPropertyReferences`
-     on every variant. Don't rely on empty text alone — Figma won't collapse the auto-layout
-     gap/width for a present-but-empty text layer the way code's conditional omits the element
-     outright. See `CONVENTIONS.md`.
-   - **Every pseudo-class state and state-ish prop** (`:hover`, `:focus`, `:active`,
-     `disabled`, `readonly`, `loading`) **collapses into one `state` Figma variant property**
-     (`default` / `hover` / `focus` / `active` / `disabled` / `readonly` / `loading`, limited to
-     whichever of these the component actually has) — never separate axes, never separate
-     booleans.
-   - Anything ambiguous (doesn't fit the rules above cleanly) is flagged explicitly rather than
-     guessed.
-3. **Sketch the resulting variant grid itself, not just the property list** — how many axes
-   there are determines Figma's own native variant-grid arrangement, and the user should be able
-   to picture it before Phase 3 builds anything. **This ASCII sketch is a planning/counting aid for
-   the variant matrix, not a literal rendering of Phase 8's "🔒 Component Set" section** — that
-   section no longer draws table chrome (headers/gridlines/cells); it just places the real
-   `COMPONENT_SET` and lets Figma's own `combineAsVariants()` arrange its children natively. Include
-   this sketch (plain ASCII, in the same draft) alongside the proposed grouping:
-   - **2 axes (the normal case)**: one simple grid — one axis across the header row, the other
-     down the header column, e.g. `state` (rows: default/hover/active/disabled/...) × a
-     same-layers prop like `size` (columns: sm/base). One cell per combination, same shape as the
-     variant matrix Phase 8's "🔒 Component Set" section will show:
-     ```
-                sm        base
-     default  [cell]    [cell]
-     hover    [cell]    [cell]
-     active   [cell]    [cell]
-     ```
-   - **3+ same-layer axes (Primer-style nested matrix)**: don't stack repeated 2-axis grids — fold
-     every same-layer axis into one matrix with nested, bracket-grouped labels on rows and/or
-     columns, the way GitHub's Primer design system lays out its own Button variant grid (multiple
-     axes nested on each side, not one grid per option). Assign axes by a fixed rule, no per-component
-     judgment call:
-     - `size` always stays the single, innermost **column** axis.
-     - Every other same-layer axis goes on **rows**, nested outer→inner ordered by **ascending
-       option count outward** — the axis with the _fewest_ distinct options is the outermost
-       grouping, the axis with the _most_ options is innermost (closest to the cell). This keeps
-       the matrix growing taller, not wider, as axes are added, and generalizes the existing
-       `state`-on-rows convention: a `state` axis usually has the fewest options among a
-       component's same-layer axes, so it naturally lands outermost anyway.
-     - No height-based rebalancing — every non-size axis goes on rows regardless of how tall the
-       resulting table gets. Simpler and more predictable than a threshold that would need
-       recomputing per component.
-     - In the plain-ASCII sketch, the outermost row axis's label prints once per group with blank
-       cells underneath for the rest of that group (merged-cell convention) rather than repeating
-       on every row.
-     - Worked example — a component with same-layer axes `size` (sm/lg), `color` (6 options),
-       `pulse` (2 options): `pulse` has fewer options than `color`, so it's the outer row grouping;
-       `color` nests inside it; `size` stays on columns.
-       ```
-                         sm      lg
-       false   default  [cell]  [cell]
-               disabled [cell]  [cell]
-               info     [cell]  [cell]
-               danger   [cell]  [cell]
-               warning  [cell]  [cell]
-               success  [cell]  [cell]
-       true    default  [cell]  [cell]
-               disabled [cell]  [cell]
-               info     [cell]  [cell]
-               danger   [cell]  [cell]
-               warning  [cell]  [cell]
-               success  [cell]  [cell]
-       ```
-   - **Any axis that is structural rather than same-layer** (different layers/shape per option,
-     not just a different token on an identical shape — same test as the enum-prop rule above, and
-     the same treatment `inverted` already gets in Phase 8), regardless of how many same-layer axes
-     exist alongside it: that axis is a top-level split signal, not another matrix dimension —
-     split it into separate top-level components (Instance Swap), and sketch each split
-     component's own nested matrix separately, each with its own frame/title, same as `inverted`'s
-     light/dark two-frame layout.
-   - State which case applies to this component (2-axis / nested-matrix / top-level-split) before
-     moving to step 4's approval ask, so the user is confirming an actual layout, not just a
-     property list.
-   - **Worked example — `ds-spinner`'s real, confirmed layout** (see `spinner.figma.md`'s "Major
-     rebuild — Main components split into two titled grids" section). Predates the nested-matrix
-     rule above — kept here as the historical record of what was actually built, not as the
-     pattern to follow for a new 3+-axis component going forward (today it'd fold `variation` into
-     the matrix as an outer-row grouping instead of stacking two separate titled grids). It has 4
-     axes — `variation` (logo/circle), `size` (sm/base), `labelPosition` (right/bottom), `inverted`
-     (false/true). `inverted` is structural → split into two top-level component sets,
-     `Spinner/Primary` and `Spinner/Inverted`, each on its own full frame. Within each frame, 3
-     axes remain, built as stacked 2-axis grids — one titled grid per `variation` value, each grid
-     being a 2-axis table of `labelPosition` (rows: Bottom/Right) × `size` (columns: Base/SM):
-     ```
-     Spinner/Primary                        Spinner/Inverted
-     Logo                                   Logo
-                Base      SM                           Base      SM
-     Bottom   [cell]    [cell]              Bottom   [cell]    [cell]
-     Right    [cell]    [cell]              Right    [cell]    [cell]
+### 1. Map every prop and state
 
-     Circle                                 Circle
-                Base      SM                           Base      SM
-     Bottom   [cell]    [cell]              Bottom   [cell]    [cell]
-     Right    [cell]    [cell]              Right    [cell]    [cell]
-     ```
-     This is the end state after several rebuild iterations on the real component — sketching it
-     this way up front in Phase 2 is what lets the user catch "2 titled grids, not 1 table" before
-     Phase 3 builds anything, rather than discovering it only after a build-review-rebuild cycle.
-4. **Compute the total variant count and check it against the 500-variant hard-stop threshold**
-   before presenting anything for approval. This is this skill's own conservative ceiling, not a
-   number Figma enforces — Figma's own docs only warn qualitatively (performance issues appear
-   with "thousands" of variants per set, no fixed number given) and describe a shared ~2GB-per-tab
-   memory budget across the _whole_ library file, not per-component. Staying well under it leaves
-   headroom for every other component sharing that file.
-   - **Count** = sum, across every top-level split (e.g. each separately-split icon name from the
-     content-selection-prop rule), of the product of that split's own crossed variant-property
-     option counts from step 2 above (every variant property, including `state`).
-   - **Exclude lightweight Instance Swap library members** (plain single `COMPONENT`s parked as
-     swap targets, not crossed into a `COMPONENT_SET`) from the count — they're structurally
-     trivial (one vector, no bound state/size variants) and don't carry the same performance cost
-     as a crossed variant.
-   - **If the count is ≤500**, continue to step 5.
-   - **If the count exceeds 500**, stop here — do not present the grouping for approval yet.
-     Identify which axis/axes are driving the count up and classify each by the same test used in
-     step 2, then recommend a mitigation:
-     - A **token-swap axis** — same layers, only a different Figma-Variable-bound value (color is
-       the common case, but this generalizes to any variable-bound attribute, e.g. border-width or
-       elevation) — is eligible for the **variable-override mitigation**: bind that attribute to a
-       Figma Variable once and let consumers override it per-instance (`setBoundVariableForPaint`
-       for paint fields, or the matching bound-variable setter for other field types) instead of
-       crossing it into a variant property. This drops the axis from the cross-product entirely
-       with zero new nodes created, at the cost of a less discoverable per-instance override
-       instead of a variant dropdown — offer this specifically because the threshold was exceeded,
-       never as a universal default (see `CONVENTIONS.md`).
-     - A **structural or open-ended content-selection axis** (different layers/shape per option,
-       or an unbounded set like icon `name`) is eligible for the existing **wrapper + Instance
-       Swap split** pattern (see `CONVENTIONS.md`'s current rule, originally developed for
-       `ds-icon`): one shared wrapper `COMPONENT_SET` crossing only the remaining same-layers
-       sub-props, plus a lightweight Instance Swap library for the content axis.
-     - **A size axis is never offered the variable-override mitigation** — resolve a
-       size-driven explosion via a crossed variant (if it fits the budget on its own) or a
-       structural split, never a variable swap.
-       Present the count, the dominant-axis breakdown, and the recommended mitigation(s) to the user
-       and ask them to choose (or combine both). Once they pick, recompute the total against the new
-       structure and **repeat this check** — loop until the count is ≤500, the same way step 6 below
-       loops on edits before approval.
-5. Write the proposed grouping (and grid sketch) into `<name>.figma.md` and present it to the
-   user for review.
-6. **Stop and wait for the user to confirm or edit** the mapping directly in the file before
-   proceeding to Phase 3. Do not proceed on an assumed approval.
-7. Once confirmed, propose any new heuristic worth keeping (e.g. a grouping decision that didn't
-   fit an existing `CONVENTIONS.md` rule) as an addition to `CONVENTIONS.md`. Show the user the
-   exact diff and get approval before writing it — never auto-append.
+Apply this table to each prop/state from Phase 1. **The deciding test is never the prop's name or
+whether it's an enum: same layers, different token → variant; different layers/structure →
+top-level split via Instance Swap.**
+
+| Code construct                                                                                    | Figma mapping                                                                                                                                                             | Notes                                                                                                                                                                                                          |
+| ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Enum (`@OneOf([...])`), every option re-skins the **same layers**                                 | One variant property, same name, same options                                                                                                                             | e.g. `size: sm/base`, badge `color` swapping a fill token on the same pill.                                                                                                                                    |
+| Enum, options need **different layers/structure**                                                 | Separate top-level components swapped via Instance Swap                                                                                                                   | e.g. button `type`: `primary` solid fill, `ghost` transparent + border, `link` text-only. Matches TapTap's `Button/Primary`, `Button/Ghost`, … — never a shared "style" variant. Same treatment as `inverted`. |
+| Open-ended content-selection prop (unbounded options, e.g. icon `name`)                           | **Never** a variant property. No crossed sub-props → N top-level components (`<Component>/<option>`). With crossed same-layers sub-props → one wrapper set + swap library | Full pattern in `conventions/content-selection-and-mitigations.md`.                                                                                                                                            |
+| Boolean with a static visual effect                                                               | One boolean Figma property                                                                                                                                                |                                                                                                                                                                                                                |
+| Boolean with **no static visual effect**                                                          | Excluded from the mapping                                                                                                                                                 | e.g. `ds-spinner`'s `deactivated` (animation only). List it as "excluded" in the draft so the omission is visible.                                                                                             |
+| Pseudo-class or state-ish prop (`:hover`, `:focus`, `:active`, `disabled`, `readonly`, `loading`) | **One** `state` variant property: `default` / `hover` / `focus` / `active` / `disabled` / `readonly` / `loading` (only those the component has)                           | Never separate axes, never separate booleans.                                                                                                                                                                  |
+| Free-text prop (e.g. `label`)                                                                     | Instance text override — never a variant property                                                                                                                         | Ships with **placeholder text on every variant member**, not empty. If the member should show the true code default and that default is `''`, ask the user which policy applies.                               |
+| Free-text prop guarded in `render()` (e.g. `hasValue(label) && <span>`)                           | Text override **plus** a boolean `Show <name>` component property bound to the layer's `visible` via `componentPropertyReferences` on every variant                       | Default the boolean to the code's real default. Empty text alone isn't enough — Figma won't collapse the auto-layout gap/width the way code omits the element. Check every text-override prop's `render()`.    |
+| Prop whose effect depends on another prop                                                         | Its own independent variant axis                                                                                                                                          | Never collapsed or special-cased (e.g. `labelPosition` only shows when `label` is set, but stays an axis).                                                                                                     |
+| Anything else / ambiguous                                                                         | Flag explicitly                                                                                                                                                           | Never guess.                                                                                                                                                                                                   |
+
+### 2. Sketch the variant grid
+
+Sketch the grid itself, not just the property list, so the user can picture the layout before
+Phase 3. This ASCII sketch is a planning/counting aid, **not** a literal rendering of Phase 8's
+"🔒 Component Set" section (that section places the real `COMPONENT_SET` and lets Figma's
+`combineAsVariants()` arrange it). Put the sketch in the same draft and **state which case
+applies** before asking for approval:
+
+- **2 axes (normal case)**: one grid, e.g. `state` (rows) × `size` (columns).
+  ```
+             sm        base
+  default  [cell]    [cell]
+  hover    [cell]    [cell]
+  active   [cell]    [cell]
+  ```
+- **3+ same-layer axes (Primer-style nested matrix)**: fold all axes into one matrix with nested
+  row groups — don't stack repeated 2-axis grids. Fixed assignment, no per-component judgment:
+  - `size` is always the single, innermost **column** axis.
+  - Every other axis goes on **rows**, nested outer→inner by **ascending option count** (fewest
+    options outermost). No height-based rebalancing.
+  - In ASCII, print the outermost row label once per group, blank beneath (merged-cell look).
+  - Example — `size` (sm/lg), `color` (6 options), `pulse` (2 options): `pulse` outermost,
+    `color` inside it, `size` on columns.
+    ```
+                      sm      lg
+    false   default  [cell]  [cell]
+            disabled [cell]  [cell]
+            info     [cell]  [cell]
+            danger   [cell]  [cell]
+            warning  [cell]  [cell]
+            success  [cell]  [cell]
+    true    default  [cell]  [cell]
+            ...      ...     ...
+    ```
+- **Top-level split**: any structural axis (different layers per option, per the table above) is
+  not a matrix dimension. Split it into separate top-level components and sketch each one's own
+  matrix with its own frame/title, like `inverted`'s light/dark two-frame layout (e.g.
+  `Spinner/Primary` and `Spinner/Inverted`).
+
+### 3. Check the variant count (500 hard stop)
+
+Compute the total before presenting anything. 500 is this skill's own conservative ceiling, not a
+Figma limit (Figma only warns about "thousands" per set and a shared ~2 GB per-tab memory budget
+across the whole library file) — staying under it leaves headroom for other components.
+
+- **Count** = sum, across every top-level split, of the product of that split's crossed
+  variant-property option counts (every property, including `state`).
+- **Exclude** lightweight Instance Swap library members (single `COMPONENT`s, not crossed sets).
+- **≤500** → continue.
+- **>500** → stop; do not present for approval. Find the axes driving the count, classify each with
+  the table's test, and recommend a mitigation:
+  - **Token-swap axis** (same layers, only a Variable-bound value differs — color, border-width,
+    elevation, …) → **variable-override mitigation**: bind the attribute to a Figma Variable once
+    and let consumers override it per instance instead of crossing it. Zero new nodes, but less
+    discoverable than a dropdown — offer it only because the threshold was exceeded, never as a
+    default. **Never offered for a size axis.**
+  - **Structural or open-ended content axis** → **wrapper + Instance Swap split** (one wrapper set
+    crossing only the remaining same-layers props, plus a swap library for the content axis).
+  - **Size-driven explosion** → a crossed variant (if it fits on its own) or a structural split.
+
+  Present the count, the dominant-axis breakdown, and the recommendation(s); let the user choose
+  or combine. Recompute against the new structure and **repeat until ≤500**. Mechanics:
+  `conventions/content-selection-and-mitigations.md`.
+
+### 4. Write and present
+
+Write the proposed grouping (table result + grid sketch + count) into `<name>.figma.md` and
+present it to the user for review.
+
+### 5. Wait for confirmation
+
+**Stop and wait for the user to confirm or edit** the mapping in the file before proceeding to
+Phase 3. Do not proceed on an assumed approval.
+
+### 6. Propose new heuristics
+
+Once confirmed, propose any heuristic worth keeping (e.g. a grouping decision that didn't fit the
+table) as a new or edited row in this file's step 1 table. A lesson about content-selection props or
+threshold mitigations goes to `conventions/content-selection-and-mitigations.md` instead. Show the
+exact diff and get approval before writing it — never auto-append.
 
 ## Output
 
-- The proposed variant grouping and its grid sketch (2-axis / nested-matrix / top-level-split),
-  written into `<name>.figma.md`.
-- The total variant count against the 500-variant threshold, with a mitigation proposal if it was
-  exceeded.
-- Any new `CONVENTIONS.md` heuristic worth keeping, proposed as an explicit diff.
+- The proposed grouping, its grid sketch (2-axis / nested-matrix / top-level-split) and the
+  variant count against the 500 threshold (with a mitigation proposal if exceeded), written into
+  `<name>.figma.md`.
+- Any new heuristic worth keeping, proposed as an explicit diff against the step 1 table (or the
+  content-selection topic file).
 
 ## Completion Criteria
 
 - The variant count is ≤500 (after any mitigation round-trip with the user).
-- The grouping and grid sketch are written into `<name>.figma.md` and the user has explicitly
-  confirmed or edited them — not an assumed approval.
-- Any new heuristic was shown to the user as a diff and approved before being written to
-  `CONVENTIONS.md`.
+- The user has explicitly confirmed or edited the grouping and sketch — not an assumed approval.
+- Any new heuristic was shown as a diff and approved before being written.
 
 ## Next Phase
 
-Proceed to [`PHASE-3-BUILD.md`](PHASE-3-BUILD.md) only once step 6's user confirmation is
+Proceed to [`PHASE-3-BUILD.md`](PHASE-3-BUILD.md) only once step 5's user confirmation is
 received.

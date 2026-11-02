@@ -36,17 +36,17 @@ Two kinds of pause, treated differently:
 
 ## Phase 2 — Propose grouping
 
-- 🛑 **Ambiguous prop-to-variant mapping** (step 2): anything that doesn't cleanly fit the
+- 🛑 **Ambiguous prop-to-variant mapping** (step 1): anything that doesn't cleanly fit the
   enum/boolean/free-text/state rules — flagged explicitly, never guessed.
-- 🟡 **Variant-grid-layout confirmation** (step 3): state which case applies (2-axis / nested-matrix
+- 🟡 **Variant-grid-layout confirmation** (step 2): state which case applies (2-axis / nested-matrix
   / top-level-split) before asking for approval, so the user confirms an actual layout, not just a
   property list.
-- 🛑 **500-variant threshold exceeded** (step 4): stop before presenting the grouping for approval;
+- 🛑 **500-variant threshold exceeded** (step 3): stop before presenting the grouping for approval;
   present the count, the dominant-axis breakdown, and the recommended mitigation(s); loop until
   the count is ≤500 after the user picks.
-- 🟡 **Grouping sign-off** (step 6): stop and wait for the user to confirm or edit the mapping
+- 🟡 **Grouping sign-off** (step 5): stop and wait for the user to confirm or edit the mapping
   directly in `<name>.figma.md` before Phase 3 starts. Never proceed on assumed approval.
-- 🟡 **New `CONVENTIONS.md` heuristic** (step 7): show the user the exact diff and get approval
+- 🟡 **New Phase 2 heuristic** (step 6): show the user the exact diff and get approval
   before writing it — never auto-append.
 
 ## Phase 3 — Build

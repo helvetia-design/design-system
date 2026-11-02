@@ -26,7 +26,7 @@ documentation page too, not just the raw component set.
   a literal structural template).
 - `conventions/component-set-rendering.md` — stale-bounding-box note, `ABSOLUTE`-positioning
   pitfalls, the "never auto-rehugs" note.
-- `conventions/variant-grouping.md`'s "Open-ended content-selection props" section.
+- `conventions/content-selection-and-mitigations.md`'s "Open-ended content-selection props" section.
 - `CHANGELOG.md`'s "Old table-overlay mechanics" section.
 - `PHASE-4-DOCUMENT-LAYOUT.md`'s "Cross-cutting build pitfalls" section.
 
@@ -325,7 +325,7 @@ any such gap in the master component, not with a per-instance override.
 
 ### Handling an open-ended content-selection prop (wrapper + Instance Swap library)
 
-Unchanged by the 2026-10-29 restructure — see `conventions/variant-grouping.md`'s
+Unchanged by the 2026-10-29 restructure — see `conventions/content-selection-and-mitigations.md`'s
 "Open-ended content-selection props" section for the full wrapper-`COMPONENT_SET` + Instance Swap library
 pattern, its fallback (N separate top-level sets), and every build pitfall (multi-vector glyph
 flattening, `<clipPath>` stripping, per-row dark-preview backgrounds for invisible token-swap

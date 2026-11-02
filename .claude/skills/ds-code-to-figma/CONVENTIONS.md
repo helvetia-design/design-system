@@ -1,18 +1,20 @@
-# Mapping conventions — code → Figma
+# Cross-phase conventions — code → Figma
 
-Heuristics the `ds-code-to-figma` skill uses when proposing a variant grouping in Phase 2 and
-building Phase 3/4. This file (and its `conventions/*.md` topic files) are only ever changed by
-the skill _proposing_ an addition and the user _approving_ it — never auto-appended.
+Rules and topic files that apply across several phases of the `ds-code-to-figma` skill. Prop-to-
+variant mapping and the 500-variant check are **not** here — they live in
+[`PHASE-2-PROPOSE.md`](PHASE-2-PROPOSE.md) (step 1 table, step 3). This file (and its
+`conventions/*.md` topic files) are only ever changed by the skill _proposing_ an addition and the
+user _approving_ it — never auto-appended.
 
 ## Index
 
-- **Baseline rules** (below) — seeded, not learned: free-text/state/enum prop mapping, the
-  500-variant threshold, category pages, "never lock a node", "no attribute is ever assumed".
+- **Cross-phase rules** (below) — category pages and fixed category copy, "never lock a node",
+  "no attribute is ever assumed".
 - [`conventions/tokens-and-props.md`](conventions/tokens-and-props.md) — resolving design tokens
   (Phase 1), and verifying a claimed value/behavior before trusting it (Phase 1/5).
-- [`conventions/variant-grouping.md`](conventions/variant-grouping.md) — prop-to-variant mapping,
-  the wrapper + Instance Swap pattern for open-ended content props, the 500-variant threshold's
-  mitigations (Phase 2).
+- [`conventions/content-selection-and-mitigations.md`](conventions/content-selection-and-mitigations.md)
+  — the wrapper + Instance Swap pattern for open-ended content props and the 500-variant
+  threshold's mitigations (Phase 2, conditional; Phase 8).
 - [`conventions/page-structure.md`](conventions/page-structure.md) — category pages, the
   one-documentation-frame-per-component invariant, the `inverted`-axis handling (Phase 3 / Phase 4
   / Phase 8).
@@ -22,37 +24,7 @@ the skill _proposing_ an addition and the user _approving_ it — never auto-app
   gotchas that apply across any phase: platform limits, variant-set mechanics, auto-layout
   sizing, vector import, color/paint, focus states.
 
-## Baseline rules (seeded, not learned)
-
-- **Free-text props never become Figma variant properties.** A prop like `label` maps to an
-  instance text override, not a variant option — the set of possible strings is unbounded.
-- **Pseudo-class states and state-ish props collapse into one `state` Figma variant property.**
-  `:hover`, `:focus`, `:active` (from SCSS) plus `disabled` / `readonly` / `loading`-style props
-  all become options on a single `state` property (`default` / `hover` / `focus` / `active` /
-  `disabled` / `readonly` / `loading`, limited to whichever apply) — never separate axes, never
-  separate booleans.
-- **Enum props (`@OneOf([...])`) map 1:1** to a Figma variant property of the same name with the
-  same options — no renaming or collapsing unless a later rule says otherwise.
-- **An enum prop only maps to a variant property when its options share the same layer
-  structure — same shape, different token.** If the options instead require different
-  layers/structure (e.g. a button `color`/`type` prop where `primary` is a solid fill, `ghost` is
-  a transparent fill + border, `link` is text-only with an underline), it is **not** a variant
-  property — split it into separate top-level components instead, swapped via Figma's native
-  Instance Swap, same treatment as the `inverted` axis and open-ended content-selection props.
-  Confirmed against the TapTap Design System's own Button, which models
-  `Primary`/`Ghost`/`Link`/`Outline` this way, never as a crossed "style" variant. **The test is
-  never the prop's name or whether it's an enum — it's: same layers, different token → variant;
-  different layers/structure → top-level split via instance swap.** For the current rule on
-  open-ended content-selection props and the wrapper + Instance Swap pattern, see
-  [`conventions/variant-grouping.md`](conventions/variant-grouping.md).
-
-- **Total variant count is checked against a hard-stop ceiling of 500 before any grouping is
-  presented for approval** — this skill's own conservative limit, not a number Figma enforces.
-  Count = sum, across every top-level split, of the product of that split's own crossed
-  variant-property option counts (every property, including `state`). Lightweight Instance Swap
-  library members are excluded from the count. See
-  [`conventions/variant-grouping.md`](conventions/variant-grouping.md) for the full threshold
-  check and its mitigations (token-swap variable override, structural wrapper+swap split).
+## Cross-phase rules (seeded, not learned)
 
 - **Components are grouped onto one shared Figma page per code category, not one page per
   component — `Core / <Category>`, Title Case, plural, matching the code folder name exactly.**

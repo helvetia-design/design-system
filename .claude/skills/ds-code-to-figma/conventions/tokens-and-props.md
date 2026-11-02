@@ -1,7 +1,7 @@
 # Conventions — token resolution & prop analysis (Phase 1 / Phase 9)
 
 Relevant to Phase 1's analysis and Phase 9's review. See `../CONVENTIONS.md` for the index and
-baseline rules; see `../CHANGELOG.md` for superseded approaches.
+cross-phase rules; see `../CHANGELOG.md` for superseded approaches.
 
 ## Resolving tokens
 

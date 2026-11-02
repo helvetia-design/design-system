@@ -24,7 +24,7 @@ computed CSS value for that same token, read directly from the running dev serve
 ## References
 
 - `conventions/tokens-and-props.md` — the `ds-spinner` glyph-sizing example.
-- `CONVENTIONS.md` — mapping rules between component props and Figma variant properties.
+- `PHASE-2-PROPOSE.md` — step 1 table: mapping rules between component props and Figma variant properties.
 
 ## Instructions
 
@@ -49,7 +49,7 @@ For every Figma variant/state combination built in Phase 3:
    variables — the properties Figma actually binds (size, spacing, font, color, whatever
    applies). Don't invent an expected value for a property Figma left unbound.
 2. Find the matching element in `*.visual.html` using the component's props (they map 1:1 to the
-   Figma variant properties per `CONVENTIONS.md`'s mapping rules), e.g.
+   Figma variant properties per `PHASE-2-PROPOSE.md`'s mapping table), e.g.
    `ds-badge[color="danger"][size="lg"]`.
    - **If no matching element exists in `*.visual.html`** (the static markup doesn't render every
      combination — e.g. `badge.visual.html`'s "Sizes" section only shows 3 sizes at default

@@ -1,13 +1,13 @@
 # Conventions — category pages & documentation-frame structure (Phase 3 / Phases 4–8)
 
 Relevant to Phase 3's category-page setup and Phases 4–8's documentation frame. See
-`../CONVENTIONS.md` for the index, baseline rules, and the seeded category copy table. See
+`../CONVENTIONS.md` for the index, cross-phase rules, and the seeded category copy table. See
 `../CHANGELOG.md` for every reverted approach to this page's structure (slotted Category Frame
 master, separate Masters row, two-frame `inverted` split).
 
 - **Components are grouped onto one shared Figma page per code category, not one page per
   component** — `Core / <Category>`, Title Case, plural, matching the code folder name exactly. See
-  `../CONVENTIONS.md`'s baseline rules for the full seven-category copy table.
+  `../CONVENTIONS.md`'s cross-phase rules for the full seven-category copy table.
 - **Grouping multiple components onto one shared category page is built from nested
   `HORIZONTAL`/`VERTICAL` auto-layout, never manual x/y position math** — "append a new component"
   is then just one `row.appendChild(outerFrame)` call. The row's children are positioned entirely
