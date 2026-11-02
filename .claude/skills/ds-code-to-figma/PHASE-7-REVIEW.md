@@ -1,4 +1,4 @@
-# Phase 9 — Review against the live dev server
+# Phase 7 — Review against the live dev server
 
 ## Objective
 
@@ -9,15 +9,14 @@ back to the user as a report, not an auto-fix loop.
 This phase does **not** compare screenshots. Figma and browser rendering differ enough
 (anti-aliasing, font rasterization, PNG compression) to produce constant false mismatches on a
 pixel/visual comparison — and a small/compressed baseline image can make real content look like it
-has variation it doesn't actually have, or hide variation it does have. Instead, Phase 9 compares
+has variation it doesn't actually have, or hide variation it does have. Instead, Phase 7 compares
 **resolved values**: the Figma variable each property is bound to, against the live component's
 computed CSS value for that same token, read directly from the running dev server.
 
 ## Inputs
 
-- The documentation frame (header, Copy me, Anatomy, Specs, Component Set), finished and appended
-  into the category page in [`PHASE-8-DOCUMENT-COMPONENT-SET.md`](PHASE-8-DOCUMENT-COMPONENT-SET.md),
-  both iterated on and confirmed visually with the user.
+- The documentation frame (header, Copy me, Anatomy, Specs, Component Set), built across
+  [`PHASE-3-BUILD.md`](PHASE-3-BUILD.md) and Phases 4–6 and confirmed with the user.
 - The component's `*.visual.html` under
   `packages/core/src/components/<category>/<name>/test/*.visual.html`.
 
@@ -85,9 +84,9 @@ and compare it against what was built. See `conventions/tokens-and-props.md` for
 against the real computed/rendered output.** `ds-icon`'s `turn` was documented as "rotated 180deg"
 but the real CSS only rotates 3 specific icon names, one of them by 225deg, not 180 — caught by
 comparing the real `turn` visual-regression baseline, confirmed via `getComputedStyle` matrix
-inspection. When Phase 9 reveals the _component's own code doc_ was wrong (not just the Figma
+inspection. When Phase 7 reveals the _component's own code doc_ was wrong (not just the Figma
 mapping or `<name>.figma.md`'s draft notes), fix the code doc too, in the same pass — code is the
-source of truth for documentation copy (`PHASE-4-DOCUMENT-LAYOUT.md`'s header lead-paragraph
+source of truth for documentation copy (`PHASE-3-BUILD.md`'s header lead-paragraph
 rule), so a known-wrong comment shouldn't survive a run that just disproved it.
 
 ## Output

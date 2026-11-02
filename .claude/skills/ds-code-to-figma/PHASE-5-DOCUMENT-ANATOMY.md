@@ -1,37 +1,37 @@
-# Phase 6 — Document: Anatomy
+# Phase 5 — Document: Anatomy
 
 ## Objective
 
-Fill in the second section of the left `documentation` column: "🏗️ Anatomy". **Skip this entire
-phase** when the component's `<name>.figma.md` has no `anatomy:` list (no `@part` tags found in
-Phase 1) — go straight to [`PHASE-7-DOCUMENT-SPECS.md`](PHASE-7-DOCUMENT-SPECS.md) instead.
+Fill in the second section of the left `documentation` column: "🏗️ Anatomy". When the
+component's `<name>.figma.md` has no `anatomy:` list (no `@part` tags found in Phase 1), **delete
+the cloned frame's Anatomy `Section` placeholder** (the one with `Title` `kind=anatomy` in
+`body` › `Documentation`) so no empty Anatomy frame is left behind, then go straight to
+[`PHASE-6-DOCUMENT-SPECS.md`](PHASE-6-DOCUMENT-SPECS.md).
 
 Build this right after "Copy me" is confirmed, before
-[`PHASE-7-DOCUMENT-SPECS.md`](PHASE-7-DOCUMENT-SPECS.md) — unless this phase is skipped per the
-condition above.
+[`PHASE-6-DOCUMENT-SPECS.md`](PHASE-6-DOCUMENT-SPECS.md) — unless there are no parts, in which case this phase only deletes the placeholder.
 
 ## Inputs
 
 - "👉 Copy me", built and confirmed as the first child of the left `documentation` column in
-  [`PHASE-5-DOCUMENT-COPY-ME.md`](PHASE-5-DOCUMENT-COPY-ME.md).
+  [`PHASE-4-DOCUMENT-COPY-ME.md`](PHASE-4-DOCUMENT-COPY-ME.md).
 - `<name>.figma.md`'s `anatomy:` list (letter, part name, description) from Phase 1 — absence of
-  this list is the skip condition above.
+  this list is the no-parts condition above.
 
 ## References
 
-- `PHASE-4-DOCUMENT-LAYOUT.md`'s "0. Shared `Section`/`Preview`/`Title` components" section.
-- `PHASE-4-DOCUMENT-LAYOUT.md`'s "2. Body — 2-column layout and column sizing" section.
-- `PHASE-4-DOCUMENT-LAYOUT.md`'s "Cross-cutting build pitfalls" section.
+- `conventions/document-sections.md`.
+- `PHASE-3-BUILD.md`'s cloned frame (`body` › `Documentation` / `Component Sets` columns).
+- `conventions/build-mechanics.md`.
 - The prior revision of this document, or `ds-close`'s reference pages, for the full
   diagram/circle/leader-line construction rules (unchanged by this restructure).
 - `conventions/build-mechanics.md`'s "Color and paint" section.
 
 ## Instructions
 
-Mostly unchanged in diagram/legend content from the prior template — only its position in the page
-moved (now second in the left column, still skipped entirely when the component's
-`<name>.figma.md` has no `anatomy:` list). **Structure: a `Section` instance in `Flat` variant**
-(`Title` set to `kind=anatomy`) **as the outer zero-inset container, with one nested `Preview`
+**Fill the `Section` placeholder whose `Title` is `kind=anatomy` (`Flat` variant) in the cloned frame's `body` ›
+`Documentation` column** — don't create a new one. **Structure: that `Section`** (hard stop if no
+`kind=anatomy` placeholder exists) **is the outer zero-inset container, with one nested `Preview`
 instance in `Default` variant inside that outer slot** — the real diagram/circle/leader-line/legend
 content goes into the _nested_ `Preview`'s own slot, not the outer `Section`'s slot directly.
 Confirmed live on `Documentaion`: the Anatomy `Section`'s `Preview` slot has zero inset and
@@ -57,25 +57,23 @@ Create Text` **Bold**, leaving the `" · "`, `" — "`, and trailing description
   same rule as every other skill-authored label, see `conventions/build-mechanics.md`'s
   "Color and paint" section; don't hardcode a near-black literal even if it looks indistinguishable.
 
-Append this `Section` instance as the second child of the left `documentation` column (see
-`PHASE-4-DOCUMENT-LAYOUT.md`'s "2. Body — 2-column layout and column sizing" section). Iterate on
-it with the user (screenshot checkpoint) before moving on.
+The `kind=anatomy` placeholder already sits between Copy me and Specs in the cloned frame, so
+nothing is appended or moved. Iterate on it with the user in Figma before moving on.
 
 ## Output
 
-- A "🏗️ Anatomy" `Section` instance (or an explicit skip, when the component has no `anatomy:`
-  list), appended as the second child of the left `documentation` column.
+- The cloned frame's `kind=anatomy` `Section` placeholder filled as "🏗️ Anatomy" — or, when the component
+  has no `anatomy:` list, that placeholder deleted (no Anatomy frame at all).
 
 ## Completion Criteria
 
-- The `Section` instance uses `kind=anatomy` and `Flat` variant, with exactly one nested
+- The filled `Section` uses `kind=anatomy` and `Flat` variant, with exactly one nested
   `Default`-variant `Preview` holding the real diagram/legend content.
 - `diagram-area` and `legend` are `FILL` width; each legend line's letter and part name are Bold,
   the rest Regular; the legend line's fill is bound to `🔗 Alias/🔤 Text/Color/Primary`.
-- The section has been iterated on and confirmed with the user via a screenshot checkpoint (unless
-  this phase was skipped).
+- The section has been iterated on and confirmed with the user in Figma (unless the placeholder was deleted).
 
 ## Next Phase
 
-Proceed to [`PHASE-7-DOCUMENT-SPECS.md`](PHASE-7-DOCUMENT-SPECS.md) once Anatomy is built and
-confirmed (or immediately, if this phase was skipped).
+Proceed to [`PHASE-6-DOCUMENT-SPECS.md`](PHASE-6-DOCUMENT-SPECS.md) once Anatomy is built and
+confirmed (or immediately, once the placeholder is deleted).

@@ -84,7 +84,7 @@ Read the component's code and produce the draft mapping that Phase 2 proposes a 
      `<name>.figma.md`'s `tokens:` list (see `SKILL.md`'s mapping-file schema), no further lookup
      needed. A breakpoint-suffixed var (`--ds-logo-size-base-mobile`/`-tablet`/`-desktop`)
      resolves to that one breakpoint's own id directly; the bare, un-suffixed var resolves to the
-     full `{ mobile, tablet, desktop[, device] }` object — see `PHASE-3-BUILD.md` step 4's
+     full `{ mobile, tablet, desktop[, device] }` object — see `PHASE-3-BUILD.md` step 3's
      responsive-binding mechanics for what `device` is and when it's present.
    - **This still requires `search_design_system`/`get_variable_defs`/live enumeration for
      exactly one case: a value with no CSS-var binding at all** (a hardcoded literal in the
@@ -157,10 +157,10 @@ Tokens` collection has exactly those three. Any other mixin (`desktop-lg`, `desk
 6. Write all of the above into `<name>.figma.md` (create it if it doesn't exist) as a draft, per
    the schema in `SKILL.md`'s "Mapping file format" section. Include the `specs:` list —
    the values (fixed or min width/height, padding/gaps, fixed sizes of nested elements, radius,
-   border width, typography) per option of the Variants axis that Phase 7's "📐 Specs" section
+   border width, typography) per option of the Variants axis that Phase 6's "📐 Specs" section
    will show, each pointing at its Figma variable. It's a view onto the completeness checklist
    from step 5b, not new analysis. Leave out calculated inner content sizes and the radius of a
-   circle (see `PHASE-7-DOCUMENT-SPECS.md`).
+   circle (see `PHASE-6-DOCUMENT-SPECS.md`).
 
 ## Output
 

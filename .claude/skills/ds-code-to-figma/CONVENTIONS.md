@@ -11,15 +11,16 @@ user _approving_ it — never auto-appended.
 - **Cross-phase rules** (below) — category pages and fixed category copy, "never lock a node",
   "no attribute is ever assumed".
 - [`conventions/tokens-and-props.md`](conventions/tokens-and-props.md) — resolving design tokens
-  (Phase 1), and verifying a claimed value/behavior before trusting it (Phase 1/5).
+  (Phase 1), and verifying a claimed value/behavior before trusting it (Phase 1/4).
 - [`conventions/content-selection-and-mitigations.md`](conventions/content-selection-and-mitigations.md)
   — the wrapper + Instance Swap pattern for open-ended content props and the 500-variant
-  threshold's mitigations (Phase 2, conditional; Phase 8).
+  threshold's mitigations (Phase 2, conditional; Phase 3).
 - [`conventions/page-structure.md`](conventions/page-structure.md) — category pages, the
-  one-documentation-frame-per-component invariant, the `inverted`-axis handling (Phase 3 / Phase 4
-  / Phase 8).
+  one-documentation-frame-per-component invariant, the `inverted`-axis handling (Phase 3).
 - [`conventions/component-set-rendering.md`](conventions/component-set-rendering.md) — Component
-  Set axis labeling, sizing/grid mechanics, screenshot reliability for this section (Phase 8).
+  Set axis labeling, sizing/grid mechanics, screenshot reliability for this section (Phase 3).
+- [`conventions/document-sections.md`](conventions/document-sections.md) — `Section` / `Preview` /
+  `Title` mechanics for the Copy me, Anatomy and Specs sections (Phases 4–7).
 - [`conventions/build-mechanics.md`](conventions/build-mechanics.md) — general Figma Plugin API
   gotchas that apply across any phase: platform limits, variant-set mechanics, auto-layout
   sizing, vector import, color/paint, focus states.
@@ -29,7 +30,7 @@ user _approving_ it — never auto-appended.
 - **Components are grouped onto one shared Figma page per code category, not one page per
   component — `Core / <Category>`, Title Case, plural, matching the code folder name exactly.**
   The seven categories and their fixed title/lead copy for the shared
-  category-page header (see `PHASE-4-DOCUMENT-LAYOUT.md`'s "Page-level structure" section) — **never
+  category-page header (see `PHASE-3-BUILD.md`'s "Category pages" section) — **never
   invent category copy on the fly, this table is the source of truth**:
 
   | Category (folder) | Page name           | Title      | Lead                                                                                   |

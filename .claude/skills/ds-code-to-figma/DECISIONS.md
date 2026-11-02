@@ -1,6 +1,6 @@
 # Decision path — every stop-and-wait point in this skill
 
-A single index of every place this skill must pause for a human decision, across all nine phases.
+A single index of every place this skill must pause for a human decision, across all seven phases.
 Check this file when you're unsure whether you're at a checkpoint — it exists so that doesn't
 require re-reading full phase prose to confirm.
 
@@ -51,48 +51,38 @@ Two kinds of pause, treated differently:
 
 ## Phase 3 — Build
 
-- 🟡 **First-variant screenshot checkpoint** (step 4): show the user a screenshot of the single
-  default/base combination before fanning out the rest of the matrix — catches a structural
+- 🟡 **Documentation-frame approval** (step 6): give the user a Figma link to the frame (filled
+  header and finished labeled set(s)) and wait for approval in Figma before Phase 4; changes loop back to step 5.
+- 🛑 **Template page or layer missing**: `🗂️ Template / Category` not found, or a layer in
+  `PHASE-3-BUILD.md`'s layer-name contract is missing — stop and report which; never hand-build
+  the shell as a fallback.
+- 🛑 **Category copy missing**: category not in `CONVENTIONS.md`'s table — stop and ask for
+  title/lead text.
+- 🛑 **Storybook story ID unresolvable**: no `doc-config.ts` for the component — stop and ask
+  rather than shipping a dead link.
+- 🟡 **First-variant checkpoint** (step 4): give the user a Figma link to the single
+  default/base combination and wait for their confirmation in Figma before fanning out the rest of the matrix — catches a structural
   mistake once, before it's replicated across every variant.
 
-## Phase 4 — Document: Layout
+## Phase 4 — Document: Copy me
 
-- 🟡 **Layout iteration before moving on**: iterate on the header/2-column shell with the user
-  (screenshot checkpoint) before starting Phase 5 — same discipline as Phase 3's variant-matrix
-  checkpoint.
-- 🛑 **Unresolvable link URL** (Header section): if a build can't resolve one of the three header
-  links (Storybook/Toky/GitHub) — stop and ask rather than silently shipping that row dead.
-- 🛑 **Missing category copy** (page-level structure): a category folder with no seeded
-  title/lead in `CONVENTIONS.md`'s table — stop and ask before building that category's page.
+- 🟡 **Iteration before moving on**: confirm "Copy me" with the user before starting Phase 5.
 
-## Phase 5 — Document: Copy me
+## Phase 5 — Document: Anatomy
 
-- 🟡 **Iteration before moving on**: confirm "Copy me" with the user before starting Phase 6.
+- No checkpoints beyond the standing iteration discipline. **No-parts condition**: the component's
+  `<name>.figma.md` has no `anatomy:` list (no `@part` tags) — delete the cloned frame's Anatomy
+  `Section` placeholder (no Anatomy frame) and go straight to Phase 6.
 
-## Phase 6 — Document: Anatomy
+## Phase 6 — Document: Specs
 
-- No checkpoints beyond the standing iteration discipline. **Skip condition**: the component's
-  `<name>.figma.md` has no `anatomy:` list (no `@part` tags) — skip this phase entirely, go
-  straight to Phase 7.
+- 🟡 **Iteration before moving on**: confirm Specs with the user before the review (Phase 7).
 
-## Phase 7 — Document: Specs
-
-- 🟡 **Iteration before moving on**: confirm Specs with the user before starting Phase 8.
-
-## Phase 8 — Document: Component Set
-
-- 🟡 **Axis-count check** (required, not optional): count the real crossed axes on the set before
-  deciding on row/column labels — skipping this has shipped unlabeled sets twice (`ds-spinner`,
-  `ds-logo`).
-- 🟡 **Final layout iteration before done**: iterate on the finished documentation frame with the
-  user (screenshot checkpoints) before considering the whole documentation page finished and
-  moving on to Phase 9 — same discipline as Phase 3's variant-matrix checkpoint.
-
-## Phase 9 — Review
+## Phase 7 — Review
 
 - No checkpoints or hard stops — this phase only reports. Findings (token mismatches, uncovered
   gaps, a wrong code-doc comment) are advisory; the user decides what, if anything, gets fixed.
-  See `PHASE-9-REVIEW.md` §3 for the one exception where this skill fixes something on its own
+  See `PHASE-7-REVIEW.md` §3 for the one exception where this skill fixes something on its own
   authority: a confirmed-wrong _code doc comment_ gets corrected in the same pass, since code is
   this system's own source of truth for documentation copy.
 

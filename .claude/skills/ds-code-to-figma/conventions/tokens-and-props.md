@@ -1,7 +1,7 @@
-# Conventions — token resolution & prop analysis (Phase 1 / Phase 9)
+# Conventions — token resolution & prop analysis (Phase 1 / Phase 7)
 
-Relevant to Phase 1's analysis and Phase 9's review. See `../CONVENTIONS.md` for the index and
-cross-phase rules; see `../CHANGELOG.md` for superseded approaches.
+Relevant to Phase 1's analysis and Phase 7's review. See `../CONVENTIONS.md` for the index and
+cross-phase rules.
 
 ## Resolving tokens
 
@@ -27,7 +27,7 @@ cross-phase rules; see `../CHANGELOG.md` for superseded approaches.
   an inherited-context binding, not a literal one. (From: `ds-spinner`'s label part.)
 - **Responsive (device-mode) token bindings are a formal part of this skill** — detection lives in
   `PHASE-1-ANALYZE.md` step 5a, the `device:` mapping-file schema in `SKILL.md`, and the
-  routing-variable create-or-reuse mechanism in `PHASE-3-BUILD.md` step 4. Known standing risk:
+  routing-variable create-or-reuse mechanism in `PHASE-3-BUILD.md` step 3. Known standing risk:
   the routing variables this mechanism creates are hand-built, not emitted by `scripts/figma-sync`
   — if the underlying per-breakpoint variables are ever renamed/removed, the alias targets go
   stale with no automatic fix. `ds-icon` is a known, not-yet-fixed gap (a real `@include tablet`
@@ -36,7 +36,7 @@ cross-phase rules; see `../CHANGELOG.md` for superseded approaches.
 ## Verifying a claimed value or behavior before trusting it
 
 - **A prop's JSDoc comment can itself be wrong or incomplete** — verify its claimed behavior
-  against the real computed/rendered output during Phase 1/5, don't just transcribe it.
+  against the real computed/rendered output during Phase 1/4, don't just transcribe it.
   `ds-icon`'s `turn` was documented as "rotated 180deg" but the real CSS only rotates 3 specific
   icon names, one by 225deg — confirmed via `getComputedStyle` matrix inspection, not by re-reading
   the SCSS harder. When a check reveals the _component's own code doc_ was wrong (not just the
@@ -53,7 +53,7 @@ cross-phase rules; see `../CHANGELOG.md` for superseded approaches.
   square's axis-aligned bounding box is naturally larger than its own side length at any angle
   other than 0/90/180/270°. Prefer `getComputedStyle(el).width` over the rendered bounding box for
   anything with a running CSS `animation`, or measure a paused instance. (From: `ds-spinner`'s
-  circle Phase 9 sweep, which read ~30px for a token that's actually exactly 24px.)
+  circle Phase 7 sweep, which read ~30px for a token that's actually exactly 24px.)
 - **When a library recolors nested SVG content dynamically (e.g. `lottie-colorify`), querying the
   first matching `path`/`g` can land on an unstyled wrapper, not the actual colored leaf
   element** — its computed `fill` then reads the SVG spec's initial value (`black`), not the real

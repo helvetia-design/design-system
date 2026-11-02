@@ -1,9 +1,7 @@
 # Conventions — general Figma Plugin API mechanics (any phase)
 
 Gotchas and techniques that apply to building any frame/section in this skill, not one specific
-phase or section. See `../CONVENTIONS.md` for the index; see `../CHANGELOG.md` for the retired
-table-overlay-era mechanics (z-order against a table, absolute-coordinate realignment) that these
-superseded.
+phase or section. See `../CONVENTIONS.md` for the index.
 
 ## Platform limits
 

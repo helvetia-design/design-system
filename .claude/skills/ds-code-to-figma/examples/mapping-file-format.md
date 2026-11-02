@@ -19,7 +19,7 @@ figmaMasterNodeId: null # this component's master COMPONENT_SET node id (referen
 
 figmaDocFrameNodeId: null # this component's "<Component> Documentation" frame id within the
 
-# documentation-frames row — filled in by Phase 3 and Phase 8 respectively, since the page itself
+# documentation-frames row — filled in by Phase 3, since the page itself
 
 # no longer uniquely identifies a single component's content
 
@@ -90,7 +90,7 @@ props:
   figmaVariableId: null # the routing/Device variable is hand-created by Phase 3, not resolved by
   # css-token-lookup.mjs — see device: above and PHASE-3-BUILD.md step 4
   resolved: true
-  specs: # one entry per option of the Variants axis, shown in Phase 7's "📐 Specs" section
+  specs: # one entry per option of the Variants axis, shown in Phase 6's "📐 Specs" section
   base:
   - kind: size # size | icon | spacing | radius (| type, once added)
     label: Size # Size (width = height, same variable) | Width | Height | Min width | Min height | Padding | Gap | Radius | …
