@@ -14,6 +14,8 @@ user sign-off on it — before anything is built.
 - `conventions/content-selection-and-mitigations.md` — wrapper + Instance Swap pattern and
   over-threshold mitigation mechanics. Read only if the component has an open-ended content prop
   or the step 3 count exceeds 500.
+- `conventions/component-set-rendering.md` → "Option and axis ordering" — **required read before
+  step 2**; it governs `figmaOptions:` order and the grid sketch.
 - `CONVENTIONS.md` — cross-phase rules; not a required read in this phase.
 
 ## Instructions
@@ -107,7 +109,9 @@ across the whole library file) — staying under it leaves headroom for other co
 ### 4. Write and present
 
 Write the proposed grouping (table result + grid sketch + count) into `<name>.figma.md` and
-present it to the user for review.
+present it to the user for review. **Pre-flight before presenting:** verify every axis's
+`figmaOptions:` and the ASCII sketch follow the ordering rules (smallest at the left or top, e.g.
+`sm` before `base`) — checked, not assumed.
 
 ### 5. Wait for confirmation
 
@@ -132,6 +136,7 @@ exact diff and get approval before writing it — never auto-append.
 ## Completion Criteria
 
 - The variant count is ≤500 (after any mitigation round-trip with the user).
+- Every axis's options are in canonical order (checked, not assumed).
 - The user has explicitly confirmed or edited the grouping and sketch — not an assumed approval.
 - Any new heuristic was shown as a diff and approved before being written.
 

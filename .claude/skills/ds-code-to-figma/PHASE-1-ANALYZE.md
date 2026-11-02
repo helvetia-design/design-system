@@ -24,7 +24,10 @@ Read the component's code and produce the draft mapping that Phase 2 proposes a 
 
 1. Read `packages/core/src/components/<category>/<name>/<name>.tsx` and extract every **public
    `@Prop()`** — ignore `@Method`, `@Event`, and private `@State`. Note each prop's type
-   (`@OneOf([...])` enum, boolean, string, number) and default.
+   (`@OneOf([...])` enum, boolean, string, number) and default. Write every enum's
+   `figmaOptions:` in canonical order per `conventions/component-set-rendering.md` → "Option and
+   axis ordering" (T-shirt scale `sm · base · md · lg`, never default-first). The implicit unset
+   default is named `base` and slots into the scale, not at the front.
 2. Extract the component's **anatomy** — its named visual parts — from the class-level `@part`
    JSDoc tags (e.g. `ds-button`: `@part native`, `@part spinner`, `@part icon`, `@part label`,
    `@part icon-right`). Cross-check every `@part` tag against a real `part="..."` attribute in
