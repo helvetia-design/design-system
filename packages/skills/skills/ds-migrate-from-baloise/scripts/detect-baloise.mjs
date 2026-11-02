@@ -99,23 +99,30 @@ function detectFramework(manifest) {
   return 'html'
 }
 
+/**
+ * Every framework gets `tokens` and `core` on top of its own binding package, because the
+ * migration makes the consumer import both directly:
+ *
+ * - `tokens` — Init writes an `@helvetia-design/tokens/css/base` import into the consumer's own
+ *   entry file (the `normalize` and bundled `css/all` rules in SKILL.md).
+ * - `core` — the controller and option types live there and are not re-exported by the binding
+ *   packages, so `AlertController`, `Alert`, `ModalController` and `ModalOptions` are imported
+ *   from `@helvetia-design/core` even in a React or Angular app.
+ *
+ * Both currently resolve anyway, as transitive dependencies, but only because npm and Yarn
+ * flatten `node_modules`. Under pnpm's default layout, where only declared dependencies are
+ * linked, those imports fail to resolve. Declaring what the skill tells the consumer to import
+ * is the fix.
+ */
 function aliasesFor(framework, version) {
-  if (framework === 'react') {
-    return {
-      [targetPackageName('react')]: version,
-      [targetPackageName('styles')]: version,
-    }
-  }
-  if (framework === 'angular') {
-    return {
-      [targetPackageName('angular')]: version,
-      [targetPackageName('styles')]: version,
-    }
-  }
-  return {
+  const shared = {
     [targetPackageName('core')]: version,
     [targetPackageName('styles')]: version,
+    [targetPackageName('tokens')]: version,
   }
+  if (framework === 'react') return { [targetPackageName('react')]: version, ...shared }
+  if (framework === 'angular') return { [targetPackageName('angular')]: version, ...shared }
+  return shared
 }
 
 function dependencyNames(manifest) {

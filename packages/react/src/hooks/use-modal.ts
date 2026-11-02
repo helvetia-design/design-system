@@ -1,6 +1,7 @@
 'use client'
 
 import { dsModalController, type ModalOptions } from '@helvetia-design/core'
+import { defineCustomElement as defineDsModal } from '@helvetia-design/core/components/ds-modal.js'
 import { useCallback, useRef, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot, type Root } from 'react-dom/client'
@@ -10,6 +11,12 @@ import { createRoot, type Root } from 'react-dom/client'
  * and hands it to the modal controller via `ModalOptions.component`.
  */
 export function useModal() {
+  // `dsModalController.create()` builds the element with `document.createElement('ds-modal')`,
+  // which leaves it un-upgraded unless `ds-modal` is registered. Nothing else in this path
+  // registers it — an app that only ever presents modals imperatively never renders a `<Modal>`
+  // or `<DsModal>` wrapper — so the hook has to, the same way `useAlertController` does.
+  defineDsModal()
+
   const modalRef = useRef<HTMLDsModalElement | null>(null)
   const rootRef = useRef<Root | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
