@@ -1,18 +1,32 @@
 # Phase 7 — Document: Specs
 
-**You are here:** assumes [`PHASE-6-DOCUMENT-ANATOMY.md`](PHASE-6-DOCUMENT-ANATOMY.md) has built
-(or skipped) "🏗️ Anatomy". This phase fills in the last section of the left `documentation`
-column: "📐 Specs". It relies on the shared `Section`/`Preview`/`Title` components described in
-`PHASE-4-DOCUMENT-LAYOUT.md`'s "0. Shared `Section`/`Preview`/`Title` components" section.
+## Objective
 
-## When to use this
-
-Build this right after Anatomy (or right after Copy me, if Anatomy was skipped), before
-[`PHASE-8-DOCUMENT-COMPONENT-SET.md`](PHASE-8-DOCUMENT-COMPONENT-SET.md). Specs is always the last
+Fill in the last section of the left `documentation` column: "📐 Specs". Specs is always the last
 section of the left column — the "🛠 Variants" section that historically followed it has been
 retired.
 
-### 5. "📐 Specs"
+Build this right after Anatomy (or right after Copy me, if Anatomy was skipped), before
+[`PHASE-8-DOCUMENT-COMPONENT-SET.md`](PHASE-8-DOCUMENT-COMPONENT-SET.md).
+
+## Inputs
+
+- "🏗️ Anatomy" (or "👉 Copy me", if Anatomy was skipped), built and confirmed in
+  [`PHASE-6-DOCUMENT-ANATOMY.md`](PHASE-6-DOCUMENT-ANATOMY.md).
+- `<name>.figma.md`'s `specs:` list from Phase 1 — the values (fixed or min width/height,
+  padding/gaps, fixed sizes of nested elements, radius, border width, typography) per option of
+  the Variants axis.
+
+## References
+
+- `PHASE-4-DOCUMENT-LAYOUT.md`'s "0. Shared `Section`/`Preview`/`Title` components" section.
+- `PHASE-4-DOCUMENT-LAYOUT.md`'s "2. Body — 2-column layout and column sizing" section.
+- `PHASE-4-DOCUMENT-LAYOUT.md`'s "Cross-cutting build pitfalls" section.
+- `🧰 Annotations` page, node `2046:5` — the `Spec/*` annotation components.
+- `conventions/build-mechanics.md`'s "Color and paint" section.
+- `PHASE-8-DOCUMENT-COMPONENT-SET.md`'s "Handling an `inverted` axis" section.
+
+## Instructions
 
 **Moved from its old end-of-page position to directly after Anatomy, now the last left-column
 section (the "🛠 Variants" section that used to follow it has been retired), per explicit
@@ -57,9 +71,22 @@ Append this `Section` instance as the last child of the left `documentation` col
 `PHASE-4-DOCUMENT-LAYOUT.md`'s "2. Body — 2-column layout and column sizing" section). Iterate on
 it with the user (screenshot checkpoint) before moving on.
 
-See `PHASE-4-DOCUMENT-LAYOUT.md`'s "Cross-cutting build pitfalls" section for build gotchas that
-apply here too.
+## Output
 
-**Next: [`PHASE-8-DOCUMENT-COMPONENT-SET.md`](PHASE-8-DOCUMENT-COMPONENT-SET.md)** — once Specs is
+- A "📐 Specs" `Section` instance, with one nested `Default`-variant `Preview` per Variants-axis
+  option, appended as the last child of the left `documentation` column.
+
+## Completion Criteria
+
+- The `Section` instance uses `kind=specs` and `Flat` variant, with one nested `Default`-variant
+  `Preview` per Variants-axis option.
+- Every nested `Preview` is `FILL` width and ends up `HUG` height; every card frame is resized to
+  match its slot's real width (`x = 0`, no clipped label text).
+- Specs shows the `Primary` set's instances/values only, never `Inverted`.
+- The section has been iterated on and confirmed with the user via a screenshot checkpoint.
+
+## Next Phase
+
+Proceed to [`PHASE-8-DOCUMENT-COMPONENT-SET.md`](PHASE-8-DOCUMENT-COMPONENT-SET.md) once Specs is
 built and confirmed. The left column is now complete; the component-set phase fills in the right
 column and finishes this documentation frame.

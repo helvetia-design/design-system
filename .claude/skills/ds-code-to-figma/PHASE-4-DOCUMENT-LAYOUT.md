@@ -1,20 +1,16 @@
 # Phase 4 — Document: Layout (header, page shell, body columns)
 
-**You are here:** assumes [`PHASE-3-BUILD.md`](PHASE-3-BUILD.md) has built and confirmed the full
-variant matrix as a real Figma `COMPONENT_SET`, with its key written back to `<name>.figma.md`.
-This phase is the first of five documentation sub-phases that together build the per-component
-**documentation page**: this phase lays the foundation — the category page shell, the outer frame,
-the purple header, and the 2-column body skeleton — that
+## Objective
+
+Lay the foundation of the per-component **documentation page**: the category page shell, the
+outer frame, the purple header, and the 2-column body skeleton that
 [`PHASE-5-DOCUMENT-COPY-ME.md`](PHASE-5-DOCUMENT-COPY-ME.md),
 [`PHASE-6-DOCUMENT-ANATOMY.md`](PHASE-6-DOCUMENT-ANATOMY.md),
 [`PHASE-7-DOCUMENT-SPECS.md`](PHASE-7-DOCUMENT-SPECS.md), and
-[`PHASE-8-DOCUMENT-COMPONENT-SET.md`](PHASE-8-DOCUMENT-COMPONENT-SET.md) then fill in. Build this
-after Phase 3 confirms the variant matrix looks right — don't start it on an unconfirmed or
-partially-built component set. The full five-sub-phase sequence must finish before
+[`PHASE-8-DOCUMENT-COMPONENT-SET.md`](PHASE-8-DOCUMENT-COMPONENT-SET.md) then fill in. This is the
+first of five documentation sub-phases; the full sequence must finish before
 [`PHASE-9-REVIEW.md`](PHASE-9-REVIEW.md)'s review, so that review covers the documentation page
 too, not just the raw component set.
-
-## What this is, and why we have it
 
 The raw component set that Phase 3 produces is not the deliverable on its own. Every component
 pushed into Figma also gets a readable **documentation page** — a single Figma frame that shows a
@@ -43,22 +39,29 @@ an existing not-yet-migrated page should be brought up to date). `ds-close`, `ds
 see `CONVENTIONS.md`/`CHANGELOG.md` for which.
 
 This phase, and the four that follow it, share one canonical live reference and one page-level
-grouping mechanism — both described below, once, since every sub-phase builds against the same
-nodes.
+grouping mechanism — both described under Instructions below, once, since every sub-phase builds
+against the same nodes.
 
-## Table of contents
+Build this after Phase 3 confirms the variant matrix looks right — don't start it on an unconfirmed
+or partially-built component set.
+
+## Inputs
+
+- The confirmed full variant matrix (real `COMPONENT_SET`) built and confirmed in Phase 3, with
+  its key written back to `<name>.figma.md`.
+- The component's category page (`Core / <Category>`), created in Phase 3 if this is the first
+  component in that category.
+
+## References
 
 - [Canonical reference — inspect before you build](#canonical-reference--inspect-before-you-build)
-- [When to use this](#when-to-use-this)
-- [What to do](#what-to-do)
-- [Page-level structure (once per category)](#page-level-structure-once-per-category)
-- [Page and outer frame](#page-and-outer-frame)
-- [0. Shared `Section`/`Preview`/`Title` components](#0-shared-sectionpreviewtitle-components)
-- [1. Header](#1-header)
-- [2. Body — 2-column layout and column sizing](#2-body--2-column-layout-and-column-sizing)
-- [Cross-cutting build pitfalls](#cross-cutting-build-pitfalls)
+  below.
+- `🧰 Annotations` page — the `Header`, `Category Header`, `Title`, `Preview`, and `Section` shared
+  master components.
+- `CHANGELOG.md` — history of this template's prior revisions, if deciding whether an
+  existing not-yet-migrated page should be brought up to date.
 
-## Canonical reference — inspect before you build
+### Canonical reference — inspect before you build
 
 **For the per-component documentation frame's own internal structure** (header, 2-column body,
 every section's real `Section`/`Preview`/`Title` nesting, the Component Set panel) — **don't
@@ -91,7 +94,8 @@ layout/header/Section-nesting/Component Set, `ds-close` for everything else — 
 one alone is complete. `ds-close`'s own Copy me box /
 Anatomy box panels predate the shared `Section`/`Preview` components and each still
 use their own (inconsistent) hand-built chrome — don't copy their individual fills/strokes/radii
-for the panel wrapper itself; use `Section`/`Preview` instances there instead, per section 0 below.
+for the panel wrapper itself; use `Section`/`Preview` instances there instead, per
+[section 0](#0-shared-sectionpreviewtitle-components) below.
 
 **Don't use `ds-badge`'s own pre-2026-10-29 live pages, or `ds-spinner`/`ds-icon`'s current live
 pages, as a structural reference** — they use the superseded single-column white-header layout (or,
@@ -105,14 +109,7 @@ that structure, rather than reconstructing positions/alignment from this documen
 time. If you change the template's structure during a future run, update this reference pointer if
 the canonical node IDs change.
 
-## When to use this
-
-Build this after Phase 3 confirms the variant matrix looks right — don't start it on an unconfirmed
-or partially-built component set. This phase (and the four sub-phases that follow it) must finish
-before Phase 9's visual-regression review, so that review covers the documentation page too, not
-just the raw component set.
-
-## What to do
+## Instructions
 
 At a high level, in order:
 
@@ -134,8 +131,6 @@ At a high level, in order:
    Phase 3. The remaining content (Copy me, Anatomy, Specs, Component Set) is filled in by the
    next four phases, in order.
 
-## Document structure
-
 ### Page-level structure (once per category)
 
 **Confirmed live via the `Core / Indicators` dry run (2026-10-29, two passes — see the note at the
@@ -145,7 +140,7 @@ whichever component is first pushed into that category (see `PHASE-3-BUILD.md`'s
 section for the full find-or-create logic) — every subsequent component in the same category only
 _appends_ into the `Documentation Frames` row this section describes, it never rebuilds the rest.
 
-- **Page**: named `Core / <Category>` (Title Case, plural, no `⏳`/`✅` emoji), `page.backgrounds`
+- **Page**: named `Core / <Category>` (Title Case, plural), `page.backgrounds`
   literal solid `#1e1e1e` — same dark-page convention the per-component template already used,
   just set once at the category-page level now instead of once per component page.
 - **One top-level frame, `Category Frame`** (hand-built fresh on each category page — **not** an
@@ -364,14 +359,12 @@ instance-text-override technique used everywhere else in this template — find 
 via `instance.findOne`/`findAll` and set `.characters`, no component properties involved):
 
 - `component` → the component name (e.g. `"Badge"`).
-- `kicker` → **`"Core / Category"` only — no component name, and no `⏳`/`✅` emoji prefix**
-  (changed 2026-10-29; see the review-marker note below).
+- `kicker` → **`"Core / Category"` only — no component name.**
 - `review-status` (an `INSTANCE` sibling of `component` inside the `title` frame) → the review
-  marker, now a dedicated pill component instead of text. **Always build with
+  marker, a dedicated pill component. **Always build with
   `status=review`** (`instance.swapComponent()` to the `status=review` variant, or confirm it's
-  already the default) **— never `status=approved`.** This is the same standing rule as before
-  (this skill never marks a page as human-approved on its own), just moved from an emoji text
-  prefix onto this component's variant choice.
+  already the default) **— never `status=approved`.** This skill never marks a page as
+  human-approved on its own.
 - `lead` → the component's JSDoc lead paragraph.
 - `wordmark` (4 instances: label/value × version/last-updated rows, in that order — index them via
   `findAll`, not by assuming a single node) → `"version"` / `"v<x>"` / `"last updated"` /
@@ -447,21 +440,11 @@ structure for reference (e.g. when editing the shared master itself) — confirm
   - **Title block** (`VERTICAL`, `itemSpacing: 0`, title and kicker touch with no gap):
     - `component`: the component name, e.g. `"Badge"`. `Baloise Create Headline` **Bold**, 48px,
       fill bound to `🔗 Alias/🔤 Text/Color/White`.
-    - `kicker`: **just the breadcrumb, `"Core / Category"`** — no component name, no `⏳`/`✅`
-      emoji prefix. `Baloise Create Headline` **Light**, 18px, fill bound to
-      `🔗 Alias/🔤 Text/Color/White`. On `Documentaion` (`ds-badge`'s original, pre-category-page
-      build) this reads `"Core / Indicator"` (singular, matching that era's per-component page
-      name). **For any component built under the new shared category-page scheme, match the
-      category page's own name exactly — plural, e.g. `"Core / Indicators"`** — don't reintroduce
-      the old singular form; the two should read identically since the kicker is literally
-      restating which page the component lives on.
-    - **The `⏳`/`✅` review-marker mechanism lives entirely on the `review-status` pill instance**
-      (see above), not on any text, emoji, or page name. The older per-component pages still carry
-      a `⏳` prefix in their own page name (e.g. `⏳ Core / Indicator / Badge`) from before this
-      convention existed — that's legacy and is not retroactively cleaned up (see "new components
-      only" in `PHASE-3-BUILD.md`'s "Category pages" section). **New category pages never get an
-      `⏳`/`✅` prefix at all** — the page name is just `Core / <Category>`, full stop; the emoji
-      convention is fully retired going forward, not replaced with an always-`⏳` version.
+    - `kicker`: **just the breadcrumb, `"Core / Category"`** — no component name. `Baloise Create
+Headline` **Light**, 18px, fill bound to `🔗 Alias/🔤 Text/Color/White`. Match the category
+      page's own name exactly, e.g. `"Core / Indicators"`.
+    - **The review-marker mechanism lives entirely on the `review-status` pill instance** (see
+      above), not on any text or page name.
     - **No second `instance` qualifier line is visible in this header** (unlike the prior
       template's two-line `heading`). **An `inverted` axis no longer needs a kicker qualifier at
       all** — per [the stacked-component-sets handling](#handling-an-inverted-axis-one-frame-stacked-component-sets),
@@ -547,7 +530,7 @@ against the right/bottom edges; add the missing `paddingRight`/`paddingBottom` t
 frame and header both `HUG`/stay `FIXED` to whatever total width the two columns produce, so a
 wide right column widens the whole page, including the header band.
 
-## Cross-cutting build pitfalls
+### Cross-cutting build pitfalls
 
 These apply to building any frame/section in this template, not one specific section:
 
@@ -562,5 +545,26 @@ These apply to building any frame/section in this template, not one specific sec
   non-deterministically. Confirmed by observing this fail silently on one build and succeed by luck
   on another with the exact same fire-and-forget pattern.
 
-**Next: [`PHASE-5-DOCUMENT-COPY-ME.md`](PHASE-5-DOCUMENT-COPY-ME.md)** — once the header and
+## Output
+
+- The component's category page shell (if newly created) and the "<Component> Documentation"
+  outer frame.
+- A purple component documentation header, fully overridden (name, kicker, review status,
+  version/date, all three links).
+- A 2-column body shell (`documentation` / `component` columns), correctly sized.
+
+## Completion Criteria
+
+- The category page exists with its `Category Frame`, `Category Header`, and `Documentation
+Frames` row (built once, reused by every component in that category).
+- The outer frame, header, and 2-column body shell are built per the fixed template structure
+  above — no improvised deviation from it.
+- `review-status` is set to `status=review` (never `status=approved`), and all three header links
+  resolve to real, non-blank URLs.
+- The header/shell layout has been iterated on and confirmed with the user via a screenshot
+  checkpoint.
+
+## Next Phase
+
+Proceed to [`PHASE-5-DOCUMENT-COPY-ME.md`](PHASE-5-DOCUMENT-COPY-ME.md) once the header and
 2-column body shell are built and iterated on with the user (step 4 above).

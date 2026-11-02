@@ -1,18 +1,32 @@
 # Phase 6 — Document: Anatomy
 
-**You are here:** assumes [`PHASE-5-DOCUMENT-COPY-ME.md`](PHASE-5-DOCUMENT-COPY-ME.md) has built
-and confirmed "👉 Copy me" as the first child of the left `documentation` column. This phase fills
-in the second section of that column: "🏗️ Anatomy". **Skip this entire phase** when the
-component's `<name>.figma.md` has no `anatomy:` list (no `@part` tags found in Phase 1) — go
-straight to [`PHASE-7-DOCUMENT-SPECS.md`](PHASE-7-DOCUMENT-SPECS.md) instead.
+## Objective
 
-## When to use this
+Fill in the second section of the left `documentation` column: "🏗️ Anatomy". **Skip this entire
+phase** when the component's `<name>.figma.md` has no `anatomy:` list (no `@part` tags found in
+Phase 1) — go straight to [`PHASE-7-DOCUMENT-SPECS.md`](PHASE-7-DOCUMENT-SPECS.md) instead.
 
 Build this right after "Copy me" is confirmed, before
 [`PHASE-7-DOCUMENT-SPECS.md`](PHASE-7-DOCUMENT-SPECS.md) — unless this phase is skipped per the
 condition above.
 
-### 4. "🏗️ Anatomy"
+## Inputs
+
+- "👉 Copy me", built and confirmed as the first child of the left `documentation` column in
+  [`PHASE-5-DOCUMENT-COPY-ME.md`](PHASE-5-DOCUMENT-COPY-ME.md).
+- `<name>.figma.md`'s `anatomy:` list (letter, part name, description) from Phase 1 — absence of
+  this list is the skip condition above.
+
+## References
+
+- `PHASE-4-DOCUMENT-LAYOUT.md`'s "0. Shared `Section`/`Preview`/`Title` components" section.
+- `PHASE-4-DOCUMENT-LAYOUT.md`'s "2. Body — 2-column layout and column sizing" section.
+- `PHASE-4-DOCUMENT-LAYOUT.md`'s "Cross-cutting build pitfalls" section.
+- The prior revision of this document, or `ds-close`'s reference pages, for the full
+  diagram/circle/leader-line construction rules (unchanged by this restructure).
+- `conventions/build-mechanics.md`'s "Color and paint" section.
+
+## Instructions
 
 Mostly unchanged in diagram/legend content from the prior template — only its position in the page
 moved (now second in the left column, still skipped entirely when the component's
@@ -47,8 +61,21 @@ Append this `Section` instance as the second child of the left `documentation` c
 `PHASE-4-DOCUMENT-LAYOUT.md`'s "2. Body — 2-column layout and column sizing" section). Iterate on
 it with the user (screenshot checkpoint) before moving on.
 
-See `PHASE-4-DOCUMENT-LAYOUT.md`'s "Cross-cutting build pitfalls" section for build gotchas that
-apply here too.
+## Output
 
-**Next: [`PHASE-7-DOCUMENT-SPECS.md`](PHASE-7-DOCUMENT-SPECS.md)** — once Anatomy is built and
+- A "🏗️ Anatomy" `Section` instance (or an explicit skip, when the component has no `anatomy:`
+  list), appended as the second child of the left `documentation` column.
+
+## Completion Criteria
+
+- The `Section` instance uses `kind=anatomy` and `Flat` variant, with exactly one nested
+  `Default`-variant `Preview` holding the real diagram/legend content.
+- `diagram-area` and `legend` are `FILL` width; each legend line's letter and part name are Bold,
+  the rest Regular; the legend line's fill is bound to `🔗 Alias/🔤 Text/Color/Primary`.
+- The section has been iterated on and confirmed with the user via a screenshot checkpoint (unless
+  this phase was skipped).
+
+## Next Phase
+
+Proceed to [`PHASE-7-DOCUMENT-SPECS.md`](PHASE-7-DOCUMENT-SPECS.md) once Anatomy is built and
 confirmed (or immediately, if this phase was skipped).

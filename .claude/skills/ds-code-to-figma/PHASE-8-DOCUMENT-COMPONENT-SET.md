@@ -1,20 +1,36 @@
 # Phase 8 — Document: Component Set
 
-**You are here:** assumes [`PHASE-7-DOCUMENT-SPECS.md`](PHASE-7-DOCUMENT-SPECS.md) has built and
-confirmed "📐 Specs", completing the left `documentation` column. This phase fills in the right
-`component` column's single section, "🔒 Component Set", handles the `inverted`-axis and
-open-ended content-selection special cases, and then finishes the whole documentation frame by
-appending it into the category page's `Documentation Frames` row. This is the last of the five
-documentation sub-phases — once it's done, move on to
-[`PHASE-9-REVIEW.md`](PHASE-9-REVIEW.md).
+## Objective
 
-## When to use this
+Fill in the right `component` column's single section, "🔒 Component Set", handle the
+`inverted`-axis and open-ended content-selection special cases, and finish the whole documentation
+frame by appending it into the category page's `Documentation Frames` row. This is the last of the
+five documentation sub-phases — once it's done, move on to
+[`PHASE-9-REVIEW.md`](PHASE-9-REVIEW.md).
 
 Build this right after Specs is confirmed. Finish it (including the append-and-write-back step at
 the end of this file) before Phase 9's visual-regression review, so that review covers the
 documentation page too, not just the raw component set.
 
-## What to do
+## Inputs
+
+- "📐 Specs", built and confirmed in [`PHASE-7-DOCUMENT-SPECS.md`](PHASE-7-DOCUMENT-SPECS.md),
+  completing the left `documentation` column.
+- The real `COMPONENT_SET`(s) built in Phase 3 — including, where applicable, the `Primary`/
+  `Inverted` split or the wrapper + Instance Swap library for an open-ended content-selection prop.
+- The category page's `Documentation Frames` row (Phase 3/4).
+
+## References
+
+- `🧰 Annotations` page — the `github example` reference frame (background/inspiration only, not
+  a literal structural template).
+- `conventions/component-set-rendering.md` — stale-bounding-box note, `ABSOLUTE`-positioning
+  pitfalls, the "never auto-rehugs" note.
+- `conventions/variant-grouping.md`'s "Open-ended content-selection props" section.
+- `CHANGELOG.md`'s "Old table-overlay mechanics" section.
+- `PHASE-4-DOCUMENT-LAYOUT.md`'s "Cross-cutting build pitfalls" section.
+
+## Instructions
 
 1. Build [🔒 Component Set](#6--component-set) in the right `component` column — **count the real
    crossed axes first** and add row/column labels for any 3+-axis set (never skip this check).
@@ -259,7 +275,7 @@ the real set. Confirmed live on `Documentaion`'s right column (`Component Sets` 
   this section shows the real wrapper set's own native arrangement the same way — not N separate
   per-option tables, same as before, just without any table chrome now either.
 
-## Handling an `inverted` axis (one frame, stacked component sets)
+### Handling an `inverted` axis (one frame, stacked component sets)
 
 **SUPERSEDED, 2026-10-29, same day as the category-page rebuild — a component with a true
 `inverted`/dark-context axis still gets exactly ONE documentation frame, never two.** An earlier
@@ -307,7 +323,7 @@ This also surfaces the same real bug worth checking for every time: does the mas
 `inverted=true` variant actually have every text element recolored for dark-context contrast? Fix
 any such gap in the master component, not with a per-instance override.
 
-## Handling an open-ended content-selection prop (wrapper + Instance Swap library)
+### Handling an open-ended content-selection prop (wrapper + Instance Swap library)
 
 Unchanged by the 2026-10-29 restructure — see `conventions/variant-grouping.md`'s
 "Open-ended content-selection props" section for the full wrapper-`COMPONENT_SET` + Instance Swap library
@@ -320,4 +336,26 @@ built, in the right column below "🔒 Component Set", same mechanism as before.
 
 See `PHASE-4-DOCUMENT-LAYOUT.md`'s "Cross-cutting build pitfalls" section for build gotchas that apply here too.
 
-**Next: [`PHASE-9-REVIEW.md`](PHASE-9-REVIEW.md)** — once the documentation frame is complete and appended, and the page has been iterated on with the user (step 4 above).
+## Output
+
+- A "🔒 Component Set" panel in the right `component` column — labeled per the axis-count rules
+  above, with the stacked `Primary`/`Inverted` handling or the Instance Swap wrapper handling
+  applied where the component needs them.
+- The finished documentation frame, appended as the last child of the category page's
+  `Documentation Frames` row.
+- The frame's node id, written back into `<name>.figma.md` (`figmaDocFrameNodeId`).
+
+## Completion Criteria
+
+- The real axis count was checked, and every `COMPONENT_SET` display is labeled (row/column
+  labels + dashed grid) regardless of axis count — never skipped for a "simple" 1- or 2-axis set.
+- A true `inverted` axis produces exactly one documentation frame with both sets stacked inside
+  "🔒 Component Set" — never two frames.
+- The layout was iterated on and confirmed with the user via screenshot checkpoints.
+- The finished frame is appended (never inserted out of order) into the `Documentation Frames`
+  row, and its node id is written back into `<name>.figma.md`.
+
+## Next Phase
+
+Proceed to [`PHASE-9-REVIEW.md`](PHASE-9-REVIEW.md) once the documentation frame is complete and
+appended, and the page has been iterated on with the user (step 4 above).

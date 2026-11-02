@@ -55,8 +55,8 @@ the skill _proposing_ an addition and the user _approving_ it — never auto-app
   check and its mitigations (token-swap variable override, structural wrapper+swap split).
 
 - **Components are grouped onto one shared Figma page per code category, not one page per
-  component — `Core / <Category>`, Title Case, plural, matching the code folder name exactly, no
-  `⏳`/`✅` emoji prefix.** The seven categories and their fixed title/lead copy for the shared
+  component — `Core / <Category>`, Title Case, plural, matching the code folder name exactly.**
+  The seven categories and their fixed title/lead copy for the shared
   category-page header (see `PHASE-4-DOCUMENT-LAYOUT.md`'s "Page-level structure" section) — **never
   invent category copy on the fly, this table is the source of truth**:
 
@@ -74,8 +74,7 @@ the skill _proposing_ an addition and the user _approving_ it — never auto-app
   `packages/core/CONTEXT.md`'s Usage-Category Taxonomy), stop and ask the user for title/lead
   copy before building that category's page — same hard-stop discipline as a missing design
   token, never guessed. See [`conventions/page-structure.md`](conventions/page-structure.md) for
-  the "applies to new components only" migration rule and the one-documentation-frame-per-component
-  invariant (including the `inverted`-axis handling).
+  the one-documentation-frame-per-component invariant (including the `inverted`-axis handling).
 
 - **Never lock any Figma node this skill builds** — no master `COMPONENT_SET`, no display clone,
   no documentation-frame content, nothing. The current template has no table geometry for a human

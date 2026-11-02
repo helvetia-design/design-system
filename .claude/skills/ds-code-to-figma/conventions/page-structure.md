@@ -6,12 +6,8 @@ Relevant to Phase 3's category-page setup and Phases 4–8's documentation frame
 master, separate Masters row, two-frame `inverted` split).
 
 - **Components are grouped onto one shared Figma page per code category, not one page per
-  component** — `Core / <Category>`, Title Case, plural, matching the code folder name exactly, no
-  `⏳`/`✅` emoji prefix. See `../CONVENTIONS.md`'s baseline rules for the full seven-category copy
-  table. **Applies to new components only** — an already-pushed component's existing
-  per-component page (`⏳ Core / Indicator / Badge`, `⏳ Core / Indicator / Spinner`,
-  `⏳ Core / Indicator / Tag`, `⏳ Core / Media / Icon`, `⏳ Core / Action / Close`) is never
-  migrated as a side effect of pushing an unrelated sibling component.
+  component** — `Core / <Category>`, Title Case, plural, matching the code folder name exactly. See
+  `../CONVENTIONS.md`'s baseline rules for the full seven-category copy table.
 - **Grouping multiple components onto one shared category page is built from nested
   `HORIZONTAL`/`VERTICAL` auto-layout, never manual x/y position math** — "append a new component"
   is then just one `row.appendChild(outerFrame)` call. The row's children are positioned entirely

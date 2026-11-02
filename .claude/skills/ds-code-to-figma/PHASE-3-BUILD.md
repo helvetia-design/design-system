@@ -1,16 +1,29 @@
 # Phase 3 — Build incrementally
 
-**You are here:** assumes [`PHASE-2-PROPOSE.md`](PHASE-2-PROPOSE.md) got an explicit user
-confirmation on the variant grouping and grid sketch in `<name>.figma.md`. This phase builds the
-real Figma component set from that confirmed mapping.
+## Objective
+
+Build the real Figma component set from the variant grouping and grid sketch that Phase 2 got
+explicit user confirmation on.
+
+## Inputs
+
+- The confirmed `<name>.figma.md` — variant grouping and grid sketch from Phase 2.
+- `figma.config.json`'s `componentLibraryFileKey`.
+- Every resolved Figma variable id from Phase 1 (`tokens:` list) and every nested DS component's
+  Figma component key (Phase 1, step 4).
+
+## References
+
+- `figma-use` skill — mandatory before any `use_figma` call.
+- `CONVENTIONS.md` — for the seeded category-copy table.
+
+## Instructions
 
 1. Load `figma-use` (mandatory before any `use_figma` call) and create a session against
    `figma.config.json`'s `componentLibraryFileKey`.
 2. **Find or create the component's shared category page**, per
    [Category pages](#category-pages) below — never create a page named after the component
-   itself. This applies to new components only; an already-pushed component's existing
-   per-component page (e.g. `⏳ Core / Indicator / Badge`) is never migrated as a side effect of
-   pushing a sibling component — see `CONVENTIONS.md` for which pages are still pending migration.
+   itself.
 3. Build **one full variant combination first** — pick the default/base combination (every
    variant property at its default value, state at `default`). Wire up:
    - The component's shape/layout.
@@ -91,60 +104,64 @@ Responsive Tokens` first — **reuse it if it already exists** rather than creat
 7. Write the resulting Figma component key/node-id and the category page name back into
    `<name>.figma.md`.
 
-## Category pages
+### Category pages
 
-**Components are grouped onto one shared Figma page per code category, not one page per
-component** (2026-10-29, confirmed via a `Core / Indicators` dry run — see
-`conventions/page-structure.md`). A component's category is the folder it lives in under
-`packages/core/src/components/<category>/` (see `packages/core/CONTEXT.md`'s Usage-Category
-Taxonomy — seven categories: `actions`, `forms`, `indicators`, `media`, `navigation`, `overlays`,
-`structure`). The target Figma page name is **`Core / <Category>`** — Title Case, **plural**,
-matching the code folder name exactly (e.g. `indicators` → `Core / Indicators`) — **no `⏳`/`✅`
-emoji prefix**, unlike the older per-component page names, which still carry it on pages that
-predate this change and are not retroactively renamed.
-
-**This applies to new components only.** An already-pushed component's existing per-component
-page (`ds-badge`, `ds-spinner`, `ds-icon`, `ds-close`, `ds-tag` — all still on their own
-`⏳ Core / <Category singular> / <Component>` pages) is never migrated into the new shared page as
-a side effect of pushing an unrelated sibling component. Migrating them is its own, separate,
-deliberate piece of work — don't do it opportunistically.
+Components are grouped onto one shared Figma page per code category, not one page per component.
+A component's category is the folder it lives in under `packages/core/src/components/<category>/`
+(see `packages/core/CONTEXT.md`'s Usage-Category Taxonomy — seven categories: `actions`, `forms`,
+`indicators`, `media`, `navigation`, `overlays`, `structure`). The target Figma page name is
+**`Core / <Category>`** — Title Case, **plural**, matching the code folder name exactly (e.g.
+`indicators` → `Core / Indicators`).
 
 **Finding or creating the page:**
 
 1. Search `figma.root.children` for a page named exactly `Core / <Category>`. If found, reuse it
    — don't create a duplicate.
-2. **If it doesn't exist yet, this is the first component in that category being pushed under the
-   new scheme — build the whole page shell before appending anything component-specific:**
+2. **If it doesn't exist yet, build the whole page shell before appending anything
+   component-specific:**
    - Create the page, name it `Core / <Category>`, set `page.backgrounds` to literal solid
-     `#1e1e1e` (same dark-page convention as the per-component template — see
-     `PHASE-4-DOCUMENT-LAYOUT.md`'s "Page and outer frame" section).
-   - Build one top-level `VERTICAL` auto-layout frame (`Category Frame`, hand-built fresh — **not**
-     an instance of a shared master, see `PHASE-4-DOCUMENT-LAYOUT.md`'s page-level structure section for
-     why), `HUG` both axes, `400`px padding on all sides, `itemSpacing: 200`, `cornerRadius: 24`,
+     `#1e1e1e` (see `PHASE-4-DOCUMENT-LAYOUT.md`'s "Page and outer frame" section).
+   - Build one top-level `VERTICAL` auto-layout frame (`Category Frame`, hand-built fresh — not an
+     instance of a shared master; see `PHASE-4-DOCUMENT-LAYOUT.md`'s page-level structure section),
+     `HUG` both axes, `400`px padding on all sides, `itemSpacing: 200`, `cornerRadius: 24`,
      `clipsContent: false`, fill a two-stop navy `GRADIENT_LINEAR` (literal values, not a bound
-     token — see `PHASE-4-DOCUMENT-LAYOUT.md` for the exact stops/transform). This is the only top-level
-     frame on the page — everything else nests inside it.
+     token — see `PHASE-4-DOCUMENT-LAYOUT.md` for the exact stops/transform). This is the only
+     top-level frame on the page — everything else nests inside it.
    - **Category Header** (first child): instance the shared `Category Header` master component
-     (`🧰 Annotations` page, node `2412:1247` — a lightweight sibling of `Header`/`Title`/
-     `Section`/`Preview`: just a `component` text node, `Baloise Create Headline` Bold 176px,
-     white, and a `lead` text node, `Baloise Create Text` Regular 80px, white, `VERTICAL`
-     auto-layout, `itemSpacing: 24`, no fill, `FILL` width). Override `component`/`lead` from the
-     fixed category-copy table in `CONVENTIONS.md` (seeded for all 7 categories) — **never invent
-     category copy**; if a category is somehow missing from that table, stop and ask the user for
+     (`🧰 Annotations` page, node `2412:1247` — a `component` text node, `Baloise Create Headline`
+     Bold 176px, white, and a `lead` text node, `Baloise Create Text` Regular 80px, white,
+     `VERTICAL` auto-layout, `itemSpacing: 24`, no fill, `FILL` width). Override `component`/`lead`
+     from the fixed category-copy table in `CONVENTIONS.md` (seeded for all 7 categories) — never
+     invent category copy; if a category is missing from that table, stop and ask the user for
      title/lead text before continuing, same hard-stop discipline as a missing design token.
    - **Documentation-frames row** (second child): a `HORIZONTAL` auto-layout frame
      (`Documentation Frames`), `HUG` both axes, `itemSpacing: 200`, no fill, `FILL` width. Starts
      empty — the first component's documentation frame (built in Phases 4–8) is the first thing
-     appended into it. **There is no separate "Masters" overview row** — an earlier revision of
-     this scheme had one (one dashed master `COMPONENT_SET` per component, parked above this row);
-     it was dropped as redundant with each documentation frame's own "🔒 Component Set" panel, and
-     also because Figma disallows moving a slot-bearing subtree (which every documentation frame
-     is) into another component's slot, ruling out a shared slotted master for this row anyway.
+     appended into it. There is no separate "Masters" overview row.
 3. **Appending a component's documentation frame** happens at the end of Phase 8, same
    append-only rule, into the `Documentation Frames` row — see `PHASE-4-DOCUMENT-LAYOUT.md`'s
    page-level structure section.
 
-**Next: [`PHASE-4-DOCUMENT-LAYOUT.md`](PHASE-4-DOCUMENT-LAYOUT.md)** — once the full variant
+## Output
+
+- A full Figma variant matrix built as a real `COMPONENT_SET`
+- The component's shared category page (`Core / <Category>`)
+- The resulting Figma component
+
+## Completion Criteria
+
+- The first full variant combination was screenshotted and confirmed with the user before the
+  rest of the matrix was fanned out.
+- Every styled value is bound to a real Figma variable id — never a literal — except the
+  documented line-height exception (resolved value, intentionally unbound).
+- Every `device:` responsive binding resolved to a routing variable (reused or newly created, per
+  the steps above), never bound directly to one of the three per-breakpoint variables.
+- The category page exists and the component key/node-id/category page name are written back into
+  `<name>.figma.md`.
+
+## Next Phase
+
+Proceed to [`PHASE-4-DOCUMENT-LAYOUT.md`](PHASE-4-DOCUMENT-LAYOUT.md) once the full variant
 matrix is built, the category page exists, and the component key is written back. Build the
 documentation page (Phases 4–8) before Phase 9's review, so that review covers the documentation
 page too, not just the raw component set.

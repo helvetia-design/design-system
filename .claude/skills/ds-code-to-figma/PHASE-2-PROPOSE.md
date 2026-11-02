@@ -1,9 +1,19 @@
 # Phase 2 — Propose variant grouping
 
-**You are here:** assumes [`PHASE-1-ANALYZE.md`](PHASE-1-ANALYZE.md) has produced a draft
-`<name>.figma.md` — props, anatomy, states, and resolved tokens are all written down. This phase
-turns that draft into a concrete Figma variant-grouping proposal and gets explicit user sign-off
-before anything is built.
+## Objective
+
+Turn Phase 1's draft mapping into a concrete Figma variant-grouping proposal — and get explicit
+user sign-off on it — before anything is built.
+
+## Inputs
+
+- The draft `<name>.figma.md` produced by Phase 1: props, anatomy, states, and resolved tokens all written down.
+
+## References
+
+- `CONVENTIONS.md` — heuristics learned from prior components.
+
+## Instructions
 
 1. Read `CONVENTIONS.md` in this skill's folder for heuristics learned from prior components.
 2. Draft how the analyzed props/states collapse into Figma variant properties:
@@ -170,4 +180,23 @@ before anything is built.
    fit an existing `CONVENTIONS.md` rule) as an addition to `CONVENTIONS.md`. Show the user the
    exact diff and get approval before writing it — never auto-append.
 
-**Next: [`PHASE-3-BUILD.md`](PHASE-3-BUILD.md)** — once step 6's user confirmation is received.
+## Output
+
+- The proposed variant grouping and its grid sketch (2-axis / nested-matrix / top-level-split),
+  written into `<name>.figma.md`.
+- The total variant count against the 500-variant threshold, with a mitigation proposal if it was
+  exceeded.
+- Any new `CONVENTIONS.md` heuristic worth keeping, proposed as an explicit diff.
+
+## Completion Criteria
+
+- The variant count is ≤500 (after any mitigation round-trip with the user).
+- The grouping and grid sketch are written into `<name>.figma.md` and the user has explicitly
+  confirmed or edited them — not an assumed approval.
+- Any new heuristic was shown to the user as a diff and approved before being written to
+  `CONVENTIONS.md`.
+
+## Next Phase
+
+Proceed to [`PHASE-3-BUILD.md`](PHASE-3-BUILD.md) only once step 6's user confirmation is
+received.
