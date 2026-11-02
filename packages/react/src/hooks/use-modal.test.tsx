@@ -6,6 +6,7 @@ import { useModal } from './use-modal'
 const create = vi.fn()
 const dismiss = vi.fn()
 const addEventListener = vi.fn()
+const defineDsModal = vi.fn()
 
 vi.mock('@helvetia-design/core', () => ({
   dsModalController: {
@@ -13,6 +14,10 @@ vi.mock('@helvetia-design/core', () => ({
     dismiss: vi.fn(),
     dismissAll: vi.fn(),
   },
+}))
+
+vi.mock('@helvetia-design/core/components/ds-modal.js', () => ({
+  defineCustomElement: (...args: unknown[]) => defineDsModal(...args),
 }))
 
 describe('useModal', () => {
@@ -29,6 +34,15 @@ describe('useModal', () => {
 
   afterEach(() => {
     vi.clearAllMocks()
+  })
+
+  // The controller builds the element with `document.createElement('ds-modal')`, which leaves it
+  // un-upgraded unless something registers the tag. An app that only ever presents modals
+  // imperatively never renders a `<Modal>` or `<DsModal>` wrapper, so the hook has to register it.
+  test('registers ds-modal, so an imperative-only app still upgrades the element', () => {
+    const { unmount } = renderHook(() => useModal())
+    expect(defineDsModal).toHaveBeenCalled()
+    unmount()
   })
 
   test('present creates a modal with a detached content element', async () => {
