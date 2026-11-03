@@ -53,10 +53,9 @@ earlier fixed-size workaround.** A wider card frame gets auto-centered by the sl
 `x` negative and clipping the card's own label text (`"base"`/`"lg"`/`"sm"`) off the left edge —
 confirmed as a real regression during this template's dry run, caused by exactly this mismatch
 after switching the nested `Preview` from a fixed `resize()` to `FILL`. **Each nested `Preview`'s
-own height must end up `layoutSizingVertical: 'HUG'`, not `FIXED`** — see the flexible-height
-sequence (`resize()` then `primaryAxisSizingMode = 'AUTO'; layoutSizingVertical = 'HUG'`) in
-`conventions/document-sections.md` above;
-apply it to every one of the per-option nested `Preview`s here, not just the first.
+own height must end up `layoutSizingVertical: 'HUG'`, not `FIXED`** — see "Sizing" in
+`conventions/document-sections.md`; apply it to every one of the per-option nested `Preview`s
+here, not just the first.
 
 **Specs always uses the `Primary` set's instances/values**, even on an `inverted`-split component
 — an `inverted` split changes colors, not geometry, so showing `Inverted`-set numbers here would

@@ -41,6 +41,9 @@ explicit user confirmation on.
      search was already done once, locally, in Phase 1.
    - Every nested component as an **instance of the existing Figma component** resolved in
      Phase 1, step 4 — never redrawn from scratch.
+   - **No Figma default layer names** (`Frame 1`, `Line`, `Ellipse`, `Vector`, `Group 1`). Name
+     built layers after their part (`icon`, `label`, `track`); cloned layers keep their template
+     name.
    - **Line-height variables cannot be true-bound — API limitation, not a missing token.** This
      repo's line-height tokens are percent-semantic FLOAT values (e.g. `150` meaning 150%, per
      `LINE_HEIGHT_PERCENT_MULTIPLIER` in `apps/toky/src/tokens/figma-map.ts`). Confirmed by
@@ -140,13 +143,13 @@ what's listed below.
 **Layer-name contract.** This skill addresses the template by these layer names only. If any is
 missing, **hard stop** and report which — never fall back to hand-building.
 
-| Where               | Layer names touched                                                                                                                                                              |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Page                | `Category Frame` › `Category Header` (`component`, `lead`) › `Documentation Frames`                                                                                              |
-| Documentation frame | `Component A Documentation` › `Header`, `body` › `Documentation` › 3 `Section` placeholders (`Title` `kind` = `copy-me`, `anatomy`, `specs`), `body` › `Component Sets` › `Sets` |
-| Sets stack          | `Sets` › `Primary` (`sub-label`, `Labeled Set` › `Row Labels` › `Bracket`, `Column + Box` › `Column Labels`, set, `Grid` › `Line`)                                               |
-| `Header`            | `kicker`, `title` › `component`, `review-status`, `body` › `lead`, `meta` › `row` (`label`/`value`)                                                                              |
-| `Header` links      | `links` › `link-row-storybook` / `link-row-toky` / `link-row-github` › `link-storybook`, `link-toky`, `link-github`                                                              |
+| Where               | Layer names touched                                                                                                                                                                   |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page                | `Category Frame` › `Category Header` (`component`, `lead`) › `Documentation Frames`                                                                                                   |
+| Documentation frame | `Component A Documentation` › `Header`, `body` › `Documentation` › 3 `Section` placeholders (`Title` `kind` = `copy-me`, `anatomy`, `specs`), `body` › `Component Sets` › `Sets`      |
+| Sets stack          | `Sets` › `Primary` (`sub-label`, `Labeled Set` › `Row Labels` › `lane-<axis>` › `bracket-<n>`, `Column + Box` › `Column Labels`, set, `Grid` › `divider-row-<n>` / `divider-col-<n>`) |
+| `Header`            | `kicker`, `title` › `component`, `review-status`, `body` › `lead`, `meta` › `row` (`label`/`value`)                                                                                   |
+| `Header` links      | `links` › `link-row-storybook` / `link-row-toky` / `link-row-github` › `link-storybook`, `link-toky`, `link-github`                                                                   |
 
 ### Labeled component set
 
@@ -157,10 +160,10 @@ values**; clone a prototype and change only text and positions.
 
 1. **Stacks — one per top-level split from Phase 2.** No split → one stack, `sub-label` removed,
    set named `<Component>`. `inverted` axis → `Primary` and `Inverted`. A structural split → one
-   stack per split, `sub-label` and set named `<Component>/<split>`. Source each stack from
-   the matching template stack — `Primary` from the template's `Primary`, `Inverted` from the
-   template's `Inverted` (it carries the dark `Alias/Surface/Primary` fill and its lighter label
-   colours), any other split cloned from `Primary`. Delete template stacks that aren't needed.
+   stack per split, `sub-label` and set named `<Component>/<split>`. Source each stack from the
+   matching template stack — `Primary` from the template's `Primary`, `Inverted` from the
+   template's `Inverted`, any other split cloned from `Primary`. Delete template stacks that aren't
+   needed.
 2. **Combine** the stack's variants into a `COMPONENT_SET` with `combineAsVariants()`. Clone the
    template set's fill, stroke (dashed, purple, variable-bound) and corner radius onto it by
    copying them from the template set — never recreate them.
@@ -168,16 +171,28 @@ values**; clone a prototype and change only text and positions.
    other axis is a row, nested outer→inner by ascending option count (ties: prop declaration order).
    Order the options within each axis per `conventions/component-set-rendering.md` → "Option and
    axis ordering" — smallest left/top, largest right/bottom.
-4. **Fixed cell grid, not Figma's native arrangement.** Cell = the largest variant's width/height
-   in the whole set **plus the template's padding** (measure it: template cell minus its largest
-   variant). One uniform cell size. Centre each variant in its cell by computed x/y, then resize the
-   set to cols × rows cells.
+4. **Fixed cell grid, not Figma's native arrangement.** Cell = the largest variant in the whole set
+   **plus 16px on every side** (width from the widest variant, height from the tallest). One
+   uniform cell size. Centre each variant in its cell by computed x/y, then resize the set to
+   cols × rows cells. Order the variant layers in grid reading order — rows top→bottom, then
+   columns left→right (`insertChild`) — because Figma's variant picker lists options in layer
+   order.
 5. **Every set is labeled — no axis count is exempt, not even a single-axis set.** With no row axis
    (e.g. a lone `size` axis) there are just `Column Labels` and no `Row Labels`.
-6. **Labels and grid lines, cloned from template prototypes** — one `Column Labels` text, one
-   `Row Labels` text, one `Bracket`, one `Grid` `Line`. Name every column/row axis and option
-   outside the set, bracket nested row groups, and draw the inner dashed grid lines at the cell
-   boundaries.
+6. **Labels and grid lines, cloned from template prototypes** — a `Column Labels` text, a
+   `lane-<axis>` text, a `bracket-<n>`, a `divider-row-<n>` / `divider-col-<n>`. Name every
+   column/row axis and option outside the set. Label text repeats the property value exactly
+   (`base`, `sm`, `none`, `leading`) — never title-cased, abbreviated or reworded.
+   - **`Column Labels`:** keep the cloned strip as is. Centre the axis name on the set and each
+     value text on its column; `Column Labels` width = set width.
+   - **`Row Labels`: one lane (`lane-<axis>`) per row axis**, outer→inner, left→right. Lane width =
+     longest text in the lane, axis name included. Labels are left-aligned in their lane and
+     vertically centred on the rows they cover; the axis name sits at the lane's left edge, on the
+     same line as the column values. Every lane but the innermost is followed by 8px, its brackets
+     (the cloned bracket's own width), 8px. Each bracket spans its group's rows minus 8px at both
+     ends. `Row Labels` width = sum of the lanes, height = `Column + Box` height. One row axis →
+     one lane, no bracket.
+   - **`Grid`:** a divider at every inner cell boundary.
 
 **Special case — asset components** (open-ended content prop such as icon `name`, later brand
 icons): build the wrapper `COMPONENT_SET` + Instance Swap library per
@@ -188,8 +203,8 @@ in the template yet: on the first asset component, **stop and ask the user** how
 before building it, then record the answer here.
 
 **Hard rules (check before asking for approval):** options ordered per convention · fixed uniform cell grid · dashed outer stroke
-**and** inner dashed grid lines · outside labels naming every axis and option · no styling literal
-written by this skill.
+**and** inner dashed grid lines · outside labels naming every axis and option · variant layers in
+grid reading order · no Figma default layer names · no styling literal written by this skill.
 
 ### Documentation frame header
 

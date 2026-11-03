@@ -30,20 +30,21 @@ to future master edits. If the chrome must change, edit the master once on the A
 const previewInstance = sectionInstance.findOne(n => n.name === 'Preview')
 const slot = previewInstance.findOne(n => n.type === 'SLOT')
 const placeholder = slot.findOne(n => n.name === 'Placeholder')
-if (placeholder) placeholder.visible = false // the master's own default state
+// Already hidden in the master; delete it so no invisible layers stay in the instance.
+if (placeholder) placeholder.remove()
 slot.appendChild(realContentNode)
 ```
 
-## Nested `Preview` sizing
+## Sizing
 
-After appending a nested `Preview` into a parent slot:
+Only `resize()` an axis that is Fixed. `resize()` switches both axes to Fixed and overwrites any
+Hug/Fill cloned from the template — check `layoutSizingHorizontal`/`Vertical` first, and if one
+axis must stay Hug/Fill, set it back after the resize. Fixed sizes come from the formula in the step
+that creates the frame (e.g. variant cells, `diagram-area`). Every `Preview` and its slot hug, so a
+`Preview` grows with the content you size inside it — never resize the `Preview` itself.
 
-- Set `layoutSizingHorizontal = 'FILL'` so it tracks the slot width. Don't pin a literal width with
-  `resize()`.
-- If you must `resize(w, h)` to correct the master's default height, immediately set
-  `primaryAxisSizingMode = 'AUTO'` and `layoutSizingVertical = 'HUG'`, because `resize()` alone
-  leaves a fixed height that clips or under-fills when content changes. Read `layoutSizingVertical`
-  back and confirm it is `'HUG'` before moving on.
+A nested `Preview` you create (rather than clone) starts at the master's fixed width: set
+`layoutSizingHorizontal = 'FILL'` after appending it to the parent slot.
 
 ## Nesting per section
 
