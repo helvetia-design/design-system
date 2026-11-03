@@ -24,7 +24,7 @@
  * docs/plans/shadow-token-type-plan.md).
  */
 
-import { parseReferencePath, resolveLiteral } from './alias.mjs'
+import { parseReferencePath, pathKey, resolveLiteral } from './alias.mjs'
 
 const RESOLVED_TYPE_BY_DTCG_TYPE = {
   color: 'COLOR',
@@ -34,6 +34,8 @@ const RESOLVED_TYPE_BY_DTCG_TYPE = {
   fontWeight: 'STRING',
   fontFamily: 'STRING',
   dimension: 'FLOAT',
+  textDecoration: 'STRING',
+  textTransform: 'STRING',
 }
 
 // 1rem = 16px, this repo's fixed base font size (matches
@@ -63,11 +65,58 @@ export function isLineHeightNumberToken(token) {
   return token.type === 'number' && token.path.includes('LineHeight')
 }
 
+function formatFigmaPercent(multiplier) {
+  return `${Number((multiplier * LINE_HEIGHT_PERCENT_MULTIPLIER).toFixed(LINE_HEIGHT_PERCENT_DECIMALS))}%`
+}
+
 export function figmaLineHeightPercentFor(literalValue) {
   if (typeof literalValue !== 'number') {
     throw new Error(`Unsupported LineHeight value "${JSON.stringify(literalValue)}" — expected a number.`)
   }
-  return `${Number((literalValue * LINE_HEIGHT_PERCENT_MULTIPLIER).toFixed(LINE_HEIGHT_PERCENT_DECIMALS))}%`
+  return formatFigmaPercent(literalValue)
+}
+
+/**
+ * A typography token's letter-spacing, as Figma's percentage string ("20%"). The token stores a rem
+ * `dimension` (DTCG), but Figma's letter spacing is relative to the font size, so the percentage is
+ * letterSpacingPx / fontSizePx — computed here against the same token's resolved desktop font size
+ * (docs/plans/typography-letter-spacing-text-decoration-plan.md decision 2). A zero letter-spacing
+ * is "0%" at every size, so it never needs a font size at all.
+ *
+ * @param {unknown} letterSpacing resolved `{value, unit}` dimension literal
+ * @param {unknown} fontSize resolved desktop `{value, unit}` dimension literal
+ */
+export function figmaLetterSpacingPercentFor(letterSpacing, fontSize) {
+  const letterSpacingPx = figmaValueFor('dimension', letterSpacing)
+  if (letterSpacingPx === 0) return formatFigmaPercent(0)
+  const fontSizePx = figmaValueFor('dimension', fontSize)
+  if (fontSizePx === 0) {
+    throw new Error('Cannot express a non-zero letter-spacing as a percentage of a zero font size.')
+  }
+  return formatFigmaPercent(letterSpacingPx / fontSizePx)
+}
+
+// textDecoration / textTransform have no native Figma variable type yet, so they ride on STRING
+// variables holding Figma's own text-property names (plan decisions 4 and 6) — a future native
+// binding then needs no migration. The CSS keyword is what the token stores.
+export const FIGMA_TEXT_DECORATION_BY_KEYWORD = {
+  'none': 'NONE',
+  'underline': 'UNDERLINE',
+  'line-through': 'STRIKETHROUGH',
+}
+export const FIGMA_TEXT_TRANSFORM_BY_KEYWORD = {
+  none: 'ORIGINAL',
+  uppercase: 'UPPER',
+  lowercase: 'LOWER',
+  capitalize: 'TITLE',
+}
+
+function figmaTextKeywordFor(table, label, literalValue) {
+  const figmaName = table[literalValue]
+  if (!figmaName) {
+    throw new Error(`Unsupported ${label} value "${literalValue}" — expected one of: ${Object.keys(table).join(', ')}.`)
+  }
+  return figmaName
 }
 
 // Figma doesn't understand a numeric font weight — its "Font Weight"
@@ -141,6 +190,10 @@ export function figmaValueFor(dtcgType, literalValue) {
       }
       return keyword
     }
+    case 'textDecoration':
+      return figmaTextKeywordFor(FIGMA_TEXT_DECORATION_BY_KEYWORD, 'textDecoration', literalValue)
+    case 'textTransform':
+      return figmaTextKeywordFor(FIGMA_TEXT_TRANSFORM_BY_KEYWORD, 'textTransform', literalValue)
     case 'fontFamily': {
       // Figma has no font-stack concept — only the primary (first) font is
       // ever sent, never the fallback chain.
@@ -287,8 +340,9 @@ export function isSyncableBorderToken(token) {
 
 /**
  * `typography` doesn't fit figmaValueFor's one-DTCG-value -> one-Figma-value shape either — Figma
- * has no typography-object variable type, so a typography token needs 4 separate Figma variables
- * (fontFamily, fontSize, fontWeight, lineHeight), one per sub-value. Same "no unsyncable shape"
+ * has no typography-object variable type, so a typography token needs 7 separate Figma variables
+ * (fontFamily, fontSize, fontWeight, lineHeight, letterSpacing, textDecoration, textTransform), one
+ * per sub-value. Same "no unsyncable shape"
  * situation as border — no array/multi-layer case exists for typography either (see
  * docs/plans/typography-token-type-plan.md decision 5 — a typography token's $value is always a
  * single flat object).
@@ -304,39 +358,75 @@ export function isSyncableBorderToken(token) {
  *   its `fontFamily`/`fontSize`/`fontWeight`/`lineHeight` fields may themselves still be
  *   `{reference}` strings
  * @param {Map<string, import('./tokens.mjs').Token>} tokenIndex
- * @returns {{ fontFamily: string, fontSize: number, fontWeight: string, lineHeight: string } | null}
+ * @returns {{ fontFamily: string, fontSize: number, fontWeight: string, lineHeight: string, letterSpacing: string, textDecoration: string, textTransform: string } | null}
  */
 export function figmaTypographySubValuesFor(literalValue, tokenIndex) {
   if (typeof literalValue !== 'object' || literalValue === null) return null
-  const { fontFamily, fontSize, fontWeight, lineHeight } = literalValue
+  const { fontFamily, fontSize, fontWeight, lineHeight, letterSpacing, textDecoration, textTransform } = literalValue
   const fontFamilyLiteral = resolveLiteral(fontFamily, tokenIndex)
   const fontSizeLiteral = resolveLiteral(fontSize, tokenIndex)
   const fontWeightLiteral = resolveLiteral(fontWeight, tokenIndex)
   const lineHeightLiteral = resolveLiteral(lineHeight, tokenIndex)
+  const letterSpacingLiteral = resolveLiteral(letterSpacing, tokenIndex)
+  const textDecorationLiteral = resolveLiteral(textDecoration, tokenIndex)
+  const textTransformLiteral = resolveLiteral(textTransform, tokenIndex)
   if (typeof lineHeightLiteral !== 'number') return null
+  if (letterSpacingLiteral === undefined || textDecorationLiteral === undefined || textTransformLiteral === undefined) {
+    return null
+  }
   return {
     fontFamily: figmaValueFor('fontFamily', fontFamilyLiteral),
     fontSize: figmaValueFor('dimension', fontSizeLiteral),
     fontWeight: figmaValueFor('fontWeight', fontWeightLiteral),
     lineHeight: figmaLineHeightPercentFor(lineHeightLiteral),
+    letterSpacing: figmaLetterSpacingPercentFor(letterSpacingLiteral, resolveDesktopDimension(fontSize, tokenIndex)),
+    textDecoration: figmaValueFor('textDecoration', textDecorationLiteral),
+    textTransform: figmaValueFor('textTransform', textTransformLiteral),
   }
 }
 
-// Sub-property suffixes appended to a typography token's path to name its 4 decomposed Figma
+// A responsive dimension token's own `$value` mirrors its mobile breakpoint (plan decision 4), so
+// following it like any other reference would give the *mobile* size. Letter-spacing percentages
+// are expressed against the desktop font size, so a reference to a responsive token is followed
+// through its `responsive.desktop` value instead (which may itself be a reference).
+function resolveDesktopDimension(rawValue, tokenIndex) {
+  const refPath = parseReferencePath(rawValue)
+  const target = refPath ? tokenIndex.get(pathKey(refPath)) : undefined
+  if (target && isRawResponsiveDimensionValue(target.responsive)) {
+    return resolveLiteral(target.responsive.desktop, tokenIndex)
+  }
+  return resolveLiteral(rawValue, tokenIndex)
+}
+
+// Sub-property suffixes appended to a typography token's path to name its 7 decomposed Figma
 // variables, e.g. '🌐 Global/🔤 Font/Typography/Test/FontFamily'. Order matches
 // figmaTypographySubValuesFor's return shape.
-export const TYPOGRAPHY_SUB_PROPERTIES = ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight']
+export const TYPOGRAPHY_SUB_PROPERTIES = [
+  'fontFamily',
+  'fontSize',
+  'fontWeight',
+  'lineHeight',
+  'letterSpacing',
+  'textDecoration',
+  'textTransform',
+]
 export const TYPOGRAPHY_SUB_PROPERTY_SUFFIX = {
   fontFamily: 'FontFamily',
   fontSize: 'FontSize',
   fontWeight: 'FontWeight',
   lineHeight: 'LineHeight',
+  letterSpacing: 'LetterSpacing',
+  textDecoration: 'TextDecoration',
+  textTransform: 'TextTransform',
 }
 export const TYPOGRAPHY_SUB_PROPERTY_RESOLVED_TYPE = {
   fontFamily: 'STRING',
   fontSize: 'FLOAT',
   fontWeight: 'STRING',
   lineHeight: 'STRING',
+  letterSpacing: 'STRING',
+  textDecoration: 'STRING',
+  textTransform: 'STRING',
 }
 
 // Every typography token is eligible for sync — no unsyncable shape to exclude, same as border.
@@ -455,7 +545,7 @@ export function figmaResponsiveDimensionDeviceVariableName(path) {
  * Flattens a token's variableId into a list of plain string ids, tagged with which sub-property
  * (if any) each one represents — every other type has exactly one untagged id; a shadow token has
  * 5 (one per SHADOW_SUB_PROPERTIES entry), a border token has 3 (one per BORDER_SUB_PROPERTIES
- * entry), a typography token has 4 (one per TYPOGRAPHY_SUB_PROPERTIES entry), a responsive
+ * entry), a typography token has 7 (one per TYPOGRAPHY_SUB_PROPERTIES entry), a responsive
  * dimension token has 3 (one per RESPONSIVE_DIMENSION_SUB_PROPERTIES entry). Used anywhere that
  * needs to treat "this token's Figma identity" as a set of ids regardless of how many it is
  * (baseline bookkeeping, deletion detection) — see docs/plans/shadow-token-type-plan.md,

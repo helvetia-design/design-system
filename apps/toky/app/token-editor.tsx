@@ -221,7 +221,15 @@ function emptyDraft(layer: TokenLayer = 'Global'): Draft {
     referenceTarget: '',
     shadowValue: [],
     borderValue: { color: undefined, width: undefined, style: undefined },
-    typographyValue: { fontFamily: undefined, fontSize: undefined, fontWeight: undefined, lineHeight: undefined },
+    typographyValue: {
+      fontFamily: undefined,
+      fontSize: undefined,
+      fontWeight: undefined,
+      lineHeight: undefined,
+      letterSpacing: undefined,
+      textDecoration: undefined,
+      textTransform: undefined,
+    },
     responsiveValue: null,
     description: '',
   }
@@ -1278,6 +1286,12 @@ interface TypographyValue {
   fontSize: unknown
   fontWeight: unknown
   lineHeight: unknown
+  // docs/plans/typography-letter-spacing-text-decoration-plan.md: `letterSpacing` is a free
+  // literal-or-reference dimension like `fontSize`; `textDecoration`/`textTransform` are always
+  // references, like `fontWeight`.
+  letterSpacing: unknown
+  textDecoration: unknown
+  textTransform: unknown
 }
 
 function isTypographyValue(value: unknown): value is TypographyValue {
@@ -1314,6 +1328,9 @@ const EMPTY_TYPOGRAPHY_VALUE: TypographyValue = {
   fontSize: undefined,
   fontWeight: undefined,
   lineHeight: undefined,
+  letterSpacing: undefined,
+  textDecoration: undefined,
+  textTransform: undefined,
 }
 
 function typographySummaryText(value: unknown): string {
@@ -1492,11 +1509,81 @@ function TypographySubFieldReferenceChip({
   )
 }
 
-// The full typography popup: fontFamily/fontWeight are reference-pickers (nested Popover +
-// renderReferenceSearch, same pattern as the hexagon-icon reference button on plain dimension/number
-// cells), fontSize reuses ShadowDimensionField verbatim, lineHeight gets its own plain-number field
-// above. `renderReferenceSearch` is threaded in as a prop rather than closed over, since — unlike
-// ShadowEditor/BorderEditor — this component needs it for two of its four fields.
+// A reference-only typography sub-field (textDecoration / textTransform): a link trigger that opens
+// a nested reference search filtered to one token type, plus a detach button once something is
+// picked — the same markup as TypographyEditor's fontFamily/fontWeight rows, shared by the two
+// fields added later so they don't repeat it twice more.
+function TypographyKeywordReferenceField({
+  id,
+  label,
+  ariaLabel,
+  placeholder,
+  value,
+  typeFilter,
+  detachLabel,
+  onChange,
+  renderReferenceSearch,
+}: {
+  id: string
+  label: string
+  ariaLabel: string
+  placeholder: string
+  value: unknown
+  typeFilter: string[]
+  detachLabel: string
+  onChange: (next: string | undefined) => void
+  renderReferenceSearch: RenderReferenceSearch
+}): ReactNode {
+  // Locally controlled — see TypographyReferenceToggle for why this can't share the row popover's
+  // openPopoverId.
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="space-y-1">
+      <Label htmlFor={id} className="text-xs text-muted-foreground">
+        {label}
+      </Label>
+      <div className="group/tag flex items-center gap-1">
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger
+            id={id}
+            aria-label={ariaLabel}
+            render={
+              <Button
+                type="button"
+                variant="outline"
+                className={cn(CELL_TAG_CLASS, 'h-8 max-h-8 min-w-0 flex-1 justify-start text-left')}
+              />
+            }
+          >
+            <Link2Icon className="size-3.5 shrink-0" />
+            <span className="min-w-0 flex-1 truncate">{typographyReferenceLabel(value, placeholder)}</span>
+          </PopoverTrigger>
+          <PopoverContent className="w-128">
+            {renderReferenceSearch(
+              typeof value === 'string' ? bareReferenceText(value) : '',
+              next => {
+                onChange(bracedReference(next))
+                setOpen(false)
+              },
+              ariaLabel,
+              false,
+              typeFilter,
+            )}
+          </PopoverContent>
+        </Popover>
+        {typeof value === 'string' &&
+          value.trim() !== '' &&
+          renderDetachButton(detachLabel, () => onChange(undefined), 'icon')}
+      </div>
+    </div>
+  )
+}
+
+// The full typography popup: fontFamily/fontWeight/textDecoration/textTransform are reference-pickers
+// (nested Popover + renderReferenceSearch, same pattern as the hexagon-icon reference button on plain
+// dimension/number cells), fontSize and letterSpacing reuse ShadowDimensionField verbatim, lineHeight
+// gets its own plain-number field above. `renderReferenceSearch` is threaded in as a prop rather than closed over, since — unlike
+// ShadowEditor/BorderEditor — this component needs it for most of its fields.
 function TypographyEditor({
   idPrefix,
   value,
@@ -1510,6 +1597,9 @@ function TypographyEditor({
 }): ReactNode {
   const fontSize: DimensionValue = isDimensionValue(value.fontSize) ? value.fontSize : { value: 16, unit: 'px' }
   const lineHeight = typeof value.lineHeight === 'number' ? value.lineHeight : 1
+  const letterSpacing: DimensionValue = isDimensionValue(value.letterSpacing)
+    ? value.letterSpacing
+    : { value: 0, unit: 'rem' }
   // Locally controlled — see TypographyReferenceToggle for why this can't share the row popover's
   // openPopoverId.
   const [familyOpen, setFamilyOpen] = useState(false)
@@ -1653,6 +1743,58 @@ function TypographyEditor({
           }
         />
       )}
+
+      {typeof value.letterSpacing === 'string' ? (
+        <TypographySubFieldReferenceChip
+          id={`${idPrefix}-letter-spacing`}
+          label="Letter Spacing"
+          reference={value.letterSpacing}
+          onSelect={next => onChange({ ...value, letterSpacing: next })}
+          onDetach={() => onChange({ ...value, letterSpacing: { value: 0, unit: 'rem' } })}
+          renderReferenceSearch={renderReferenceSearch}
+          typeFilter={['dimension']}
+        />
+      ) : (
+        <ShadowDimensionField
+          id={`${idPrefix}-letter-spacing`}
+          label="Letter Spacing"
+          dimension={letterSpacing}
+          onCommit={next => onChange({ ...value, letterSpacing: next })}
+          trailing={
+            <TypographyReferenceToggle
+              ariaLabel="Letter spacing reference"
+              onSelect={next => onChange({ ...value, letterSpacing: bracedReference(next) })}
+              renderReferenceSearch={renderReferenceSearch}
+              typeFilter={['dimension']}
+              size="icon"
+            />
+          }
+        />
+      )}
+
+      <TypographyKeywordReferenceField
+        id={`${idPrefix}-text-decoration`}
+        label="Text Decoration"
+        ariaLabel="Text decoration reference"
+        placeholder="Select a text decoration…"
+        value={value.textDecoration}
+        typeFilter={['textDecoration']}
+        detachLabel="Detach text decoration alias"
+        onChange={next => onChange({ ...value, textDecoration: next })}
+        renderReferenceSearch={renderReferenceSearch}
+      />
+
+      <TypographyKeywordReferenceField
+        id={`${idPrefix}-text-transform`}
+        label="Text Transform"
+        ariaLabel="Text transform reference"
+        placeholder="Select a text transform…"
+        value={value.textTransform}
+        typeFilter={['textTransform']}
+        detachLabel="Detach text transform alias"
+        onChange={next => onChange({ ...value, textTransform: next })}
+        renderReferenceSearch={renderReferenceSearch}
+      />
     </div>
   )
 }
@@ -1832,6 +1974,8 @@ const TOKEN_TYPE_ICON: Record<string, typeof PaletteIcon> = {
   shadow: LayersIcon,
   border: SquareDashedIcon,
   typography: ALargeSmallIcon,
+  textDecoration: TypeIcon,
+  textTransform: TypeIcon,
 }
 
 // Opaque (100%) is the sensible default for anything that isn't yet a real
@@ -6309,6 +6453,8 @@ export function TokenEditor({
                     <SelectItem value="shadow">shadow</SelectItem>
                     <SelectItem value="border">border</SelectItem>
                     <SelectItem value="typography">typography</SelectItem>
+                    <SelectItem value="textDecoration">textDecoration</SelectItem>
+                    <SelectItem value="textTransform">textTransform</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
