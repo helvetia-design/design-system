@@ -28,7 +28,7 @@ import {
   isResponsiveDimensionFigmaId,
   isShadowFigmaId,
   isTypographyFigmaId,
-  LINE_HEIGHT_PERCENT_MULTIPLIER,
+  lineHeightFromFigmaPercent,
   pathFromFigmaVariableName,
   RESPONSIVE_DIMENSION_SUB_PROPERTIES,
   SHADOW_SUB_PROPERTIES,
@@ -206,6 +206,14 @@ function deriveValue(
     return { kind: 'unsupported', reason: `Unsupported Figma type "${variable.resolvedType}" — skipped.` }
   }
 
+  // A LineHeight variable is a Figma STRING ("130%"), but the token itself is a `number` — resolved
+  // here (by path, matched or brand-new) instead of falling through to the generic 'string' type.
+  // A leftover FLOAT under a LineHeight path is claimed too, so it hits the strict "NNN%" check
+  // below and is reported rather than being read as a raw multiplier.
+  const lineHeightPath = referenceToken?.path ?? pathFromFigmaVariableName(variable.name)
+  const isLineHeightVariable = (dtcgType === 'string' || dtcgType === 'number') && isLineHeightPath(lineHeightPath)
+  if (isLineHeightVariable) dtcgType = 'number'
+
   const expectedType = referenceToken?.type
   if ((expectedType === 'fontWeight' || expectedType === 'fontFamily') && dtcgType === 'string') {
     dtcgType = expectedType
@@ -284,18 +292,17 @@ function deriveValue(
   }
 
   // A standalone LineHeight `number` token (Global.Font.LineHeight.*, Alias.Text.LineHeight.*,
-  // Component.*.LineHeight) round-trips Figma's percentage back to this codebase's raw multiplier
-  // — see LINE_HEIGHT_PERCENT_MULTIPLIER. `referenceToken`'s path covers a matched variable;
-  // `pathFromFigmaVariableName` covers a brand-new/unmatched one, mirroring how every other
-  // ambiguous-by-resolvedType case above resolves via `referenceToken` where possible.
-  if (dtcgType === 'number') {
-    const path = referenceToken?.path ?? pathFromFigmaVariableName(variable.name)
-    if (isLineHeightPath(path)) {
-      if (typeof modeValue !== 'number') {
-        return { kind: 'unsupported', reason: `LineHeight value "${String(modeValue)}" is not a number — skipped.` }
+  // Component.*.LineHeight) round-trips Figma's "130%" string back to this codebase's raw
+  // multiplier (1.3) — strict, see lineHeightFromFigmaPercent.
+  if (isLineHeightVariable) {
+    const multiplier = lineHeightFromFigmaPercent(modeValue)
+    if (multiplier === undefined) {
+      return {
+        kind: 'unsupported',
+        reason: `LineHeight value "${String(modeValue)}" on "${variable.name}" is not a "NNN%" string — skipped.`,
       }
-      return { kind: 'literal', type: dtcgType, rawValue: modeValue / LINE_HEIGHT_PERCENT_MULTIPLIER }
     }
+    return { kind: 'literal', type: dtcgType, rawValue: multiplier }
   }
 
   return { kind: 'literal', type: dtcgType, rawValue: modeValue }
@@ -870,13 +877,13 @@ function deriveTypographyValue(
   }
   const unit = localUnit()
   const figmaFontSizeLiteral = { value: unit === 'rem' ? rawFontSize / PX_PER_REM : rawFontSize, unit }
-  const figmaLineHeightPercent = modeValues.lineHeight
-  if (typeof figmaLineHeightPercent !== 'number') {
-    return { kind: 'unsupported', reason: 'Typography lineHeight sub-value could not be read — skipped.' }
+  const figmaLineHeight = lineHeightFromFigmaPercent(modeValues.lineHeight)
+  if (figmaLineHeight === undefined) {
+    return {
+      kind: 'unsupported',
+      reason: `Typography lineHeight value "${String(modeValues.lineHeight)}" is not a "NNN%" string — skipped.`,
+    }
   }
-  // Figma holds lineHeight as a percentage (130), not this codebase's raw multiplier (1.3) — see
-  // LINE_HEIGHT_PERCENT_MULTIPLIER.
-  const figmaLineHeight = figmaLineHeightPercent / LINE_HEIGHT_PERCENT_MULTIPLIER
 
   const fontSizeMatches = isLiteralValueEqual('dimension', figmaFontSizeLiteral, resolved.fontSize)
   const lineHeightMatches = figmaLineHeight === resolved.lineHeight

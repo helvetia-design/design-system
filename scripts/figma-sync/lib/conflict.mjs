@@ -11,7 +11,7 @@
  * check doesn't build yet — a real, stated limitation, not a silent gap
  * (docs/plans/figma-sync-action-plan.md §8 territory, not attempted here).
  */
-import { figmaValueFor } from './figma-value.mjs'
+import { figmaLiteralValueFor } from './figma-value.mjs'
 
 export const COMMENT_MARKER = '<!-- figma-sync-conflict-check -->'
 
@@ -37,8 +37,8 @@ export function findConflicts({ existingState, currentBaseTokens, figmaVariables
     const figmaLiveValue = figmaVariable?.valuesByMode?.[modeId]
     if (figmaLiveValue === undefined) continue // never synced, or since deleted — not a conflict
 
-    const baselineFigmaShape = figmaValueFor(token.type, baseline.resolvedValue.value)
-    const currentFigmaShape = figmaValueFor(token.type, token.value.value)
+    const baselineFigmaShape = figmaLiteralValueFor(token, baseline.resolvedValue.value)
+    const currentFigmaShape = figmaLiteralValueFor(token, token.value.value)
 
     const githubChanged = JSON.stringify(currentFigmaShape) !== JSON.stringify(baselineFigmaShape)
     const figmaChanged = JSON.stringify(figmaLiveValue) !== JSON.stringify(baselineFigmaShape)

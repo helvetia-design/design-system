@@ -14,18 +14,17 @@ import {
   figmaBorderSubValuesFor,
   figmaResponsiveDimensionDeviceVariableName,
   figmaResponsiveDimensionSubEntriesFor,
-  figmaLineHeightPercentFor,
+  figmaLiteralValueFor,
+  flattenVariableId,
   figmaShadowSubValuesFor,
   figmaTypographySubValuesFor,
-  figmaValueFor,
   isDeviceEligibleResponsiveDimensionToken,
-  isLineHeightNumberToken,
   isPushableToken,
   isSyncableBorderToken,
   isSyncableResponsiveDimensionToken,
   isSyncableShadowToken,
   isSyncableTypographyToken,
-  resolvedTypeFor,
+  resolvedTypeForToken,
   RESPONSIVE_DIMENSION_SUB_PROPERTIES,
   RESPONSIVE_DIMENSION_SUB_PROPERTY_RESOLVED_TYPE,
   RESPONSIVE_DIMENSION_SUB_PROPERTY_SUFFIX,
@@ -356,7 +355,7 @@ export function buildCreatePassPayload({
       id: variableId,
       name: figmaVariableName(token.path),
       variableCollectionId: collectionId,
-      resolvedType: resolvedTypeFor(token.type),
+      resolvedType: resolvedTypeForToken(token),
       scopes: token.figmaScopes ?? ['ALL_SCOPES'],
       description: token.description ?? '',
     })
@@ -422,14 +421,12 @@ export function buildCreatePassPayload({
       }
 
       // A standalone LineHeight `number` token (Global.Font.LineHeight.*, Alias.Text.LineHeight.*,
-      // Component.*.LineHeight) is scaled ×100 for Figma's percentage convention, same as
-      // typography's own lineHeight sub-value above — see figmaLineHeightPercentFor.
+      // Component.*.LineHeight) is sent as a percentage string ("150%") for Figma's line-height
+      // convention, same as typography's own lineHeight sub-value above — see figmaLiteralValueFor.
       variableModeValues.push({
         variableId: idByPath.get(pathKey(token.path)),
         modeId,
-        value: isLineHeightNumberToken(token)
-          ? figmaLineHeightPercentFor(token.value.value)
-          : figmaValueFor(token.type, token.value.value),
+        value: figmaLiteralValueFor(token, token.value.value),
       })
     }
   }
@@ -725,6 +722,44 @@ export function buildNameUpdatePayload({ baseTokens, idByPath, remoteVariablesBy
   }
 
   return { variables }
+}
+
+/**
+ * Finds tokens whose existing Figma variable(s) carry a different `resolvedType` than this run
+ * expects — Figma can't change a variable's type after creation, so such a token has to be deleted
+ * and recreated (e.g. LineHeight tokens moving from FLOAT to the "150%" STRING). Token-level, not
+ * per-variable: a composite token's sub-variables are deleted and recreated together, since the
+ * ones that still match would otherwise collide by name with their own recreated siblings.
+ *
+ * @param {import('./tokens.mjs').Token[]} baseTokens
+ * @param {Record<string, { resolvedType: string }>} remoteVariablesById
+ * @returns {{ token: import('./tokens.mjs').Token, ids: string[] }[]} `ids` are every variableId of the
+ *   token that exists in Figma (the ones to DELETE)
+ */
+export function findResolvedTypeMismatches(baseTokens, remoteVariablesById) {
+  const mismatches = []
+  for (const token of baseTokens) {
+    if (!isPushableToken(token) || !token.variableId) continue
+    const flattened = flattenVariableId(token.variableId)
+    const mismatched = flattened.some(({ id, subProperty }) => {
+      const remote = remoteVariablesById[id]
+      return remote && remote.resolvedType !== expectedResolvedTypeFor(token, subProperty)
+    })
+    if (mismatched) {
+      mismatches.push({ token, ids: flattened.map(({ id }) => id).filter(id => remoteVariablesById[id]) })
+    }
+  }
+  return mismatches
+}
+
+function expectedResolvedTypeFor(token, subProperty) {
+  if (isSyncableShadowToken(token)) return SHADOW_SUB_PROPERTY_RESOLVED_TYPE[subProperty]
+  if (isSyncableBorderToken(token)) return BORDER_SUB_PROPERTY_RESOLVED_TYPE[subProperty]
+  if (isSyncableTypographyToken(token)) return TYPOGRAPHY_SUB_PROPERTY_RESOLVED_TYPE[subProperty]
+  if (isSyncableResponsiveDimensionToken(token)) {
+    return subProperty === 'device' ? 'FLOAT' : RESPONSIVE_DIMENSION_SUB_PROPERTY_RESOLVED_TYPE[subProperty]
+  }
+  return resolvedTypeForToken(token)
 }
 
 /**

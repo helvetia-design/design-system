@@ -11,6 +11,7 @@ import {
   flattenVariableId,
   isLineHeightNumberToken,
   resolvedTypeFor,
+  resolvedTypeForToken,
 } from '../lib/figma-value.mjs'
 import {
   assignVariableIds,
@@ -24,6 +25,7 @@ import {
   figmaShadowSubVariableName,
   figmaTypographySubVariableName,
   figmaVariableName,
+  findResolvedTypeMismatches,
   resolveTempIds,
 } from '../lib/write.mjs'
 
@@ -124,10 +126,21 @@ describe('isLineHeightNumberToken / figmaLineHeightPercentFor', () => {
     expect(isLineHeightNumberToken({ type: 'string', path: ['🌐 Global', 'LineHeight'] })).toBe(false)
   })
 
-  it("scales a raw CSS-style multiplier ×100 into Figma's percentage convention", () => {
-    expect(figmaLineHeightPercentFor(1)).toBe(100)
-    expect(figmaLineHeightPercentFor(1.3)).toBe(130)
-    expect(figmaLineHeightPercentFor(2)).toBe(200)
+  it("converts a raw CSS-style multiplier into Figma's percentage string", () => {
+    expect(figmaLineHeightPercentFor(1)).toBe('100%')
+    expect(figmaLineHeightPercentFor(1.3)).toBe('130%')
+    expect(figmaLineHeightPercentFor(1.5)).toBe('150%')
+    expect(figmaLineHeightPercentFor(2)).toBe('200%')
+  })
+
+  it('drops float noise instead of leaking it into the string', () => {
+    expect(figmaLineHeightPercentFor(1.15)).toBe('115%')
+    expect(figmaLineHeightPercentFor(1.3333)).toBe('133.33%')
+  })
+
+  it('maps a LineHeight number token to a STRING variable, any other number token to FLOAT', () => {
+    expect(resolvedTypeForToken({ type: 'number', path: ['🌐 Global', 'LineHeight', '2'] })).toBe('STRING')
+    expect(resolvedTypeForToken({ type: 'number', path: ['🔗 Alias', 'Opacity', 'Half'] })).toBe('FLOAT')
   })
 
   it('throws on a non-number value', () => {
@@ -298,7 +311,7 @@ describe('figmaTypographySubValuesFor', () => {
       fontFamily: 'BaloiseCreateHeadline',
       fontSize: 16,
       fontWeight: 'Bold',
-      lineHeight: 130,
+      lineHeight: '130%',
     })
   })
 
@@ -357,7 +370,7 @@ describe('LineHeight number token push (two-pass write payload)', () => {
   }
   const tokens = [lineHeightToken, opacityToken]
 
-  it("writes a LineHeight number token's mode-value scaled ×100, but leaves a same-type Opacity token unscaled", () => {
+  it("writes a LineHeight number token's mode-value as a percentage string, but leaves a same-type Opacity token unscaled", () => {
     const idByPath = assignVariableIds(tokens)
     const { variableModeValues } = buildCreatePassPayload({
       baseTokens: tokens,
@@ -367,7 +380,7 @@ describe('LineHeight number token push (two-pass write payload)', () => {
       modeIdByBrand: { Base: 'm-base' },
     })
     const byId = Object.fromEntries(variableModeValues.map(v => [v.variableId, v.value]))
-    expect(byId[idByPath.get('🌐 Global.🔤 Font.LineHeight.2')]).toBe(130)
+    expect(byId[idByPath.get('🌐 Global.🔤 Font.LineHeight.2')]).toBe('130%')
     expect(byId[idByPath.get('🔗 Alias.🌫️ Opacity.Half')]).toBe(0.5)
   })
 })
@@ -747,7 +760,7 @@ describe('typography push (two-pass write payload)', () => {
       'Global/Font/Typography/Test/FontWeight',
       'Global/Font/Typography/Test/LineHeight',
     ])
-    expect(typographyVariables.map(v => v.resolvedType)).toEqual(['STRING', 'FLOAT', 'STRING', 'FLOAT'])
+    expect(typographyVariables.map(v => v.resolvedType)).toEqual(['STRING', 'FLOAT', 'STRING', 'STRING'])
     expect(figmaTypographySubVariableName(typographyToken.path, 'fontSize')).toBe(
       'Global/Font/Typography/Test/FontSize',
     )
@@ -767,7 +780,7 @@ describe('typography push (two-pass write payload)', () => {
     expect(byId['temp-Global.Font.Typography.Test-fontFamily']).toBe('BaloiseCreateHeadline')
     expect(byId['temp-Global.Font.Typography.Test-fontSize']).toBe(16)
     expect(byId['temp-Global.Font.Typography.Test-fontWeight']).toBe('Bold')
-    expect(byId['temp-Global.Font.Typography.Test-lineHeight']).toBe(130)
+    expect(byId['temp-Global.Font.Typography.Test-lineHeight']).toBe('130%')
   })
 
   it('pass 2 writes 4 alias mode-values for a typography reference, each pointing at the matching sub-property of the target', () => {
@@ -1598,5 +1611,53 @@ describe('assignVariableIds path/name fallback match (docs/adr/0001-figma-variab
     expect(collectNewlyCreatedIds([unsynced], idByPath)).toEqual([
       { path: unsynced.path, variableId: 'VariableID:9:9' },
     ])
+  })
+})
+
+describe('findResolvedTypeMismatches', () => {
+  const lineHeightToken = {
+    path: ['🌐 Global', '🔤 Font', 'LineHeight', '2'],
+    type: 'number',
+    value: { kind: 'literal', value: 1.3 },
+    variableId: 'VariableID:lh',
+  }
+  const opacityToken = {
+    path: ['🔗 Alias', '🌫️ Opacity', 'Half'],
+    type: 'number',
+    value: { kind: 'literal', value: 0.5 },
+    variableId: 'VariableID:op',
+  }
+
+  it('flags a LineHeight token whose existing Figma variable is still a FLOAT', () => {
+    const remote = { 'VariableID:lh': { resolvedType: 'FLOAT' }, 'VariableID:op': { resolvedType: 'FLOAT' } }
+    const mismatches = findResolvedTypeMismatches([lineHeightToken, opacityToken], remote)
+    expect(mismatches).toEqual([{ token: lineHeightToken, ids: ['VariableID:lh'] }])
+  })
+
+  it('flags nothing once the LineHeight variable is already a STRING', () => {
+    const remote = { 'VariableID:lh': { resolvedType: 'STRING' }, 'VariableID:op': { resolvedType: 'FLOAT' } }
+    expect(findResolvedTypeMismatches([lineHeightToken, opacityToken], remote)).toEqual([])
+  })
+
+  it("recreates all of a typography token's sub-variables together when only lineHeight mismatches", () => {
+    const typography = {
+      path: ['🌐 Global', '🔤 Font', 'Typography', 'Test'],
+      type: 'typography',
+      value: { kind: 'literal', value: {} },
+      variableId: { fontFamily: 'f', fontSize: 's', fontWeight: 'w', lineHeight: 'l' },
+    }
+    const remote = {
+      f: { resolvedType: 'STRING' },
+      s: { resolvedType: 'FLOAT' },
+      w: { resolvedType: 'STRING' },
+      l: { resolvedType: 'FLOAT' },
+    }
+    const [mismatch] = findResolvedTypeMismatches([typography], remote)
+    expect(mismatch.ids).toEqual(['f', 's', 'w', 'l'])
+  })
+
+  it('ignores a token with no variableId or no matching remote variable', () => {
+    expect(findResolvedTypeMismatches([{ ...lineHeightToken, variableId: undefined }], {})).toEqual([])
+    expect(findResolvedTypeMismatches([lineHeightToken], {})).toEqual([])
   })
 })

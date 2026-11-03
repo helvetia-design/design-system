@@ -33,13 +33,25 @@ const DTCG_TYPE_BY_RESOLVED_TYPE: Record<string, string> = {
   BOOLEAN: 'boolean',
 }
 
-// Figma's Variables UI expects a percentage for line height, not this codebase's raw CSS-style
-// multiplier (1.3, not 130) — inverse of
-// scripts/figma-sync/lib/figma-value.mjs's LINE_HEIGHT_PERCENT_MULTIPLIER (reimplemented here, not
+// Figma's line-height convention is a percentage string ("130%"), not this codebase's raw CSS-style
+// multiplier (1.3) — so a LineHeight Figma variable is a STRING, not a FLOAT. Inverse of
+// scripts/figma-sync/lib/figma-value.mjs's figmaLineHeightPercentFor (reimplemented here, not
 // imported — Node-only module, outside apps/toky's module boundary, per this file's header).
 // Applies to both a standalone `number`-typed LineHeight token and a `typography` composite
 // token's `lineHeight` sub-value.
 export const LINE_HEIGHT_PERCENT_MULTIPLIER = 100
+
+const LINE_HEIGHT_PERCENT_PATTERN = /^(\d+(?:\.\d+)?)%$/
+
+// Strict: only exactly what our own push side generates ("130%") is accepted. Anything else — a
+// legacy bare FLOAT, "1.3" without the symbol, free text — returns undefined, so the caller
+// reports it as unsupported rather than guessing and writing a wrong multiplier into the token file.
+export function lineHeightFromFigmaPercent(value: unknown): number | undefined {
+  if (typeof value !== 'string') return undefined
+  const match = LINE_HEIGHT_PERCENT_PATTERN.exec(value)
+  if (!match) return undefined
+  return Number((Number(match[1]) / LINE_HEIGHT_PERCENT_MULTIPLIER).toFixed(6))
+}
 
 // Mirrors scripts/figma-sync/lib/figma-value.mjs's isLineHeightNumberToken — "LineHeight" anywhere
 // in the path is this codebase's only way to tell a LineHeight `number` token apart from

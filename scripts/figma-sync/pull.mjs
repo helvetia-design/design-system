@@ -43,6 +43,7 @@ import {
   buildNameUpdatePayload,
   collectNewlyCreatedIds,
   committedVariableIds,
+  findResolvedTypeMismatches,
   resolveTempIds,
 } from './lib/write.mjs'
 
@@ -186,6 +187,22 @@ async function writePull({ baseTokens, brandNames, brandTokensByName }, figmaTok
         `different Figma file — set TOKENS_DIR_OVERRIDE to a scratch tokens directory for sandbox-` +
         `file testing, or point FIGMA_FILE_KEY at the file these variableIds actually belong to.`,
     )
+  }
+
+  // Figma can't change a variable's resolvedType after creation, so a token whose existing
+  // variable(s) no longer match the type this run expects (e.g. LineHeight FLOAT -> "150%" STRING)
+  // is deleted here, in its own POST ahead of everything else — a same-name CREATE in the same
+  // batch would collide with the not-yet-deleted original — then handled as a brand-new token
+  // below: no variableId, so it gets a fresh one, which the backfill commit writes back.
+  const mismatches = findResolvedTypeMismatches(baseTokens, localVariables.variables)
+  if (mismatches.length > 0) {
+    const staleIds = mismatches.flatMap(({ ids }) => ids)
+    console.log(
+      `Pass 0: recreating ${mismatches.length} token(s) whose Figma variable type changed (${staleIds.length} variable(s) deleted)…`,
+    )
+    await postVariables(figmaFileKey, figmaToken, buildDeleteVariablesPayload(staleIds))
+    for (const id of staleIds) delete localVariables.variables[id]
+    for (const { token } of mismatches) delete token.variableId
   }
 
   const { collectionId, modeIdByBrand } = await resolveBrandCollection(

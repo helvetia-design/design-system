@@ -667,7 +667,7 @@ describe('buildBasePullPlan', () => {
     expect(plan.deletes).toHaveLength(0)
   })
 
-  it("divides a matched LineHeight number token's Figma percentage back to a raw multiplier", () => {
+  it("parses a matched LineHeight number token's Figma percentage string back to a raw multiplier", () => {
     const lineHeight2 = token({
       path: ['🌐 Global', '🔤 Font', 'LineHeight', '2'],
       type: 'number',
@@ -678,8 +678,8 @@ describe('buildBasePullPlan', () => {
     const v = variable({
       id: 'VariableID:lineheight-2',
       name: '🌐 Global/🔤 Font/LineHeight/2',
-      resolvedType: 'FLOAT',
-      valuesByMode: { [BASE_MODE]: 150 }, // changed in Figma from 130% to 150%
+      resolvedType: 'STRING',
+      valuesByMode: { [BASE_MODE]: '150%' }, // changed in Figma from 130% to 150%
     })
     const plan = buildBasePullPlan({
       original: [lineHeight2],
@@ -691,16 +691,44 @@ describe('buildBasePullPlan', () => {
     expect(plan.updates[0].rawValue).toBe(1.5)
   })
 
-  it("divides an unmatched (new) LineHeight number variable's Figma percentage, keyed off its name", () => {
+  it("parses an unmatched (new) LineHeight number variable's Figma percentage string, keyed off its name", () => {
     const v = variable({
       id: 'VariableID:lineheight-new',
       name: '🌐 Global/🔤 Font/LineHeight/5',
-      resolvedType: 'FLOAT',
-      valuesByMode: { [BASE_MODE]: 175 },
+      resolvedType: 'STRING',
+      valuesByMode: { [BASE_MODE]: '175%' },
     })
     const plan = buildBasePullPlan({ original: [], working: [], figmaMeta: meta([v]), baseModeId: BASE_MODE })
     expect(plan.creates).toHaveLength(1)
     expect(plan.creates[0].rawValue).toBe(1.75)
+  })
+
+  it.each([
+    ['a legacy bare FLOAT', 'FLOAT', 150],
+    ['a string without the % symbol', 'STRING', '1.5'],
+    ['free text', 'STRING', 'abc'],
+  ])('reports %s on a LineHeight variable as unsupported instead of writing it', (_label, resolvedType, value) => {
+    const lineHeight2 = token({
+      path: ['🌐 Global', '🔤 Font', 'LineHeight', '2'],
+      type: 'number',
+      figmaId: 'VariableID:lineheight-2',
+      rawValue: 1.3,
+      resolvedValue: 1.3,
+    })
+    const v = variable({
+      id: 'VariableID:lineheight-2',
+      name: '🌐 Global/🔤 Font/LineHeight/2',
+      resolvedType,
+      valuesByMode: { [BASE_MODE]: value },
+    })
+    const plan = buildBasePullPlan({
+      original: [lineHeight2],
+      working: [working(lineHeight2)],
+      figmaMeta: meta([v]),
+      baseModeId: BASE_MODE,
+    })
+    expect(plan.updates).toHaveLength(0)
+    expect(plan.skipped.length).toBeGreaterThan(0)
   })
 
   it('does not scale a plain (non-LineHeight) number token, e.g. Opacity', () => {
@@ -1272,14 +1300,13 @@ describe('buildBasePullPlan — typography', () => {
     fontFamily?: string
     fontSize?: number
     fontWeight?: string
-    lineHeight?: number
+    lineHeight?: string
   }): FigmaVariable[] {
     const fontFamily = overrides?.fontFamily ?? 'BaloiseCreateHeadline'
     const fontSize = overrides?.fontSize ?? 16
     const fontWeight = overrides?.fontWeight ?? 'Bold'
-    // Figma-side value — a percentage (130), not this codebase's raw multiplier (1.3). See
-    // LINE_HEIGHT_PERCENT_MULTIPLIER.
-    const lineHeight = overrides?.lineHeight ?? 130
+    // Figma-side value — a percentage string ("130%"), not this codebase's raw multiplier (1.3).
+    const lineHeight = overrides?.lineHeight ?? '130%'
     return [
       variable({
         id: typographyFigmaId.fontFamily,
@@ -1302,7 +1329,7 @@ describe('buildBasePullPlan — typography', () => {
       variable({
         id: typographyFigmaId.lineHeight,
         name: 'x/LineHeight',
-        resolvedType: 'FLOAT',
+        resolvedType: 'STRING',
         valuesByMode: { [BASE_MODE]: lineHeight },
       }),
     ]
@@ -1430,7 +1457,7 @@ describe('buildBasePullPlan — typography', () => {
       variable({
         id: (target.figmaId as Record<string, string>)[sub],
         name: `target/${sub}`,
-        resolvedType: sub === 'fontSize' || sub === 'lineHeight' ? 'FLOAT' : 'STRING',
+        resolvedType: sub === 'fontSize' ? 'FLOAT' : 'STRING',
         valuesByMode: {
           [BASE_MODE]:
             sub === 'fontFamily'
@@ -1447,7 +1474,7 @@ describe('buildBasePullPlan — typography', () => {
       variable({
         id: typographyFigmaId[sub],
         name: `x/${sub}`,
-        resolvedType: sub === 'fontSize' || sub === 'lineHeight' ? 'FLOAT' : 'STRING',
+        resolvedType: sub === 'fontSize' ? 'FLOAT' : 'STRING',
         valuesByMode: { [BASE_MODE]: { type: 'VARIABLE_ALIAS', id: (target.figmaId as Record<string, string>)[sub] } },
       }),
     )
@@ -1820,10 +1847,9 @@ describe('buildBrandPullPlan — typography', () => {
       variable({
         id: typographyFigmaId.lineHeight,
         name: 'x/LineHeight',
-        resolvedType: 'FLOAT',
-        // Figma-side value — a percentage (130), not this codebase's raw multiplier (1.3). See
-        // LINE_HEIGHT_PERCENT_MULTIPLIER.
-        valuesByMode: { [ZURICH_MODE]: 130 },
+        resolvedType: 'STRING',
+        // Figma-side value — a percentage string ("130%"), not this codebase's raw multiplier (1.3).
+        valuesByMode: { [ZURICH_MODE]: '130%' },
       }),
     ]
   }
