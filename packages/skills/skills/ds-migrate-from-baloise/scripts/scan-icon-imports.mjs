@@ -95,9 +95,13 @@ function collect(file, text, masked, found) {
   while ((match = SYMBOL_RE.exec(text)) !== null) if (visible(match.index)) add(match.index)
 
   for (const name of namespaces) {
-    const usage = new RegExp(`(?<![\\w$])(?<![^.]\\.)${name.replace(/\$/g, '\\$')}(?![\\w$])`, 'g')
+    const usage = new RegExp(`(?<![\\w$])(?<![^.]\\.)${escapeRegExp(name)}(?![\\w$])`, 'g')
     while ((match = usage.exec(text)) !== null) if (visible(match.index)) add(match.index)
   }
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 // source-scan blanks whole template literals, so `${…}` substitutions are found by walking back to an
