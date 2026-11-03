@@ -50,6 +50,19 @@ Conventions that hold across every component:
 
 Done when **Components** lists the new heading and choosing it follows that file.
 
+### Icons travel with the component migration
+
+Every component migration also migrates the icons from `@baloise/ds-icons` and `@baloise/ds-brand-icons` in the files it touches, following `shared/icons.md`. The **Assets** menu item applies the same file to every other file that still uses legacy icons, such as a constants file with no `bal-*` tag. `SKILL.md` hooks that file into the Scan, Rewrite and Report steps of whichever component file is chosen, so a new component gets icon handling without mentioning it. `shared/` sits outside `components/` so that **Manual** does not list it.
+
+- **UI icon** — an icon resolved by name through the design system config (`ds-icon name="…"`, and the `icon` props of other components). A wrong name fails silently at runtime.
+- **Brand icon** — an illustration passed as a raw SVG string to `ds-brand-icon` (`svg`) or as a URL (`src`). There is no name lookup. A wrong symbol fails at build time.
+- **Icon registration** — handing an icon set to the config at startup. The standard UI icon set is pre-registered, so the legacy registration of the whole set is never carried over. Only a **custom icon**, a registered key that names something other than its own standard icon, is carried over and reported. The legacy registration itself is deleted only once no `bal-*` component is left, because every remaining legacy component still looks names up in it.
+- **Icon name mapping** — the legacy UI icon names that have no identical counterpart, each mapped to an approximation or reported as lost, plus the names both sets share whose glyph changed meaning, which are kept and reported. It lives in `shared/icon-name-map.json`. A component migration that copies an icon name points at the name rule in `shared/icons.md` rather than keeping its own.
+
+`app` does not copy `icons` onto `ds-root`. The Registration rules in `shared/icons.md` handle it.
+
+`scripts/scan-icon-imports.mjs` takes the component's finding files as extra arguments and scans only those. Without them it scans the whole project, which the Assets step uses and the component report uses to point at files Assets still has to migrate. `test/scan-icon-imports.spec.ts` checks the map against `@helvetia-design/assets`, the one workspace devDependency of this package.
+
 ### Steps: panels mode and navigation mode
 
 `ds-steps` runs in panels mode (`ds-step` paired with `ds-step-panel` via `name`/`for`) or navigation mode (each `ds-step` wraps a slotted `<a>`, active step via `aria-current`). The legacy `bal-step-item` was header and content in one element, so `href` decides the mode, and a group mixing both is reported, never rewritten.
@@ -107,13 +120,13 @@ node /absolute/path/to/packages/skills/dist/cli.js add
 Done when:
 
 1. stdout is `Copied ds-migrate-from-baloise to <scratch>/.claude/skills/ds-migrate-from-baloise`
-2. that folder contains `SKILL.md` with the 4-item menu (Init / Components / CSS utils (coming soon) / Assets (coming soon)) and the line that the skill never runs `git add` or `git commit`
+2. that folder contains `SKILL.md` with the 4-item menu (Init / Components / CSS utils (coming soon) / Assets) and the line that the skill never runs `git add` or `git commit`
 3. `node …/dist/cli.js` with no args, or with `list`, prints `Usage: skills add` and exits 1
 4. after writing a stale `SKILL.md` and `stale.txt` into the destination, a second `add` restores `SKILL.md` and removes `stale.txt`
 
 ### Menu (Claude)
 
-In the scratch directory, invoke `/ds-migrate-from-baloise`. Done when Init runs `scripts/detect-baloise.mjs`, Components offers **Manual** and **Detect**, Manual lists exactly one entry per `components/*/migration.md` (named after its first heading, e.g. `app → root`) and nothing else, Detect suggests a component only when the project uses it and that migration exists, and CSS utils / Assets report "coming soon" and stop.
+In the scratch directory, invoke `/ds-migrate-from-baloise`. Done when Init runs `scripts/detect-baloise.mjs`, Components offers **Manual** and **Detect**, Manual lists exactly one entry per `components/*/migration.md` (named after its first heading, e.g. `app → root`) and nothing else, Detect suggests a component only when the project uses it and that migration exists, Assets scans the whole project with `scan-icon-imports.mjs` and follows `shared/icons.md`, and CSS utils reports "coming soon" and stops.
 
 Against a project with no `@baloise/ds-*` dependency and no CSS/JS import, Init says "no Baloise Design System installation detected, nothing to migrate" and does not edit files. Against a project that has both, Init adds the `@helvetia-design/*` packages from the script JSON, runs that JSON's `installCommand`, inserts the new import beside the untouched `@baloise/*` import, and leaves the result unstaged.
 

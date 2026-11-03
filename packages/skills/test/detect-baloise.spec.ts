@@ -359,6 +359,66 @@ describe('detectBaloise', () => {
     })
   })
 
+  it('detects the icon packages as dependencies and their imports as references', async () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'package.json',
+      JSON.stringify({
+        dependencies: {
+          '@baloise/ds-react': '19.11.0',
+          '@baloise/ds-icons': '19.11.0',
+          '@baloise/ds-brand-icons': '19.11.0',
+        },
+      }),
+    )
+    write(
+      root,
+      'src/App.tsx',
+      [
+        "import * as balIcons from '@baloise/ds-icons'",
+        "import { balBrandIconLiabilityPurple } from '@baloise/ds-brand-icons'",
+        '',
+      ].join('\n'),
+    )
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.0') })
+
+    expect(result).toMatchObject({
+      status: 'ready',
+      dependencies: ['@baloise/ds-brand-icons', '@baloise/ds-icons', '@baloise/ds-react'],
+      imports: [
+        { file: 'src/App.tsx', line: 1, snippet: "import * as balIcons from '@baloise/ds-icons'", kind: 'reference' },
+        {
+          file: 'src/App.tsx',
+          line: 2,
+          snippet: "import { balBrandIconLiabilityPurple } from '@baloise/ds-brand-icons'",
+          kind: 'reference',
+        },
+      ],
+    })
+  })
+
+  it('prefers the app manifest over a shallower manifest that declares only icon packages', async () => {
+    const root = createScratchDir()
+    write(root, 'package.json', JSON.stringify({ devDependencies: { '@baloise/ds-icons': '19.11.0' } }))
+    write(
+      root,
+      'apps/web/package.json',
+      JSON.stringify({ dependencies: { '@baloise/ds-angular': '19.11.0', '@angular/core': '18.0.0' } }),
+    )
+    write(root, 'apps/web/src/main.ts', "import { BaloiseDesignSystemModule } from '@baloise/ds-angular'\n")
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.0') })
+
+    expect(result).toMatchObject({
+      status: 'ready',
+      framework: 'angular',
+      packageJsonPath: 'apps/web/package.json',
+      dependencies: ['@baloise/ds-angular'],
+    })
+  })
+
   it('classifies the all-in-one bundle (css/all) as bootstrap', async () => {
     const root = createScratchDir()
     write(root, 'package.json', JSON.stringify({ dependencies: { '@baloise/ds-styles': '19.11.0' } }))
@@ -460,4 +520,16 @@ describe('aliasesFor declares every package the migration makes the consumer imp
       '@helvetia-design/tokens',
     ])
   })
+
+  it.each(['@baloise/ds-icons', '@baloise/ds-brand-icons'])(
+    'declares assets when %s is a direct dependency',
+    async name => {
+      expect(await aliasesForDeps({ '@baloise/ds-core': '19.0.0', [name]: '19.0.0' })).toEqual([
+        '@helvetia-design/assets',
+        '@helvetia-design/core',
+        '@helvetia-design/styles',
+        '@helvetia-design/tokens',
+      ])
+    },
+  )
 })

@@ -69,8 +69,8 @@ When a `bal-card-title` or `bal-card-subtitle` is nested deeper than a direct ch
 | _(always)_              | `color="info"`                     | Legacy always hardcoded `color="info"` internally. Write it explicitly.                          |
 | _(always)_              | `wide`                             | Legacy always hardcoded `expanded` internally, the equivalent of `ds-button`'s `wide`. Write it. |
 | _(always)_              | _(no `bottom-rounded` equivalent)_ | `ds-button` has no bottom-rounded corner variant. Drop it and report it in the summary.          |
-| `icon`                  | `icon`                             | Copy as-is.                                                                                      |
-| `iconRight`             | `iconRight`                        | Copy as-is.                                                                                      |
+| `icon`                  | `icon`                             | Copy the value, then apply the icon name rule from `shared/icons.md`.                            |
+| `iconRight`             | `iconRight`                        | Copy the value, then apply the icon name rule from `shared/icons.md`.                            |
 | `elementType`           | `elementType`                      | Copy as-is.                                                                                      |
 | `disabled`              | `disabled`                         | Copy as-is.                                                                                      |
 | `href`                  | `href`                             | Copy as-is.                                                                                      |
