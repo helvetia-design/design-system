@@ -84,6 +84,7 @@ import type { SyncStatus } from '@/src/tokens/github-write'
 import { validateWorkingTokens } from '@/src/tokens/validate'
 import type { FlatToken, ResponsiveDimensionValue, TokenLayer } from '@/src/tokens/types'
 import { BrandsSidebar } from './brands-sidebar'
+import { BrandSwitcher } from './brand-switcher'
 import { ProblemsSidebar } from './problems-sidebar'
 import type { ProblemItem } from './problems-sidebar'
 import { PreviewSidebar, PREVIEW_TAB_ICON } from './preview-sidebar'
@@ -3428,6 +3429,14 @@ const TokenRow = memo(function TokenRow({
   )
 })
 
+// Writes (or clears) `?brand=` without a Next navigation — see selectBrand.
+function syncBrandParam(brand: string | null) {
+  const url = new URL(window.location.href)
+  if (brand) url.searchParams.set('brand', brand)
+  else url.searchParams.delete('brand')
+  window.history.replaceState(window.history.state, '', url)
+}
+
 export function TokenEditor({
   tokens,
   defaultBranch,
@@ -3436,6 +3445,7 @@ export function TokenEditor({
   brandTokens,
   syncStatus,
   localTokensMode = false,
+  initialBrand = null,
 }: {
   tokens: FlatToken[]
   defaultBranch: string
@@ -3452,6 +3462,9 @@ export function TokenEditor({
   // the base diff straight to Base.tokens.json on disk instead of opening a
   // GitHub PR. Brand staging isn't supported in this mode.
   localTokensMode?: boolean
+  // `?brand=` from the URL, read server-side. Only honoured if it names a real
+  // brand — anything else (typo, deleted brand) falls back to Base.
+  initialBrand?: string | null
 }) {
   const router = useRouter()
   const { data: session } = useSession()
@@ -3548,7 +3561,9 @@ export function TokenEditor({
   // null = Base only. A real brand name, or a pendingBrands name not yet on
   // GitHub (brandTokens has no entry for it yet — treated as starting empty,
   // same as any other freshly created brand).
-  const [selectedBrand, setSelectedBrand] = useState<string | null>(null)
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(() =>
+    initialBrand && tokenBrands.includes(initialBrand) ? initialBrand : null,
+  )
   // Per-brand sparse override working copies, keyed by brand name — kept
   // independent of `working`'s undo/redo history (see the grilling decision:
   // no Ctrl+Z for brand edits in this pass). Only ever holds entries whose
@@ -5816,6 +5831,21 @@ export function TokenEditor({
   } satisfies TokenRowHandlers)
   const rowHandlers = rowHandlersRef.current
 
+  // Single entry point for changing the active brand (sidebar and Brand
+  // switcher). Mirrors it into `?brand=` via the History API rather than
+  // router.replace — the page is force-dynamic and would re-fetch every token
+  // file from GitHub. Pending brands aren't written (a link to one is dead on
+  // arrival); Base is the absence of the param.
+  function selectBrand(name: string | null) {
+    setSelectedBrand(name)
+    syncBrandParam(name !== null && tokenBrands.includes(name) ? name : null)
+  }
+
+  // An unresolvable `?brand=` falls back to Base — drop it so the URL matches.
+  useEffect(() => {
+    if (initialBrand && selectedBrand === null) syncBrandParam(null)
+  }, [])
+
   function stageBrand(name: string) {
     setPendingBrands(prev => (prev.includes(name) ? prev : [...prev, name]))
   }
@@ -6179,7 +6209,9 @@ export function TokenEditor({
                 {pullConflicts.length} Figma conflict{pullConflicts.length === 1 ? '' : 's'}
               </Button>
             )}
+          </div>
 
+          <div className="ml-auto flex items-center gap-2">
             <Button
               type="button"
               onClick={() => {
@@ -6191,6 +6223,12 @@ export function TokenEditor({
               <PlusIcon />
               Create
             </Button>
+            <BrandSwitcher
+              realBrands={tokenBrands}
+              pendingBrands={pendingBrands}
+              selectedBrand={selectedBrand}
+              onSelectBrand={selectBrand}
+            />
           </div>
         </div>
       </div>
@@ -7221,7 +7259,7 @@ export function TokenEditor({
           pendingBrands={pendingBrands}
           onStageBrand={stageBrand}
           selectedBrand={selectedBrand}
-          onSelectBrand={setSelectedBrand}
+          onSelectBrand={selectBrand}
           width={sidebarWidth}
           onWidthChange={setSidebarWidth}
           syncStatus={syncStatus}

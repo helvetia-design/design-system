@@ -866,12 +866,12 @@
         {
           "name": "🧩 Component / Accordion / Summary / Typo",
           "cssVarName": "--ds-accordion-summary-typo",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-textfontsize-device-text-size-basefontweight-alias-text-weight-regularlineheight-alias-text-lineheight-text",
-              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / BasefontWeight Alias / Text / Weight / RegularlineHeight Alias / Text / LineHeight / Text"
+              "cssVar": "--ds-text-family-textfontsize-device-text-size-basefontweight-alias-text-weight-regularlineheight-alias-text-lineheight-textletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / BasefontWeight Alias / Text / Weight / RegularlineHeight Alias / Text / LineHeight / TextletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-accordion-summary-typo",
@@ -1705,12 +1705,12 @@
         {
           "name": "🧩 Component / AppFooter / Typo",
           "cssVarName": "--ds-appfooter-typo",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-textfontsize-device-text-size-smfontweight-alias-text-weight-regularlineheight-alias-text-lineheight-text",
-              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / SMfontWeight Alias / Text / Weight / RegularlineHeight Alias / Text / LineHeight / Text"
+              "cssVar": "--ds-text-family-textfontsize-device-text-size-smfontweight-alias-text-weight-regularlineheight-alias-text-lineheight-textletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / SMfontWeight Alias / Text / Weight / RegularlineHeight Alias / Text / LineHeight / TextletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-appfooter-typo",
@@ -28513,12 +28513,12 @@
         {
           "name": "🧩 Component / Heading / Level / 1",
           "cssVarName": "--ds-heading-level-1",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.3XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.3XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.3XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.3XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-3xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-heading",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 3XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Heading"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-3xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-headingletterspacing-alias-text-letterspacing-headingtextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 3XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / HeadingletterSpacing Alias / Text / LetterSpacing / HeadingtextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-heading-level-1",
@@ -28535,12 +28535,12 @@
         {
           "name": "🧩 Component / Heading / Level / 2",
           "cssVarName": "--ds-heading-level-2",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.2XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.2XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.2XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.2XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-2xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-heading",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 2XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Heading"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-2xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-headingletterspacing-alias-text-letterspacing-headingtextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 2XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / HeadingletterSpacing Alias / Text / LetterSpacing / HeadingtextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-heading-level-2",
@@ -28557,12 +28557,12 @@
         {
           "name": "🧩 Component / Heading / Level / 3",
           "cssVarName": "--ds-heading-level-3",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-heading",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Heading"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-headingletterspacing-alias-text-letterspacing-headingtextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / HeadingletterSpacing Alias / Text / LetterSpacing / HeadingtextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-heading-level-3",
@@ -28579,12 +28579,12 @@
         {
           "name": "🧩 Component / Heading / Level / 4",
           "cssVarName": "--ds-heading-level-4",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-lgfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-heading",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / LGfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Heading"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-lgfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-headingletterspacing-alias-text-letterspacing-headingtextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / LGfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / HeadingletterSpacing Alias / Text / LetterSpacing / HeadingtextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-heading-level-4",
@@ -28601,12 +28601,12 @@
         {
           "name": "🧩 Component / Heading / Level / 5",
           "cssVarName": "--ds-heading-level-5",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-basefontweight-alias-text-weight-boldlineheight-alias-text-lineheight-heading",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / BasefontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Heading"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-basefontweight-alias-text-weight-boldlineheight-alias-text-lineheight-headingletterspacing-alias-text-letterspacing-headingtextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / BasefontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / HeadingletterSpacing Alias / Text / LetterSpacing / HeadingtextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-heading-level-5",
@@ -28623,12 +28623,12 @@
         {
           "name": "🧩 Component / Heading / Level / Light1",
           "cssVarName": "--ds-heading-level-light1",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.3XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.3XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.3XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.3XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-3xlfontweight-alias-text-weight-lightlineheight-alias-text-lineheight-heading",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 3XLfontWeight Alias / Text / Weight / LightlineHeight Alias / Text / LineHeight / Heading"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-3xlfontweight-alias-text-weight-lightlineheight-alias-text-lineheight-headingletterspacing-alias-text-letterspacing-headingtextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 3XLfontWeight Alias / Text / Weight / LightlineHeight Alias / Text / LineHeight / HeadingletterSpacing Alias / Text / LetterSpacing / HeadingtextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-heading-level-light1",
@@ -28645,12 +28645,12 @@
         {
           "name": "🧩 Component / Heading / Level / Light3",
           "cssVarName": "--ds-heading-level-light3",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-xlfontweight-alias-text-weight-lightlineheight-alias-text-lineheight-heading",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / XLfontWeight Alias / Text / Weight / LightlineHeight Alias / Text / LineHeight / Heading"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-xlfontweight-alias-text-weight-lightlineheight-alias-text-lineheight-headingletterspacing-alias-text-letterspacing-headingtextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / XLfontWeight Alias / Text / Weight / LightlineHeight Alias / Text / LineHeight / HeadingletterSpacing Alias / Text / LetterSpacing / HeadingtextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-heading-level-light3",
@@ -28667,12 +28667,12 @@
         {
           "name": "🧩 Component / Heading / Level / Display2",
           "cssVarName": "--ds-heading-level-display2",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.4XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.4XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.4XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.4XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-4xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-heading",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 4XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Heading"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-4xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-headingletterspacing-alias-text-letterspacing-headingtextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 4XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / HeadingletterSpacing Alias / Text / LetterSpacing / HeadingtextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-heading-level-display2",
@@ -28689,12 +28689,12 @@
         {
           "name": "🧩 Component / Heading / Level / Display1",
           "cssVarName": "--ds-heading-level-display1",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.5XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.5XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.5XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.5XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-5xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-heading",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 5XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Heading"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-5xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-headingletterspacing-alias-text-letterspacing-headingtextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 5XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / HeadingletterSpacing Alias / Text / LetterSpacing / HeadingtextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-heading-level-display1",
@@ -28711,12 +28711,12 @@
         {
           "name": "🧩 Component / Heading / Level / LightDisplay2",
           "cssVarName": "--ds-heading-level-lightdisplay2",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.4XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.4XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.4XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.4XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-4xlfontweight-alias-text-weight-lightlineheight-alias-text-lineheight-heading",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 4XLfontWeight Alias / Text / Weight / LightlineHeight Alias / Text / LineHeight / Heading"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-4xlfontweight-alias-text-weight-lightlineheight-alias-text-lineheight-headingletterspacing-alias-text-letterspacing-headingtextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 4XLfontWeight Alias / Text / Weight / LightlineHeight Alias / Text / LineHeight / HeadingletterSpacing Alias / Text / LetterSpacing / HeadingtextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-heading-level-lightdisplay2",
@@ -28733,12 +28733,12 @@
         {
           "name": "🧩 Component / Heading / Level / LightDisplay1",
           "cssVarName": "--ds-heading-level-lightdisplay1",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.5XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.5XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.5XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.5XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-5xlfontweight-alias-text-weight-lightlineheight-alias-text-lineheight-heading",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 5XLfontWeight Alias / Text / Weight / LightlineHeight Alias / Text / LineHeight / Heading"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-5xlfontweight-alias-text-weight-lightlineheight-alias-text-lineheight-headingletterspacing-alias-text-letterspacing-headingtextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 5XLfontWeight Alias / Text / Weight / LightlineHeight Alias / Text / LineHeight / HeadingletterSpacing Alias / Text / LetterSpacing / HeadingtextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-heading-level-lightdisplay1",
@@ -28755,12 +28755,12 @@
         {
           "name": "🧩 Component / Heading / Level / Light2",
           "cssVarName": "--ds-heading-level-light2",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.2XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.2XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.2XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.2XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Light}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-2xlfontweight-alias-text-weight-lightlineheight-alias-text-lineheight-heading",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 2XLfontWeight Alias / Text / Weight / LightlineHeight Alias / Text / LineHeight / Heading"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-2xlfontweight-alias-text-weight-lightlineheight-alias-text-lineheight-headingletterspacing-alias-text-letterspacing-headingtextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 2XLfontWeight Alias / Text / Weight / LightlineHeight Alias / Text / LineHeight / HeadingletterSpacing Alias / Text / LetterSpacing / HeadingtextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-heading-level-light2",
@@ -29458,7 +29458,7 @@
           "name": "🧩 Component / Hint / Heading",
           "cssVarName": "--ds-hint-heading",
           "value": "{🧩 Component.Heading.Level.3}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-heading-level-3",
@@ -29479,7 +29479,7 @@
           "name": "🧩 Component / Hint / Body",
           "cssVarName": "--ds-hint-body",
           "value": "{🧩 Component.Body.Font}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-text-typo-paragraph",
@@ -29827,7 +29827,6 @@
             "grey",
             "success",
             "danger",
-            "info",
             "warning"
           ]
         },
@@ -33762,12 +33761,12 @@
         {
           "name": "🧩 Component / Label / Typo / Base",
           "cssVarName": "--ds-label-typo-base",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-textfontsize-device-text-size-smfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-text",
-              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / SMfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Text"
+              "cssVar": "--ds-text-family-textfontsize-device-text-size-smfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-textletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / SMfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / TextletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-label-typo-base",
@@ -33784,12 +33783,12 @@
         {
           "name": "🧩 Component / Label / Typo / MD",
           "cssVarName": "--ds-label-typo-md",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-textfontsize-device-text-size-basefontweight-alias-text-weight-boldlineheight-alias-text-lineheight-text",
-              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / BasefontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Text"
+              "cssVar": "--ds-text-family-textfontsize-device-text-size-basefontweight-alias-text-weight-boldlineheight-alias-text-lineheight-textletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / BasefontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / TextletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-label-typo-md",
@@ -33806,12 +33805,12 @@
         {
           "name": "🧩 Component / Label / Typo / 3XL",
           "cssVarName": "--ds-label-typo-3xl",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.3XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.3XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.3XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.3XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-3xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-text",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 3XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Text"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-3xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-textletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 3XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / TextletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-label-typo-3xl",
@@ -33828,12 +33827,12 @@
         {
           "name": "🧩 Component / Label / Typo / 2XL",
           "cssVarName": "--ds-label-typo-2xl",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.2XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.2XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.2XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.2XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-2xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-text",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 2XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Text"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-2xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-textletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / 2XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / TextletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-label-typo-2xl",
@@ -33850,12 +33849,12 @@
         {
           "name": "🧩 Component / Label / Typo / LG",
           "cssVarName": "--ds-label-typo-lg",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-lgfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-text",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / LGfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Text"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-lgfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-textletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / LGfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / TextletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-label-typo-lg",
@@ -33872,12 +33871,12 @@
         {
           "name": "🧩 Component / Label / Typo / XL",
           "cssVarName": "--ds-label-typo-xl",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-text",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Text"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-xlfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-textletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / XLfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / TextletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-label-typo-xl",
@@ -35018,12 +35017,12 @@
         {
           "name": "🧩 Component / List / Item / Title",
           "cssVarName": "--ds-list-item-title",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-basefontweight-alias-text-weight-boldlineheight-alias-text-lineheight-heading",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / BasefontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Heading"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-basefontweight-alias-text-weight-boldlineheight-alias-text-lineheight-headingletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / BasefontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / HeadingletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-list-item-title",
@@ -35040,12 +35039,12 @@
         {
           "name": "🧩 Component / List / Item / Text",
           "cssVarName": "--ds-list-item-text",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-textfontsize-device-text-size-smfontweight-alias-text-weight-regularlineheight-alias-text-lineheight-text",
-              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / SMfontWeight Alias / Text / Weight / RegularlineHeight Alias / Text / LineHeight / Text"
+              "cssVar": "--ds-text-family-textfontsize-device-text-size-smfontweight-alias-text-weight-regularlineheight-alias-text-lineheight-textletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / SMfontWeight Alias / Text / Weight / RegularlineHeight Alias / Text / LineHeight / TextletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-list-item-text",
@@ -36055,7 +36054,7 @@
           "name": "🧩 Component / Modal / Heading",
           "cssVarName": "--ds-modal-heading",
           "value": "{🧩 Component.Heading.Level.3}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.XL}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-heading-level-3",
@@ -36799,7 +36798,7 @@
           "name": "🧩 Component / Notification / Default / Heading",
           "cssVarName": "--ds-notification-default-heading",
           "value": "{🧩 Component.Heading.Level.4}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-heading-level-4",
@@ -36821,7 +36820,7 @@
           "name": "🧩 Component / Notification / Default / Body",
           "cssVarName": "--ds-notification-default-body",
           "value": "{🧩 Component.Text.Typo.Paragraph}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-text-typo-paragraph",
@@ -36883,7 +36882,7 @@
           "name": "🧩 Component / Notification / Info / Heading",
           "cssVarName": "--ds-notification-info-heading",
           "value": "{🧩 Component.Heading.Level.4}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-heading-level-4",
@@ -36905,7 +36904,7 @@
           "name": "🧩 Component / Notification / Info / Body",
           "cssVarName": "--ds-notification-info-body",
           "value": "{🧩 Component.Text.Typo.Paragraph}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-text-typo-paragraph",
@@ -37137,7 +37136,7 @@
           "name": "🧩 Component / Notification / Success / Heading",
           "cssVarName": "--ds-notification-success-heading",
           "value": "{🧩 Component.Heading.Level.4}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-heading-level-4",
@@ -37159,7 +37158,7 @@
           "name": "🧩 Component / Notification / Success / Body",
           "cssVarName": "--ds-notification-success-body",
           "value": "{🧩 Component.Text.Typo.Paragraph}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-text-typo-paragraph",
@@ -37306,7 +37305,7 @@
           "name": "🧩 Component / Notification / Warning / Heading",
           "cssVarName": "--ds-notification-warning-heading",
           "value": "{🧩 Component.Heading.Level.4}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-heading-level-4",
@@ -37328,7 +37327,7 @@
           "name": "🧩 Component / Notification / Warning / Body",
           "cssVarName": "--ds-notification-warning-body",
           "value": "{🧩 Component.Text.Typo.Paragraph}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-text-typo-paragraph",
@@ -37475,7 +37474,7 @@
           "name": "🧩 Component / Notification / Danger / Heading",
           "cssVarName": "--ds-notification-danger-heading",
           "value": "{🧩 Component.Heading.Level.4}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-heading-level-4",
@@ -37497,7 +37496,7 @@
           "name": "🧩 Component / Notification / Danger / Body",
           "cssVarName": "--ds-notification-danger-body",
           "value": "{🧩 Component.Text.Typo.Paragraph}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-text-typo-paragraph",
@@ -37626,7 +37625,7 @@
           "name": "🧩 Component / Notification / OutlineDefault / Heading",
           "cssVarName": "--ds-notification-outlinedefault-heading",
           "value": "{🧩 Component.Heading.Level.4}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-heading-level-4",
@@ -37648,7 +37647,7 @@
           "name": "🧩 Component / Notification / OutlineDefault / Body",
           "cssVarName": "--ds-notification-outlinedefault-body",
           "value": "{🧩 Component.Text.Typo.Paragraph}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-text-typo-paragraph",
@@ -37821,7 +37820,7 @@
           "name": "🧩 Component / Notification / OutlinePurple / Heading",
           "cssVarName": "--ds-notification-outlinepurple-heading",
           "value": "{🧩 Component.Heading.Level.4}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-heading-level-4",
@@ -37843,7 +37842,7 @@
           "name": "🧩 Component / Notification / OutlinePurple / Body",
           "cssVarName": "--ds-notification-outlinepurple-body",
           "value": "{🧩 Component.Text.Typo.Paragraph}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-text-typo-paragraph",
@@ -37994,7 +37993,7 @@
           "name": "🧩 Component / Notification / OutlineGreen / Heading",
           "cssVarName": "--ds-notification-outlinegreen-heading",
           "value": "{🧩 Component.Heading.Level.4}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-heading-level-4",
@@ -38016,7 +38015,7 @@
           "name": "🧩 Component / Notification / OutlineGreen / Body",
           "cssVarName": "--ds-notification-outlinegreen-body",
           "value": "{🧩 Component.Text.Typo.Paragraph}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-text-typo-paragraph",
@@ -38167,7 +38166,7 @@
           "name": "🧩 Component / Notification / OutlineYellow / Heading",
           "cssVarName": "--ds-notification-outlineyellow-heading",
           "value": "{🧩 Component.Heading.Level.4}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-heading-level-4",
@@ -38189,7 +38188,7 @@
           "name": "🧩 Component / Notification / OutlineYellow / Body",
           "cssVarName": "--ds-notification-outlineyellow-body",
           "value": "{🧩 Component.Text.Typo.Paragraph}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-text-typo-paragraph",
@@ -38340,7 +38339,7 @@
           "name": "🧩 Component / Notification / OutlineRed / Heading",
           "cssVarName": "--ds-notification-outlinered-heading",
           "value": "{🧩 Component.Heading.Level.4}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-heading-level-4",
@@ -38362,7 +38361,7 @@
           "name": "🧩 Component / Notification / OutlineRed / Body",
           "cssVarName": "--ds-notification-outlinered-body",
           "value": "{🧩 Component.Text.Typo.Paragraph}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-text-typo-paragraph",
@@ -54866,7 +54865,7 @@
           "name": "🧩 Component / Snackbar / Heading",
           "cssVarName": "--ds-snackbar-heading",
           "value": "{🧩 Component.Heading.Level.4}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-heading-level-4",
@@ -54887,7 +54886,7 @@
           "name": "🧩 Component / Snackbar / Body",
           "cssVarName": "--ds-snackbar-body",
           "value": "{🧩 Component.Text.Typo.Paragraph}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-text-typo-paragraph",
@@ -57283,7 +57282,7 @@
           "name": "🧩 Component / Steps / Step / Typo / Base",
           "cssVarName": "--ds-steps-step-typo-base",
           "value": "{🧩 Component.Heading.Level.5}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-heading-level-5",
@@ -57305,12 +57304,12 @@
         {
           "name": "🧩 Component / Steps / Step / Typo / SM",
           "cssVarName": "--ds-steps-step-typo-sm",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-smfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-heading",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / SMfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Heading"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-smfontweight-alias-text-weight-boldlineheight-alias-text-lineheight-headingletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / SMfontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / HeadingletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-steps-step-typo-sm",
@@ -58579,12 +58578,12 @@
         {
           "name": "🧩 Component / Tabs / Tab / Selected / Typo",
           "cssVarName": "--ds-tabs-tab-selected-typo",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-basefontweight-alias-text-weight-boldlineheight-alias-text-lineheight-text",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / BasefontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Text"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-basefontweight-alias-text-weight-boldlineheight-alias-text-lineheight-textletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / BasefontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / TextletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-tabs-tab-selected-typo",
@@ -58689,12 +58688,12 @@
         {
           "name": "🧩 Component / Tabs / Tab / Unselected / Typo",
           "cssVarName": "--ds-tabs-tab-unselected-typo",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-headingfontsize-device-text-size-basefontweight-alias-text-weight-boldlineheight-alias-text-lineheight-text",
-              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / BasefontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / Text"
+              "cssVar": "--ds-text-family-headingfontsize-device-text-size-basefontweight-alias-text-weight-boldlineheight-alias-text-lineheight-textletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / HeadingfontSize Device / Text / Size / BasefontWeight Alias / Text / Weight / BoldlineHeight Alias / Text / LineHeight / TextletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-tabs-tab-unselected-typo",
@@ -62619,12 +62618,12 @@
         {
           "name": "🧩 Component / Text / Typo / Paragraph",
           "cssVarName": "--ds-text-typo-paragraph",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-textfontsize-device-text-size-basefontweight-alias-text-weight-regularlineheight-alias-text-lineheight-text",
-              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / BasefontWeight Alias / Text / Weight / RegularlineHeight Alias / Text / LineHeight / Text"
+              "cssVar": "--ds-text-family-textfontsize-device-text-size-basefontweight-alias-text-weight-regularlineheight-alias-text-lineheight-textletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / BasefontWeight Alias / Text / Weight / RegularlineHeight Alias / Text / LineHeight / TextletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-text-typo-paragraph",
@@ -62641,12 +62640,12 @@
         {
           "name": "🧩 Component / Text / Typo / Small",
           "cssVarName": "--ds-text-typo-small",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-textfontsize-device-text-size-smfontweight-alias-text-weight-regularlineheight-alias-text-lineheight-text",
-              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / SMfontWeight Alias / Text / Weight / RegularlineHeight Alias / Text / LineHeight / Text"
+              "cssVar": "--ds-text-family-textfontsize-device-text-size-smfontweight-alias-text-weight-regularlineheight-alias-text-lineheight-textletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / SMfontWeight Alias / Text / Weight / RegularlineHeight Alias / Text / LineHeight / TextletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-text-typo-small",
@@ -62663,12 +62662,12 @@
         {
           "name": "🧩 Component / Text / Typo / Lead",
           "cssVarName": "--ds-text-typo-lead",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.LG}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-textfontsize-device-text-size-lgfontweight-alias-text-weight-regularlineheight-alias-text-lineheight-text",
-              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / LGfontWeight Alias / Text / Weight / RegularlineHeight Alias / Text / LineHeight / Text"
+              "cssVar": "--ds-text-family-textfontsize-device-text-size-lgfontweight-alias-text-weight-regularlineheight-alias-text-lineheight-textletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / LGfontWeight Alias / Text / Weight / RegularlineHeight Alias / Text / LineHeight / TextletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-text-typo-lead",
@@ -62685,12 +62684,12 @@
         {
           "name": "🧩 Component / Text / Typo / Block",
           "cssVarName": "--ds-text-typo-block",
-          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.MD}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.MD}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "value": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.MD}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.MD}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
-              "cssVar": "--ds-text-family-textfontsize-device-text-size-mdfontweight-alias-text-weight-regularlineheight-alias-text-lineheight-text",
-              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / MDfontWeight Alias / Text / Weight / RegularlineHeight Alias / Text / LineHeight / Text"
+              "cssVar": "--ds-text-family-textfontsize-device-text-size-mdfontweight-alias-text-weight-regularlineheight-alias-text-lineheight-textletterspacing-alias-text-letterspacing-texttextdecoration-alias-text-textdecoration-nonetexttransform-alias-text-texttransform-none",
+              "figmaName": "fontFamily Alias / Text / Family / TextfontSize Device / Text / Size / MDfontWeight Alias / Text / Weight / RegularlineHeight Alias / Text / LineHeight / TextletterSpacing Alias / Text / LetterSpacing / TexttextDecoration Alias / Text / TextDecoration / NonetextTransform Alias / Text / TextTransform / None"
             },
             {
               "cssVar": "--ds-text-typo-block",
@@ -65469,7 +65468,7 @@
           "name": "🧩 Component / Toast / Heading",
           "cssVarName": "--ds-toast-heading",
           "value": "{🧩 Component.Heading.Level.5}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Heading}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.Base}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Bold}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Heading}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Heading}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-heading-level-5",
@@ -65490,7 +65489,7 @@
           "name": "🧩 Component / Toast / Body",
           "cssVarName": "--ds-toast-body",
           "value": "{🧩 Component.Text.Typo.Small}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-text-typo-small",
@@ -67633,7 +67632,7 @@
           "name": "🧩 Component / Tooltip / Text",
           "cssVarName": "--ds-tooltip-text",
           "value": "{🧩 Component.Text.Typo.Small}",
-          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\"}",
+          "nativeValue": "{\"fontFamily\":\"{🔗 Alias.🔤 Text.Family.Text}\",\"fontSize\":\"{📱 Device.🔤 Text.Size.SM}\",\"fontWeight\":\"{🔗 Alias.🔤 Text.Weight.Regular}\",\"lineHeight\":\"{🔗 Alias.🔤 Text.LineHeight.Text}\",\"letterSpacing\":\"{🔗 Alias.🔤 Text.LetterSpacing.Text}\",\"textDecoration\":\"{🔗 Alias.🔤 Text.TextDecoration.None}\",\"textTransform\":\"{🔗 Alias.🔤 Text.TextTransform.None}\"}",
           "inheritance": [
             {
               "cssVar": "--ds-text-typo-small",
