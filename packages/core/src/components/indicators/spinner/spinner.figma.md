@@ -1,12 +1,12 @@
 # spinner → Figma mapping
 
-> **Status: all phases done (rebuilt 04.11.2026 on the new template). Specs accepted as is, pending the Specs rework.**
+> **Status: all phases done (rebuilt 04.11.2026 on the new template; legend, Anatomy spacing, sub-labels and label bindings updated to the revised rules the same day). Specs accepted as is, pending the Specs rework.**
 
 ```yaml
 figmaComponentKey: null # four top-level sets, see figmaSets below
 figmaPage: Core / Indicators # page node 2804:322
 figmaMasterNodeId: null # see figmaSets
-figmaDocFrameNodeId: '2865:464' # "Spinner Documentation" (old frame 2804:326 kept as "Spinner Documentation (old)" until removal)
+figmaDocFrameNodeId: '2865:464' # "Spinner Documentation" (old frame 2804:326 and its sets deleted 04.11.2026)
 figmaSets:
   logoPrimary: { nodeId: '2869:348', key: 'b3f18954b8066281a5ad73d72bfd1aa92d62241b' }
   logoInverted: { nodeId: '2869:365', key: 'dc32950841a518257f4219569a518d332448bfac' }
@@ -158,8 +158,9 @@ tokens:
   - {
       cssVar: --ds-alias-text-line-height-text,
       figmaVariable: 🔗 Alias/🔤 Text/LineHeight/Text,
-      figmaVariableId: 'VariableID:137:283',
+      figmaVariableId: 'VariableID:2826:9940',
       resolved: true,
+      note: 'STRING "150%" — cannot be bound to lineHeight; applied as unbound literal 150% (PHASE-3-BUILD.md → Text property bindings)',
     }
   - {
       cssVar: '(inherited) font-size',
@@ -183,15 +184,15 @@ tokens:
       note: 'inherited-context binding; inverted uses Alias/Text/Color/InvertedPrimary (137:289)',
     }
   - cssVar: '(inherited) letter-spacing'
-    figmaVariable: null
-    figmaVariableId: null
+    figmaVariable: 🔗 Alias/🔤 Text/LetterSpacing/Text
+    figmaVariableId: 'VariableID:2826:9941'
     resolved: true
-    resolution: 'No letter-spacing token exists. User accepted Figma default (0%) as a one-off.'
+    note: 'inherited-context binding; bound on all 16 labels (applies as 0px)'
   - cssVar: '(inherited) text-decoration'
-    figmaVariable: null
-    figmaVariableId: null
+    figmaVariable: 🔗 Alias/🔤 Text/TextDecoration/None
+    figmaVariableId: 'VariableID:2826:9943'
     resolved: true
-    resolution: 'No decoration token exists; label uses none. User accepted "none" as a one-off.'
+    note: 'inherited-context; STRING "NONE" — not a bindable field, applied as unbound literal NONE'
 
 specs: # per option of the Variants axis (size)
   base:
@@ -257,7 +258,9 @@ Axis order checked: `size` = sm · base (scale); `labelPosition` = right · bott
 - 4 component sets × 4 variants (`labelPosition` × `size`), each with set-level properties `Show label` (boolean, default false) and `Label` (text, "Label"). Variants are named `labelPosition=<…>, size=<…>`.
 - Logo glyph: hand-traced polygon of the Helvetia mark (from a fully formed Lottie frame), 86.3% of the `inner` container, corner radius scaled with glyph size. Fill bound to `Spinner/Logo/{Primary|Inverted}/Color`.
 - Circle: `ring` ellipse (stroke bound to circle background token, stroke weight bound to thickness) plus `progress` arc ellipse (top 90°, fill bound to progress token). The arc's `innerRadius` ratio is calculated from size/thickness — the Plugin API cannot bind it, so it is a derived literal.
-- Label line-height: resolved 150% applied as an unbound literal (percent-semantic token cannot be bound via the Plugin API).
+- Label line-height and text-decoration: applied as unbound literals (150%, NONE) — their STRING variables can't be bound via the Plugin API. Letter-spacing is bound.
+- Set sub-labels read `Logo / Primary`, `Logo / Inverted`, `Circle / Primary`, `Circle / Inverted`; set names keep the full `Spinner/<Split>/<Primary|Inverted>` path.
+- Anatomy legend uses `Anatomy/Legend item` instances; section spacing 30 / 24 / 30.
 - Label weight variable is a STRING → bound to `fontStyle`, not `fontWeight`.
 - Circle inverted: background resolves to white (`Alias/Surface/White`), progress to navy (`Alias/Text/Color/Primary`, same as Primary). On the inverted navy background the arc is invisible — in code and in Figma alike (checked in Phase 7). Flag for design review.
 - With `Show label` defaulting to `false`, the `right` and `bottom` rows of each set look identical (no label shown). Set instance property to `true` to see the difference.
@@ -266,10 +269,11 @@ Axis order checked: `size` = sm · base (scale); `labelPosition` = right · bott
 
 Mismatches only:
 
-| Property             | Variant         | Figma                                                                   | Live                                                                     | Issue                                                                                                                  |
-| -------------------- | --------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| `inner` height       | logo, all sizes | 64 / 32 (bound to `Logo/Size/MD` / `SM`)                                | 70.5px / 38.5px                                                          | Code binds only the width to the logo size token; the height comes from the Lottie SVG. Figma binds both.              |
-| line-height token id | label           | `Alias/Text/LineHeight/Text` now `VariableID:2826:9940` (STRING `150%`) | `Base.tokens.json` still records `VariableID:137:283` (deleted in Figma) | Stale variable id after the type change; needs a figma-sync pull/backfill. Value itself matches (24px = 150% of 16px). |
+| Property       | Variant         | Figma                                    | Live            | Issue                                                                                                     |
+| -------------- | --------------- | ---------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------- |
+| `inner` height | logo, all sizes | 64 / 32 (bound to `Logo/Size/MD` / `SM`) | 70.5px / 38.5px | Code binds only the width to the logo size token; the height comes from the Lottie SVG. Figma binds both. |
+
+Resolved since: the stale line-height variable id (`Base.tokens.json` now records `VariableID:2826:9940` after merging `test/figma-skill`).
 
 All other bound values match: circle size/thickness, ring and progress colours (Primary and Inverted), logo colours, gaps 8/4, label family/size/weight/colour.
 
