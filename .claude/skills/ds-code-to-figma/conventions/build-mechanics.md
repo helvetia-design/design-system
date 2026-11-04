@@ -110,8 +110,7 @@ imported.width)`, then move **all** `imported.children` (via `findAll`, not `fin
 - **Every skill-authored label/annotation text on the documentation page — never the component's
   own content — binds its fill to `🔗 Alias/🔤 Text/Color/Primary` (`VariableID:137:288`), never a
   hardcoded literal color**, even when the literal happens to match the token's resolved value
-  exactly. Covers things this skill builds as chrome around the real component (Anatomy legend
-  lines, Specs card titles, Component Set sub-labels). Does not cover text that's part of the real
+  exactly. Covers things this skill builds as chrome around the real component (Specs card titles, Component Set sub-labels). Does not cover text that's part of the real
   component/master being documented. When in doubt which color a piece of skill-authored text
   should use, default to `Alias/Text/Color/Primary` rather than guessing a hex value.
 

@@ -44,19 +44,23 @@ explicit user confirmation on.
    - **No Figma default layer names** (`Frame 1`, `Line`, `Ellipse`, `Vector`, `Group 1`). Name
      built layers after their part (`icon`, `label`, `track`); cloned layers keep their template
      name.
-   - **Line-height variables cannot be true-bound — API limitation, not a missing token.** This
-     repo's line-height tokens are percent-semantic FLOAT values (e.g. `150` meaning 150%, per
-     `LINE_HEIGHT_PERCENT_MULTIPLIER` in `apps/toky/src/tokens/figma-map.ts`). Confirmed by
-     testing: binding a FLOAT variable to a text node's `lineHeight` via `setBoundVariable` /
-     `setRangeBoundVariable` **always** applies it as `PIXELS`, regardless of what unit was set
-     on the node immediately before the bind call — there is no way to bind a percent-semantic
-     FLOAT token to `lineHeight` through the Plugin API. Workaround: resolve the variable's
-     numeric value yourself (walk its `VARIABLE_ALIAS` chain via `getVariableByIdAsync` until you
-     hit a literal number), then set `node.lineHeight = { unit: 'PERCENT', value: resolvedValue }`
-     as a **literal, unbound** value — do not call `setBoundVariable`/`setRangeBoundVariable` for
-     `lineHeight` on a percent-semantic token. Record this in `<name>.figma.md`'s tokens list as
-     an exception (resolved but intentionally unbound, with the reason), not as a hard stop —
-     the token exists and its correct value is applied, it's just not a live binding.
+   - **Text property bindings — what the Plugin API can and can't bind** (tested 04.11.2026):
+
+     | Property         | Figma variable                                    | Bind?                                                     |
+     | ---------------- | ------------------------------------------------- | --------------------------------------------------------- |
+     | `letterSpacing`  | `Alias/Text/LetterSpacing/*` — FLOAT              | Yes, `setRangeBoundVariable`. Applies as `PIXELS`.        |
+     | `lineHeight`     | `Alias/Text/LineHeight/*` — STRING (`"150%"`)     | No: "variable of resolved type 'STRING' cannot be bound". |
+     | `textDecoration` | `Alias/Text/TextDecoration/*` — STRING (`"NONE"`) | No: not a bindable text field.                            |
+
+     For the two that cannot be bound: walk the variable's `VARIABLE_ALIAS` chain via
+     `getVariableByIdAsync` to the literal, then set it as a **literal, unbound** value —
+     `lineHeight = { unit: 'PERCENT', value: parseFloat("150%") }`, `textDecoration = "NONE"`.
+     Record each in `<name>.figma.md`'s tokens list with its `figmaVariableId` and as an exception
+     (resolved but intentionally unbound, with the reason), not as a hard stop — the token exists
+     and its value is applied, it's just not a live binding. `letterSpacing` binds as `PIXELS`,
+     which is right for the current `0` tokens; for a non-zero token, compare the bound pixel
+     value against the code's rem value and hard stop if they differ.
+
    - **Binding `fontFamily`/`lineHeight` on an empty text node doesn't survive setting
      `characters` afterward** — text styling is per character-range, so writing new characters
      resets any binding applied while the node was empty. Set `characters` (and load whatever
@@ -158,12 +162,23 @@ The template's `Sets` frame is a worked example: one stack per split, each a `La
 the real set by cloning from it — **this skill writes no fill, stroke, font, dash or spacing
 values**; clone a prototype and change only text and positions.
 
-1. **Stacks — one per top-level split from Phase 2.** No split → one stack, `sub-label` removed,
-   set named `<Component>`. `inverted` axis → `Primary` and `Inverted`. A structural split → one
-   stack per split, `sub-label` and set named `<Component>/<split>`. Source each stack from the
-   matching template stack — `Primary` from the template's `Primary`, `Inverted` from the
-   template's `Inverted`, any other split cloned from `Primary`. Delete template stacks that aren't
-   needed.
+1. **Stacks — one per top-level split from Phase 2.** Name each stack's `sub-label` and set:
+
+   | Split                         | Stacks                                      | `sub-label`                     | Set name                                  |
+   | ----------------------------- | ------------------------------------------- | ------------------------------- | ----------------------------------------- |
+   | None                          | one                                         | removed                         | `<Component>`                             |
+   | `inverted` only               | `Primary`, `Inverted`                       | `Primary` / `Inverted`          | `<Component>/<Primary\|Inverted>`         |
+   | Structural only               | one per split                               | `<Split>`                       | `<Component>/<Split>`                     |
+   | Structural **and** `inverted` | one per combination, structural split outer | `<Split> / <Primary\|Inverted>` | `<Component>/<Split>/<Primary\|Inverted>` |
+
+   The `sub-label` never repeats the component name — the frame title already shows it. The set
+   name always carries the full path, because that's what the assets panel and the instance-swap
+   list show. Call the non-inverted state `Primary`, as the component tokens do (e.g.
+   `--ds-spinner-circle-primary-background` next to `--ds-spinner-circle-inverted-background`).
+
+   Source every inverted stack from the template's `Inverted` stack and every other stack from its
+   `Primary` stack. Delete template stacks that aren't needed.
+
 2. **Combine** the stack's variants into a `COMPONENT_SET` with `combineAsVariants()`. Clone the
    template set's fill, stroke (dashed, purple, variable-bound) and corner radius onto it by
    copying them from the template set — never recreate them.
@@ -250,7 +265,7 @@ re-set all three hyperlinks, unconditionally, even if they look correct. A human
 - The finished labeled component set(s) satisfy the hard rules above and were approved by the user
   in Figma before Phase 4.
 - Every styled value is bound to a real Figma variable id — never a literal — except the
-  documented line-height exception (resolved value, intentionally unbound).
+  documented `lineHeight`/`textDecoration` exceptions (resolved value, intentionally unbound).
 - Every `device:` responsive binding resolved to a routing variable (reused or newly created, per
   the steps above), never bound directly to one of the three per-breakpoint variables.
 - The category page and the component's documentation frame exist, cloned from

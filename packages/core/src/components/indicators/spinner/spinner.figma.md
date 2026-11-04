@@ -1,17 +1,17 @@
 # spinner → Figma mapping
 
-> **Status: Phase 2 confirmed. Phase 3 built — awaiting user approval of the documentation frame in Figma.**
+> **Status: all phases done (rebuilt 04.11.2026 on the new template). Specs accepted as is, pending the Specs rework.**
 
 ```yaml
 figmaComponentKey: null # four top-level sets, see figmaSets below
 figmaPage: Core / Indicators # page node 2804:322
 figmaMasterNodeId: null # see figmaSets
-figmaDocFrameNodeId: '2804:326' # "Spinner Documentation"
+figmaDocFrameNodeId: '2865:464' # "Spinner Documentation" (old frame 2804:326 kept as "Spinner Documentation (old)" until removal)
 figmaSets:
-  logoPrimary: { nodeId: '2807:168', key: '3aeb67a5db77eba2d7990a1dd37a59f068877cd8' }
-  logoInverted: { nodeId: '2807:185', key: '2bb4a4afd740de515aff1bfc6a7843bb6fbfe370' }
-  circlePrimary: { nodeId: '2807:206', key: 'ba714b46d3051c410c474caabef131aef89849ed' }
-  circleInverted: { nodeId: '2807:227', key: '54634663f44bd730b82f0ec6c4e869d0674096ca' }
+  logoPrimary: { nodeId: '2869:348', key: 'b3f18954b8066281a5ad73d72bfd1aa92d62241b' }
+  logoInverted: { nodeId: '2869:365', key: 'dc32950841a518257f4219569a518d332448bfac' }
+  circlePrimary: { nodeId: '2869:386', key: '4c2ae734d4f89e9f886c37396838dfbb3f460d00' }
+  circleInverted: { nodeId: '2869:407', key: '44e9d7628b35593988b4aeb80171e2a86254b3eb' }
 
 anatomy:
   - letter: A
@@ -259,5 +259,20 @@ Axis order checked: `size` = sm · base (scale); `labelPosition` = right · bott
 - Circle: `ring` ellipse (stroke bound to circle background token, stroke weight bound to thickness) plus `progress` arc ellipse (top 90°, fill bound to progress token). The arc's `innerRadius` ratio is calculated from size/thickness — the Plugin API cannot bind it, so it is a derived literal.
 - Label line-height: resolved 150% applied as an unbound literal (percent-semantic token cannot be bound via the Plugin API).
 - Label weight variable is a STRING → bound to `fontStyle`, not `fontWeight`.
-- Circle inverted background (`Alias/Surface/White`) and progress (`Alias/Text/Color/InvertedPrimary`) resolve to the same white, so the arc is not visible against the ring there. This follows the tokens; flag for design review.
+- Circle inverted: background resolves to white (`Alias/Surface/White`), progress to navy (`Alias/Text/Color/Primary`, same as Primary). On the inverted navy background the arc is invisible — in code and in Figma alike (checked in Phase 7). Flag for design review.
 - With `Show label` defaulting to `false`, the `right` and `bottom` rows of each set look identical (no label shown). Set instance property to `true` to see the difference.
+
+## Phase 7 — Review (04.11.2026)
+
+Mismatches only:
+
+| Property             | Variant         | Figma                                                                   | Live                                                                     | Issue                                                                                                                  |
+| -------------------- | --------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `inner` height       | logo, all sizes | 64 / 32 (bound to `Logo/Size/MD` / `SM`)                                | 70.5px / 38.5px                                                          | Code binds only the width to the logo size token; the height comes from the Lottie SVG. Figma binds both.              |
+| line-height token id | label           | `Alias/Text/LineHeight/Text` now `VariableID:2826:9940` (STRING `150%`) | `Base.tokens.json` still records `VariableID:137:283` (deleted in Figma) | Stale variable id after the type change; needs a figma-sync pull/backfill. Value itself matches (24px = 150% of 16px). |
+
+All other bound values match: circle size/thickness, ring and progress colours (Primary and Inverted), logo colours, gaps 8/4, label family/size/weight/colour.
+
+Uncovered (no element in `spinner.visual.html`): every `size=sm` with a label, `labelPosition` on circle and inverted sets, logo inverted `sm`, circle inverted `sm`.
+
+Not verifiable: logo glyph-to-container ratio. The Lottie glyph's bounding box ranges 15–58px across frames (rotation), so the recorded 86.3% can't be confirmed from a running instance.

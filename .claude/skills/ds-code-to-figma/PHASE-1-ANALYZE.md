@@ -57,7 +57,9 @@ Read the component's code and produce the draft mapping that Phase 2 proposes a 
      exemption.** For attributes inherited from this system's own default text treatment (not set
      by the component's own code), bind to the matching system-default token — e.g.
      `🔗 Alias/🔤 Text/Color/Primary` for color, `📱 Device/🔤 Text/Size/Base/Device` for size (from
-     the `Design Responsive Tokens` collection, mode-based) — and flag these as inherited-context
+     the `Design Responsive Tokens` collection, mode-based), `🔗 Alias/🔤 Text/LetterSpacing/Text`
+     for letter-spacing, `🔗 Alias/🔤 Text/TextDecoration/None` for decoration (which of these the
+     Plugin API can bind: `PHASE-3-BUILD.md` → "Text property bindings") — and flag these as inherited-context
      bindings, not literal bindings to something the component's own code sets. Never leave an
      attribute unbound/assumed because the component's SCSS doesn't mention it.
 4. Identify any **nested DS component** usage (e.g. `<ds-icon>` inside `ds-button`'s render). For

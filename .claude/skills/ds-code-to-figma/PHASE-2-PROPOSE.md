@@ -78,8 +78,9 @@ right/bottom) so the approved sketch already shows the final order:
     ```
 - **Top-level split**: any structural axis (different layers per option, per the table above) is
   not a matrix dimension. Split it into separate top-level components and sketch each one's own
-  matrix with its own frame/title, like `inverted`'s light/dark two-frame layout (e.g.
-  `Spinner/Primary` and `Spinner/Inverted`).
+  matrix with its own stack and sub-label (e.g. `Spinner/Logo` and `Spinner/Circle`), the same
+  way `inverted` gets `Primary`/`Inverted` stacks. Set names per `PHASE-3-BUILD.md` → "Labeled
+  component set".
 
 ### 3. Check the variant count (500 hard stop)
 

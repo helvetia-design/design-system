@@ -92,7 +92,7 @@ flowchart TD
     subgraph P5G["Phase 5 — Anatomy"]
         direction LR
         P5a{{"Component has<br/>@part tags?"}}:::human -->|no| P5s(["Delete Anatomy<br/>placeholder"]):::figma
-        P5a -->|yes| P5b["Build diagram +<br/>bold-letter legend"]:::figma
+        P5a -->|yes| P5b["Build diagram +<br/>legend items"]:::figma
         P5b --> P5c{{"User confirms<br/>Anatomy"}}:::human
     end
 
