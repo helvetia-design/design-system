@@ -14,7 +14,7 @@ All three live on the `🧰 Annotations` page. Find them by name; the node ids a
 - **`Preview`** (`COMPONENT_SET`, `2192:7497`) — the bordered content box. Contains a real `SLOT`
   node with a hidden `Placeholder` inside. Get a variant via
   `previewSet.children.find(v => v.name === 'Variant=Default')`; `2182:2` is only its `Flat`
-  child. `Default` insets the slot 14px; `Flat` insets it 0 (an outer container for further nested
+  child. `Default` insets the slot; `Flat` doesn't (an outer container for further nested
   `Preview`s).
 - **`Section`** (`COMPONENT_SET`, `2192:5987`) — a `Title` + a `Preview`, with the same
   `Default`/`Flat` property as `Preview`. The building block for every left-column section.

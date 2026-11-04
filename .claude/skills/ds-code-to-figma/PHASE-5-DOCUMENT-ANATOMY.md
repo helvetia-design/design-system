@@ -39,12 +39,15 @@ is missing.
    variant (`swapComponent`) and centre it horizontally in `diagram-area`.
 2. **Markers — one per `anatomy:` entry.** Clone `marker-A` for each part, delete the unused ones,
    rename each to `marker-<letter>` and keep the groups in letter order. Set each `letter` text.
-   - Markers at `y = 16`; the component directly below at `y = 16 + marker height`, so each
-     leader ends on its top edge.
-   - Each dot is centred horizontally on the part it labels. A part that encloses others (e.g. the
-     container) gets its marker over a spot no other part covers.
-   - `diagram-area` height = 16 + marker height + component height + 16 (see "Sizing" — its width
-     stays `FILL`).
+   - Dots at `y = 16`; the component keeps its cloned `y`.
+   - Each dot is centred horizontally on the part it labels; move the whole `marker-<letter>` group,
+     never its children one by one. A part that encloses others (e.g. the container) gets its
+     marker on the straight part of its top edge (between the corner radii), as far from the other
+     markers as possible.
+   - Each `leader` runs from the bottom of its dot to **4px above the part's visible top**
+     (`absoluteRenderBounds` — for text that's the glyphs, not the text box). Same 4px for every
+     part.
+   - `diagram-area` height = component bottom + 16 (see "Sizing" — its width stays `FILL`).
 3. **Legend — one line per part:** `"<letter> · <part> — <description>"`. Clone the first line for
    each part and delete the unused ones. Setting `characters` resets the line's mixed formatting,
    so read the template's Bold font (letter) and Regular font (description) from the line first;
