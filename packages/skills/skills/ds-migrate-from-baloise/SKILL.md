@@ -14,7 +14,7 @@ On invocation, present this menu and wait for one choice:
 1. **Init** — bootstrap Helvetia packages alongside the existing Baloise install
 2. **Components** — migrate a specific `bal-*` component to `ds-*`
 3. **CSS utils (coming soon)**
-4. **Assets (coming soon)**
+4. **Assets** — migrate legacy icons in files that no component migration touches
 
 Then follow only the matching section below. Stop when that section says to stop.
 
@@ -67,7 +67,7 @@ If `status` is `ready`, show the detected framework, package manager, version, a
    - When the line is HTML, CSS, or a side-effect import, duplicate the line. In the duplicate only, apply this package map: `@baloise/ds-core` → `@helvetia-design/core`, `@baloise/ds-react` → `@helvetia-design/react`, `@baloise/ds-angular` → `@helvetia-design/angular`, and `@baloise/ds-styles` → `@helvetia-design/styles`.
    - When the line is JSON, such as an `angular.json` styles entry, insert a sibling string with that same package replacement. Keep the file valid JSON. Do not copy surrounding keys, and do not duplicate the whole file when the match is only one string.
    - If that duplicate would still be an `http://` or `https://` URL, do not write the URL. Insert the local form below instead.
-   - Do not duplicate `kind` `reference` lines. Those are component imports; migrating them is a later menu item.
+   - Do not duplicate `kind` `reference` lines. Those are component and icon imports; **Components** migrates them.
    - If there is no `bootstrap` import, insert the local form immediately after the first `reference` line, without editing that line.
    - Skip the insert when the same `@helvetia-design` line is already the next line.
    - Local form when `framework` is `html`:
@@ -95,6 +95,12 @@ Present this menu and wait for one choice:
 1. **Manual** — choose from every available component migration
 2. **Detect** — scan the project and suggest applicable component migrations
 
+Every component migration also migrates the legacy icons in the files it touches. Follow `shared/icons.md` alongside the chosen file:
+
+- After the file's Scan step, run the icon scan from `shared/icons.md` for every file with a finding, and show its findings with the component findings. The file's single confirmation covers both.
+- In the Rewrite step, apply the icon rules to those files as well.
+- In the Report step, add the icon items to the summary.
+
 #### Manual
 
 List every file matching `components/*.md` or `components/*/migration.md` in this skill folder. Build a picker from each file's title (the first Markdown heading). Dispatch to the chosen file's instructions.
@@ -121,6 +127,12 @@ Build a picker from every entry in `suggested`, showing its `name` and `total`. 
 
 Report "coming soon" and stop.
 
-### Assets (coming soon)
+### Assets
 
-Report "coming soon" and stop.
+Migrate every legacy icon left in the project, following `shared/icons.md`. Component migrations already handle the icons in the files they touch. This step covers the rest, such as a constants file that imports `balBrandIcon*` symbols but has no `bal-*` tag.
+
+1. Run the icon scan from `shared/icons.md` without file arguments, so it covers the whole project. Show the findings grouped by file (path, line, snippet) and end with the total count. If `total` is 0, say there are no legacy icons left to migrate and stop.
+2. Ask for one yes/no: rewrite every listed usage? On no, stop with the files unchanged.
+3. Apply every rule in `shared/icons.md` to the listed files. No component is being migrated here, so the Registration rules count every `bal-*` component that `scan-migratable.mjs` reports.
+4. Print a per-file summary with the items from the Report section of `shared/icons.md`. Skip its final whole-project scan, which this step already is.
+5. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.

@@ -4,13 +4,13 @@ import { extname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', 'out', '.next', '.angular', '.git', '.claude', 'coverage'])
 const EXTENSIONS = new Set(['.tsx', '.jsx', '.html', '.ts'])
 
-export function scanSourceFiles(rootDir, collect) {
+export function scanSourceFiles(rootDir, collect, extensions = EXTENSIONS) {
   const root = realpathSync(resolve(rootDir))
   if (!statSync(root).isDirectory()) throw new Error(`Scan root is not a directory: ${root}`)
-  walk(root, root, collect)
+  walk(root, root, collect, extensions)
 }
 
-function walk(rootDir, dir, collect) {
+function walk(rootDir, dir, collect, extensions) {
   let entries
   try {
     entries = readdirSync(dir, { withFileTypes: true })
@@ -24,10 +24,10 @@ function walk(rootDir, dir, collect) {
     if (!entryPath) continue
     if (entry.isDirectory()) {
       if (SKIP_DIRS.has(entry.name)) continue
-      walk(rootDir, entryPath, collect)
+      walk(rootDir, entryPath, collect, extensions)
       continue
     }
-    if (!entry.isFile() || !EXTENSIONS.has(extname(entry.name))) continue
+    if (!entry.isFile() || !extensions.has(extname(entry.name))) continue
     readSource(rootDir, entryPath, collect)
   }
 }
