@@ -21,17 +21,23 @@ import {
   dtcgShadowLayerFromFigma,
   dtcgTypeFor,
   fontWeightNumberFromKeyword,
+  hasCompleteTypographyFigmaId,
   isBorderFigmaId,
   isFigmaAlias,
   isLineHeightPath,
   isLiteralValueEqual,
   isResponsiveDimensionFigmaId,
   isShadowFigmaId,
+  isTextDecorationPath,
+  isTextTransformPath,
   isTypographyFigmaId,
+  letterSpacingPercentFor,
   lineHeightFromFigmaPercent,
   pathFromFigmaVariableName,
   RESPONSIVE_DIMENSION_SUB_PROPERTIES,
   SHADOW_SUB_PROPERTIES,
+  textDecorationKeywordFromFigma,
+  textTransformKeywordFromFigma,
   TYPOGRAPHY_SUB_PROPERTIES,
 } from './figma-map'
 import type {
@@ -214,6 +220,15 @@ function deriveValue(
   const isLineHeightVariable = (dtcgType === 'string' || dtcgType === 'number') && isLineHeightPath(lineHeightPath)
   if (isLineHeightVariable) dtcgType = 'number'
 
+  // Likewise a textDecoration / textTransform variable is a Figma STRING holding Figma's own name
+  // ("UNDERLINE", "UPPER"), but the token's $type is its own — resolved by the matched token's type,
+  // or by path for a brand-new variable.
+  const textKeywordPath = referenceToken?.path ?? pathFromFigmaVariableName(variable.name)
+  if (dtcgType === 'string') {
+    if (isTextDecorationPath(textKeywordPath)) dtcgType = 'textDecoration'
+    else if (isTextTransformPath(textKeywordPath)) dtcgType = 'textTransform'
+  }
+
   const expectedType = referenceToken?.type
   if ((expectedType === 'fontWeight' || expectedType === 'fontFamily') && dtcgType === 'string') {
     dtcgType = expectedType
@@ -265,6 +280,21 @@ function deriveValue(
       }
     }
     return { kind: 'literal', type: dtcgType, rawValue: numeric }
+  }
+
+  if (dtcgType === 'textDecoration' || dtcgType === 'textTransform') {
+    // Strict, like fontWeight: only Figma's own names (what our push side writes) are accepted.
+    const keyword =
+      dtcgType === 'textDecoration'
+        ? textDecorationKeywordFromFigma(modeValue)
+        : textTransformKeywordFromFigma(modeValue)
+    if (keyword === undefined) {
+      return {
+        kind: 'unsupported',
+        reason: `${dtcgType} value "${String(modeValue)}" on "${variable.name}" is not a known Figma name — skipped.`,
+      }
+    }
+    return { kind: 'literal', type: dtcgType, rawValue: keyword }
   }
 
   if (dtcgType === 'fontFamily') {
@@ -769,6 +799,9 @@ interface LocalTypographyValue {
   fontSize: unknown
   fontWeight: unknown
   lineHeight: unknown
+  letterSpacing: unknown
+  textDecoration: unknown
+  textTransform: unknown
 }
 
 function unitForTypographyFontSize(token: FlatToken): 'px' | 'rem' {
@@ -807,13 +840,62 @@ function buildFontWeightReferenceIndex(tokens: FlatToken[]): Map<number, string>
   return index
 }
 
+// Same idea as buildFontWeightReferenceIndex, for textDecoration- / textTransform-typed tokens:
+// resolved keyword -> the {reference} path pointing at it.
+function buildKeywordReferenceIndex(
+  tokens: FlatToken[],
+  type: 'textDecoration' | 'textTransform',
+): Map<string, string> {
+  const index = new Map<string, string>()
+  for (const t of tokens) {
+    if (t.type !== type || typeof t.resolvedValue !== 'string') continue
+    if (!index.has(t.resolvedValue)) index.set(t.resolvedValue, t.path.join('.'))
+  }
+  return index
+}
+
+// Everything deriveTypographyValue needs beyond the Figma meta and the token itself, built once per
+// pull from the Base tokens.
+interface TypographyPullContext {
+  textDecorationIndex: Map<string, string>
+  textTransformIndex: Map<string, string>
+  // The typography token's desktop font size in px — Figma expresses letter spacing as a percentage
+  // of it (scripts/figma-sync/lib/figma-value.mjs's figmaLetterSpacingPercentFor). undefined when
+  // it can't be resolved.
+  desktopFontSizePx: (token: FlatToken) => number | undefined
+}
+
+function dimensionToPx(value: unknown): number | undefined {
+  if (typeof value !== 'object' || value === null) return undefined
+  const { value: num, unit } = value as { value?: unknown; unit?: unknown }
+  if (typeof num !== 'number') return undefined
+  if (unit === 'rem') return num * PX_PER_REM
+  return unit === 'px' ? num : undefined
+}
+
+function buildTypographyPullContext(tokens: FlatToken[]): TypographyPullContext {
+  const byPath = new Map(tokens.map(t => [t.path.join('.'), t]))
+  return {
+    textDecorationIndex: buildKeywordReferenceIndex(tokens, 'textDecoration'),
+    textTransformIndex: buildKeywordReferenceIndex(tokens, 'textTransform'),
+    desktopFontSizePx: token => {
+      // A responsive font size token's own value mirrors mobile, so follow `resolvedResponsive`.
+      const rawFontSize = (token.rawValue as { fontSize?: unknown } | undefined)?.fontSize
+      const refMatch = typeof rawFontSize === 'string' ? /^\{(.+)\}$/.exec(rawFontSize) : null
+      const target = refMatch ? byPath.get(refMatch[1]) : undefined
+      if (target?.resolvedResponsive) return dimensionToPx(target.resolvedResponsive.desktop)
+      return dimensionToPx((token.resolvedValue as { fontSize?: unknown } | undefined)?.fontSize)
+    },
+  }
+}
+
 type TypographyDerivedValue =
   | { kind: 'literal'; rawValue: LocalTypographyValue }
   | { kind: 'alias'; referenceTarget: string }
   | { kind: 'unsupported'; reason: string }
 
 /**
- * Reconstructs one DTCG typography value from its 4 already-fetched Figma sub-values, shared by
+ * Reconstructs one DTCG typography value from its 7 already-fetched Figma sub-values, shared by
  * both the Base-layer loop (deriveTypographyPullEntries) and the brand-layer loop
  * (buildBrandPullPlan's typography pass) — the reconstruction logic itself doesn't differ between
  * the two, only what each does with the result (mirrors border's split, minus a shared-core
@@ -837,6 +919,8 @@ function deriveTypographyValue(
   resolved: LocalTypographyValue,
   rawValue: LocalTypographyValue,
   localUnit: () => 'px' | 'rem',
+  context: TypographyPullContext,
+  token: FlatToken,
 ): TypographyDerivedValue {
   const modeValues: Partial<Record<TypographySubProperty, unknown>> = {}
   for (const sub of TYPOGRAPHY_SUB_PROPERTIES) {
@@ -934,9 +1018,57 @@ function deriveTypographyValue(
     fontWeight = `{${target}}`
   }
 
+  // letterSpacing: like fontSize/lineHeight, free literal-or-reference, so a difference from the
+  // local value is reported rather than guessed at. Compared as Figma's percentage string against
+  // what the local value works out to at the desktop font size.
+  const letterSpacingPx = dimensionToPx(resolved.letterSpacing)
+  const localLetterSpacingPercent =
+    letterSpacingPx === undefined
+      ? undefined
+      : letterSpacingPercentFor(letterSpacingPx, context.desktopFontSizePx(token))
+  if (localLetterSpacingPercent === undefined || modeValues.letterSpacing !== localLetterSpacingPercent) {
+    return {
+      kind: 'unsupported',
+      reason:
+        `Typography letterSpacing "${String(modeValues.letterSpacing)}" differs from what the local value resolves to ` +
+        `(${localLetterSpacingPercent ?? 'unresolvable'} at the desktop font size) — no safe way to auto-write it. ` +
+        'Resolve manually in Toky.',
+    }
+  }
+
+  // textDecoration / textTransform: always references locally, like fontWeight.
+  const textKeyword = (
+    sub: 'textDecoration' | 'textTransform',
+    fromFigma: (value: unknown) => string | undefined,
+    index: Map<string, string>,
+  ): { value: unknown } | { reason: string } => {
+    const keyword = fromFigma(modeValues[sub])
+    if (keyword === undefined) {
+      return { reason: `Typography ${sub} value "${String(modeValues[sub])}" is not a known Figma name — skipped.` }
+    }
+    if (keyword === resolved[sub]) return { value: rawValue[sub] }
+    const target = index.get(keyword)
+    if (!target) {
+      return { reason: `Typography ${sub} value "${keyword}" doesn't match a known ${sub} primitive — skipped.` }
+    }
+    return { value: `{${target}}` }
+  }
+  const textDecoration = textKeyword('textDecoration', textDecorationKeywordFromFigma, context.textDecorationIndex)
+  if ('reason' in textDecoration) return { kind: 'unsupported', reason: textDecoration.reason }
+  const textTransform = textKeyword('textTransform', textTransformKeywordFromFigma, context.textTransformIndex)
+  if ('reason' in textTransform) return { kind: 'unsupported', reason: textTransform.reason }
+
   return {
     kind: 'literal',
-    rawValue: { fontFamily, fontSize: rawValue.fontSize, fontWeight, lineHeight: rawValue.lineHeight },
+    rawValue: {
+      fontFamily,
+      fontSize: rawValue.fontSize,
+      fontWeight,
+      lineHeight: rawValue.lineHeight,
+      letterSpacing: rawValue.letterSpacing,
+      textDecoration: textDecoration.value,
+      textTransform: textTransform.value,
+    },
   }
 }
 
@@ -963,17 +1095,21 @@ function deriveTypographyPullEntries(params: {
 
   const typographySubIndex = new Map<string, { token: FlatToken; subProperty: TypographySubProperty }>()
   for (const t of original) {
-    if (!isTypographyFigmaId(t.figmaId)) continue
+    if (!isTypographyFigmaId(t.figmaId) || !hasCompleteTypographyFigmaId(t.figmaId)) continue
     for (const sub of TYPOGRAPHY_SUB_PROPERTIES) {
       typographySubIndex.set(t.figmaId[sub], { token: t, subProperty: sub })
     }
   }
   const fontFamilyIndex = buildFontFamilyReferenceIndex(original)
   const fontWeightIndex = buildFontWeightReferenceIndex(original)
+  const typographyContext = buildTypographyPullContext(original)
   const workingByPath = new Map(working.map(w => [w.token.path.join('.'), w]))
 
   for (const token of original) {
     if (!isTypographyFigmaId(token.figmaId)) continue
+    // Not yet backfilled with the letterSpacing/textDecoration/textTransform ids — nothing to
+    // compare against, and its absent variables must not read as "deleted in Figma".
+    if (!hasCompleteTypographyFigmaId(token.figmaId)) continue
     const idSet = token.figmaId
     const path = token.path.join('.')
 
@@ -995,6 +1131,8 @@ function deriveTypographyPullEntries(params: {
       token.resolvedValue as LocalTypographyValue,
       token.rawValue as LocalTypographyValue,
       () => unitForTypographyFontSize(token),
+      typographyContext,
+      token,
     )
     if (derived.kind === 'unsupported') {
       skipped.push({
@@ -1645,18 +1783,20 @@ function deriveBrandTypographyPullEntries(params: {
 
   const typographySubIndex = new Map<string, { token: FlatToken; subProperty: TypographySubProperty }>()
   for (const t of baseOriginal) {
-    if (!isTypographyFigmaId(t.figmaId)) continue
+    if (!isTypographyFigmaId(t.figmaId) || !hasCompleteTypographyFigmaId(t.figmaId)) continue
     for (const sub of TYPOGRAPHY_SUB_PROPERTIES) {
       typographySubIndex.set(t.figmaId[sub], { token: t, subProperty: sub })
     }
   }
   const fontFamilyIndex = buildFontFamilyReferenceIndex(baseOriginal)
   const fontWeightIndex = buildFontWeightReferenceIndex(baseOriginal)
+  const typographyContext = buildTypographyPullContext(baseOriginal)
   const brandOriginalByPath = new Map(brandOriginal.map(t => [t.path.join('.'), t]))
   const brandWorkingByPath = new Map(brandWorking.map(w => [w.token.path.join('.'), w]))
 
   for (const baseToken of baseOriginal) {
     if (!isTypographyFigmaId(baseToken.figmaId)) continue
+    if (!hasCompleteTypographyFigmaId(baseToken.figmaId)) continue // see deriveTypographyPullEntries
     const idSet = baseToken.figmaId
     const path = baseToken.path.join('.')
     const override = brandOriginalByPath.get(path)
@@ -1686,6 +1826,8 @@ function deriveBrandTypographyPullEntries(params: {
       referenceToken.resolvedValue as LocalTypographyValue,
       referenceToken.rawValue as LocalTypographyValue,
       () => unitForTypographyFontSize(referenceToken),
+      typographyContext,
+      referenceToken,
     )
     if (derived.kind === 'unsupported') {
       skipped.push({

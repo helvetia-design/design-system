@@ -137,7 +137,21 @@ export function assignVariableIds(baseTokens, existingNameIndex = new Map(), exi
 
     if (isSyncableTypographyToken(token)) {
       if (isCompositeVariableIdSet(token.variableId)) {
-        idByPath.set(key, token.variableId)
+        // A typography token committed before a sub-property was added (e.g. letterSpacing) carries
+        // fewer ids than TYPOGRAPHY_SUB_PROPERTIES lists. Keep the ids it has and complete only the
+        // missing ones — name-matched if Figma already has it (an interrupted earlier run), else a
+        // fresh temp id — so the existing variables are never touched or recreated.
+        idByPath.set(
+          key,
+          Object.fromEntries(
+            TYPOGRAPHY_SUB_PROPERTIES.map(sub => [
+              sub,
+              token.variableId[sub] ??
+                existingNameIndex.get(figmaTypographySubVariableName(token.path, sub)) ??
+                `temp-${key}-${sub}`,
+            ]),
+          ),
+        )
         continue
       }
       // Path/name fallback match, per sub-property — same "all-or-nothing" reasoning as shadow's.
@@ -782,13 +796,20 @@ export function resolveTempIds(idByPath, tempIdToRealId) {
 }
 
 /**
- * Tokens that had no `variableId` at the start of this run — what
- * docs/adr/0017-direct-commit-variableid-backfill.md's write-back commit
- * needs. Call only after `resolveTempIds`, so every entry already holds a
- * real Figma id, never a temp one.
+ * Tokens whose Figma identity changed this run, as `{ path, variableId }` — what
+ * docs/adr/0017-direct-commit-variableid-backfill.md's write-back commit needs. Two kinds: tokens
+ * that had no `variableId` at the start of the run, and typography tokens that had one but were
+ * missing sub-property ids added since (e.g. letterSpacing) — for those, `variableId` is the full
+ * completed id set, existing ids included, since the backfill replaces the whole value. Call only
+ * after `resolveTempIds`, so every entry already holds a real Figma id, never a temp one.
  */
 export function collectNewlyCreatedIds(baseTokens, idByPath) {
   return baseTokens
-    .filter(token => isPushableToken(token) && !token.variableId)
+    .filter(token => {
+      if (!isPushableToken(token)) return false
+      if (!token.variableId) return true
+      if (!isSyncableTypographyToken(token) || !isCompositeVariableIdSet(token.variableId)) return false
+      return TYPOGRAPHY_SUB_PROPERTIES.some(sub => !token.variableId[sub])
+    })
     .map(token => ({ path: token.path, variableId: idByPath.get(pathKey(token.path)) }))
 }

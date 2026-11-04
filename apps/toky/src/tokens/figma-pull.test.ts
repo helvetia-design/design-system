@@ -1246,6 +1246,9 @@ describe('buildBasePullPlan — typography', () => {
     fontSize: 'VariableID:typography:fontSize',
     fontWeight: 'VariableID:typography:fontWeight',
     lineHeight: 'VariableID:typography:lineHeight',
+    letterSpacing: 'VariableID:typography:letterSpacing',
+    textDecoration: 'VariableID:typography:textDecoration',
+    textTransform: 'VariableID:typography:textTransform',
   }
 
   // fontFamily/fontWeight are always {reference} strings (docs/plans/typography-token-type-
@@ -1286,21 +1289,41 @@ describe('buildBasePullPlan — typography', () => {
       fontSize: { value: 1, unit: 'rem' },
       fontWeight: '{🌐 Global.🔤 Font.Weight.700}',
       lineHeight: 1.3,
+      letterSpacing: '{🌐 Global.🔤 Font.LetterSpacing.0}',
+      textDecoration: '{🌐 Global.🔤 Font.TextDecoration.None}',
+      textTransform: '{🌐 Global.🔤 Font.TextTransform.None}',
     },
     resolvedValue: {
       fontFamily: ['BaloiseCreateHeadline', 'Arial', 'sans-serif'],
       fontSize: { value: 1, unit: 'rem' },
       fontWeight: 700,
       lineHeight: 1.3,
+      letterSpacing: { value: 0, unit: 'rem' },
+      textDecoration: 'none',
+      textTransform: 'none',
     },
   })
-  const typographyPrimitives = [familyHeading, familyBody, weight700, weight400]
+  const decorationNone = token({
+    path: ['🌐 Global', '🔤 Font', 'TextDecoration', 'None'],
+    type: 'textDecoration',
+    rawValue: 'none',
+    resolvedValue: 'none',
+  })
+  const decorationUnderline = token({
+    path: ['🌐 Global', '🔤 Font', 'TextDecoration', 'Underline'],
+    type: 'textDecoration',
+    rawValue: 'underline',
+    resolvedValue: 'underline',
+  })
+  const typographyPrimitives = [familyHeading, familyBody, weight700, weight400, decorationNone, decorationUnderline]
 
   function typographyVariables(overrides?: {
     fontFamily?: string
     fontSize?: number
     fontWeight?: string
     lineHeight?: string
+    letterSpacing?: string
+    textDecoration?: string
   }): FigmaVariable[] {
     const fontFamily = overrides?.fontFamily ?? 'BaloiseCreateHeadline'
     const fontSize = overrides?.fontSize ?? 16
@@ -1332,10 +1355,28 @@ describe('buildBasePullPlan — typography', () => {
         resolvedType: 'STRING',
         valuesByMode: { [BASE_MODE]: lineHeight },
       }),
+      variable({
+        id: typographyFigmaId.letterSpacing,
+        name: 'x/LetterSpacing',
+        resolvedType: 'STRING',
+        valuesByMode: { [BASE_MODE]: overrides?.letterSpacing ?? '0%' },
+      }),
+      variable({
+        id: typographyFigmaId.textDecoration,
+        name: 'x/TextDecoration',
+        resolvedType: 'STRING',
+        valuesByMode: { [BASE_MODE]: overrides?.textDecoration ?? 'NONE' },
+      }),
+      variable({
+        id: typographyFigmaId.textTransform,
+        name: 'x/TextTransform',
+        resolvedType: 'STRING',
+        valuesByMode: { [BASE_MODE]: 'ORIGINAL' },
+      }),
     ]
   }
 
-  it('is a no-op when all 4 sub-variables still match the local resolved typography value', () => {
+  it('is a no-op when all 7 sub-variables still match the local resolved typography value', () => {
     const plan = buildBasePullPlan({
       original: [...typographyPrimitives, typography],
       working: [working(typography)],
@@ -1362,6 +1403,9 @@ describe('buildBasePullPlan — typography', () => {
       fontSize: { value: 1, unit: 'rem' },
       fontWeight: '{🌐 Global.🔤 Font.Weight.700}',
       lineHeight: 1.3,
+      letterSpacing: '{🌐 Global.🔤 Font.LetterSpacing.0}',
+      textDecoration: '{🌐 Global.🔤 Font.TextDecoration.None}',
+      textTransform: '{🌐 Global.🔤 Font.TextTransform.None}',
     })
   })
 
@@ -1378,6 +1422,9 @@ describe('buildBasePullPlan — typography', () => {
       fontSize: { value: 1, unit: 'rem' },
       fontWeight: '{🌐 Global.🔤 Font.Weight.400}',
       lineHeight: 1.3,
+      letterSpacing: '{🌐 Global.🔤 Font.LetterSpacing.0}',
+      textDecoration: '{🌐 Global.🔤 Font.TextDecoration.None}',
+      textTransform: '{🌐 Global.🔤 Font.TextTransform.None}',
     })
   })
 
@@ -1429,7 +1476,61 @@ describe('buildBasePullPlan — typography', () => {
     expect(plan.deletes).toHaveLength(0)
   })
 
-  it('resolves a typography token whose 4 sub-values all alias another typography token’s matching sub-properties', () => {
+  it('resolves a changed textDecoration via the TextDecoration primitive index, preserving the rest', () => {
+    const plan = buildBasePullPlan({
+      original: [...typographyPrimitives, typography],
+      working: [working(typography)],
+      figmaMeta: meta(typographyVariables({ textDecoration: 'UNDERLINE' })),
+      baseModeId: BASE_MODE,
+    })
+    expect(plan.updates).toHaveLength(1)
+    expect(plan.updates[0].rawValue).toMatchObject({
+      textDecoration: '{🌐 Global.🔤 Font.TextDecoration.Underline}',
+      letterSpacing: '{🌐 Global.🔤 Font.LetterSpacing.0}',
+      textTransform: '{🌐 Global.🔤 Font.TextTransform.None}',
+    })
+  })
+
+  it("skips a textDecoration that is not one of Figma's known names", () => {
+    const plan = buildBasePullPlan({
+      original: [...typographyPrimitives, typography],
+      working: [working(typography)],
+      figmaMeta: meta(typographyVariables({ textDecoration: 'underline' })), // CSS keyword, not Figma's name
+      baseModeId: BASE_MODE,
+    })
+    expect(plan.updates).toHaveLength(0)
+    expect(plan.skipped[0].reason).toMatch(/textDecoration value "underline" is not a known Figma name/)
+  })
+
+  it('skips (does not auto-write) when letterSpacing differs from what the local value resolves to', () => {
+    const plan = buildBasePullPlan({
+      original: [...typographyPrimitives, typography],
+      working: [working(typography)],
+      figmaMeta: meta(typographyVariables({ letterSpacing: '20%' })),
+      baseModeId: BASE_MODE,
+    })
+    expect(plan.updates).toHaveLength(0)
+    expect(plan.skipped[0].reason).toMatch(/letterSpacing "20%" differs/)
+  })
+
+  it('leaves a typography token with a legacy 4-id set alone — neither updated nor proposed for deletion', () => {
+    const { letterSpacing, textDecoration, textTransform, ...legacyIds } = typographyFigmaId
+    void letterSpacing
+    void textDecoration
+    void textTransform
+    const legacy = { ...typography, figmaId: legacyIds }
+    const plan = buildBasePullPlan({
+      original: [...typographyPrimitives, legacy],
+      working: [working(legacy)],
+      figmaMeta: meta(typographyVariables().slice(0, 4)),
+      baseModeId: BASE_MODE,
+    })
+    expect(plan.updates).toHaveLength(0)
+    expect(plan.deletes).toHaveLength(0)
+    expect(plan.skipped).toHaveLength(0)
+  })
+
+  it('resolves a typography token whose 7 sub-values all alias another typography token’s matching sub-properties', () => {
     const target = token({
       path: ['🌐 Global', '🔤 Font', 'Typography', 'Other'],
       type: 'typography',
@@ -1438,36 +1539,53 @@ describe('buildBasePullPlan — typography', () => {
         fontSize: 'VariableID:target:fontSize',
         fontWeight: 'VariableID:target:fontWeight',
         lineHeight: 'VariableID:target:lineHeight',
+        letterSpacing: 'VariableID:target:letterSpacing',
+        textDecoration: 'VariableID:target:textDecoration',
+        textTransform: 'VariableID:target:textTransform',
       },
       rawValue: {
         fontFamily: '{🌐 Global.🔤 Font.Family.Body}',
         fontSize: { value: 1.5, unit: 'rem' },
         fontWeight: '{🌐 Global.🔤 Font.Weight.400}',
         lineHeight: 1.5,
+        letterSpacing: '{🌐 Global.🔤 Font.LetterSpacing.0}',
+        textDecoration: '{🌐 Global.🔤 Font.TextDecoration.None}',
+        textTransform: '{🌐 Global.🔤 Font.TextTransform.None}',
       },
       resolvedValue: {
         fontFamily: ['BaloiseCreateText', 'Arial', 'sans-serif'],
         fontSize: { value: 1.5, unit: 'rem' },
         fontWeight: 400,
         lineHeight: 1.5,
+        letterSpacing: { value: 0, unit: 'rem' },
+        textDecoration: 'none',
+        textTransform: 'none',
       },
     })
-    const TYPOGRAPHY_SUB_PROPERTIES_FOR_TEST = ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight'] as const
+    const TYPOGRAPHY_SUB_PROPERTIES_FOR_TEST = [
+      'fontFamily',
+      'fontSize',
+      'fontWeight',
+      'lineHeight',
+      'letterSpacing',
+      'textDecoration',
+      'textTransform',
+    ] as const
+    const FIGMA_VALUE_BY_SUB = {
+      fontFamily: 'BaloiseCreateText',
+      fontSize: 24,
+      fontWeight: 'Regular',
+      lineHeight: '150%',
+      letterSpacing: '0%',
+      textDecoration: 'NONE',
+      textTransform: 'ORIGINAL',
+    }
     const targetVariables = TYPOGRAPHY_SUB_PROPERTIES_FOR_TEST.map(sub =>
       variable({
         id: (target.figmaId as Record<string, string>)[sub],
         name: `target/${sub}`,
         resolvedType: sub === 'fontSize' ? 'FLOAT' : 'STRING',
-        valuesByMode: {
-          [BASE_MODE]:
-            sub === 'fontFamily'
-              ? 'BaloiseCreateText'
-              : sub === 'fontSize'
-                ? 24
-                : sub === 'fontWeight'
-                  ? 'Regular'
-                  : 1.5,
-        },
+        valuesByMode: { [BASE_MODE]: FIGMA_VALUE_BY_SUB[sub] },
       }),
     )
     const aliasingVariables = TYPOGRAPHY_SUB_PROPERTIES_FOR_TEST.map(sub =>
@@ -1804,6 +1922,9 @@ describe('buildBrandPullPlan — typography', () => {
     fontSize: 'VariableID:brand-typography:fontSize',
     fontWeight: 'VariableID:brand-typography:fontWeight',
     lineHeight: 'VariableID:brand-typography:lineHeight',
+    letterSpacing: 'VariableID:brand-typography:letterSpacing',
+    textDecoration: 'VariableID:brand-typography:textDecoration',
+    textTransform: 'VariableID:brand-typography:textTransform',
   }
   const baseTypography = token({
     path: ['🌐 Global', '🔤 Font', 'Typography', 'Test'],
@@ -1814,12 +1935,18 @@ describe('buildBrandPullPlan — typography', () => {
       fontSize: { value: 1, unit: 'rem' },
       fontWeight: '{🌐 Global.🔤 Font.Weight.700}',
       lineHeight: 1.3,
+      letterSpacing: '{🌐 Global.🔤 Font.LetterSpacing.0}',
+      textDecoration: '{🌐 Global.🔤 Font.TextDecoration.None}',
+      textTransform: '{🌐 Global.🔤 Font.TextTransform.None}',
     },
     resolvedValue: {
       fontFamily: ['BaloiseCreateHeadline', 'Arial', 'sans-serif'],
       fontSize: { value: 1, unit: 'rem' },
       fontWeight: 700,
       lineHeight: 1.3,
+      letterSpacing: { value: 0, unit: 'rem' },
+      textDecoration: 'none',
+      textTransform: 'none',
     },
   })
   const baseOriginal = [familyHeading, familyBody, familyMono, weight700, baseTypography]
@@ -1851,6 +1978,24 @@ describe('buildBrandPullPlan — typography', () => {
         // Figma-side value — a percentage string ("130%"), not this codebase's raw multiplier (1.3).
         valuesByMode: { [ZURICH_MODE]: '130%' },
       }),
+      variable({
+        id: typographyFigmaId.letterSpacing,
+        name: 'x/LetterSpacing',
+        resolvedType: 'STRING',
+        valuesByMode: { [ZURICH_MODE]: '0%' },
+      }),
+      variable({
+        id: typographyFigmaId.textDecoration,
+        name: 'x/TextDecoration',
+        resolvedType: 'STRING',
+        valuesByMode: { [ZURICH_MODE]: 'NONE' },
+      }),
+      variable({
+        id: typographyFigmaId.textTransform,
+        name: 'x/TextTransform',
+        resolvedType: 'STRING',
+        valuesByMode: { [ZURICH_MODE]: 'ORIGINAL' },
+      }),
     ]
   }
 
@@ -1868,6 +2013,9 @@ describe('buildBrandPullPlan — typography', () => {
       fontSize: { value: 1, unit: 'rem' },
       fontWeight: '{🌐 Global.🔤 Font.Weight.700}',
       lineHeight: 1.3,
+      letterSpacing: '{🌐 Global.🔤 Font.LetterSpacing.0}',
+      textDecoration: '{🌐 Global.🔤 Font.TextDecoration.None}',
+      textTransform: '{🌐 Global.🔤 Font.TextTransform.None}',
     })
   })
 
@@ -1880,12 +2028,18 @@ describe('buildBrandPullPlan — typography', () => {
         fontSize: { value: 1, unit: 'rem' },
         fontWeight: '{🌐 Global.🔤 Font.Weight.700}',
         lineHeight: 1.3,
+        letterSpacing: '{🌐 Global.🔤 Font.LetterSpacing.0}',
+        textDecoration: '{🌐 Global.🔤 Font.TextDecoration.None}',
+        textTransform: '{🌐 Global.🔤 Font.TextTransform.None}',
       },
       resolvedValue: {
         fontFamily: ['BaloiseCreateText', 'Arial', 'sans-serif'],
         fontSize: { value: 1, unit: 'rem' },
         fontWeight: 700,
         lineHeight: 1.3,
+        letterSpacing: { value: 0, unit: 'rem' },
+        textDecoration: 'none',
+        textTransform: 'none',
       },
     })
     const plan = buildBrandPullPlan({
@@ -1903,6 +2057,9 @@ describe('buildBrandPullPlan — typography', () => {
       fontSize: { value: 1, unit: 'rem' },
       fontWeight: '{🌐 Global.🔤 Font.Weight.700}',
       lineHeight: 1.3,
+      letterSpacing: '{🌐 Global.🔤 Font.LetterSpacing.0}',
+      textDecoration: '{🌐 Global.🔤 Font.TextDecoration.None}',
+      textTransform: '{🌐 Global.🔤 Font.TextTransform.None}',
     })
   })
 
@@ -1915,12 +2072,18 @@ describe('buildBrandPullPlan — typography', () => {
         fontSize: { value: 1, unit: 'rem' },
         fontWeight: '{🌐 Global.🔤 Font.Weight.700}',
         lineHeight: 1.3,
+        letterSpacing: '{🌐 Global.🔤 Font.LetterSpacing.0}',
+        textDecoration: '{🌐 Global.🔤 Font.TextDecoration.None}',
+        textTransform: '{🌐 Global.🔤 Font.TextTransform.None}',
       },
       resolvedValue: {
         fontFamily: ['BaloiseCreateText', 'Arial', 'sans-serif'],
         fontSize: { value: 1, unit: 'rem' },
         fontWeight: 700,
         lineHeight: 1.3,
+        letterSpacing: { value: 0, unit: 'rem' },
+        textDecoration: 'none',
+        textTransform: 'none',
       },
     })
     const plan = buildBrandPullPlan({
@@ -1942,6 +2105,9 @@ describe('buildBrandPullPlan — typography', () => {
         fontSize: { value: 1, unit: 'rem' },
         fontWeight: '{🌐 Global.🔤 Font.Weight.700}',
         lineHeight: 1.3,
+        letterSpacing: '{🌐 Global.🔤 Font.LetterSpacing.0}',
+        textDecoration: '{🌐 Global.🔤 Font.TextDecoration.None}',
+        textTransform: '{🌐 Global.🔤 Font.TextTransform.None}',
       },
     })
     const plan = buildBrandPullPlan({

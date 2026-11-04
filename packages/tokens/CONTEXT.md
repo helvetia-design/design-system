@@ -189,6 +189,10 @@ _Avoid_: theme, variant (component variants are a distinct concept in this syste
 How a line-height token is shown in Figma: a percentage string such as `"150%"`, for a token whose value is the unitless multiplier `1.5` everywhere else. The multiplier stays the one stored value; the percentage exists only on the Figma side.
 _Avoid_: scaled line-height, line-height percent token (there is no second token — it is the same token seen from Figma)
 
+**Typography token**:
+A single token that describes how a piece of text looks, with seven required parts: font family, size, weight, line height, letter spacing, text decoration and text transform. It is one token for designers and developers, even though the Figma side shows each part as its own variable.
+_Avoid_: text style, font token (a font family or weight on its own is a primitive, not a typography token)
+
 ## Key Concepts
 
 ### Responsive Tokens
@@ -238,7 +242,7 @@ Common categories in the Alias layer:
 - **Space** (2XS–4XL, plus responsive variants) — the raw scale only; Component-layer tokens built from it are named `Padding`/`Gap`/`Margin`, see [Spacing Naming](#spacing-naming)
 - **Color** (backgrounds, borders, text, with light/dark variants)
 - **Border** (width, color, radius, plus a pilot set of `$type: "border"` composite tokens under `▭ Border.Composite.*` — `{color, width, style}`, each sub-value a reference to the existing `Color`/`Width`/new `Style` primitives; see `docs/plans/border-token-type-plan.md`)
-- **Text** (size, color, family, weight, line-height, shadow, plus a `$type: "typography"` composite type — `{fontFamily, fontSize, fontWeight, lineHeight}` — fully supported in Toky/Style Dictionary/Figma sync, but no actual `Typography.*` tokens exist yet; the responsive-`fontSize` question a real pilot needs is still open. See `docs/plans/typography-token-type-plan.md`.)
+- **Text** (size, color, family, weight, line-height, shadow, plus a `$type: "typography"` composite type — `{fontFamily, fontSize, fontWeight, lineHeight, letterSpacing, textDecoration, textTransform}` — fully supported in Toky/Style Dictionary/Figma sync. `letterSpacing` is a `dimension` referencing `Alias.Text.LetterSpacing.*`; `textDecoration`/`textTransform` have their own `$type`s and reference `Alias.Text.TextDecoration.*`/`TextTransform.*`. See `docs/plans/typography-letter-spacing-text-decoration-plan.md` and [ADR-0035](../../docs/adr/0035-typography-letter-spacing-text-decoration-text-transform.md).)
 - **Opacity** (hidden, half, disabled, backdrop, full)
 - **Z-Index** (deep, masked, sticky, navigation, popup, modal, toast, tooltip)
 - **Shadow** (box, text)
@@ -466,6 +470,7 @@ Decisions specific to this package (Figma Variable identity, brand modes, sync b
 - [ADR-0019](../../docs/adr/0019-pull-auto-deletes-figma-variables.md) — Pull deletes the Figma Variable when a token is removed
 - [ADR-0020](../../docs/adr/0020-figma-sync-action-standalone-script.md) — The Figma Sync Action's code stays standalone, not shared with apps/toky
 - [ADR-0034](../../docs/adr/0034-figma-variable-type-change-recreates-variable.md) — A changed Figma variable type deletes and recreates the variable
+- [ADR-0035](../../docs/adr/0035-typography-letter-spacing-text-decoration-text-transform.md) — Typography gains letter-spacing, text-decoration and text-transform
 - [ADR-0030](../../docs/adr/0030-full-merge-brand-token-css.md) — Brand token CSS is fully merged, split into a theme file (`:host, :root`) and an override file (`[data-theme]`)
 
 ## Related Contexts

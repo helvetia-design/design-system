@@ -1613,7 +1613,7 @@
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
-            "com.figma.variableId": "VariableID:137:280"
+            "com.figma.variableId": "VariableID:2826:9937"
           }
         },
         "Heading": {
@@ -1623,7 +1623,7 @@
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
-            "com.figma.variableId": "VariableID:137:281"
+            "com.figma.variableId": "VariableID:2826:9938"
           }
         },
         "Double": {
@@ -1633,7 +1633,7 @@
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
-            "com.figma.variableId": "VariableID:137:282"
+            "com.figma.variableId": "VariableID:2826:9939"
           }
         },
         "Text": {
@@ -1643,7 +1643,7 @@
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
-            "com.figma.variableId": "VariableID:137:283"
+            "com.figma.variableId": "VariableID:2826:9940"
           }
         }
       },
@@ -1879,6 +1879,52 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": "VariableID:137:309"
+          }
+        }
+      },
+      "LetterSpacing": {
+        "Text": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.🔤 Font.LetterSpacing.0}",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2826:9941",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        },
+        "Heading": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.🔤 Font.LetterSpacing.0}",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2826:9942",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        }
+      },
+      "TextDecoration": {
+        "None": {
+          "$type": "textDecoration",
+          "$value": "{🌐 Global.🔤 Font.TextDecoration.None}",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2826:9943",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        }
+      },
+      "TextTransform": {
+        "None": {
+          "$type": "textTransform",
+          "$value": "{🌐 Global.🔤 Font.TextTransform.None}",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2826:9944",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
           }
         }
       }
@@ -6260,17 +6306,23 @@
           "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
           "fontSize": "{📱 Device.🔤 Text.Size.SM}",
           "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-          "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+          "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+          "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+          "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+          "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
         },
         "$extensions": {
           "com.figma.scopes": [
             "ALL_SCOPES"
           ],
           "com.figma.variableId": {
-            "fontFamily": "VariableID:137:854",
-            "fontSize": "VariableID:137:855",
-            "fontWeight": "VariableID:137:856",
-            "lineHeight": "VariableID:137:857"
+            "fontFamily": "VariableID:2826:9945",
+            "fontSize": "VariableID:2826:9946",
+            "fontWeight": "VariableID:2826:9947",
+            "lineHeight": "VariableID:2826:9948",
+            "letterSpacing": "VariableID:2826:9949",
+            "textDecoration": "VariableID:2826:9950",
+            "textTransform": "VariableID:2826:9951"
           }
         }
       },
@@ -6414,10 +6466,13 @@
             "ALL_SCOPES"
           ],
           "com.figma.variableId": {
-            "fontFamily": "VariableID:137:865",
-            "fontSize": "VariableID:137:866",
-            "fontWeight": "VariableID:137:867",
-            "lineHeight": "VariableID:137:868"
+            "fontFamily": "VariableID:2826:9952",
+            "fontSize": "VariableID:2826:9953",
+            "fontWeight": "VariableID:2826:9954",
+            "lineHeight": "VariableID:2826:9955",
+            "letterSpacing": "VariableID:2826:9956",
+            "textDecoration": "VariableID:2826:9957",
+            "textTransform": "VariableID:2826:9958"
           }
         }
       },
@@ -6429,10 +6484,13 @@
             "ALL_SCOPES"
           ],
           "com.figma.variableId": {
-            "fontFamily": "VariableID:137:869",
-            "fontSize": "VariableID:137:870",
-            "fontWeight": "VariableID:137:871",
-            "lineHeight": "VariableID:137:872"
+            "fontFamily": "VariableID:2826:9959",
+            "fontSize": "VariableID:2826:9960",
+            "fontWeight": "VariableID:2826:9961",
+            "lineHeight": "VariableID:2826:9962",
+            "letterSpacing": "VariableID:2826:9963",
+            "textDecoration": "VariableID:2826:9964",
+            "textTransform": "VariableID:2826:9965"
           }
         }
       },
@@ -6487,17 +6545,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.3XL}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Heading}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:892",
-              "fontSize": "VariableID:137:893",
-              "fontWeight": "VariableID:137:894",
-              "lineHeight": "VariableID:137:895"
+              "fontFamily": "VariableID:2826:9966",
+              "fontSize": "VariableID:2826:9967",
+              "fontWeight": "VariableID:2826:9968",
+              "lineHeight": "VariableID:2826:9969",
+              "letterSpacing": "VariableID:2826:9970",
+              "textDecoration": "VariableID:2826:9971",
+              "textTransform": "VariableID:2826:9972"
             }
           }
         },
@@ -6507,17 +6571,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.2XL}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Heading}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:896",
-              "fontSize": "VariableID:137:897",
-              "fontWeight": "VariableID:137:898",
-              "lineHeight": "VariableID:137:899"
+              "fontFamily": "VariableID:2826:9973",
+              "fontSize": "VariableID:2826:9974",
+              "fontWeight": "VariableID:2826:9975",
+              "lineHeight": "VariableID:2826:9976",
+              "letterSpacing": "VariableID:2826:9977",
+              "textDecoration": "VariableID:2826:9978",
+              "textTransform": "VariableID:2826:9979"
             }
           }
         },
@@ -6527,17 +6597,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.XL}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Heading}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:900",
-              "fontSize": "VariableID:137:901",
-              "fontWeight": "VariableID:137:902",
-              "lineHeight": "VariableID:137:903"
+              "fontFamily": "VariableID:2826:9980",
+              "fontSize": "VariableID:2826:9981",
+              "fontWeight": "VariableID:2826:9982",
+              "lineHeight": "VariableID:2826:9983",
+              "letterSpacing": "VariableID:2826:9984",
+              "textDecoration": "VariableID:2826:9985",
+              "textTransform": "VariableID:2826:9986"
             }
           }
         },
@@ -6547,17 +6623,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.LG}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Heading}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:904",
-              "fontSize": "VariableID:137:905",
-              "fontWeight": "VariableID:137:906",
-              "lineHeight": "VariableID:137:907"
+              "fontFamily": "VariableID:2826:9987",
+              "fontSize": "VariableID:2826:9988",
+              "fontWeight": "VariableID:2826:9989",
+              "lineHeight": "VariableID:2826:9990",
+              "letterSpacing": "VariableID:2826:9991",
+              "textDecoration": "VariableID:2826:9992",
+              "textTransform": "VariableID:2826:9993"
             }
           }
         },
@@ -6567,17 +6649,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.Base}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Heading}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:908",
-              "fontSize": "VariableID:137:909",
-              "fontWeight": "VariableID:137:910",
-              "lineHeight": "VariableID:137:911"
+              "fontFamily": "VariableID:2826:9994",
+              "fontSize": "VariableID:2826:9995",
+              "fontWeight": "VariableID:2826:9996",
+              "lineHeight": "VariableID:2826:9997",
+              "letterSpacing": "VariableID:2826:9998",
+              "textDecoration": "VariableID:2826:9999",
+              "textTransform": "VariableID:2826:10000"
             }
           }
         },
@@ -6587,17 +6675,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.3XL}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Light}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Heading}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:912",
-              "fontSize": "VariableID:137:913",
-              "fontWeight": "VariableID:137:914",
-              "lineHeight": "VariableID:137:915"
+              "fontFamily": "VariableID:2826:10001",
+              "fontSize": "VariableID:2826:10002",
+              "fontWeight": "VariableID:2826:10003",
+              "lineHeight": "VariableID:2826:10004",
+              "letterSpacing": "VariableID:2826:10005",
+              "textDecoration": "VariableID:2826:10006",
+              "textTransform": "VariableID:2826:10007"
             }
           }
         },
@@ -6607,17 +6701,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.XL}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Light}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Heading}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:916",
-              "fontSize": "VariableID:137:917",
-              "fontWeight": "VariableID:137:918",
-              "lineHeight": "VariableID:137:919"
+              "fontFamily": "VariableID:2826:10008",
+              "fontSize": "VariableID:2826:10009",
+              "fontWeight": "VariableID:2826:10010",
+              "lineHeight": "VariableID:2826:10011",
+              "letterSpacing": "VariableID:2826:10012",
+              "textDecoration": "VariableID:2826:10013",
+              "textTransform": "VariableID:2826:10014"
             }
           }
         },
@@ -6627,17 +6727,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.4XL}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Heading}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:920",
-              "fontSize": "VariableID:137:921",
-              "fontWeight": "VariableID:137:922",
-              "lineHeight": "VariableID:137:923"
+              "fontFamily": "VariableID:2826:10015",
+              "fontSize": "VariableID:2826:10016",
+              "fontWeight": "VariableID:2826:10017",
+              "lineHeight": "VariableID:2826:10018",
+              "letterSpacing": "VariableID:2826:10019",
+              "textDecoration": "VariableID:2826:10020",
+              "textTransform": "VariableID:2826:10021"
             }
           }
         },
@@ -6647,17 +6753,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.5XL}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Heading}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:924",
-              "fontSize": "VariableID:137:925",
-              "fontWeight": "VariableID:137:926",
-              "lineHeight": "VariableID:137:927"
+              "fontFamily": "VariableID:2826:10022",
+              "fontSize": "VariableID:2826:10023",
+              "fontWeight": "VariableID:2826:10024",
+              "lineHeight": "VariableID:2826:10025",
+              "letterSpacing": "VariableID:2826:10026",
+              "textDecoration": "VariableID:2826:10027",
+              "textTransform": "VariableID:2826:10028"
             }
           }
         },
@@ -6667,17 +6779,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.4XL}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Light}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Heading}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:928",
-              "fontSize": "VariableID:137:929",
-              "fontWeight": "VariableID:137:930",
-              "lineHeight": "VariableID:137:931"
+              "fontFamily": "VariableID:2826:10029",
+              "fontSize": "VariableID:2826:10030",
+              "fontWeight": "VariableID:2826:10031",
+              "lineHeight": "VariableID:2826:10032",
+              "letterSpacing": "VariableID:2826:10033",
+              "textDecoration": "VariableID:2826:10034",
+              "textTransform": "VariableID:2826:10035"
             }
           }
         },
@@ -6687,17 +6805,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.5XL}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Light}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Heading}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:932",
-              "fontSize": "VariableID:137:933",
-              "fontWeight": "VariableID:137:934",
-              "lineHeight": "VariableID:137:935"
+              "fontFamily": "VariableID:2826:10036",
+              "fontSize": "VariableID:2826:10037",
+              "fontWeight": "VariableID:2826:10038",
+              "lineHeight": "VariableID:2826:10039",
+              "letterSpacing": "VariableID:2826:10040",
+              "textDecoration": "VariableID:2826:10041",
+              "textTransform": "VariableID:2826:10042"
             }
           }
         },
@@ -6707,17 +6831,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.2XL}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Light}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Heading}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:936",
-              "fontSize": "VariableID:137:937",
-              "fontWeight": "VariableID:137:938",
-              "lineHeight": "VariableID:137:939"
+              "fontFamily": "VariableID:2826:10043",
+              "fontSize": "VariableID:2826:10044",
+              "fontWeight": "VariableID:2826:10045",
+              "lineHeight": "VariableID:2826:10046",
+              "letterSpacing": "VariableID:2826:10047",
+              "textDecoration": "VariableID:2826:10048",
+              "textTransform": "VariableID:2826:10049"
             }
           }
         }
@@ -7079,7 +7209,7 @@
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
-            "com.figma.variableId": "VariableID:137:970"
+            "com.figma.variableId": "VariableID:2826:10050"
           }
         }
       },
@@ -9226,7 +9356,7 @@
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
-              "com.figma.variableId": "VariableID:137:1258"
+              "com.figma.variableId": "VariableID:2826:10051"
             }
           },
           "FontWeight": {
@@ -9318,7 +9448,7 @@
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
-              "com.figma.variableId": "VariableID:137:1267"
+              "com.figma.variableId": "VariableID:2826:10052"
             }
           },
           "FontWeight": {
@@ -9410,7 +9540,7 @@
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
-              "com.figma.variableId": "VariableID:137:1276"
+              "com.figma.variableId": "VariableID:2826:10053"
             }
           },
           "FontWeight": {
@@ -9525,10 +9655,13 @@
             "ALL_SCOPES"
           ],
           "com.figma.variableId": {
-            "fontFamily": "VariableID:137:1287",
-            "fontSize": "VariableID:137:1288",
-            "fontWeight": "VariableID:137:1289",
-            "lineHeight": "VariableID:137:1290"
+            "fontFamily": "VariableID:2826:10054",
+            "fontSize": "VariableID:2826:10055",
+            "fontWeight": "VariableID:2826:10056",
+            "lineHeight": "VariableID:2826:10057",
+            "letterSpacing": "VariableID:2826:10058",
+            "textDecoration": "VariableID:2826:10059",
+            "textTransform": "VariableID:2826:10060"
           }
         }
       },
@@ -11526,17 +11659,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
               "fontSize": "{📱 Device.🔤 Text.Size.SM}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:1503",
-                "fontSize": "VariableID:137:1504",
-                "fontWeight": "VariableID:137:1505",
-                "lineHeight": "VariableID:137:1506"
+                "fontFamily": "VariableID:2826:10061",
+                "fontSize": "VariableID:2826:10062",
+                "fontWeight": "VariableID:2826:10063",
+                "lineHeight": "VariableID:2826:10064",
+                "letterSpacing": "VariableID:2826:10065",
+                "textDecoration": "VariableID:2826:10066",
+                "textTransform": "VariableID:2826:10067"
               }
             }
           },
@@ -11558,17 +11697,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
               "fontSize": "{📱 Device.🔤 Text.Size.Base}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:1508",
-                "fontSize": "VariableID:137:1509",
-                "fontWeight": "VariableID:137:1510",
-                "lineHeight": "VariableID:137:1511"
+                "fontFamily": "VariableID:2826:10068",
+                "fontSize": "VariableID:2826:10069",
+                "fontWeight": "VariableID:2826:10070",
+                "lineHeight": "VariableID:2826:10071",
+                "letterSpacing": "VariableID:2826:10072",
+                "textDecoration": "VariableID:2826:10073",
+                "textTransform": "VariableID:2826:10074"
               }
             }
           },
@@ -11604,17 +11749,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
               "fontSize": "{📱 Device.🔤 Text.Size.XS}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:1514",
-                "fontSize": "VariableID:137:1515",
-                "fontWeight": "VariableID:137:1516",
-                "lineHeight": "VariableID:137:1517"
+                "fontFamily": "VariableID:2826:10075",
+                "fontSize": "VariableID:2826:10076",
+                "fontWeight": "VariableID:2826:10077",
+                "lineHeight": "VariableID:2826:10078",
+                "letterSpacing": "VariableID:2826:10079",
+                "textDecoration": "VariableID:2826:10080",
+                "textTransform": "VariableID:2826:10081"
               }
             }
           },
@@ -11752,17 +11903,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
               "fontSize": "{📱 Device.🔤 Text.Size.SM}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:1535",
-                "fontSize": "VariableID:137:1536",
-                "fontWeight": "VariableID:137:1537",
-                "lineHeight": "VariableID:137:1538"
+                "fontFamily": "VariableID:2826:10082",
+                "fontSize": "VariableID:2826:10083",
+                "fontWeight": "VariableID:2826:10084",
+                "lineHeight": "VariableID:2826:10085",
+                "letterSpacing": "VariableID:2826:10086",
+                "textDecoration": "VariableID:2826:10087",
+                "textTransform": "VariableID:2826:10088"
               }
             }
           },
@@ -11784,17 +11941,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
               "fontSize": "{📱 Device.🔤 Text.Size.Base}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:1540",
-                "fontSize": "VariableID:137:1541",
-                "fontWeight": "VariableID:137:1542",
-                "lineHeight": "VariableID:137:1543"
+                "fontFamily": "VariableID:2826:10089",
+                "fontSize": "VariableID:2826:10090",
+                "fontWeight": "VariableID:2826:10091",
+                "lineHeight": "VariableID:2826:10092",
+                "letterSpacing": "VariableID:2826:10093",
+                "textDecoration": "VariableID:2826:10094",
+                "textTransform": "VariableID:2826:10095"
               }
             }
           },
@@ -11830,17 +11993,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
               "fontSize": "{📱 Device.🔤 Text.Size.XS}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:1546",
-                "fontSize": "VariableID:137:1547",
-                "fontWeight": "VariableID:137:1548",
-                "lineHeight": "VariableID:137:1549"
+                "fontFamily": "VariableID:2826:10096",
+                "fontSize": "VariableID:2826:10097",
+                "fontWeight": "VariableID:2826:10098",
+                "lineHeight": "VariableID:2826:10099",
+                "letterSpacing": "VariableID:2826:10100",
+                "textDecoration": "VariableID:2826:10101",
+                "textTransform": "VariableID:2826:10102"
               }
             }
           },
@@ -11894,17 +12063,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
               "fontSize": "{📱 Device.🔤 Text.Size.SM}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:1555",
-                "fontSize": "VariableID:137:1556",
-                "fontWeight": "VariableID:137:1557",
-                "lineHeight": "VariableID:137:1558"
+                "fontFamily": "VariableID:2826:10103",
+                "fontSize": "VariableID:2826:10104",
+                "fontWeight": "VariableID:2826:10105",
+                "lineHeight": "VariableID:2826:10106",
+                "letterSpacing": "VariableID:2826:10107",
+                "textDecoration": "VariableID:2826:10108",
+                "textTransform": "VariableID:2826:10109"
               }
             }
           },
@@ -11926,17 +12101,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
               "fontSize": "{📱 Device.🔤 Text.Size.Base}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:1560",
-                "fontSize": "VariableID:137:1561",
-                "fontWeight": "VariableID:137:1562",
-                "lineHeight": "VariableID:137:1563"
+                "fontFamily": "VariableID:2826:10110",
+                "fontSize": "VariableID:2826:10111",
+                "fontWeight": "VariableID:2826:10112",
+                "lineHeight": "VariableID:2826:10113",
+                "letterSpacing": "VariableID:2826:10114",
+                "textDecoration": "VariableID:2826:10115",
+                "textTransform": "VariableID:2826:10116"
               }
             }
           },
@@ -11972,17 +12153,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
               "fontSize": "{📱 Device.🔤 Text.Size.XS}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:1566",
-                "fontSize": "VariableID:137:1567",
-                "fontWeight": "VariableID:137:1568",
-                "lineHeight": "VariableID:137:1569"
+                "fontFamily": "VariableID:2826:10117",
+                "fontSize": "VariableID:2826:10118",
+                "fontWeight": "VariableID:2826:10119",
+                "lineHeight": "VariableID:2826:10120",
+                "letterSpacing": "VariableID:2826:10121",
+                "textDecoration": "VariableID:2826:10122",
+                "textTransform": "VariableID:2826:10123"
               }
             }
           },
@@ -12036,17 +12223,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
               "fontSize": "{📱 Device.🔤 Text.Size.SM}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:1575",
-                "fontSize": "VariableID:137:1576",
-                "fontWeight": "VariableID:137:1577",
-                "lineHeight": "VariableID:137:1578"
+                "fontFamily": "VariableID:2826:10124",
+                "fontSize": "VariableID:2826:10125",
+                "fontWeight": "VariableID:2826:10126",
+                "lineHeight": "VariableID:2826:10127",
+                "letterSpacing": "VariableID:2826:10128",
+                "textDecoration": "VariableID:2826:10129",
+                "textTransform": "VariableID:2826:10130"
               }
             }
           },
@@ -12068,17 +12261,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
               "fontSize": "{📱 Device.🔤 Text.Size.Base}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:1580",
-                "fontSize": "VariableID:137:1581",
-                "fontWeight": "VariableID:137:1582",
-                "lineHeight": "VariableID:137:1583"
+                "fontFamily": "VariableID:2826:10131",
+                "fontSize": "VariableID:2826:10132",
+                "fontWeight": "VariableID:2826:10133",
+                "lineHeight": "VariableID:2826:10134",
+                "letterSpacing": "VariableID:2826:10135",
+                "textDecoration": "VariableID:2826:10136",
+                "textTransform": "VariableID:2826:10137"
               }
             }
           },
@@ -12114,17 +12313,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
               "fontSize": "{📱 Device.🔤 Text.Size.XS}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:1586",
-                "fontSize": "VariableID:137:1587",
-                "fontWeight": "VariableID:137:1588",
-                "lineHeight": "VariableID:137:1589"
+                "fontFamily": "VariableID:2826:10138",
+                "fontSize": "VariableID:2826:10139",
+                "fontWeight": "VariableID:2826:10140",
+                "lineHeight": "VariableID:2826:10141",
+                "letterSpacing": "VariableID:2826:10142",
+                "textDecoration": "VariableID:2826:10143",
+                "textTransform": "VariableID:2826:10144"
               }
             }
           },
@@ -12174,17 +12379,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
               "fontSize": "{📱 Device.🔤 Text.Size.SM}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:1595",
-                "fontSize": "VariableID:137:1596",
-                "fontWeight": "VariableID:137:1597",
-                "lineHeight": "VariableID:137:1598"
+                "fontFamily": "VariableID:2826:10145",
+                "fontSize": "VariableID:2826:10146",
+                "fontWeight": "VariableID:2826:10147",
+                "lineHeight": "VariableID:2826:10148",
+                "letterSpacing": "VariableID:2826:10149",
+                "textDecoration": "VariableID:2826:10150",
+                "textTransform": "VariableID:2826:10151"
               }
             }
           },
@@ -12206,17 +12417,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
               "fontSize": "{📱 Device.🔤 Text.Size.Base}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:1600",
-                "fontSize": "VariableID:137:1601",
-                "fontWeight": "VariableID:137:1602",
-                "lineHeight": "VariableID:137:1603"
+                "fontFamily": "VariableID:2826:10152",
+                "fontSize": "VariableID:2826:10153",
+                "fontWeight": "VariableID:2826:10154",
+                "lineHeight": "VariableID:2826:10155",
+                "letterSpacing": "VariableID:2826:10156",
+                "textDecoration": "VariableID:2826:10157",
+                "textTransform": "VariableID:2826:10158"
               }
             }
           },
@@ -12252,17 +12469,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
               "fontSize": "{📱 Device.🔤 Text.Size.XS}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:1606",
-                "fontSize": "VariableID:137:1607",
-                "fontWeight": "VariableID:137:1608",
-                "lineHeight": "VariableID:137:1609"
+                "fontFamily": "VariableID:2826:10159",
+                "fontSize": "VariableID:2826:10160",
+                "fontWeight": "VariableID:2826:10161",
+                "lineHeight": "VariableID:2826:10162",
+                "letterSpacing": "VariableID:2826:10163",
+                "textDecoration": "VariableID:2826:10164",
+                "textTransform": "VariableID:2826:10165"
               }
             }
           },
@@ -12570,7 +12793,7 @@
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
-            "com.figma.variableId": "VariableID:137:1632"
+            "com.figma.variableId": "VariableID:2826:10166"
           }
         },
         "Size": {
@@ -12658,7 +12881,7 @@
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
-            "com.figma.variableId": "VariableID:137:1641"
+            "com.figma.variableId": "VariableID:2826:10167"
           }
         },
         "FontSize": {
@@ -12752,7 +12975,7 @@
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
-            "com.figma.variableId": "VariableID:137:1649"
+            "com.figma.variableId": "VariableID:2826:10168"
           }
         },
         "Size": {
@@ -13305,10 +13528,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1704",
-              "fontSize": "VariableID:137:1705",
-              "fontWeight": "VariableID:137:1706",
-              "lineHeight": "VariableID:137:1707"
+              "fontFamily": "VariableID:2826:10169",
+              "fontSize": "VariableID:2826:10170",
+              "fontWeight": "VariableID:2826:10171",
+              "lineHeight": "VariableID:2826:10172",
+              "letterSpacing": "VariableID:2826:10173",
+              "textDecoration": "VariableID:2826:10174",
+              "textTransform": "VariableID:2826:10175"
             }
           }
         },
@@ -13320,10 +13546,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1708",
-              "fontSize": "VariableID:137:1709",
-              "fontWeight": "VariableID:137:1710",
-              "lineHeight": "VariableID:137:1711"
+              "fontFamily": "VariableID:2826:10176",
+              "fontSize": "VariableID:2826:10177",
+              "fontWeight": "VariableID:2826:10178",
+              "lineHeight": "VariableID:2826:10179",
+              "letterSpacing": "VariableID:2826:10180",
+              "textDecoration": "VariableID:2826:10181",
+              "textTransform": "VariableID:2826:10182"
             }
           }
         }
@@ -13361,10 +13590,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1719",
-              "fontSize": "VariableID:137:1720",
-              "fontWeight": "VariableID:137:1721",
-              "lineHeight": "VariableID:137:1722"
+              "fontFamily": "VariableID:2826:10183",
+              "fontSize": "VariableID:2826:10184",
+              "fontWeight": "VariableID:2826:10185",
+              "lineHeight": "VariableID:2826:10186",
+              "letterSpacing": "VariableID:2826:10187",
+              "textDecoration": "VariableID:2826:10188",
+              "textTransform": "VariableID:2826:10189"
             }
           }
         },
@@ -13376,10 +13608,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1723",
-              "fontSize": "VariableID:137:1724",
-              "fontWeight": "VariableID:137:1725",
-              "lineHeight": "VariableID:137:1726"
+              "fontFamily": "VariableID:2826:10190",
+              "fontSize": "VariableID:2826:10191",
+              "fontWeight": "VariableID:2826:10192",
+              "lineHeight": "VariableID:2826:10193",
+              "letterSpacing": "VariableID:2826:10194",
+              "textDecoration": "VariableID:2826:10195",
+              "textTransform": "VariableID:2826:10196"
             }
           }
         },
@@ -13481,10 +13716,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1734",
-              "fontSize": "VariableID:137:1735",
-              "fontWeight": "VariableID:137:1736",
-              "lineHeight": "VariableID:137:1737"
+              "fontFamily": "VariableID:2826:10197",
+              "fontSize": "VariableID:2826:10198",
+              "fontWeight": "VariableID:2826:10199",
+              "lineHeight": "VariableID:2826:10200",
+              "letterSpacing": "VariableID:2826:10201",
+              "textDecoration": "VariableID:2826:10202",
+              "textTransform": "VariableID:2826:10203"
             }
           }
         },
@@ -13496,10 +13734,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1738",
-              "fontSize": "VariableID:137:1739",
-              "fontWeight": "VariableID:137:1740",
-              "lineHeight": "VariableID:137:1741"
+              "fontFamily": "VariableID:2826:10204",
+              "fontSize": "VariableID:2826:10205",
+              "fontWeight": "VariableID:2826:10206",
+              "lineHeight": "VariableID:2826:10207",
+              "letterSpacing": "VariableID:2826:10208",
+              "textDecoration": "VariableID:2826:10209",
+              "textTransform": "VariableID:2826:10210"
             }
           }
         }
@@ -13569,10 +13810,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1749",
-              "fontSize": "VariableID:137:1750",
-              "fontWeight": "VariableID:137:1751",
-              "lineHeight": "VariableID:137:1752"
+              "fontFamily": "VariableID:2826:10211",
+              "fontSize": "VariableID:2826:10212",
+              "fontWeight": "VariableID:2826:10213",
+              "lineHeight": "VariableID:2826:10214",
+              "letterSpacing": "VariableID:2826:10215",
+              "textDecoration": "VariableID:2826:10216",
+              "textTransform": "VariableID:2826:10217"
             }
           }
         },
@@ -13584,10 +13828,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1753",
-              "fontSize": "VariableID:137:1754",
-              "fontWeight": "VariableID:137:1755",
-              "lineHeight": "VariableID:137:1756"
+              "fontFamily": "VariableID:2826:10218",
+              "fontSize": "VariableID:2826:10219",
+              "fontWeight": "VariableID:2826:10220",
+              "lineHeight": "VariableID:2826:10221",
+              "letterSpacing": "VariableID:2826:10222",
+              "textDecoration": "VariableID:2826:10223",
+              "textTransform": "VariableID:2826:10224"
             }
           }
         }
@@ -13657,10 +13904,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1764",
-              "fontSize": "VariableID:137:1765",
-              "fontWeight": "VariableID:137:1766",
-              "lineHeight": "VariableID:137:1767"
+              "fontFamily": "VariableID:2826:10225",
+              "fontSize": "VariableID:2826:10226",
+              "fontWeight": "VariableID:2826:10227",
+              "lineHeight": "VariableID:2826:10228",
+              "letterSpacing": "VariableID:2826:10229",
+              "textDecoration": "VariableID:2826:10230",
+              "textTransform": "VariableID:2826:10231"
             }
           }
         },
@@ -13672,10 +13922,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1768",
-              "fontSize": "VariableID:137:1769",
-              "fontWeight": "VariableID:137:1770",
-              "lineHeight": "VariableID:137:1771"
+              "fontFamily": "VariableID:2826:10232",
+              "fontSize": "VariableID:2826:10233",
+              "fontWeight": "VariableID:2826:10234",
+              "lineHeight": "VariableID:2826:10235",
+              "letterSpacing": "VariableID:2826:10236",
+              "textDecoration": "VariableID:2826:10237",
+              "textTransform": "VariableID:2826:10238"
             }
           }
         }
@@ -13731,10 +13984,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1776",
-              "fontSize": "VariableID:137:1777",
-              "fontWeight": "VariableID:137:1778",
-              "lineHeight": "VariableID:137:1779"
+              "fontFamily": "VariableID:2826:10239",
+              "fontSize": "VariableID:2826:10240",
+              "fontWeight": "VariableID:2826:10241",
+              "lineHeight": "VariableID:2826:10242",
+              "letterSpacing": "VariableID:2826:10243",
+              "textDecoration": "VariableID:2826:10244",
+              "textTransform": "VariableID:2826:10245"
             }
           }
         },
@@ -13746,10 +14002,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1780",
-              "fontSize": "VariableID:137:1781",
-              "fontWeight": "VariableID:137:1782",
-              "lineHeight": "VariableID:137:1783"
+              "fontFamily": "VariableID:2826:10246",
+              "fontSize": "VariableID:2826:10247",
+              "fontWeight": "VariableID:2826:10248",
+              "lineHeight": "VariableID:2826:10249",
+              "letterSpacing": "VariableID:2826:10250",
+              "textDecoration": "VariableID:2826:10251",
+              "textTransform": "VariableID:2826:10252"
             }
           }
         },
@@ -13833,10 +14092,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1794",
-              "fontSize": "VariableID:137:1795",
-              "fontWeight": "VariableID:137:1796",
-              "lineHeight": "VariableID:137:1797"
+              "fontFamily": "VariableID:2826:10253",
+              "fontSize": "VariableID:2826:10254",
+              "fontWeight": "VariableID:2826:10255",
+              "lineHeight": "VariableID:2826:10256",
+              "letterSpacing": "VariableID:2826:10257",
+              "textDecoration": "VariableID:2826:10258",
+              "textTransform": "VariableID:2826:10259"
             }
           }
         },
@@ -13848,10 +14110,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1798",
-              "fontSize": "VariableID:137:1799",
-              "fontWeight": "VariableID:137:1800",
-              "lineHeight": "VariableID:137:1801"
+              "fontFamily": "VariableID:2826:10260",
+              "fontSize": "VariableID:2826:10261",
+              "fontWeight": "VariableID:2826:10262",
+              "lineHeight": "VariableID:2826:10263",
+              "letterSpacing": "VariableID:2826:10264",
+              "textDecoration": "VariableID:2826:10265",
+              "textTransform": "VariableID:2826:10266"
             }
           }
         }
@@ -13921,10 +14186,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1809",
-              "fontSize": "VariableID:137:1810",
-              "fontWeight": "VariableID:137:1811",
-              "lineHeight": "VariableID:137:1812"
+              "fontFamily": "VariableID:2826:10267",
+              "fontSize": "VariableID:2826:10268",
+              "fontWeight": "VariableID:2826:10269",
+              "lineHeight": "VariableID:2826:10270",
+              "letterSpacing": "VariableID:2826:10271",
+              "textDecoration": "VariableID:2826:10272",
+              "textTransform": "VariableID:2826:10273"
             }
           }
         },
@@ -13936,10 +14204,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1813",
-              "fontSize": "VariableID:137:1814",
-              "fontWeight": "VariableID:137:1815",
-              "lineHeight": "VariableID:137:1816"
+              "fontFamily": "VariableID:2826:10274",
+              "fontSize": "VariableID:2826:10275",
+              "fontWeight": "VariableID:2826:10276",
+              "lineHeight": "VariableID:2826:10277",
+              "letterSpacing": "VariableID:2826:10278",
+              "textDecoration": "VariableID:2826:10279",
+              "textTransform": "VariableID:2826:10280"
             }
           }
         }
@@ -14009,10 +14280,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1824",
-              "fontSize": "VariableID:137:1825",
-              "fontWeight": "VariableID:137:1826",
-              "lineHeight": "VariableID:137:1827"
+              "fontFamily": "VariableID:2826:10281",
+              "fontSize": "VariableID:2826:10282",
+              "fontWeight": "VariableID:2826:10283",
+              "lineHeight": "VariableID:2826:10284",
+              "letterSpacing": "VariableID:2826:10285",
+              "textDecoration": "VariableID:2826:10286",
+              "textTransform": "VariableID:2826:10287"
             }
           }
         },
@@ -14024,10 +14298,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1828",
-              "fontSize": "VariableID:137:1829",
-              "fontWeight": "VariableID:137:1830",
-              "lineHeight": "VariableID:137:1831"
+              "fontFamily": "VariableID:2826:10288",
+              "fontSize": "VariableID:2826:10289",
+              "fontWeight": "VariableID:2826:10290",
+              "lineHeight": "VariableID:2826:10291",
+              "letterSpacing": "VariableID:2826:10292",
+              "textDecoration": "VariableID:2826:10293",
+              "textTransform": "VariableID:2826:10294"
             }
           }
         }
@@ -14097,10 +14374,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1839",
-              "fontSize": "VariableID:137:1840",
-              "fontWeight": "VariableID:137:1841",
-              "lineHeight": "VariableID:137:1842"
+              "fontFamily": "VariableID:2826:10295",
+              "fontSize": "VariableID:2826:10296",
+              "fontWeight": "VariableID:2826:10297",
+              "lineHeight": "VariableID:2826:10298",
+              "letterSpacing": "VariableID:2826:10299",
+              "textDecoration": "VariableID:2826:10300",
+              "textTransform": "VariableID:2826:10301"
             }
           }
         },
@@ -14112,10 +14392,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1843",
-              "fontSize": "VariableID:137:1844",
-              "fontWeight": "VariableID:137:1845",
-              "lineHeight": "VariableID:137:1846"
+              "fontFamily": "VariableID:2826:10302",
+              "fontSize": "VariableID:2826:10303",
+              "fontWeight": "VariableID:2826:10304",
+              "lineHeight": "VariableID:2826:10305",
+              "letterSpacing": "VariableID:2826:10306",
+              "textDecoration": "VariableID:2826:10307",
+              "textTransform": "VariableID:2826:10308"
             }
           }
         }
@@ -14191,17 +14474,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
             "fontSize": "{📱 Device.🔤 Text.Size.SM}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1855",
-              "fontSize": "VariableID:137:1856",
-              "fontWeight": "VariableID:137:1857",
-              "lineHeight": "VariableID:137:1858"
+              "fontFamily": "VariableID:2826:10309",
+              "fontSize": "VariableID:2826:10310",
+              "fontWeight": "VariableID:2826:10311",
+              "lineHeight": "VariableID:2826:10312",
+              "letterSpacing": "VariableID:2826:10313",
+              "textDecoration": "VariableID:2826:10314",
+              "textTransform": "VariableID:2826:10315"
             }
           }
         },
@@ -14211,17 +14500,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
             "fontSize": "{📱 Device.🔤 Text.Size.Base}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1859",
-              "fontSize": "VariableID:137:1860",
-              "fontWeight": "VariableID:137:1861",
-              "lineHeight": "VariableID:137:1862"
+              "fontFamily": "VariableID:2826:10316",
+              "fontSize": "VariableID:2826:10317",
+              "fontWeight": "VariableID:2826:10318",
+              "lineHeight": "VariableID:2826:10319",
+              "letterSpacing": "VariableID:2826:10320",
+              "textDecoration": "VariableID:2826:10321",
+              "textTransform": "VariableID:2826:10322"
             }
           }
         },
@@ -14231,17 +14526,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.3XL}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1863",
-              "fontSize": "VariableID:137:1864",
-              "fontWeight": "VariableID:137:1865",
-              "lineHeight": "VariableID:137:1866"
+              "fontFamily": "VariableID:2826:10323",
+              "fontSize": "VariableID:2826:10324",
+              "fontWeight": "VariableID:2826:10325",
+              "lineHeight": "VariableID:2826:10326",
+              "letterSpacing": "VariableID:2826:10327",
+              "textDecoration": "VariableID:2826:10328",
+              "textTransform": "VariableID:2826:10329"
             }
           }
         },
@@ -14251,17 +14552,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.2XL}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1867",
-              "fontSize": "VariableID:137:1868",
-              "fontWeight": "VariableID:137:1869",
-              "lineHeight": "VariableID:137:1870"
+              "fontFamily": "VariableID:2826:10330",
+              "fontSize": "VariableID:2826:10331",
+              "fontWeight": "VariableID:2826:10332",
+              "lineHeight": "VariableID:2826:10333",
+              "letterSpacing": "VariableID:2826:10334",
+              "textDecoration": "VariableID:2826:10335",
+              "textTransform": "VariableID:2826:10336"
             }
           }
         },
@@ -14271,17 +14578,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.LG}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1871",
-              "fontSize": "VariableID:137:1872",
-              "fontWeight": "VariableID:137:1873",
-              "lineHeight": "VariableID:137:1874"
+              "fontFamily": "VariableID:2826:10337",
+              "fontSize": "VariableID:2826:10338",
+              "fontWeight": "VariableID:2826:10339",
+              "lineHeight": "VariableID:2826:10340",
+              "letterSpacing": "VariableID:2826:10341",
+              "textDecoration": "VariableID:2826:10342",
+              "textTransform": "VariableID:2826:10343"
             }
           }
         },
@@ -14291,17 +14604,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.XL}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1875",
-              "fontSize": "VariableID:137:1876",
-              "fontWeight": "VariableID:137:1877",
-              "lineHeight": "VariableID:137:1878"
+              "fontFamily": "VariableID:2826:10344",
+              "fontSize": "VariableID:2826:10345",
+              "fontWeight": "VariableID:2826:10346",
+              "lineHeight": "VariableID:2826:10347",
+              "letterSpacing": "VariableID:2826:10348",
+              "textDecoration": "VariableID:2826:10349",
+              "textTransform": "VariableID:2826:10350"
             }
           }
         }
@@ -14687,17 +15006,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
             "fontSize": "{📱 Device.🔤 Text.Size.Base}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1891",
-              "fontSize": "VariableID:137:1892",
-              "fontWeight": "VariableID:137:1893",
-              "lineHeight": "VariableID:137:1894"
+              "fontFamily": "VariableID:2826:10351",
+              "fontSize": "VariableID:2826:10352",
+              "fontWeight": "VariableID:2826:10353",
+              "lineHeight": "VariableID:2826:10354",
+              "letterSpacing": "VariableID:2826:10355",
+              "textDecoration": "VariableID:2826:10356",
+              "textTransform": "VariableID:2826:10357"
             }
           }
         },
@@ -14707,17 +15032,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
             "fontSize": "{📱 Device.🔤 Text.Size.SM}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:1895",
-              "fontSize": "VariableID:137:1896",
-              "fontWeight": "VariableID:137:1897",
-              "lineHeight": "VariableID:137:1898"
+              "fontFamily": "VariableID:2826:10358",
+              "fontSize": "VariableID:2826:10359",
+              "fontWeight": "VariableID:2826:10360",
+              "lineHeight": "VariableID:2826:10361",
+              "letterSpacing": "VariableID:2826:10362",
+              "textDecoration": "VariableID:2826:10363",
+              "textTransform": "VariableID:2826:10364"
             }
           }
         },
@@ -14799,10 +15130,13 @@
             "ALL_SCOPES"
           ],
           "com.figma.variableId": {
-            "fontFamily": "VariableID:137:1934",
-            "fontSize": "VariableID:137:1935",
-            "fontWeight": "VariableID:137:1936",
-            "lineHeight": "VariableID:137:1937"
+            "fontFamily": "VariableID:2826:10365",
+            "fontSize": "VariableID:2826:10366",
+            "fontWeight": "VariableID:2826:10367",
+            "lineHeight": "VariableID:2826:10368",
+            "letterSpacing": "VariableID:2826:10369",
+            "textDecoration": "VariableID:2826:10370",
+            "textTransform": "VariableID:2826:10371"
           }
         }
       },
@@ -16114,10 +16448,13 @@
             "ALL_SCOPES"
           ],
           "com.figma.variableId": {
-            "fontFamily": "VariableID:137:2054",
-            "fontSize": "VariableID:137:2055",
-            "fontWeight": "VariableID:137:2056",
-            "lineHeight": "VariableID:137:2057"
+            "fontFamily": "VariableID:2826:10372",
+            "fontSize": "VariableID:2826:10373",
+            "fontWeight": "VariableID:2826:10374",
+            "lineHeight": "VariableID:2826:10375",
+            "letterSpacing": "VariableID:2826:10376",
+            "textDecoration": "VariableID:2826:10377",
+            "textTransform": "VariableID:2826:10378"
           }
         }
       },
@@ -16129,10 +16466,13 @@
             "ALL_SCOPES"
           ],
           "com.figma.variableId": {
-            "fontFamily": "VariableID:137:2058",
-            "fontSize": "VariableID:137:2059",
-            "fontWeight": "VariableID:137:2060",
-            "lineHeight": "VariableID:137:2061"
+            "fontFamily": "VariableID:2826:10379",
+            "fontSize": "VariableID:2826:10380",
+            "fontWeight": "VariableID:2826:10381",
+            "lineHeight": "VariableID:2826:10382",
+            "letterSpacing": "VariableID:2826:10383",
+            "textDecoration": "VariableID:2826:10384",
+            "textTransform": "VariableID:2826:10385"
           }
         }
       },
@@ -16666,10 +17006,13 @@
             "ALL_SCOPES"
           ],
           "com.figma.variableId": {
-            "fontFamily": "VariableID:137:2107",
-            "fontSize": "VariableID:137:2108",
-            "fontWeight": "VariableID:137:2109",
-            "lineHeight": "VariableID:137:2110"
+            "fontFamily": "VariableID:2826:10386",
+            "fontSize": "VariableID:2826:10387",
+            "fontWeight": "VariableID:2826:10388",
+            "lineHeight": "VariableID:2826:10389",
+            "letterSpacing": "VariableID:2826:10390",
+            "textDecoration": "VariableID:2826:10391",
+            "textTransform": "VariableID:2826:10392"
           }
         }
       },
@@ -16681,10 +17024,13 @@
             "ALL_SCOPES"
           ],
           "com.figma.variableId": {
-            "fontFamily": "VariableID:137:2111",
-            "fontSize": "VariableID:137:2112",
-            "fontWeight": "VariableID:137:2113",
-            "lineHeight": "VariableID:137:2114"
+            "fontFamily": "VariableID:2826:10393",
+            "fontSize": "VariableID:2826:10394",
+            "fontWeight": "VariableID:2826:10395",
+            "lineHeight": "VariableID:2826:10396",
+            "letterSpacing": "VariableID:2826:10397",
+            "textDecoration": "VariableID:2826:10398",
+            "textTransform": "VariableID:2826:10399"
           }
         }
       },
@@ -17175,7 +17521,7 @@
           "com.figma.scopes": [
             "ALL_SCOPES"
           ],
-          "com.figma.variableId": "VariableID:137:2157"
+          "com.figma.variableId": "VariableID:2826:10400"
         }
       },
       "FontFamily": {
@@ -17958,7 +18304,7 @@
           "com.figma.scopes": [
             "ALL_SCOPES"
           ],
-          "com.figma.variableId": "VariableID:137:2240"
+          "com.figma.variableId": "VariableID:2826:10401"
         }
       }
     },
@@ -18282,7 +18628,7 @@
           "com.figma.scopes": [
             "ALL_SCOPES"
           ],
-          "com.figma.variableId": "VariableID:137:2266"
+          "com.figma.variableId": "VariableID:2826:10402"
         }
       }
     },
@@ -18648,7 +18994,7 @@
           "com.figma.scopes": [
             "ALL_SCOPES"
           ],
-          "com.figma.variableId": "VariableID:137:2292"
+          "com.figma.variableId": "VariableID:2826:10403"
         }
       }
     },
@@ -18990,17 +19336,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
             "fontSize": "{📱 Device.🔤 Text.Size.Base}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:2344",
-              "fontSize": "VariableID:137:2345",
-              "fontWeight": "VariableID:137:2346",
-              "lineHeight": "VariableID:137:2347"
+              "fontFamily": "VariableID:2826:10404",
+              "fontSize": "VariableID:2826:10405",
+              "fontWeight": "VariableID:2826:10406",
+              "lineHeight": "VariableID:2826:10407",
+              "letterSpacing": "VariableID:2826:10408",
+              "textDecoration": "VariableID:2826:10409",
+              "textTransform": "VariableID:2826:10410"
             }
           }
         }
@@ -19055,17 +19407,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
               "fontSize": "{📱 Device.🔤 Text.Size.Base}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:2354",
-                "fontSize": "VariableID:137:2355",
-                "fontWeight": "VariableID:137:2356",
-                "lineHeight": "VariableID:137:2357"
+                "fontFamily": "VariableID:2826:10411",
+                "fontSize": "VariableID:2826:10412",
+                "fontWeight": "VariableID:2826:10413",
+                "lineHeight": "VariableID:2826:10414",
+                "letterSpacing": "VariableID:2826:10415",
+                "textDecoration": "VariableID:2826:10416",
+                "textTransform": "VariableID:2826:10417"
               }
             }
           },
@@ -19111,17 +19469,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
               "fontSize": "{📱 Device.🔤 Text.Size.Base}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:2361",
-                "fontSize": "VariableID:137:2362",
-                "fontWeight": "VariableID:137:2363",
-                "lineHeight": "VariableID:137:2364"
+                "fontFamily": "VariableID:2826:10418",
+                "fontSize": "VariableID:2826:10419",
+                "fontWeight": "VariableID:2826:10420",
+                "lineHeight": "VariableID:2826:10421",
+                "letterSpacing": "VariableID:2826:10422",
+                "textDecoration": "VariableID:2826:10423",
+                "textTransform": "VariableID:2826:10424"
               }
             }
           },
@@ -19703,10 +20067,13 @@
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:2455",
-                "fontSize": "VariableID:137:2456",
-                "fontWeight": "VariableID:137:2457",
-                "lineHeight": "VariableID:137:2458"
+                "fontFamily": "VariableID:2826:10425",
+                "fontSize": "VariableID:2826:10426",
+                "fontWeight": "VariableID:2826:10427",
+                "lineHeight": "VariableID:2826:10428",
+                "letterSpacing": "VariableID:2826:10429",
+                "textDecoration": "VariableID:2826:10430",
+                "textTransform": "VariableID:2826:10431"
               }
             }
           },
@@ -19716,17 +20083,23 @@
               "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
               "fontSize": "{📱 Device.🔤 Text.Size.SM}",
               "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}"
+              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
             },
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
               "com.figma.variableId": {
-                "fontFamily": "VariableID:137:2459",
-                "fontSize": "VariableID:137:2460",
-                "fontWeight": "VariableID:137:2461",
-                "lineHeight": "VariableID:137:2462"
+                "fontFamily": "VariableID:2826:10432",
+                "fontSize": "VariableID:2826:10433",
+                "fontWeight": "VariableID:2826:10434",
+                "lineHeight": "VariableID:2826:10435",
+                "letterSpacing": "VariableID:2826:10436",
+                "textDecoration": "VariableID:2826:10437",
+                "textTransform": "VariableID:2826:10438"
               }
             }
           }
@@ -20134,10 +20507,13 @@
             "ALL_SCOPES"
           ],
           "com.figma.variableId": {
-            "fontFamily": "VariableID:137:2500",
-            "fontSize": "VariableID:137:2501",
-            "fontWeight": "VariableID:137:2502",
-            "lineHeight": "VariableID:137:2503"
+            "fontFamily": "VariableID:2826:10439",
+            "fontSize": "VariableID:2826:10440",
+            "fontWeight": "VariableID:2826:10441",
+            "lineHeight": "VariableID:2826:10442",
+            "letterSpacing": "VariableID:2826:10443",
+            "textDecoration": "VariableID:2826:10444",
+            "textTransform": "VariableID:2826:10445"
           }
         }
       },
@@ -20232,10 +20608,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:2521",
-              "fontSize": "VariableID:137:2522",
-              "fontWeight": "VariableID:137:2523",
-              "lineHeight": "VariableID:137:2524"
+              "fontFamily": "VariableID:2826:10453",
+              "fontSize": "VariableID:2826:10454",
+              "fontWeight": "VariableID:2826:10455",
+              "lineHeight": "VariableID:2826:10456",
+              "letterSpacing": "VariableID:2826:10457",
+              "textDecoration": "VariableID:2826:10458",
+              "textTransform": "VariableID:2826:10459"
             }
           }
         }
@@ -20282,10 +20661,13 @@
             "ALL_SCOPES"
           ],
           "com.figma.variableId": {
-            "fontFamily": "VariableID:137:2509",
-            "fontSize": "VariableID:137:2510",
-            "fontWeight": "VariableID:137:2511",
-            "lineHeight": "VariableID:137:2512"
+            "fontFamily": "VariableID:2826:10446",
+            "fontSize": "VariableID:2826:10447",
+            "fontWeight": "VariableID:2826:10448",
+            "lineHeight": "VariableID:2826:10449",
+            "letterSpacing": "VariableID:2826:10450",
+            "textDecoration": "VariableID:2826:10451",
+            "textTransform": "VariableID:2826:10452"
           }
         }
       }
@@ -20488,7 +20870,7 @@
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
-              "com.figma.variableId": "VariableID:137:2549"
+              "com.figma.variableId": "VariableID:2826:10460"
             }
           },
           "Size": {
@@ -20726,7 +21108,7 @@
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
-              "com.figma.variableId": "VariableID:137:2570"
+              "com.figma.variableId": "VariableID:2826:10461"
             }
           },
           "Color": {
@@ -20794,7 +21176,7 @@
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
-              "com.figma.variableId": "VariableID:137:2576"
+              "com.figma.variableId": "VariableID:2826:10462"
             }
           },
           "Color": {
@@ -21104,17 +21486,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
             "fontSize": "{📱 Device.🔤 Text.Size.Base}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:2608",
-              "fontSize": "VariableID:137:2609",
-              "fontWeight": "VariableID:137:2610",
-              "lineHeight": "VariableID:137:2611"
+              "fontFamily": "VariableID:2826:10463",
+              "fontSize": "VariableID:2826:10464",
+              "fontWeight": "VariableID:2826:10465",
+              "lineHeight": "VariableID:2826:10466",
+              "letterSpacing": "VariableID:2826:10467",
+              "textDecoration": "VariableID:2826:10468",
+              "textTransform": "VariableID:2826:10469"
             }
           }
         },
@@ -21124,17 +21512,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
             "fontSize": "{📱 Device.🔤 Text.Size.SM}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:2612",
-              "fontSize": "VariableID:137:2613",
-              "fontWeight": "VariableID:137:2614",
-              "lineHeight": "VariableID:137:2615"
+              "fontFamily": "VariableID:2826:10470",
+              "fontSize": "VariableID:2826:10471",
+              "fontWeight": "VariableID:2826:10472",
+              "lineHeight": "VariableID:2826:10473",
+              "letterSpacing": "VariableID:2826:10474",
+              "textDecoration": "VariableID:2826:10475",
+              "textTransform": "VariableID:2826:10476"
             }
           }
         },
@@ -21144,17 +21538,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
             "fontSize": "{📱 Device.🔤 Text.Size.LG}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:2616",
-              "fontSize": "VariableID:137:2617",
-              "fontWeight": "VariableID:137:2618",
-              "lineHeight": "VariableID:137:2619"
+              "fontFamily": "VariableID:2826:10477",
+              "fontSize": "VariableID:2826:10478",
+              "fontWeight": "VariableID:2826:10479",
+              "lineHeight": "VariableID:2826:10480",
+              "letterSpacing": "VariableID:2826:10481",
+              "textDecoration": "VariableID:2826:10482",
+              "textTransform": "VariableID:2826:10483"
             }
           }
         },
@@ -21164,17 +21564,23 @@
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
             "fontSize": "{📱 Device.🔤 Text.Size.MD}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}"
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
           },
           "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
             "com.figma.variableId": {
-              "fontFamily": "VariableID:137:2620",
-              "fontSize": "VariableID:137:2621",
-              "fontWeight": "VariableID:137:2622",
-              "lineHeight": "VariableID:137:2623"
+              "fontFamily": "VariableID:2826:10484",
+              "fontSize": "VariableID:2826:10485",
+              "fontWeight": "VariableID:2826:10486",
+              "lineHeight": "VariableID:2826:10487",
+              "letterSpacing": "VariableID:2826:10488",
+              "textDecoration": "VariableID:2826:10489",
+              "textTransform": "VariableID:2826:10490"
             }
           }
         }
@@ -24065,7 +24471,7 @@
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
-            "com.figma.variableId": "VariableID:137:2802"
+            "com.figma.variableId": "VariableID:2826:10491"
           }
         },
         "2": {
@@ -24075,7 +24481,7 @@
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
-            "com.figma.variableId": "VariableID:137:2803"
+            "com.figma.variableId": "VariableID:2826:10492"
           }
         },
         "3": {
@@ -24085,7 +24491,7 @@
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
-            "com.figma.variableId": "VariableID:137:2804"
+            "com.figma.variableId": "VariableID:2826:10493"
           }
         },
         "4": {
@@ -24095,7 +24501,96 @@
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
-            "com.figma.variableId": "VariableID:137:2805"
+            "com.figma.variableId": "VariableID:2826:10494"
+          }
+        }
+      },
+      "LetterSpacing": {
+        "0": {
+          "$type": "dimension",
+          "$value": {
+            "value": 0,
+            "unit": "rem"
+          },
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2826:10495",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        }
+      },
+      "TextDecoration": {
+        "None": {
+          "$type": "textDecoration",
+          "$value": "none",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2826:10496",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        },
+        "Underline": {
+          "$type": "textDecoration",
+          "$value": "underline",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2826:10497",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        },
+        "LineThrough": {
+          "$type": "textDecoration",
+          "$value": "line-through",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2826:10498",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        }
+      },
+      "TextTransform": {
+        "None": {
+          "$type": "textTransform",
+          "$value": "none",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2826:10499",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        },
+        "Uppercase": {
+          "$type": "textTransform",
+          "$value": "uppercase",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2826:10500",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        },
+        "Lowercase": {
+          "$type": "textTransform",
+          "$value": "lowercase",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2826:10501",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        },
+        "Capitalize": {
+          "$type": "textTransform",
+          "$value": "capitalize",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:2826:10502",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
           }
         }
       }
