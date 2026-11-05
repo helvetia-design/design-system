@@ -18,7 +18,7 @@ node <this-skill-directory>/scripts/scan-bal-app.mjs <project-root>
 
 The script prints one JSON object. `total` is the number of findings. `files` groups them by path. Each finding has `line` and `snippet`.
 
-The scan also lists `initializeBaloiseDesignSystem` and `useBaloiseDesignSystem` calls, which usually live in a startup file that never mentions `bal-app`. Those are not tags to rewrite. They are the source values for the Config section.
+The scan also lists the legacy config calls `initializeBaloiseDesignSystem`, `useBaloiseDesignSystem` and `provideBaloiseDesignSystem`, which usually live in a startup file that never mentions `bal-app`. Those are not tags to rewrite. They are the source values for the Config section.
 
 Show that list to the user grouped by file (path, line, snippet) and end with the total count.
 
@@ -48,7 +48,7 @@ initializeBaloiseDesignSystem({ language: 'fr', region: 'BE', allowedLanguages: 
 
 `ds-root` does hold configuration, and it reads a different global. When it finds none it configures itself with the defaults: brand `helvetia`, region `CH`, language `de`. Nothing throws. A rewrite that only changes the tag therefore switches a French Belgian app to German Swiss silently.
 
-Copy the values from the legacy call onto `ds-root`.
+Copy the values from the legacy call onto `ds-root`. In React and Angular they sit under `defaults`, as in `useBaloiseDesignSystem({ defaults: { language: 'fr' } })`.
 
 | legacy config key  | new home                                               | handling                                                                                                                                                                                             |
 | ------------------ | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -59,10 +59,10 @@ Copy the values from the legacy call onto `ds-root`.
 | `allowedLanguages` | `allowed-languages` attribute                          | The legacy value is an array. The attribute is one comma separated string: `['fr', 'nl']` becomes `allowed-languages="fr,nl"`. In React use `DsRootProvider`, which takes the array unchanged.       |
 | `animated`         | `animated` attribute                                   | Copy as-is. `bal-app` also had this prop; keep whichever value was set.                                                                                                                              |
 | `icons`            | `initializeDesignSystem({ icons })`, or the React prop | Do not copy it onto `ds-root`. The Registration rules in `shared/icons.md` handle it: they drop the standard set, which `@helvetia-design/core` already registers, and carry over only custom icons. |
-| `logger`           | _(no equivalent)_                                      | Drop it. `ds-root` has a `logger` prop but it is `@internal` and takes component names, not a logger function. Mention each dropped `logger` in the summary.                                         |
-| `httpFormSubmit`   | _(no equivalent)_                                      | Drop it. The option no longer exists. Mention each one in the summary.                                                                                                                               |
+| `logger`           | _(no equivalent)_                                      | Do not carry it over. `ds-root` has a `logger` prop but it is `@internal` and takes component names, not a logger function. Mention each `logger` in the summary.                                    |
+| `httpFormSubmit`   | _(no equivalent)_                                      | Do not carry it over. The option no longer exists. Mention each one in the summary.                                                                                                                  |
 
-Leave the legacy `initializeBaloiseDesignSystem` or `useBaloiseDesignSystem` call exactly where it is in HTML and Angular projects. The `bal-*` components still in the app depend on it. The one exception is React, where `DsRootProvider` replaces `useBaloiseDesignSystem` for the new components; see Tags and imports.
+Leave the legacy `initializeBaloiseDesignSystem`, `useBaloiseDesignSystem` or `provideBaloiseDesignSystem` call unchanged, in every framework. The `bal-*` components still in the app read `language`, `region`, `allowedLanguages` and `fallbackLanguage` only from the global config that this call fills. `ds-root` configures only the `ds-*` components. Without the call, every remaining `bal-*` component falls back to German Swiss without any error. `shared/legacy-config.md` deletes the call once no `bal-*` component is left.
 
 When the scan found no legacy config call, write no config attributes and say in the summary that `ds-root` will use brand `helvetia`, region `CH`, and language `de`, so the consumer can confirm that is right.
 
@@ -79,16 +79,18 @@ When the scan found no legacy config call, write no config attributes and say in
 
 - **HTML**: `<bal-app>` becomes `<ds-root>`, including the closing tag. Keep the `class` attribute; `has-sticky-footer` still works.
 - **Angular**: `<bal-app>` becomes `<ds-root>` in `.html` templates and in inline `template:` strings, including the closing tag. Add `DsRoot` from `@helvetia-design/angular` to the module or standalone component `imports`. Leave `BalLayoutBundle` and `BalComponentBundle` where they are: `BalApp` is only one entry in them and the other components are still in use. Mention in the summary that the bundle still registers `BalApp`.
-- **React**: `<BalApp>` becomes `<DsRootProvider>` and `</BalApp>` becomes `</DsRootProvider>`, imported from `@helvetia-design/react`. Move the legacy config values onto it as props, keeping `allowedLanguages` as an array. Then delete the `useBaloiseDesignSystem()` call that element was paired with, because `DsRootProvider` calls the new initializer itself. When that call sets `icons`, keep the call with only its `icons` entry instead, and let the Registration rules in `shared/icons.md` decide whether it goes. When the existing `@baloise/ds-react` import also binds other symbols, move only `BalApp` and `useBaloiseDesignSystem` and leave the other symbols on the `@baloise` import.
+- **React**: `<BalApp>` becomes `<DsRootProvider>` and `</BalApp>` becomes `</DsRootProvider>`, imported from `@helvetia-design/react`. Copy the config values from `defaults` in the `useBaloiseDesignSystem()` call onto it as props, keeping `allowedLanguages` as an array. Keep the `useBaloiseDesignSystem()` call and its import specifier unchanged. Remove only `BalApp` from the `@baloise/ds-react` import, and leave the other symbols on it.
 
 ```tsx
 // before
 import { useBaloiseDesignSystem, BalApp } from '@baloise/ds-react'
-useBaloiseDesignSystem({ language: 'fr', region: 'BE', allowedLanguages: ['fr', 'nl'] })
+useBaloiseDesignSystem({ defaults: { language: 'fr', region: 'BE', allowedLanguages: ['fr', 'nl'] } })
 return <BalApp>{children}</BalApp>
 
 // after
+import { useBaloiseDesignSystem } from '@baloise/ds-react'
 import { DsRootProvider } from '@helvetia-design/react'
+useBaloiseDesignSystem({ defaults: { language: 'fr', region: 'BE', allowedLanguages: ['fr', 'nl'] } })
 return (
   <DsRootProvider language="fr" region="BE" allowedLanguages={['fr', 'nl']}>
     {children}
@@ -129,6 +131,6 @@ For every finding in a `.html` file, also open the file with the same name and a
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every config value carried from the legacy call onto `ds-root`, or, when no legacy call was found, that `ds-root` now uses brand `helvetia`, region `CH`, and language `de`; every `allowedLanguages` array turned into a comma separated attribute; what the Registration rules in `shared/icons.md` did with the legacy `icons` value; every dropped `logger` and `httpFormSubmit`; the `useBaloiseDesignSystem` call removed in React; that `BalLayoutBundle` still registers `BalApp` in Angular; each of the Other renames applied; and that `.css` and `.scss` files were not scanned and may still use `.bal-app` or `--bal-app-height`. Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Print a per-file summary of what changed, including every config value carried from the legacy call onto `ds-root`, or, when no legacy call was found, that `ds-root` now uses brand `helvetia`, region `CH`, and language `de`; every `allowedLanguages` array turned into a comma separated attribute; what the Registration rules in `shared/icons.md` did with the legacy `icons` value; every `logger` and `httpFormSubmit` that was not carried over; that `BalLayoutBundle` still registers `BalApp` in Angular; each of the Other renames applied; and that `.css` and `.scss` files were not scanned and may still use `.bal-app` or `--bal-app-height`. Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
 
 Done when the summary is printed and the working tree is still unstaged.
