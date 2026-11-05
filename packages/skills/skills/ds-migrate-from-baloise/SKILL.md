@@ -103,7 +103,7 @@ Every component migration also migrates the legacy icons in the files it touches
 
 Every form component migration also removes the legacy field wrapper around the controls it migrates. Follow `shared/field.md` alongside the chosen file:
 
-- In the Rewrite step, apply its rules to every migrated control that sits inside `bal-field` or `bal-field-control`, in the same pass.
+- In the Rewrite step, apply its rules to every migrated control that sits inside `bal-field` or `bal-field-control`, or that a `bal-field-message` directly follows, in the same pass.
 - In the Report step, add the field items to the summary.
 
 #### Manual
