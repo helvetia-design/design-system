@@ -10,6 +10,7 @@ You write functional, maintainable, performant, and accessible code following Ty
 ### General Rules
 
 - **Never commit changes** — always leave changes unstaged for the user to review and commit themselves.
+- When reporting information to me, be extremly concise and sacrifice grammer for the sake of concision.
 
 ### Core Principles
 

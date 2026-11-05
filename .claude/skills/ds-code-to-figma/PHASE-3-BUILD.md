@@ -28,8 +28,8 @@ explicit user confirmation on.
 2. **Find or create the component's shared category page and its documentation frame**, per
    [Category pages](#category-pages) and [Documentation frame header](#documentation-frame-header)
    below — never create a page named after the component itself.
-3. Build **one full variant combination first** — pick the default/base combination (every
-   variant property at its default value, state at `default`). **Create it directly inside this
+3. Build **the default variant first** (every variant property at its code default,
+   `state=default`). **Create it directly inside this
    component's own documentation frame on the category page:** the parent is
    `<Component> Documentation` › `body` › `Component Sets` › `Sets` (from step 2). Never build it
    on a scratch page, at the page root, or off-canvas and move it in later. Wire up:
@@ -40,7 +40,10 @@ explicit user confirmation on.
      re-resolve a token by searching Figma's variable collections by name at build time; that
      search was already done once, locally, in Phase 1.
    - Every nested component as an **instance of the existing Figma component** resolved in
-     Phase 1, step 4 — never redrawn from scratch.
+     Phase 1, step 4 — never redrawn from scratch. **Icon slots** (nested `ds-icon` /
+     `ds-brand-icon`) get an `INSTANCE_SWAP` property with preferred values and an unexposed nested
+     instance, per `conventions/content-selection-and-mitigations.md` → "Icon slots in a parent
+     component".
    - **No Figma default layer names** (`Frame 1`, `Line`, `Ellipse`, `Vector`, `Group 1`). Name
      built layers after their part (`icon`, `label`, `track`); cloned layers keep their template
      name.
@@ -108,15 +111,15 @@ Responsive Tokens` first — **reuse it if it already exists** rather than creat
 4. **Stop and have the user confirm this one variant directly in Figma** — give them the node link
    (`https://www.figma.com/design/<fileKey>?node-id=<id>`) and wait. Don't send a screenshot as
    the checkpoint. This catches a structural mistake (wrong variable bound, wrong nested
-   instance) once, before it's replicated across the full variant matrix.
-5. On confirmation, fan out: build the remaining variant/state combinations, reusing the same
+   instance) once, before it's replicated across the whole component set.
+5. On confirmation, fan out: build the remaining variants, reusing the same
    bindings and nested instances, and present them as a labeled set per
    [Labeled component set](#labeled-component-set) below — inside the same `Sets` frame.
 6. **Stop and have the user approve the documentation frame directly in Figma** — the filled
    `Header` and the finished component set(s) — give them the link to the frame and wait. Any change loops back to step 5. Don't continue to Phase 4 on an
    assumed approval.
-7. Write the resulting Figma component key/node-id, the category page name and the documentation
-   frame's node id (`figmaDocFrameNodeId`) back into `<name>.figma.md`.
+7. Write `figmaComponentKey`, `figmaMasterNodeId`, `figmaPage` and `figmaDocFrameNodeId` back into
+   the mapping file.
 
 ### Category pages
 
@@ -141,7 +144,7 @@ what's listed below.
      never from a sibling component, so styling can't drift).
 3. In the cloned page/frame, keep `Component A Documentation` as this component's frame: rename it
    `<Component> Documentation`, delete `Component B Documentation` if it came along, and leave
-   `body`'s placeholder content for Phases 4–6.
+   `body`'s placeholder content for Phases 6–8.
 4. Fill the header, per [Documentation frame header](#documentation-frame-header).
 
 **Layer-name contract.** This skill addresses the template by these layer names only. If any is
@@ -162,19 +165,18 @@ The template's `Sets` frame is a worked example: one stack per split, each a `La
 the real set by cloning from it — **this skill writes no fill, stroke, font, dash or spacing
 values**; clone a prototype and change only text and positions.
 
-1. **Stacks — one per top-level split from Phase 2.** Name each stack's `sub-label` and set:
+1. **Stacks — one per top-level split option from Phase 2** (`PHASE-2-PROPOSE.md` → "Top-level
+   splits"). Name each stack's `sub-label` and set:
 
-   | Split                         | Stacks                                      | `sub-label`                     | Set name                                  |
-   | ----------------------------- | ------------------------------------------- | ------------------------------- | ----------------------------------------- |
-   | None                          | one                                         | removed                         | `<Component>`                             |
-   | `inverted` only               | `Primary`, `Inverted`                       | `Primary` / `Inverted`          | `<Component>/<Primary\|Inverted>`         |
-   | Structural only               | one per split                               | `<Split>`                       | `<Component>/<Split>`                     |
-   | Structural **and** `inverted` | one per combination, structural split outer | `<Split> / <Primary\|Inverted>` | `<Component>/<Split>/<Primary\|Inverted>` |
+   | Top-level split             | Stacks                                    | `sub-label`                                            | Set name (e.g.)                                                                |
+   | --------------------------- | ----------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------ |
+   | None                        | one                                       | removed                                                | `Button`                                                                       |
+   | Rule 1 or 3 only            | one per option of the split axis          | `default` / `<split>`                                  | `Pagination`, `PaginationDots`                                                 |
+   | Rule 2 (inverted axis) only | default, inverted                         | `default` / `inverted`                                 | `Button`, `ButtonInverted`                                                     |
+   | Rule 1 or 3 **and** rule 2  | one per combination, rule 1/3 split outer | `default`, `inverted`, `<split>`, `<split> / inverted` | `Pagination`, `PaginationInverted`, `PaginationDots`, `PaginationDotsInverted` |
 
-   The `sub-label` never repeats the component name — the frame title already shows it. The set
-   name always carries the full path, because that's what the assets panel and the instance-swap
-   list show. Call the non-inverted state `Primary`, as the component tokens do (e.g.
-   `--ds-spinner-circle-primary-background` next to `--ds-spinner-circle-inverted-background`).
+   Set names follow `PHASE-2-PROPOSE.md` → "Naming": PascalCase, flat, the default set bare. The
+   `sub-label` never repeats the component name — the frame title already shows it.
 
    Source every inverted stack from the template's `Inverted` stack and every other stack from its
    `Primary` stack. Delete template stacks that aren't needed.
@@ -217,7 +219,9 @@ for the content axis, below `Component Sets` in the documentation frame. Its lay
 in the template yet: on the first asset component, **stop and ask the user** how it should look
 before building it, then record the answer here.
 
-**Hard rules (check before asking for approval):** options ordered per convention · fixed uniform cell grid · dashed outer stroke
+**Hard rules (check before asking for approval):** options ordered per convention · every
+property name, option value and `sub-label` lowercase, every set name PascalCase per
+`PHASE-2-PROPOSE.md` → "Naming" · fixed uniform cell grid · dashed outer stroke
 **and** inner dashed grid lines · outside labels naming every axis and option · variant layers in
 grid reading order · no Figma default layer names · no styling literal written by this skill.
 
@@ -252,16 +256,16 @@ re-set all three hyperlinks, unconditionally, even if they look correct. A human
 
 ## Output
 
-- A full Figma variant matrix built as a real `COMPONENT_SET`, inside the component's own
-  documentation frame (`body` › `Component Sets` › `Sets`)
+- The full component set(s), inside the component's own documentation frame
+  (`body` › `Component Sets` › `Sets`)
 - The component's shared category page (`Core / <Category>`) with its documentation frame
   (`<Component> Documentation`) cloned from the template and its `Header` filled
 - The resulting Figma component
 
 ## Completion Criteria
 
-- The first full variant combination was confirmed by the user in Figma before the
-  rest of the matrix was fanned out.
+- The default variant was confirmed by the user in Figma before the rest of the component set
+  was fanned out.
 - The finished labeled component set(s) satisfy the hard rules above and were approved by the user
   in Figma before Phase 4.
 - Every styled value is bound to a real Figma variable id — never a literal — except the
@@ -271,11 +275,10 @@ re-set all three hyperlinks, unconditionally, even if they look correct. A human
 - The category page and the component's documentation frame exist, cloned from
   `🗂️ Template / Category` (no styling values written by this skill), with the header filled,
   `review-status` at `status=review` and all three links hyperlinked.
-- The component key/node-id/category page name are written back into `<name>.figma.md`.
+- `figmaComponentKey`, `figmaMasterNodeId`, `figmaPage` and `figmaDocFrameNodeId` are written back
+  into the mapping file.
 
 ## Next Phase
 
-Proceed to [`PHASE-4-DOCUMENT-COPY-ME.md`](PHASE-4-DOCUMENT-COPY-ME.md) once the full variant
-matrix is built, the category page exists, and the component key is written back. Build the
-documentation page (Phases 4–6) before Phase 7's review, so that review covers the documentation
-page too, not just the raw component set.
+Proceed to [`PHASE-4-VALIDATE.md`](PHASE-4-VALIDATE.md) once the full component set is built, the
+category page exists, and the mapping-file fields are written back.

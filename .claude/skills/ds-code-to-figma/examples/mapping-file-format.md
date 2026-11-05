@@ -13,9 +13,9 @@ figmaPage: Core / <Category> # the shared category page, e.g. "Core / Indicators
 
 # component's own name; multiple components share one page (see CONVENTIONS.md's category table)
 
-figmaMasterNodeId: null # this component's master COMPONENT_SET node id (referenced from inside
+figmaMasterNodeId: null # this component's component set node id (referenced from inside
 
-# its own documentation frame's "🔒 Component Set" panel — there's no separate masters row)
+# its own documentation frame's `Component Sets` column — there's no separate masters row)
 
 figmaDocFrameNodeId: null # this component's "<Component> Documentation" frame id within the
 
@@ -56,6 +56,11 @@ props:
 - childTag: ds-icon
   childMappingFile: ../icon/icon.figma.md
   figmaComponentKey: <resolved from icon.figma.md>
+  iconSlot: # only for nested ds-icon / ds-brand-icon — always instance swap
+  codeProp: icon # → INSTANCE_SWAP property `icon`
+  acceptsBrandIcon: true # brandIcon replaces icon in part="icon" → brand-icon library in preferredValues
+  size: follows parent size # icon right: fixed sm
+  color: follows inverted
   device: # omit entirely if Phase 1 step 5a found no breakpoint-driven token differences.
   # One entry per responsive binding — the single place that owns the mechanism detail (which
   # routing variable, its per-mode aliases, why this component needed it). tokens:/specs: entries
@@ -89,9 +94,9 @@ props:
   figmaVariable: 🧩 Component/Logo/Size/Base/Device # see device: above — responsive, not a
   # single static token
   figmaVariableId: null # the routing/Device variable is hand-created by Phase 3, not resolved by
-  # css-token-lookup.mjs — see device: above and PHASE-3-BUILD.md step 4
+  # css-token-lookup.mjs — see device: above and PHASE-3-BUILD.md step 3
   resolved: true
-  specs: # one entry per option of the Variants axis, shown in Phase 6's "📐 Specs" section
+  specs: # one entry per option of the Variants axis, shown in Phase 8's "📐 Specs" section
   base:
   - kind: size # size | icon | spacing | radius (| type, once added)
     label: Size # Size (width = height, same variable) | Width | Height | Min width | Min height | Padding | Gap | Radius | …

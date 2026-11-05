@@ -14,7 +14,8 @@ Read the component's code and produce the draft mapping that Phase 2 proposes a 
 
 ## References
 
-- `SKILL.md` — mapping file schema, Prerequisites section
+- [`examples/mapping-file-format.md`](examples/mapping-file-format.md) — mapping-file schema
+- `SKILL.md` — Prerequisites section
 - `scripts/figma-sync/lib/css-token-lookup.mjs` — local CSS-var → Figma variable id resolver
 - `docs/adr/0017-direct-commit-variableid-backfill.md` — why variable ids already live in
   `Base.tokens.json`
@@ -43,7 +44,7 @@ Read the component's code and produce the draft mapping that Phase 2 proposes a 
 3. Read the component's `<name>.host.scss` and scan for **pseudo-class states** —
    `:hover`, `:focus`, `:active`, `:disabled`, and any loading-related
    class/attribute selector. These don't show up as props but still need a Figma
-   representation (see Phase 2, rule 3).
+   representation (see `PHASE-2-PROPOSE.md` → mapping table, `state` row).
    - Also scan **every text-bearing part for every attribute a Figma text node needs**: font
      family, font size, font weight, line-height, letter-spacing, color, text-decoration. A
      component's own SCSS commonly sets only some of these explicitly (e.g. a `::part(label)`
@@ -64,7 +65,10 @@ Read the component's code and produce the draft mapping that Phase 2 proposes a 
      attribute unbound/assumed because the component's SCSS doesn't mention it.
 4. Identify any **nested DS component** usage (e.g. `<ds-icon>` inside `ds-button`'s render). For
    each one, read its `<child>.figma.md` and pull the recorded Figma component key. If missing,
-   stop per `SKILL.md`'s Prerequisites section above.
+   stop per `SKILL.md`'s Prerequisites section above. Mark every nested `ds-icon` /
+   `ds-brand-icon` as an **icon slot** (see `conventions/content-selection-and-mitigations.md` →
+   "Icon slots in a parent component"): record the code prop driving it, whether `ds-brand-icon`
+   can fill the same slot, and how code sets its `size` and color.
 5. For every value the component's SCSS binds to a CSS custom property (`var(--ds-...)`),
    resolve it to the matching Figma variable **id** — resolve this entirely locally, no Figma
    call needed for the common case.
@@ -86,7 +90,7 @@ Read the component's code and produce the draft mapping that Phase 2 proposes a 
      `null` (no token exists under that name — see the hard-stop rule below) or
      `{ path, cssVar, variableId, figmaScopes, type, description }`, where `variableId` is the
      real `VariableID:...` string to bind against in Phase 3 — write it straight into
-     `<name>.figma.md`'s `tokens:` list (see `SKILL.md`'s mapping-file schema), no further lookup
+     `<name>.figma.md`'s `tokens:` list (see [`examples/mapping-file-format.md`](examples/mapping-file-format.md)), no further lookup
      needed. A breakpoint-suffixed var (`--ds-logo-size-base-mobile`/`-tablet`/`-desktop`)
      resolves to that one breakpoint's own id directly; the bare, un-suffixed var resolves to the
      full `{ mobile, tablet, desktop[, device] }` object — see `PHASE-3-BUILD.md` step 3's
@@ -140,8 +144,8 @@ Tokens` collection has exactly those three. Any other mixin (`desktop-lg`, `desk
        through to the next-lower breakpoint's real value (here, Tablet uses the same token as
        Mobile) — record it as such, matching actual rendered behavior; don't invent a distinct
        Tablet-specific token that doesn't exist in code.
-     - Record every responsive binding found in the draft's `device:` section — see `SKILL.md`'s
-       mapping file schema. A component with no breakpoint-driven token differences has no
+     - Record every responsive binding found in the draft's `device:` section — see
+       [`examples/mapping-file-format.md`](examples/mapping-file-format.md). A component with no breakpoint-driven token differences has no
        `device:` section at all, same as `anatomy:`/`states:` being omitted when not applicable.
        Resolve each mode's real variable id by running the breakpoint-suffixed CSS var (e.g.
        `--ds-logo-size-base-mobile`) through `css-token-lookup.mjs` from step 5 above — same one
@@ -160,16 +164,17 @@ Tokens` collection has exactly those three. Any other mixin (`desktop-lg`, `desk
      using the same hard-stop flow as step 5, rather than discovering missing tokens one at a time
      mid-build.
 6. Write all of the above into `<name>.figma.md` (create it if it doesn't exist) as a draft, per
-   the schema in `SKILL.md`'s "Mapping file format" section. Include the `specs:` list —
+   [`examples/mapping-file-format.md`](examples/mapping-file-format.md). Include the `specs:` list —
    the values (fixed or min width/height, padding/gaps, fixed sizes of nested elements, radius,
-   border width, typography) per option of the Variants axis that Phase 6's "📐 Specs" section
+   border width, typography) per option of the Variants axis that Phase 8's "📐 Specs" section
    will show, each pointing at its Figma variable. It's a view onto the completeness checklist
    from step 5b, not new analysis. Leave out calculated inner content sizes and the radius of a
-   circle (see `PHASE-6-DOCUMENT-SPECS.md`).
+   circle (see `PHASE-8-DOCUMENT-SPECS.md`).
 
 ## Output
 
-A draft `<name>.figma.md`, written per `SKILL.md`'s mapping file schema, containing:
+A draft mapping file `<name>.figma.md`, written per
+[`examples/mapping-file-format.md`](examples/mapping-file-format.md), containing:
 
 - Extracted public props (type, default)
 - Lettered anatomy (`@part` tags cross-checked against `render()`)

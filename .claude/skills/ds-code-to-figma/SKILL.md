@@ -12,7 +12,7 @@ Generate Figma components that accurately represent the existing Web Components 
 ## Workflow
 
 Each phase lives in its own file — read the current phase's file when you reach it, don't load
-all seven up front. Each file opens with a "you are here" line naming what the prior phase must
+all eight up front. Each file opens with a "you are here" line naming what the prior phase must
 have produced, and closes with an explicit `Next:` pointer to the following file.
 
 1. [`PHASE-1-ANALYZE.md`](PHASE-1-ANALYZE.md) — read the component's code (props, anatomy,
@@ -23,17 +23,19 @@ have produced, and closes with an explicit `Next:` pointer to the following file
    budget check) and get the user's explicit sign-off before anything is built.
 3. [`PHASE-3-BUILD.md`](PHASE-3-BUILD.md) — clone the component's category page (or just its documentation
    frame) from the `🗂️ Template / Category` Figma page and fill its header, then build the real
-   Figma `COMPONENT_SET` inside that frame incrementally (one confirmed variant combination first,
+   Figma `COMPONENT_SET` inside that frame incrementally (the confirmed default variant first,
    then the rest as a labeled, fixed-grid set the user approves).
-4. [`PHASE-4-DOCUMENT-COPY-ME.md`](PHASE-4-DOCUMENT-COPY-ME.md) — build "👉 Copy me", the first
+4. [`PHASE-4-VALIDATE.md`](PHASE-4-VALIDATE.md) — read-only check of the built header, prop/state
+   mapping, token bindings and set layout against the plan and template; writes
+   `<name>.figma-validation.md` with a `pass` / `fail` / `blocked` verdict.
+5. [`PHASE-5-REPAIR.md`](PHASE-5-REPAIR.md) — fix every `fail` check in place, then re-run Phase 4
+   (max 3 iterations, then hard stop).
+6. [`PHASE-6-DOCUMENT-COPY-ME.md`](PHASE-6-DOCUMENT-COPY-ME.md) — build "👉 Copy me", the first
    section of the left column.
-5. [`PHASE-5-DOCUMENT-ANATOMY.md`](PHASE-5-DOCUMENT-ANATOMY.md) — build "🏗️ Anatomy", the second
+7. [`PHASE-7-DOCUMENT-ANATOMY.md`](PHASE-7-DOCUMENT-ANATOMY.md) — build "🏗️ Anatomy", the second
    section of the left column (the placeholder is deleted when the component has no `@part` tags).
-6. [`PHASE-6-DOCUMENT-SPECS.md`](PHASE-6-DOCUMENT-SPECS.md) — build "📐 Specs", the last section of
-   the left column.
-7. [`PHASE-7-REVIEW.md`](PHASE-7-REVIEW.md) — compare the Figma-bound token values against the live
-   component's computed CSS on the dev server and report findings; this is the last phase in this
-   skill's v1 scope.
+8. [`PHASE-8-DOCUMENT-SPECS.md`](PHASE-8-DOCUMENT-SPECS.md) — build "📐 Specs", the last section of
+   the left column; this is the last phase.
 
 ### Graph
 
@@ -73,8 +75,9 @@ flowchart TD
     subgraph P3G["Phase 3 — Build"]
         direction LR
         P3a["Clone category page / frame<br/>from template + fill header"]:::figma -->|template layer, category copy<br/>or story ID missing| P3h(["Hard stop: ask user"]):::human
-        P3a --> P3b["Build ONE variant<br/>combination"]:::figma
-        P3b --> P3c{{"User confirms first variant<br/>in Figma"}}:::human
+        P3a --> P3b["Build the<br/>default variant"]:::figma
+        P3b -->|icon-slot binding<br/>refused| P3h
+        P3b --> P3c{{"User confirms default variant<br/>in Figma"}}:::human
         P3c -->|approved| P3d["Fan out + build labeled<br/>component set(s)"]:::figma
         P3d --> P3f{{"User approves header +<br/>component set in Figma"}}:::human
         P3f -->|approved| P3e["Write the component key<br/>back to name.figma.md"]:::code
@@ -82,37 +85,47 @@ flowchart TD
 
     P3G --> P4G
 
-    subgraph P4G["Phase 4 — Copy me"]
+    subgraph P4G["Phase 4 — Validate"]
         direction LR
-        P4a["Instance Section (Default),<br/>insert one representative<br/>instance into the slot"]:::figma --> P4b{{"User confirms<br/>Copy me"}}:::human
+        P4a["Read nodes (read-only):<br/>header, mapping,<br/>tokens, layout"]:::figma --> P4b["Write<br/>name.figma-validation.md"]:::code
+        P4b --> P4v{"Verdict?"}
     end
 
-    P4G --> P5G
+    P4v -->|fail| P5G
+    P4v -->|blocked| P4h(["Hard stop: ask user about<br/>not-verified checks"]):::human
+    P4v -->|pass| P6G
 
-    subgraph P5G["Phase 5 — Anatomy"]
+    subgraph P5G["Phase 5 — Repair"]
         direction LR
-        P5a{{"Component has<br/>@part tags?"}}:::human -->|no| P5s(["Delete Anatomy<br/>placeholder"]):::figma
-        P5a -->|yes| P5b["Build diagram +<br/>legend items"]:::figma
-        P5b --> P5c{{"User confirms<br/>Anatomy"}}:::human
+        P5a["Fix fail checks<br/>in place"]:::figma --> P5b["Append repair log"]:::code
+        P5b --> P5r{"3 iterations or<br/>same error again?"}
     end
 
-    P5G --> P6G
+    P5r -->|no: re-validate| P4G
+    P5r -->|yes| P5h(["Hard stop: report<br/>unresolved failures"]):::human
 
-    subgraph P6G["Phase 6 — Specs"]
+    subgraph P6G["Phase 6 — Copy me"]
         direction LR
-        P6a["Build one spec card<br/>per Variants-axis option"]:::figma --> P6b{{"User confirms<br/>Specs"}}:::human
+        P6a["Instance Section (Default),<br/>insert one default-variant<br/>instance into the slot"]:::figma --> P6b{{"User confirms<br/>Copy me"}}:::human
     end
 
     P6G --> P7G
 
-    subgraph P7G["Phase 7 — Review"]
+    subgraph P7G["Phase 7 — Anatomy"]
         direction LR
-        P7a["Start dev server,<br/>read Figma get_variable_defs"]:::figma --> P7b["Diff live getComputedStyle<br/>against resolved token values"]:::code
-        P7b --> P7c{{"User judges<br/>the findings"}}:::human
-        P7c -->|real bug found| P7d["Fix code / code docs"]:::code
+        P7a{{"Component has<br/>@part tags?"}}:::human -->|no| P7s(["Delete Anatomy<br/>placeholder"]):::figma
+        P7a -->|yes| P7b["Build diagram +<br/>legend items"]:::figma
+        P7b --> P7c{{"User confirms<br/>Anatomy"}}:::human
     end
 
-    P7G --> Done(["Done: component live in Figma"]):::phase
+    P7G --> P8G
+
+    subgraph P8G["Phase 8 — Specs"]
+        direction LR
+        P8a["Build one spec card<br/>per Variants-axis option"]:::figma --> P8b{{"User confirms<br/>Specs"}}:::human
+    end
+
+    P8G --> Done(["Done: component live in Figma"]):::phase
 ```
 
 🔵 **code** — reads or writes a file in this repo (`.tsx`/`.scss`, `name.figma.md`, `CONVENTIONS.md`, test snapshots).
@@ -121,16 +134,16 @@ flowchart TD
 
 The human checkpoints (Phase 1's anatomy review, Phase 2's mapping confirmation, Phase 3's
 first-variant and documentation-frame approvals in Figma, and the Copy me / Anatomy / Specs
-confirmations in Phases 4–6) are the only _required_ stops — everything else is read/write work it
-does on its own between them. For the full list of every checkpoint and hard-stop condition across
-all seven phases in one place, see [`DECISIONS.md`](DECISIONS.md).
+confirmations in Phases 6–8) are the only _required_ stops. Phases 4–5 run on their own and stop
+only on a `blocked` verdict or a repair hard stop. For the full list of every checkpoint and
+hard-stop condition across all eight phases in one place, see [`DECISIONS.md`](DECISIONS.md).
 
 ## Rules
 
 - NEVER generate Code Connect mappings
 - NEVER invent a hardcoded value — always resolve to a Figma variable (design token)
 - NEVER commit — leave changes unstaged for the user to review
-- MUST treat a hard stop (missing token, missing nested child mapping) as a checkpoint, not a failure to work around — surface it and wait for the user's decision
+- MUST treat a hard stop (missing token, missing nested child mapping) as a stop-and-wait point, not a failure to work around — surface it and wait for the user's decision
 
 ## Instructions
 
@@ -156,12 +169,10 @@ Read only the documentation needed for the task:
 - [`CONVENTIONS.md`](CONVENTIONS.md) — cross-phase rules (category copy, no-lock, no assumed attributes), indexed by topic into
   [`conventions/`](conventions/) (tokens & props, content-selection & mitigations, page structure, Component Set
   rendering, general build mechanics).
-- [`DECISIONS.md`](DECISIONS.md) — every checkpoint and hard-stop condition across all seven
+- [`DECISIONS.md`](DECISIONS.md) — every checkpoint and hard-stop condition across all eight
   phases, in one place.
-- `PHASE-1-ANALYZE.md` / `PHASE-2-PROPOSE.md` / `PHASE-3-BUILD.md` /
-  `PHASE-4-DOCUMENT-COPY-ME.md` / `PHASE-5-DOCUMENT-ANATOMY.md` / `PHASE-6-DOCUMENT-SPECS.md` /
-  `PHASE-7-REVIEW.md` — the full workflow, one file per
-  phase (see "## Workflow" above).
+- `PHASE-1-ANALYZE.md` … `PHASE-8-DOCUMENT-SPECS.md` — the full workflow, one file per phase (see
+  "## Workflow" above).
 - [`packages/tokens/CONTEXT.md`](../../../packages/tokens/CONTEXT.md) — token layers and naming.
 - [`packages/core/CONTEXT.md`](../../../packages/core/CONTEXT.md) — component categories and
   structure.
@@ -171,6 +182,7 @@ Read only the documentation needed for the task:
 
 - All applicable styles must use design tokens.
 - Nested components must use existing instances.
+- Icon slots (`ds-icon` / `ds-brand-icon`) use one `INSTANCE_SWAP` property each.
 - Report unresolved mappings.
 - All Figma component keys must be written back to `<name>.figma.md` for future reference.
 
@@ -181,5 +193,5 @@ Provide:
 - `<name>.figma.md` lives at `packages/core/src/components/<category>/<name>/<name>.figma.md`.
 - `PHASE-2-PROPOSE.md`'s mapping table, `CONVENTIONS.md` and `conventions/*.md` are updated only when the user approves a new rule addition.
 - Created Figma component — documentation frames and component set
-- Validation results
+- Validation results — `<name>.figma-validation.md` (Phase 4, with the Phase 5 repair log)
 - Unresolved issues

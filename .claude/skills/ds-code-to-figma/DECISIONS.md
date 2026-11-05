@@ -1,6 +1,6 @@
 # Decision path — every stop-and-wait point in this skill
 
-A single index of every place this skill must pause for a human decision, across all seven phases.
+A single index of every place this skill must pause for a human decision, across all eight phases.
 Check this file when you're unsure whether you're at a checkpoint — it exists so that doesn't
 require re-reading full phase prose to confirm.
 
@@ -60,31 +60,38 @@ Two kinds of pause, treated differently:
   title/lead text.
 - 🛑 **Storybook story ID unresolvable**: no `doc-config.ts` for the component — stop and ask
   rather than shipping a dead link.
-- 🟡 **First-variant checkpoint** (step 4): give the user a Figma link to the single
-  default/base combination and wait for their confirmation in Figma before fanning out the rest of the matrix — catches a structural
+- 🟡 **First-variant checkpoint** (step 4): give the user a Figma link to the default
+  variant and wait for their confirmation in Figma before fanning out the rest of the component set — catches a structural
   mistake once, before it's replicated across every variant.
+- 🛑 **Icon-slot binding refused**: the Plugin API won't bind the parent `INSTANCE_SWAP` to the
+  glyph inside the icon wrapper — ask before falling back to nesting the glyph library directly
+  (`conventions/content-selection-and-mitigations.md` → "Icon slots in a parent component").
 
-## Phase 4 — Document: Copy me
+## Phase 4 — Validate
 
-- 🟡 **Iteration before moving on**: confirm "Copy me" with the user before starting Phase 5.
+- 🛑 **`blocked` verdict**: no check failed but at least one is `not verified` — list those checks
+  and why, and ask the user how to proceed. Never treat it as `pass`.
 
-## Phase 5 — Document: Anatomy
+## Phase 5 — Repair
+
+- 🛑 **Retry limit reached**: 3 repair iterations, or the same check on the same node fails again —
+  stop and report the unresolved failures.
+- 🛑 **Fix would change the confirmed mapping file**: a fix requires editing `<name>.figma.md` — stop and
+  request approval; never edit the mapping file to make validation pass.
+
+## Phase 6 — Document: Copy me
+
+- 🟡 **Iteration before moving on**: confirm "Copy me" with the user before starting Phase 7.
+
+## Phase 7 — Document: Anatomy
 
 - No checkpoints beyond the standing iteration discipline. **No-parts condition**: the component's
   `<name>.figma.md` has no `anatomy:` list (no `@part` tags) — delete the cloned frame's Anatomy
-  `Section` placeholder (no Anatomy frame) and go straight to Phase 6.
+  `Section` placeholder (no Anatomy frame) and go straight to Phase 8.
 
-## Phase 6 — Document: Specs
+## Phase 8 — Document: Specs
 
-- 🟡 **Iteration before moving on**: confirm Specs with the user before the review (Phase 7).
-
-## Phase 7 — Review
-
-- No checkpoints or hard stops — this phase only reports. Findings (token mismatches, uncovered
-  gaps, a wrong code-doc comment) are advisory; the user decides what, if anything, gets fixed.
-  See `PHASE-7-REVIEW.md` §3 for the one exception where this skill fixes something on its own
-  authority: a confirmed-wrong _code doc comment_ gets corrected in the same pass, since code is
-  this system's own source of truth for documentation copy.
+- 🟡 **Iteration before moving on**: confirm Specs with the user before finishing the skill.
 
 ## Cross-cutting
 

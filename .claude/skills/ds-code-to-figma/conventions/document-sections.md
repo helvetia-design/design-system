@@ -1,4 +1,4 @@
-# Conventions — documentation sections: `Section` / `Preview` / `Title` (Phases 4–7)
+# Conventions — documentation sections: `Section` / `Preview` / `Title` (Phases 6–8)
 
 How to fill the documentation frame's left-column sections (Copy me, Anatomy, Specs). The frame
 itself, its header and the 2-column body come from the `🗂️ Template / Category` clone in
@@ -48,11 +48,11 @@ A nested `Preview` you create (rather than clone) starts at the master's fixed w
 
 ## Nesting per section
 
-- **Copy me**: `Section` `Default`; the single representative instance goes directly into the
+- **Copy me**: `Section` `Default`; the single default-variant instance goes directly into the
   `Preview` slot.
 - **Anatomy**: `Section` `Flat`; one nested `Default` `Preview` inside the outer slot holds the
   diagram and legend.
 - **Specs**: `Section` `Flat`; one nested `Default` `Preview` per Variants-axis option (e.g.
   `base`/`lg`/`sm`), stacked, each holding that option's preview and legend card.
 - **Component Set**: not a `Section`/`Preview` — see `../PHASE-3-BUILD.md`'s "Labeled component
-  set". The variant grid never sits inside another bordered `Preview`.
+  set". The labeled set never sits inside another bordered `Preview`.

@@ -11,7 +11,7 @@ user _approving_ it — never auto-appended.
 - **Cross-phase rules** (below) — category pages and fixed category copy, "never lock a node",
   "no attribute is ever assumed".
 - [`conventions/tokens-and-props.md`](conventions/tokens-and-props.md) — resolving design tokens
-  (Phase 1), and verifying a claimed value/behavior before trusting it (Phase 1/4).
+  (Phase 1), and verifying a claimed value/behavior before trusting it (Phase 1).
 - [`conventions/content-selection-and-mitigations.md`](conventions/content-selection-and-mitigations.md)
   — the wrapper + Instance Swap pattern for open-ended content props and the 500-variant
   threshold's mitigations (Phase 2, conditional; Phase 3).
@@ -20,10 +20,34 @@ user _approving_ it — never auto-appended.
 - [`conventions/component-set-rendering.md`](conventions/component-set-rendering.md) — Component
   Set axis labeling, sizing/grid mechanics, screenshot reliability for this section (Phase 3).
 - [`conventions/document-sections.md`](conventions/document-sections.md) — `Section` / `Preview` /
-  `Title` mechanics for the Copy me, Anatomy and Specs sections (Phases 4–7).
+  `Title` mechanics for the Copy me, Anatomy and Specs sections (Phases 6–8).
 - [`conventions/build-mechanics.md`](conventions/build-mechanics.md) — general Figma Plugin API
   gotchas that apply across any phase: platform limits, variant-set mechanics, auto-layout
   sizing, vector import, color/paint, focus states.
+
+## Glossary
+
+Use these terms, and only these, in every phase and topic file.
+
+| Term                                          | Meaning                                                                                                                                     | Don't say                                                        |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| **mapping file**                              | `<name>.figma.md` ([schema](examples/mapping-file-format.md)). _Draft_ after Phase 1, _confirmed_ after Phase 2.                            | plan, approved plan, confirmed mapping, mapping-file schema      |
+| **mapping-file fields**                       | `figmaComponentKey`, `figmaMasterNodeId`, `figmaDocFrameNodeId`, `figmaPage` — always by field name.                                        | component key/node-id, component node id, category page name     |
+| **component set**                             | A Figma `COMPONENT_SET`.                                                                                                                    | variant matrix, master `COMPONENT_SET`, variant grid             |
+| **variant**                                   | One `COMPONENT` child of a component set.                                                                                                   | variant combination                                              |
+| **default variant**                           | Every variant property at its code default, `state=default`.                                                                                | default/base combination, first variant, representative instance |
+| **variant property** / **axis**               | A Figma variant property. Say _axis_ only for its place in the grid (rows/columns).                                                         |                                                                  |
+| **labeled set**                               | The template's `Labeled Set`: component set + `Row Labels` + `Column Labels` + `Grid` (`PHASE-3-BUILD.md` → "Labeled component set").       | Component Set display                                            |
+| **stack**                                     | One labeled set plus its `sub-label` inside `Sets` — one per top-level split option.                                                        |                                                                  |
+| **top-level split**                           | One component set per option, only per `PHASE-2-PROPOSE.md` → "Top-level splits" rule 1 (structure), 2 (inverted) or 3 (count).             | structural split, separate top-level components                  |
+| **inverted axis**                             | An `inverted` prop; its sets are `<Component>` / `<Component>Inverted`.                                                                     | dark-context axis, true `inverted` axis, `inverted`-split        |
+| **icon slot**                                 | A nested `ds-icon` / `ds-brand-icon` in a parent; always one `INSTANCE_SWAP` property (`conventions/content-selection-and-mitigations.md`). | exposed icon instance                                            |
+| **wrapper + swap library**                    | The content-selection pattern (`conventions/content-selection-and-mitigations.md`). Not a top-level split.                                  | wrapper + Instance Swap split                                    |
+| **documentation frame**                       | `<Component> Documentation` on the category page.                                                                                           |                                                                  |
+| **`Documentation` / `Component Sets` column** | The two `body` columns of the documentation frame (layer names).                                                                            | left `documentation` column, 🔒 Component Set panel              |
+| **naming**                                    | Properties, option values, `sub-label`s: lowercase with spaces. Set names: flat PascalCase (`PHASE-2-PROPOSE.md` → "Naming").               | `Show icon`, `labelPosition`, `button/primary`                   |
+| **default set**                               | The component set holding every split axis's code default; carries the bare name (`Button`).                                                | primary set                                                      |
+| **checkpoint** (🟡) / **hard stop** (🛑)      | Per [`DECISIONS.md`](DECISIONS.md). Lowercase in prose.                                                                                     | HARD STOP                                                        |
 
 ## Cross-phase rules (seeded, not learned)
 
@@ -49,7 +73,7 @@ user _approving_ it — never auto-appended.
   token, never guessed. See [`conventions/page-structure.md`](conventions/page-structure.md) for
   the one-documentation-frame-per-component invariant (including the `inverted`-axis handling).
 
-- **Never lock any Figma node this skill builds** — no master `COMPONENT_SET`, no display clone,
+- **Never lock any Figma node this skill builds** — no component set, no display clone,
   no documentation-frame content, nothing. The current template has no table geometry for a human
   to accidentally misalign, so locking only gets in the way of inspecting, selecting, or
   rearranging content directly in the Figma UI.

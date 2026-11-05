@@ -14,15 +14,14 @@ Relevant to Phase 3's category-page setup and documentation frame. See
 - **A `COMPONENT_SET` can be freely `clone()`d into a different page without disturbing the
   original** — useful any time a master needs to be referenced or displayed from more than one
   page.
-- **One documentation frame per component, always — a hard invariant, with no exception for a
-  true `inverted`/dark-context axis.** A true `inverted` axis only affects the "🔒 Component Set"
-  section: both the `Primary` and `Inverted` component sets are shown stacked vertically inside
-  the _same_ single frame's Component Set panel, each under its own plain text sub-label, with
-  only the `Inverted` display clone's `fills` swapped to the dark `Alias/Surface/Primary`
-  background. Every other section (Copy me, Anatomy, Specs) is built once, from the `Primary`
+- **One documentation frame per component, always — a hard invariant, with no exception for an
+  inverted axis.** An inverted axis only affects the `Component Sets` column: both the default and the `…Inverted` component sets are shown stacked vertically inside
+  the _same_ single frame's `Component Sets` column, each under its own plain text sub-label, with
+  only the `inverted` display clone's `fills` swapped to the dark `Alias/Surface/Primary`
+  background. Every other section (Copy me, Anatomy, Specs) is built once, from the default
   set's instances only. See `PHASE-3-BUILD.md`'s "Labeled component set" section for the full
   mechanism.
-- **Never lock any Figma node this skill builds** — no master `COMPONENT_SET`, no display clone,
+- **Never lock any Figma node this skill builds** — no component set, no display clone,
   no documentation-frame content, nothing. The current template has no table geometry for a human
   to accidentally misalign, so locking only gets in the way of inspecting/selecting/rearranging
   content directly in the Figma UI.

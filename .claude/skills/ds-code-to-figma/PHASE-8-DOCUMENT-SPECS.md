@@ -1,18 +1,18 @@
-# Phase 6 — Document: Specs
+# Phase 8 — Document: Specs
 
 ## Objective
 
-Fill in the last section of the left `documentation` column: "📐 Specs". Specs is always the last
+Fill in the last section of the `Documentation` column: "📐 Specs". Specs is always the last
 section of the left column — the "🛠 Variants" section that historically followed it has been
 retired.
 
-Build this right after Anatomy (or right after Copy me, if the Anatomy placeholder was deleted), before
-[`PHASE-7-REVIEW.md`](PHASE-7-REVIEW.md).
+Build this right after Anatomy (or right after Copy me, if the Anatomy placeholder was deleted). This
+is the last phase of the skill.
 
 ## Inputs
 
 - "🏗️ Anatomy" (or "👉 Copy me", if the Anatomy placeholder was deleted), built and confirmed in
-  [`PHASE-5-DOCUMENT-ANATOMY.md`](PHASE-5-DOCUMENT-ANATOMY.md).
+  [`PHASE-7-DOCUMENT-ANATOMY.md`](PHASE-7-DOCUMENT-ANATOMY.md).
 - `<name>.figma.md`'s `specs:` list from Phase 1 — the values (fixed or min width/height,
   padding/gaps, fixed sizes of nested elements, radius, border width, typography) per option of
   the Variants axis.
@@ -57,16 +57,16 @@ own height must end up `layoutSizingVertical: 'HUG'`, not `FIXED`** — see "Siz
 `conventions/document-sections.md`; apply it to every one of the per-option nested `Preview`s
 here, not just the first.
 
-**Specs always uses the `Primary` set's instances/values**, even on an `inverted`-split component
-— an `inverted` split changes colors, not geometry, so showing `Inverted`-set numbers here would
+**Specs always uses the default set's instances/values**, even on a component with an inverted axis
+— an `inverted` split changes colors, not geometry, so showing the `…Inverted` set's numbers here would
 just repeat identical figures. There's only one frame/one Specs section per component now either
 way (see `PHASE-3-BUILD.md`'s "Labeled component set" section).
 
 **The "last child of the outer frame" positioning rule from the old spec no longer applies** — since
-Specs now sits inside the left `documentation` column as a normal stacked child (same as every other
+Specs now sits inside the `Documentation` column as a normal stacked child (same as every other
 left-column section), not as the final child of the whole outer frame.
 
-The `kind=specs` placeholder is already the last child of the left `documentation` column in the
+The `kind=specs` placeholder is already the last child of the `Documentation` column in the
 cloned frame, so nothing is appended or moved. Iterate on it with the user in Figma before moving
 on.
 
@@ -81,10 +81,10 @@ on.
   `Preview` per Variants-axis option.
 - Every nested `Preview` is `FILL` width and ends up `HUG` height; every card frame is resized to
   match its slot's real width (`x = 0`, no clipped label text).
-- Specs shows the `Primary` set's instances/values only, never `Inverted`.
+- Specs shows the default set's instances/values only, never an `…Inverted` set.
 - The section has been iterated on and confirmed with the user in Figma.
 
 ## Next Phase
 
-Proceed to [`PHASE-7-REVIEW.md`](PHASE-7-REVIEW.md) once Specs is built and confirmed. The
-documentation frame is then complete.
+None — this is the last phase. Once Specs is built and confirmed, the documentation frame is
+complete and the component is done.

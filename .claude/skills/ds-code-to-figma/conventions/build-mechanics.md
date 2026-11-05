@@ -42,10 +42,10 @@ phase or section. See `../CONVENTIONS.md` for the index.
 - **A master component's child with a hardcoded `visible: false` is not instantiated on fresh
   instances at all** — Figma drops it entirely; it does not carry over as a hidden override.
   `findOne`/`findAll`/`.children` on a fresh instance can't find a node that isn't there. This
-  breaks the "Show X" pattern whenever a layer's visibility is set via plain `node.visible =
+  breaks the `show <name>` pattern whenever a layer's visibility is set via plain `node.visible =
 false` instead of a real component property. **Fix: the master's layer must stay `visible:
 true`, with visibility driven by a real `BOOLEAN` component property** —
-  `set.addComponentProperty('Show <name>', 'BOOLEAN', false)` on the set, then
+  `set.addComponentProperty('show <name>', 'BOOLEAN', false)` on the set, then
   `layer.componentPropertyReferences = { visible: propKey }` on every variant child (keeping
   `layer.visible = true`). A layer that must be structurally and unconditionally absent for one
   variant branch regardless of any boolean (e.g. a code-gated icon) is the one case where a
@@ -71,7 +71,7 @@ true`, with visibility driven by a real `BOOLEAN` component property** —
 
 - **`figma.createAutoLayout()` defaults every new frame to a solid white fill** — clear it
   explicitly (`fills = []`) on every purely-structural wrapper frame; only intentionally-chromed
-  frames (header, Component Set panel, etc.) should keep a fill. A blanket fill-clear across a
+  frames (header, `Component Sets` column, etc.) should keep a fill. A blanket fill-clear across a
   frame's children can also hit sibling **text** layers that need their own color kept intact —
   clear wrapper frames specifically, not every child indiscriminately.
 - **Appending a plain overlay node (e.g. a grid-line rectangle) into an auto-layout frame pulls it

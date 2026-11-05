@@ -8,19 +8,19 @@ exceeds the variant threshold, and to Phase 3 when building wrapper sets. See `.
 ## Prop-to-variant mapping
 
 The prop-to-variant mapping rules (no-static-effect booleans excluded, conditional props keep their
-own axis, placeholder text on text-override props, paired "Show X" boolean for conditionally
+own axis, placeholder text on text-override props, paired `show <name>` boolean for conditionally
 rendered text) are canonical in `../PHASE-2-PROPOSE.md` step 1 — not duplicated here.
 
 ## Open-ended content-selection props (current rule)
 
 - **A pure open-ended content-selection prop with no crossed sub-props** (e.g. an icon `name`
   backed by an unbounded set of SVGs) becomes N separate top-level components, one per option
-  (`<Component>/<option>`), swapped via Figma's native Instance Swap — never a crossed variant
-  property, however many options it has. Same treatment as a true `inverted`/dark-context axis.
+  (`<Component><Option>`, e.g. `IconXing` — flat PascalCase per `../PHASE-2-PROPOSE.md` → "Naming"), swapped via Figma's native Instance Swap — never a crossed variant
+  property, however many options it has. These are single `COMPONENT`s, not a top-level split.
 - **A large open-ended content-selection prop that also has crossed same-layers sub-props** (e.g.
   `ds-icon`'s `size`/`color` on top of 79 names) gets **one wrapper `COMPONENT_SET`** crossing
   only the sub-props, with each variant containing a nested `INSTANCE` bound to an
-  `INSTANCE_SWAP` component property (`addComponentProperty('Icon', 'INSTANCE_SWAP', defaultId)`
+  `INSTANCE_SWAP` component property (`addComponentProperty('icon', 'INSTANCE_SWAP', defaultId)`
   on the set, `componentPropertyReferences = { mainComponent: propKey }` on each variant's nested
   instance), **plus a lightweight Instance Swap library** of single-vector `COMPONENT`s (not
   sets) parked off-canvas — not N top-level sets each repeating the full cross-product. Figma
@@ -39,6 +39,28 @@ rendered text) are canonical in `../PHASE-2-PROPOSE.md` step 1 — not duplicate
     the master but empty when read through a swapped instance. (From: `ds-icon`'s `xing` /
     `information`, the only 2 of 79 icons with multi-path source SVGs.)
 
+## Icon slots in a parent component
+
+A nested `ds-icon` or `ds-brand-icon` inside the component being built (e.g. `ds-button`'s
+`icon` / `iconRight`) is an **icon slot**. Icon slots always use instance swap — never a variant
+property, never an exposed nested instance, never a separate set per icon.
+
+- **One `INSTANCE_SWAP` component property per icon slot** on the parent set, named after the code
+  prop per `../PHASE-2-PROPOSE.md` → "Naming" (`icon`, `icon right`), bound to the nested glyph
+  instance via `componentPropertyReferences = { mainComponent: propKey }` on every variant.
+- **Preferred values** (`preferredValues`): the icon swap library; plus the brand-icon library when
+  code lets `ds-brand-icon` fill the same slot (in `ds-button`, `brandIcon` replaces `icon` in
+  `part="icon"`).
+- **Never expose the nested icon's own properties** (`isExposedInstance = false`). Its `size` and
+  `color` are set per parent variant, matching code — e.g. `ds-button`'s left icon follows the
+  button `size`, `icon right` is always `sm`, color follows `inverted`.
+- **Conditionally rendered slot** (`hasValue(this.icon) && …`) → also a `show <name>` boolean per
+  the Phase 2 mapping table.
+- Every other nested DS component (e.g. `ds-spinner`) stays a plain nested instance.
+- **Untested:** binding a parent `INSTANCE_SWAP` to a glyph two levels down (parent → icon wrapper
+  instance → glyph). If the Plugin API refuses it, hard stop and ask the user before falling back
+  to nesting the glyph library component directly (no wrapper). Record the outcome here.
+
 ## The 500-variant threshold
 
 - The count formula and hard-stop loop are canonical in `../PHASE-2-PROPOSE.md` step 3.
@@ -50,8 +72,8 @@ rendered text) are canonical in `../PHASE-2-PROPOSE.md` step 1 — not duplicate
   universal default — a small, harmless token-swap axis still gets a normal crossed variant
   dropdown by default, since that's more discoverable for consumers. **Size axes are never
   eligible for this mitigation** — resolve a size-driven explosion via a crossed variant (if it
-  fits on its own) or a structural wrapper/Instance-Swap split, never a variable swap.
-- **An open-ended/structural axis contributing to a threshold breach uses the existing wrapper +
-  Instance Swap split pattern** above, rather than a new technique — the mitigation for this axis
+  fits on its own) or a top-level split (rule 3), never a variable swap.
+- **An open-ended/structural axis contributing to a threshold breach uses the existing wrapper + swap
+  library pattern** above, rather than a new technique — the mitigation for this axis
   type was already solved; the hard-stop check just surfaces when it's needed sooner than a human
   would have noticed.

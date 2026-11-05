@@ -1,23 +1,23 @@
-# Phase 5 — Document: Anatomy
+# Phase 7 — Document: Anatomy
 
 ## Objective
 
-Fill in the second section of the left `documentation` column: "🏗️ Anatomy". When the
+Fill in the second section of the `Documentation` column: "🏗️ Anatomy". When the
 component's `<name>.figma.md` has no `anatomy:` list (no `@part` tags found in Phase 1), **delete
 the cloned frame's Anatomy `Section` placeholder** (the one with `Title` `kind=anatomy` in
 `body` › `Documentation`) so no empty Anatomy frame is left behind, then go straight to
-[`PHASE-6-DOCUMENT-SPECS.md`](PHASE-6-DOCUMENT-SPECS.md).
+[`PHASE-8-DOCUMENT-SPECS.md`](PHASE-8-DOCUMENT-SPECS.md).
 
 Build this right after "Copy me" is confirmed, before
-[`PHASE-6-DOCUMENT-SPECS.md`](PHASE-6-DOCUMENT-SPECS.md) — unless there are no parts, in which case this phase only deletes the placeholder.
+[`PHASE-8-DOCUMENT-SPECS.md`](PHASE-8-DOCUMENT-SPECS.md) — unless there are no parts, in which case this phase only deletes the placeholder.
 
 ## Inputs
 
-- "👉 Copy me", built and confirmed as the first child of the left `documentation` column in
-  [`PHASE-4-DOCUMENT-COPY-ME.md`](PHASE-4-DOCUMENT-COPY-ME.md).
+- "👉 Copy me", built and confirmed as the first child of the `Documentation` column in
+  [`PHASE-6-DOCUMENT-COPY-ME.md`](PHASE-6-DOCUMENT-COPY-ME.md).
 - `<name>.figma.md`'s `anatomy:` list (letter, part name, description) from Phase 1 — absence of
   this list is the no-parts condition above.
-- The finished component-set variant for the default/base combination (Phase 3).
+- The default variant of the finished component set (Phase 3).
 
 ## References
 
@@ -35,7 +35,7 @@ names, fonts and colors come from that clone; this skill writes no fill, stroke,
 value here. **Hard stop** if the `kind=anatomy` placeholder, `diagram-area`, `marker-A`, `legend` or
 the `Anatomy/Legend item` component is missing.
 
-1. **Component.** Swap the template instance in `diagram-area` to the real component's default/base
+1. **Component.** Swap the template instance in `diagram-area` to the real component's default
    variant (`swapComponent`) and centre it horizontally in `diagram-area`.
 2. **Markers — one per `anatomy:` entry.** Clone `marker-A` for each part, delete the unused ones,
    rename each to `marker-<letter>` and keep the groups in letter order. Set each `letter` text.
@@ -77,5 +77,5 @@ nothing is appended or moved. Iterate on it with the user in Figma before moving
 
 ## Next Phase
 
-Proceed to [`PHASE-6-DOCUMENT-SPECS.md`](PHASE-6-DOCUMENT-SPECS.md) once Anatomy is built and
+Proceed to [`PHASE-8-DOCUMENT-SPECS.md`](PHASE-8-DOCUMENT-SPECS.md) once Anatomy is built and
 confirmed (or immediately, once the placeholder is deleted).

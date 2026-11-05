@@ -22,22 +22,52 @@ user sign-off on it — before anything is built.
 
 ### 1. Map every prop and state
 
+#### Naming
+
+- **Properties — lowercase, words separated by spaces:** component property names (variant,
+  boolean, instance swap, text), variant option values and `sub-label`s. Convert camelCase by
+  splitting words — `labelPosition` → `label position`, `brandIcon` → `brand icon`; a boolean show
+  property is `show <name>` (e.g. `show icon`).
+- **Component set and swap-library component names — PascalCase, flat, no `/`:** the default set (the one holding the code
+  default of every split axis) gets the bare component name; every other set appends its split
+  option(s) — `Button` + `ButtonInverted`, `Pagination` + `PaginationDots` +
+  `PaginationDotsInverted`. The category page already groups sets in the assets panel, so no
+  slash folders.
+- Template layer names and the header's `component` text keep their own case.
+
+#### Top-level splits
+
+**Top-level split = one `COMPONENT_SET` per option**, each with its own stack and sub-label.
+Split only when one of these applies:
+
+1. **Different layers/structure per option** (enum or boolean) — e.g. `ds-pagination`'s numbered
+   variant (many page buttons + prev/next) vs. its dot variant (prev/next + a grey context area):
+   different HTML in `render()` → separate sets.
+2. **Inverted axis** — always split (`<Component>` / `<Component>Inverted`), even though it's
+   same-layers/different-token. The one exception to the test below.
+3. **Variant count > 500** — split along the axis that brings each set under the limit; offered
+   alongside variable-override, for any axis type (see [step 3](#3-check-the-variant-count-500-hard-stop)).
+
+#### Mapping table
+
 Apply this table to each prop/state from Phase 1. **The deciding test is never the prop's name or
 whether it's an enum: same layers, different token → variant; different layers/structure →
-top-level split via Instance Swap.**
+top-level split (rule 1).**
 
-| Code construct                                                                        | Figma mapping                                                                                                                                                             | Notes                                                                                                                                                                                                          |
-| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Enum (`@OneOf([...])`), every option re-skins the **same layers**                     | One variant property, same name, same options                                                                                                                             | e.g. `size: sm/base`, badge `color` swapping a fill token on the same pill.                                                                                                                                    |
-| Enum, options need **different layers/structure**                                     | Separate top-level components swapped via Instance Swap                                                                                                                   | e.g. button `type`: `primary` solid fill, `ghost` transparent + border, `link` text-only. Matches TapTap's `Button/Primary`, `Button/Ghost`, … — never a shared "style" variant. Same treatment as `inverted`. |
-| Open-ended content-selection prop (unbounded options, e.g. icon `name`)               | **Never** a variant property. No crossed sub-props → N top-level components (`<Component>/<option>`). With crossed same-layers sub-props → one wrapper set + swap library | Full pattern in `conventions/content-selection-and-mitigations.md`.                                                                                                                                            |
-| Boolean with a static visual effect                                                   | One boolean Figma property                                                                                                                                                |                                                                                                                                                                                                                |
-| Boolean with **no static visual effect**                                              | Excluded from the mapping                                                                                                                                                 | e.g. `ds-spinner`'s `deactivated` (animation only). List it as "excluded" in the draft so the omission is visible.                                                                                             |
-| Pseudo-class or state-ish prop (`:hover`, `:focus`, `:active`, `disabled`, `loading`) | **One** `state` variant property: `default` / `hover` / `focus` / `active` / `disabled` / `loading` (only those the component has)                                        | Never separate axes, never separate booleans.                                                                                                                                                                  |
-| Free-text prop (e.g. `label`)                                                         | Instance text override — never a variant property                                                                                                                         | Ships with **placeholder text on every variant member**, not empty. If the member should show the true code default and that default is `''`, ask the user which policy applies.                               |
-| Free-text prop guarded in `render()` (e.g. `hasValue(label) && <span>`)               | Text override **plus** a boolean `Show <name>` component property bound to the layer's `visible` via `componentPropertyReferences` on every variant                       | Default the boolean to the code's real default. Empty text alone isn't enough — Figma won't collapse the auto-layout gap/width the way code omits the element. Check every text-override prop's `render()`.    |
-| Prop whose effect depends on another prop                                             | Its own independent variant axis                                                                                                                                          | Never collapsed or special-cased (e.g. `labelPosition` only shows when `label` is set, but stays an axis).                                                                                                     |
-| Anything else / ambiguous                                                             | Flag explicitly                                                                                                                                                           | Never guess.                                                                                                                                                                                                   |
+| Code construct                                                                        | Figma mapping                                                                                                                                                                             | Notes                                                                                                                                                                                                       |
+| ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Enum (`@OneOf([...])`), every option re-skins the **same layers**                     | One variant property, same name, same options                                                                                                                                             | e.g. `size: sm/base`, badge `color` swapping a fill token on the same pill.                                                                                                                                 |
+| Enum or boolean, options need **different layers/structure**                          | Top-level split (rule 1) — one component set per option                                                                                                                                   | e.g. button `type`: `primary` solid fill, `ghost` transparent + border, `link` text-only. Matches TapTap's `Button/Primary`, `Button/Ghost`, … — never a shared "style" variant.                            |
+| `inverted` prop (inverted axis)                                                       | Top-level split (rule 2) — `<Component>` / `<Component>Inverted` sets                                                                                                                     | Exception to the same-layers test.                                                                                                                                                                          |
+| Open-ended content-selection prop (unbounded options, e.g. icon `name`)               | **Never** a variant property. No crossed sub-props → N top-level components (`<Component><Option>`, e.g. `IconXing`). With crossed same-layers sub-props → one wrapper set + swap library | Full pattern in `conventions/content-selection-and-mitigations.md`.                                                                                                                                         |
+| Nested `ds-icon` / `ds-brand-icon` (icon slot, e.g. button `icon`, `iconRight`)       | One `INSTANCE_SWAP` property per icon slot on the parent, named after the code prop (`icon`, `icon right`); nested icon `size`/`color` never exposed                                      | Always instance swap — no other approach. Full rule in `conventions/content-selection-and-mitigations.md` → "Icon slots in a parent component".                                                             |
+| Boolean with a static visual effect                                                   | One boolean Figma property                                                                                                                                                                |                                                                                                                                                                                                             |
+| Boolean with **no static visual effect**                                              | Excluded from the mapping                                                                                                                                                                 | e.g. `ds-spinner`'s `deactivated` (animation only). List it as "excluded" in the draft so the omission is visible.                                                                                          |
+| Pseudo-class or state-ish prop (`:hover`, `:focus`, `:active`, `disabled`, `loading`) | **One** `state` variant property: `default` / `hover` / `focus` / `active` / `disabled` / `loading` (only those the component has)                                                        | Never separate axes, never separate booleans.                                                                                                                                                               |
+| Free-text prop (e.g. `label`)                                                         | Instance text override — never a variant property                                                                                                                                         | Ships with **placeholder text on every variant member**, not empty. If the member should show the true code default and that default is `''`, ask the user which policy applies.                            |
+| Free-text prop guarded in `render()` (e.g. `hasValue(label) && <span>`)               | Text override **plus** a boolean `show <name>` component property bound to the layer's `visible` via `componentPropertyReferences` on every variant                                       | Default the boolean to the code's real default. Empty text alone isn't enough — Figma won't collapse the auto-layout gap/width the way code omits the element. Check every text-override prop's `render()`. |
+| Prop whose effect depends on another prop                                             | Its own independent variant axis                                                                                                                                                          | Never collapsed or special-cased (e.g. `labelPosition` only shows when `label` is set, but stays an axis).                                                                                                  |
+| Anything else / ambiguous                                                             | Flag explicitly                                                                                                                                                                           | Never guess.                                                                                                                                                                                                |
 
 ### 2. Sketch the variant grid
 
@@ -76,11 +106,10 @@ right/bottom) so the approved sketch already shows the final order:
     true    default  [cell]  [cell]
             ...      ...     ...
     ```
-- **Top-level split**: any structural axis (different layers per option, per the table above) is
-  not a matrix dimension. Split it into separate top-level components and sketch each one's own
-  matrix with its own stack and sub-label (e.g. `Spinner/Logo` and `Spinner/Circle`), the same
-  way `inverted` gets `Primary`/`Inverted` stacks. Set names per `PHASE-3-BUILD.md` → "Labeled
-  component set".
+- **Top-level split** (any rule in [Top-level splits](#top-level-splits)): the split axis is not a
+  matrix dimension. Sketch each set's own matrix with its own stack and sub-label (e.g.
+  `Pagination` and `PaginationDots`, or `Button` and `ButtonInverted`). Set names per `PHASE-3-BUILD.md`
+  → "Labeled component set".
 
 ### 3. Check the variant count (500 hard stop)
 
@@ -99,9 +128,11 @@ across the whole library file) — staying under it leaves headroom for other co
     and let consumers override it per instance instead of crossing it. Zero new nodes, but less
     discoverable than a dropdown — offer it only because the threshold was exceeded, never as a
     default. **Never offered for a size axis.**
-  - **Structural or open-ended content axis** → **wrapper + Instance Swap split** (one wrapper set
+  - **Structural or open-ended content axis** → **wrapper + swap library** (one wrapper set
     crossing only the remaining same-layers props, plus a swap library for the content axis).
-  - **Size-driven explosion** → a crossed variant (if it fits on its own) or a structural split.
+  - **Size-driven explosion** → a crossed variant (if it fits on its own) or a top-level split (rule 3).
+  - **Any axis** → **top-level split** ([rule 3](#top-level-splits)): one component set per option
+    of the axis that brings every set ≤500.
 
   Present the count, the dominant-axis breakdown, and the recommendation(s); let the user choose
   or combine. Recompute against the new structure and **repeat until ≤500**. Mechanics:
@@ -112,7 +143,7 @@ across the whole library file) — staying under it leaves headroom for other co
 Write the proposed grouping (table result + grid sketch + count) into `<name>.figma.md` and
 present it to the user for review. **Pre-flight before presenting:** verify every axis's
 `figmaOptions:` and the ASCII sketch follow the ordering rules (smallest at the left or top, e.g.
-`sm` before `base`) — checked, not assumed.
+`sm` before `base`) and every name follows [Naming](#naming) — checked, not assumed.
 
 ### 5. Wait for confirmation
 
