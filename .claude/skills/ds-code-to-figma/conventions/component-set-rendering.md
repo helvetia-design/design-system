@@ -5,13 +5,26 @@ index.
 
 ## Option and axis ordering
 
-Single source of truth — `PHASE-2-PROPOSE.md` (grid sketch) and `PHASE-3-BUILD.md` (build) both
-follow it. Direction is always **smallest/first at the left (column axes) or top (row axes),
-largest/last at the right or bottom**.
+Single source of truth — `PHASE-2-PROPOSE.md` (grid sketch), `PHASE-3-BUILD.md` (build) and
+`PHASE-4-VALIDATE.md` (check) all follow it. Two **hard rules**, in priority order — rule A wins
+when they conflict.
+
+### Hard rule A — the default variant sits in the top-left cell
+
+Figma treats the top-left variant of a set as its default — the one users get when they insert
+the component from the library. So on **every axis the code-default option comes first**: leftmost
+column, top row, first outer row group. The top-left cell is therefore the default variant, and its
+layer is the first variant layer. This applies to every axis — `size` (`base`), `state`
+(`default`), booleans (the code default, usually `false`), any other enum — and overrides rule B.
+
+### Hard rule B — every other option follows canonical order
+
+After the code default, the remaining options run **smallest/first at the left (column axes) or
+top (row axes), largest/last at the right or bottom**:
 
 1. **T-shirt scale:** `3xs · 2xs · xs · sm · base · md · lg · xl · 2xl · 3xl`. A component uses
-   only the subset it has; `base` always sits between `sm` and `md`, even if one of them is absent
-   (`xs / base / lg`).
+   only the subset it has. With `base` as the code default it moves to the front per rule A and
+   the rest keep scale order: `base · xs · sm · md · lg`.
 2. **`state`:** `default / hover / focus / active / disabled / loading` (only those the component
    has). `readonly` is out of scope for Figma.
 3. **Boolean axes:** `false` first, then `true`.

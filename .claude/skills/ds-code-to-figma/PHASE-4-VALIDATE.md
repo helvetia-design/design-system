@@ -67,6 +67,11 @@ Verify the built Figma component set against the confirmed mapping file `<name>.
    their column, the column axis name centred on the set, row values vertically centred on the
    rows they cover, and the row axis name on the lane's left edge, on the same line as the column
    values.
+   c. **Ordering** per `conventions/component-set-rendering.md` → "Option and axis ordering": the
+   top-left cell and the first variant layer is the default variant (every axis at its code
+   default), `state` is the column axis when the component has one (without `state`, either placement
+   of `size` passes), and every
+   axis's remaining options follow canonical order.
 6. **Write the validation report** (see [Output](#output)).
 
 ## Rules
