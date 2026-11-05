@@ -17,14 +17,6 @@ node <this-skill-directory>/scripts/scan-icon-imports.mjs <project-root> <file> 
 
 The script prints the same JSON shape as the component scan, limited to those files. It lists imports from both legacy icon packages, every `balIcon*` and `balBrandIcon*` symbol, and every use of a namespace bound by `import * as`. Pass paths relative to `<project-root>`. When the JSON has an `unmatched` list, those arguments are not source files under `<project-root>`. Fix the paths and run the scan again before you continue.
 
-When it lists a registration (see Registration below), also run:
-
-```bash
-node <this-skill-directory>/scripts/scan-migratable.mjs <project-root>
-```
-
-In a component migration, ignore the component being migrated, because this migration replaces it. When `suggested` and `notYet` list no other component, no `bal-*` component is left. Keep the answer for the Registration rules.
-
 If `package.json` declares `@baloise/ds-icons` or `@baloise/ds-brand-icons` but not `@helvetia-design/assets`, add `@helvetia-design/assets` with the version of the other `@helvetia-design/*` entries and run the install command for the project's lockfile.
 
 ## Icon names
@@ -99,10 +91,7 @@ Carry custom icons over now:
 
 The new config merges `icons` into the pre-registered set, so pass only the custom icons.
 
-Then decide about the legacy registration with the answer from the Scan:
-
-- **`bal-*` components are still in use**: leave the legacy `icons` value, and every import it needs, unchanged. The remaining `bal-icon` tags and the legacy components that draw icons still look names up in it. A symbol that the registration uses keeps its legacy import, even when you add the new import for its other uses. Report that the legacy registration stays until the last `bal-*` component is migrated.
-- **No `bal-*` component is left**: delete the `icons` entry from the legacy config call. Delete the namespace import when nothing else uses it. When the call is a React `useBaloiseDesignSystem` that the `app` migration kept only for `icons`, and its config is now empty, delete the call and its specifier.
+Never edit the legacy `icons` value or the imports it needs here. The remaining `bal-icon` tags and the legacy components that draw icons still look names up in it. A symbol that the registration uses keeps its legacy import, even when you add the new import for its other uses. `shared/legacy-config.md` decides about the whole call. It deletes the call, with its `icons` value and the imports that only it uses, once no `bal-*` component is left.
 
 ## Report
 
@@ -114,7 +103,7 @@ node <this-skill-directory>/scripts/scan-icon-imports.mjs <project-root>
 
 The **Assets** step skips this scan, because it already scanned the whole project.
 
-These items follow the component's own checklist items, in this order. Each one gets its own line in `ds-migration-report.md`, as `shared/report.md` describes.
+These items follow the component's own checklist items and the `F` items of `shared/field.md`, in this order. Each one gets its own line in `ds-migration-report.md`, as `shared/report.md` describes.
 
 Needs your attention when found:
 
@@ -133,4 +122,4 @@ Needs your attention when found:
 Coverage only, written to the file:
 
 - I12. Every symbol renamed.
-- I13. Whether the legacy registration was deleted or kept. When it was kept, the note that it stays until the last `bal-*` component is migrated.
+  The legacy registration is reported with the legacy config call by `shared/legacy-config.md`.

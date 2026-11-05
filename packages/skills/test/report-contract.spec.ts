@@ -32,7 +32,7 @@ function buckets(report: string) {
 
 const expectedCounts: Record<string, { attention: number; coverage: number }> = {
   'accordion': { attention: 12, coverage: 3 },
-  'app': { attention: 5, coverage: 5 },
+  'app': { attention: 5, coverage: 4 },
   'badge': { attention: 3, coverage: 3 },
   'button': { attention: 11, coverage: 4 },
   'card': { attention: 9, coverage: 3 },
@@ -242,6 +242,18 @@ describe('shared/field.md Report', () => {
   it('lists the field items as a continuous F-numbered checklist', () => {
     const report = section(read('shared/field.md'), '## Report')
     const numbers = [...report.matchAll(/^- F(\d+)\. /gm)].map(([, number]) => Number(number))
+
+    expect(report).toContain('`shared/report.md`')
+    expect(report).not.toContain('summary')
+    expect(numbers.length).toBeGreaterThan(0)
+    expect(numbers).toEqual(numbers.map((_, index) => index + 1))
+  })
+})
+
+describe('shared/legacy-config.md Report', () => {
+  it('lists the legacy config items as a continuous L-numbered checklist', () => {
+    const report = section(read('shared/legacy-config.md'), '## Report')
+    const numbers = [...report.matchAll(/^- L(\d+)\. /gm)].map(([, number]) => Number(number))
 
     expect(report).toContain('`shared/report.md`')
     expect(report).not.toContain('summary')
