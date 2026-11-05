@@ -6,7 +6,7 @@ The scan lists the `bal-number-input` tag and the React and Angular symbol `BalN
 
 The legacy component has no slots. `ds-number-input` adds a default slot and an `invalid-text` slot. Nothing to migrate, leave them unused.
 
-The legacy folder has no consumer child tags. `bal-input`, `bal-input-stepper` and `bal-input-slider` are different components and are not part of this migration. The scan does not list them. The surrounding `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrapper is not part of it either: leave it untouched.
+The legacy folder has no consumer child tags. `bal-input`, `bal-input-stepper` and `bal-input-slider` are different components and are not part of this migration. The scan does not list them. The surrounding `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrapper is handled by `shared/field.md` in the Rewrite step, in the same pass.
 
 ## 1. Scan
 
@@ -82,7 +82,7 @@ Print a per-file summary of what changed, including every `required` that was se
 
 Report the accessibility change first, because it is a WCAG regression and the scan cannot see it:
 
-- **Label no longer linked**: the legacy input was linked to a surrounding `bal-field-label` and `bal-field-message` through `setAriaForm()` (`aria-labelledby`, `aria-describedby`). `ds-number-input` renders its own field and only sets `aria-describedby` to its own description. A label in a surrounding `bal-field` is no longer associated with the input. List every file where the surrounding `bal-field` carries a label or message, and tell the consumer to move it to the `label`, `description` and `invalidText` props of `ds-number-input`.
+- **Label moved**: the legacy input was linked to a surrounding `bal-field-label` and `bal-field-message` through `setAriaForm()` (`aria-labelledby`, `aria-describedby`). `ds-number-input` renders its own field, so `shared/field.md` moves that label and message onto its `label`, `description` and `invalidText` props and removes the wrapper. List every file where that happened, and every `bal-field` left in place.
 
 Report these other changes the scan cannot see, so the consumer can check them:
 

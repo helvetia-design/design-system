@@ -6,6 +6,8 @@ The legacy folder has no child elements. `components/file-list.tsx` is rendered 
 
 Legacy `label` is the text inside the drop zone. In `ds-file-upload`, `label` is the field label above the control and the drop-zone text is `dropZoneLabel`. A plain copy would silently change what the user sees, so `label` is renamed. `subTitle` and `getInputElement()` have no equivalent and are reported, not dropped.
 
+A surrounding `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrapper is handled by `shared/field.md` in the Rewrite step, in the same pass. `components/field/migration.md` migrates `bal-form-grid` and `bal-form-col`.
+
 ## 1. Scan
 
 `<project-root>` is the consumer project root that contains the app lockfile. When the skill is invoked from that root, use the current directory.
