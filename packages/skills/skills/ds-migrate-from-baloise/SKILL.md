@@ -14,7 +14,7 @@ On invocation, present this menu and wait for one choice:
 1. **Init** — bootstrap Helvetia packages alongside the existing Baloise install
 2. **Components** — migrate a specific `bal-*` component to `ds-*`
 3. **CSS utils (coming soon)**
-4. **Assets** — migrate legacy icons in files that no component migration touches
+4. **Assets** — migrate legacy icons in files that no component migration touches, and delete the legacy config call once no `bal-*` component is left
 
 Then follow only the matching section below. Stop when that section says to stop.
 
@@ -101,6 +101,12 @@ Every component migration also migrates the legacy icons in the files it touches
 - In the Rewrite step, apply the icon rules to those files as well.
 - In the Report step, add the icon items to the summary.
 
+Every component migration also decides about the legacy config call. Follow `shared/legacy-config.md` after the icon rules:
+
+- After the file's Scan step, run its Scan section. When no `bal-*` component will be left, show each legacy config call with the component findings as a call to delete. The file's single confirmation covers it.
+- In the Rewrite step, after the icon rules, apply its Decide section.
+- In the Report step, add its items to the summary.
+
 #### Manual
 
 List every file matching `components/*.md` or `components/*/migration.md` in this skill folder. Build a picker from each file's title (the first Markdown heading). Dispatch to the chosen file's instructions.
@@ -129,10 +135,11 @@ Report "coming soon" and stop.
 
 ### Assets
 
-Migrate every legacy icon left in the project, following `shared/icons.md`. Component migrations already handle the icons in the files they touch. This step covers the rest, such as a constants file that imports `balBrandIcon*` symbols but has no `bal-*` tag.
+Migrate every legacy icon left in the project, following `shared/icons.md`. Component migrations already handle the icons in the files they touch. This step covers the rest, such as a constants file that imports `balBrandIcon*` symbols but has no `bal-*` tag. It also deletes the legacy config call once no `bal-*` component is left, following `shared/legacy-config.md`.
 
-1. Run the icon scan from `shared/icons.md` without file arguments, so it covers the whole project. Show the findings grouped by file (path, line, snippet) and end with the total count. If `total` is 0, say there are no legacy icons left to migrate and stop.
-2. Ask for one yes/no: rewrite every listed usage? On no, stop with the files unchanged.
-3. Apply every rule in `shared/icons.md` to the listed files. No component is being migrated here, so the Registration rules count every `bal-*` component that `scan-migratable.mjs` reports.
-4. Print a per-file summary with the items from the Report section of `shared/icons.md`. Skip its final whole-project scan, which this step already is.
-5. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.
+1. Run the icon scan from `shared/icons.md` without file arguments, so it covers the whole project. Show the findings grouped by file (path, line, snippet) and end with the total count. Then run the Scan section of `shared/legacy-config.md`. No component is being migrated here, so every `bal-*` component that `scan-migratable.mjs` reports counts as left. List each call it marks for deletion after the icon findings.
+2. When step 1 listed icon findings, ask one yes/no: rewrite every listed usage and delete every listed call? When it listed only calls to delete, ask one yes/no: delete every listed call? On no, stop with the files unchanged. When it listed neither, say there are no legacy icons left to migrate and skip step 3.
+3. When the icon scan found anything, apply every rule in `shared/icons.md` to the listed files.
+4. Apply the Decide section of `shared/legacy-config.md`.
+5. Print a per-file summary with the items from the Report section of `shared/icons.md` and of `shared/legacy-config.md`. Skip the final whole-project scan of `shared/icons.md`, which this step already is.
+6. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.

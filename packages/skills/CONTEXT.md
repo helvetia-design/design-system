@@ -52,16 +52,20 @@ Done when **Components** lists the new heading and choosing it follows that file
 
 ### Icons travel with the component migration
 
-Every component migration also migrates the icons from `@baloise/ds-icons` and `@baloise/ds-brand-icons` in the files it touches, following `shared/icons.md`. The **Assets** menu item applies the same file to every other file that still uses legacy icons, such as a constants file with no `bal-*` tag. `SKILL.md` hooks that file into the Scan, Rewrite and Report steps of whichever component file is chosen, so a new component gets icon handling without mentioning it. `shared/` sits outside `components/` so that **Manual** does not list it.
+Every component migration also migrates the icons from `@baloise/ds-icons` and `@baloise/ds-brand-icons` in the files it touches, following `shared/icons.md`. The **Assets** menu item applies the same file to every other file that still uses legacy icons, such as a constants file with no `bal-*` tag, and deletes the legacy config call once no `bal-*` component is left. `SKILL.md` hooks that file into the Scan, Rewrite and Report steps of whichever component file is chosen, so a new component gets icon handling without mentioning it. `shared/` sits outside `components/` so that **Manual** does not list it.
 
 - **UI icon** — an icon resolved by name through the design system config (`ds-icon name="…"`, and the `icon` props of other components). A wrong name fails silently at runtime.
 - **Brand icon** — an illustration passed as a raw SVG string to `ds-brand-icon` (`svg`) or as a URL (`src`). There is no name lookup. A wrong symbol fails at build time.
-- **Icon registration** — handing an icon set to the config at startup. The standard UI icon set is pre-registered, so the legacy registration of the whole set is never carried over. Only a **custom icon**, a registered key that names something other than its own standard icon, is carried over and reported. The legacy registration itself is deleted only once no `bal-*` component is left, because every remaining legacy component still looks names up in it.
+- **Icon registration** — handing an icon set to the config at startup. The standard UI icon set is pre-registered, so the legacy registration of the whole set is never carried over. Only a **custom icon**, a registered key that names something other than its own standard icon, is carried over and reported. The legacy registration goes with the whole legacy config call, once no `bal-*` component is left, because every remaining legacy component still looks names up in it.
 - **Icon name mapping** — the legacy UI icon names that have no identical counterpart, each mapped to an approximation or reported as lost, plus the names both sets share whose glyph changed meaning, which are kept and reported. It lives in `shared/icon-name-map.json`. A component migration that copies an icon name points at the name rule in `shared/icons.md` rather than keeping its own.
 
 `app` does not copy `icons` onto `ds-root`. The Registration rules in `shared/icons.md` handle it.
 
 `scripts/scan-icon-imports.mjs` takes the component's finding files as extra arguments and scans only those. Without them it scans the whole project, which the Assets step uses and the component report uses to point at files Assets still has to migrate. `test/scan-icon-imports.spec.ts` checks the map against `@helvetia-design/assets`, the one workspace devDependency of this package.
+
+### Legacy config call stays until the last `bal-*` component
+
+The legacy config call (`initializeBaloiseDesignSystem`, `useBaloiseDesignSystem`, `provideBaloiseDesignSystem`) fills the only config that `bal-*` components read, so no migration deletes it while one `bal-*` component is left. The `app` migration copies its values onto `ds-root` and leaves the call unchanged. `shared/legacy-config.md` is the one place that deletes it: `SKILL.md` runs it at the end of every component migration and in **Assets**, and it deletes the call only when `scan-migratable.mjs` reports no other `bal-*` component.
 
 ### Steps: panels mode and navigation mode
 
@@ -134,7 +138,7 @@ Spinner: `node <skill>/scripts/scan-bal-spinner.mjs <project>` prints JSON findi
 
 Accordion: `node <skill>/scripts/scan-bal-accordion.mjs <project>` prints the same JSON shape and does not edit files. The regex covers `bal-accordion` and its `bal-accordion-summary`, `bal-accordion-trigger`, and `bal-accordion-details` children, plus the `BalAccordion*` bindings and `BalAccordionBundle`. After one yes, the agent rewrites from `components/accordion/migration.md` and leaves the result unstaged.
 
-App: `node <skill>/scripts/scan-bal-app.mjs <project>` prints the same JSON shape and does not edit files. The regex also matches `initializeBaloiseDesignSystem` and `useBaloiseDesignSystem`, so the startup file that holds the language and region is found even though it never names the tag. After one yes, the agent rewrites from `components/app/migration.md` and leaves the result unstaged.
+App: `node <skill>/scripts/scan-bal-app.mjs <project>` prints the same JSON shape and does not edit files. The regex also matches `initializeBaloiseDesignSystem`, `useBaloiseDesignSystem` and `provideBaloiseDesignSystem`, so the startup file that holds the language and region is found even though it never names the tag. After one yes, the agent rewrites from `components/app/migration.md` and leaves the result unstaged.
 
 Badge: `node <skill>/scripts/scan-bal-badge.mjs <project>` prints the same JSON shape and does not edit files. After one yes, the agent rewrites from `components/badge/migration.md` and leaves the result unstaged.
 
