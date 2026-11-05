@@ -8,14 +8,19 @@ and the output record Phase 3 writes back into.
 # <name> → Figma mapping
 
 \`\`\`yaml
-figmaComponentKey: null # filled in by Phase 3 on success
-figmaPage: Core / <Category> # the shared category page, e.g. "Core / Indicators" — NOT this
+sets: # filled in by Phase 3 — one entry per component set (top-level split), default set first.
+
+# A parent component nesting this one uses the first entry's figmaComponentKey.
+
+- name: Close # default set — bare name; also its stack's sub-label
+  figmaComponentKey: null
+  figmaMasterNodeId: null # component set node id, inside the documentation frame's `Component Sets` column
+- name: CloseInverted # only when a top-level split exists
+  figmaComponentKey: null
+  figmaMasterNodeId: null
+  figmaPage: Core / <Category> # the shared category page, e.g. "Core / Indicators" — NOT this
 
 # component's own name; multiple components share one page (see CONVENTIONS.md's category table)
-
-figmaMasterNodeId: null # this component's component set node id (referenced from inside
-
-# its own documentation frame's `Component Sets` column — there's no separate masters row)
 
 figmaDocFrameNodeId: null # this component's "<Component> Documentation" frame id within the
 
@@ -55,7 +60,7 @@ props:
   nested:
 - childTag: ds-icon
   childMappingFile: ../icon/icon.figma.md
-  figmaComponentKey: <resolved from icon.figma.md>
+  figmaComponentKey: <icon.figma.md → sets[0].figmaComponentKey>
   iconSlot: # only for nested ds-icon / ds-brand-icon — always instance swap
   codeProp: icon # → INSTANCE_SWAP property `icon`
   acceptsBrandIcon: true # brandIcon replaces icon in part="icon" → brand-icon library in preferredValues

@@ -64,7 +64,8 @@ Read the component's code and produce the draft mapping that Phase 2 proposes a 
      bindings, not literal bindings to something the component's own code sets. Never leave an
      attribute unbound/assumed because the component's SCSS doesn't mention it.
 4. Identify any **nested DS component** usage (e.g. `<ds-icon>` inside `ds-button`'s render). For
-   each one, read its `<child>.figma.md` and pull the recorded Figma component key. If missing,
+   each one, read its `<child>.figma.md` and pull the default set's `figmaComponentKey` (first
+   entry of `sets:`). If missing,
    stop per `SKILL.md`'s Prerequisites section above. Mark every nested `ds-icon` /
    `ds-brand-icon` as an **icon slot** (see `conventions/content-selection-and-mitigations.md` →
    "Icon slots in a parent component"): record the code prop driving it, whether `ds-brand-icon`

@@ -24,7 +24,8 @@ Fix every check marked `fail` in `<name>.figma-validation.md` directly in Figma,
 3. **Plan the smallest fix per node** — group the `fail` entries by node so multiple failures on
    one node are fixed in a single pass — taking the correct value from the Phase 3 source of truth:
    `PHASE-3-BUILD.md` → "Documentation frame header" for the header, the template for
-   layout/dividers/labels, `<name>.figma.md` for props/variants, and the Phase 1 variable ids and
+   layout/dividers/labels, `<name>.figma.md` for props/variants, the visual test snapshot for a snapshot mismatch
+   (Phase 4 step 6), and the Phase 1 variable ids and
    component keys for tokens and nested components.
 4. **Apply each fix with `use_figma`** as an in-place edit of the existing node, except to clone
    missing template parts (e.g. dividers) from `🗂️ Template / Category`. Read the node back after

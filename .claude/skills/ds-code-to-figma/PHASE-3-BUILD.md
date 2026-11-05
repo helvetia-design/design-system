@@ -39,6 +39,11 @@ explicit user confirmation on.
      id `<name>.figma.md`'s `tokens:` list already recorded from `css-token-lookup.mjs` — never
      re-resolve a token by searching Figma's variable collections by name at build time; that
      search was already done once, locally, in Phase 1.
+   - **Create every bound paint from the variable's resolved value** —
+     `variable.resolveForConsumer(node).value`, alpha included — **before**
+     `setBoundVariableForPaint`. Never a placeholder colour: the master keeps rendering the
+     placeholder even though the binding is correct (e.g. a transparent background shows as solid
+     black). See `conventions/build-mechanics.md` → "Color and paint".
    - Every nested component as an **instance of the existing Figma component** resolved in
      Phase 1, step 4 — never redrawn from scratch. **Icon slots** (nested `ds-icon` /
      `ds-brand-icon`) get an `INSTANCE_SWAP` property with preferred values and an unexposed nested
@@ -118,8 +123,8 @@ Responsive Tokens` first — **reuse it if it already exists** rather than creat
 6. **Stop and have the user approve the documentation frame directly in Figma** — the filled
    `Header` and the finished component set(s) — give them the link to the frame and wait. Any change loops back to step 5. Don't continue to Phase 4 on an
    assumed approval.
-7. Write `figmaComponentKey`, `figmaMasterNodeId`, `figmaPage` and `figmaDocFrameNodeId` back into
-   the mapping file.
+7. Write `sets:` (name, `figmaComponentKey`, `figmaMasterNodeId` per set, default set first),
+   `figmaPage` and `figmaDocFrameNodeId` back into the mapping file.
 
 ### Category pages
 
@@ -166,24 +171,26 @@ the real set by cloning from it — **this skill writes no fill, stroke, font, d
 values**; clone a prototype and change only text and positions.
 
 1. **Stacks — one per top-level split option from Phase 2** (`PHASE-2-PROPOSE.md` → "Top-level
-   splits"). Name each stack's `sub-label` and set:
+   splits"). Name each set and its stack's `sub-label`:
 
-   | Top-level split             | Stacks                                    | `sub-label`                                            | Set name (e.g.)                                                                |
-   | --------------------------- | ----------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------ |
-   | None                        | one                                       | removed                                                | `Button`                                                                       |
-   | Rule 1 or 3 only            | one per option of the split axis          | `default` / `<split>`                                  | `Pagination`, `PaginationDots`                                                 |
-   | Rule 2 (inverted axis) only | default, inverted                         | `default` / `inverted`                                 | `Button`, `ButtonInverted`                                                     |
-   | Rule 1 or 3 **and** rule 2  | one per combination, rule 1/3 split outer | `default`, `inverted`, `<split>`, `<split> / inverted` | `Pagination`, `PaginationInverted`, `PaginationDots`, `PaginationDotsInverted` |
+   | Top-level split             | Stacks                                    | Set name = `sub-label` (e.g.)                                                  |
+   | --------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------ |
+   | None                        | one                                       | `Button` (`sub-label` removed — the frame title already names it)              |
+   | Rule 1 or 3 only            | one per option of the split axis          | `Pagination`, `PaginationDots`                                                 |
+   | Rule 2 (inverted axis) only | default, inverted                         | `Button`, `ButtonInverted`                                                     |
+   | Rule 1 or 3 **and** rule 2  | one per combination, rule 1/3 split outer | `Pagination`, `PaginationInverted`, `PaginationDots`, `PaginationDotsInverted` |
 
-   Set names follow `PHASE-2-PROPOSE.md` → "Naming": PascalCase, flat, the default set bare. The
-   `sub-label` never repeats the component name — the frame title already shows it.
+   Set names follow `PHASE-2-PROPOSE.md` → "Naming": PascalCase, flat, the default set bare. Each
+   stack's `sub-label` is **exactly its set name**, so the heading matches what designers find in
+   the assets panel.
 
    Source every inverted stack from the template's `Inverted` stack and every other stack from its
    `Primary` stack. Delete template stacks that aren't needed.
 
 2. **Combine** the stack's variants into a `COMPONENT_SET` with `combineAsVariants()`. Clone the
    template set's fill, stroke (dashed, purple, variable-bound) and corner radius onto it by
-   copying them from the template set — never recreate them.
+   copying them from the template set — never recreate them. Put the new set **in the template
+   set's place** in `Column + Box` (between `Column Labels` and `Grid`), never after `Grid`.
 3. **Axes → grid.** Per `PHASE-2-PROPOSE.md` step 2: `state` is the column axis (`size` only when
    there is no `state` axis); every other axis is a row, nested outer→inner by ascending option count (ties: prop declaration order).
    Order the options within each axis per `conventions/component-set-rendering.md` → "Option and
@@ -210,7 +217,24 @@ values**; clone a prototype and change only text and positions.
      (the cloned bracket's own width), 8px. Each bracket spans its group's rows minus 8px at both
      ends. `Row Labels` width = sum of the lanes, height = `Column + Box` height. One row axis →
      one lane, no bracket.
-   - **`Grid`:** a divider at every inner cell boundary.
+   - **`Grid`:** the dividers are **children of this stack's own `Grid` frame** (the set's sibling
+     inside `Column + Box`), which covers the set and sits above it in layer order.
+     1. Keep one `divider-col` and one `divider-row` from the cloned template as prototypes and
+        delete every other divider in this `Grid` — the clone carries the template example's
+        count, not this set's.
+     2. Clone exactly `cols − 1` × `divider-col-<n>` and `rows − 1` × `divider-row-<n>` from the
+        prototypes, each on its cell boundary and spanning the full set height (col) or width
+        (row); then delete the prototypes. Change **only length and position** — keep everything
+        else from the prototype: type, thickness, fills, strokes, stroke weights, `dashPattern`
+        (today `divider-col` is a `RECTANGLE`, 0.01 wide, `strokeLeftWeight` 2, dashed;
+        `divider-row` is a `LINE`, stroke 2, dashed). Never use a rotated `LINE` (see
+        `conventions/component-set-rendering.md` → "Sizing and layout mechanics").
+     3. Read back from **this `Grid` node's `children`** — never a name search across the page:
+        every documentation frame (and the template) has nodes named `divider-col-1` etc. Confirm
+        the count, that each divider's styling matches the prototype, a non-empty
+        `absoluteRenderBounds`, and the **layer order**: `Grid` comes after the set in
+        `Column + Box` (`Column Labels`, set, `Grid`), so it draws on top. A `Grid` below the set is
+        covered by the set's fill and every divider disappears.
 
 **Special case — asset components** (open-ended content prop such as icon `name`, later brand
 icons): build the wrapper `COMPONENT_SET` + Instance Swap library per
@@ -222,9 +246,9 @@ before building it, then record the answer here.
 
 **Hard rules (check before asking for approval):** default variant in the top-left cell and first
 in layer order · `state` on the column axis · remaining options ordered per convention · every
-property name, option value and `sub-label` lowercase, every set name PascalCase per
-`PHASE-2-PROPOSE.md` → "Naming" · fixed uniform cell grid · dashed outer stroke
-**and** inner dashed grid lines · outside labels naming every axis and option · variant layers in
+property name and option value lowercase, every set name PascalCase and every `sub-label` equal
+to its set name per `PHASE-2-PROPOSE.md` → "Naming" · fixed uniform cell grid · dashed outer stroke
+**and** inner dashed grid lines — per set `(cols − 1) + (rows − 1)` dividers, styled like the prototypes, `Grid` above the set · outside labels naming every axis and option · variant layers in
 grid reading order · no Figma default layer names · no styling literal written by this skill.
 
 ### Documentation frame header
@@ -277,8 +301,8 @@ re-set all three hyperlinks, unconditionally, even if they look correct. A human
 - The category page and the component's documentation frame exist, cloned from
   `🗂️ Template / Category` (no styling values written by this skill), with the header filled,
   `review-status` at `status=review` and all three links hyperlinked.
-- `figmaComponentKey`, `figmaMasterNodeId`, `figmaPage` and `figmaDocFrameNodeId` are written back
-  into the mapping file.
+- `sets:` (every set, default first), `figmaPage` and `figmaDocFrameNodeId` are written back into
+  the mapping file.
 
 ## Next Phase
 

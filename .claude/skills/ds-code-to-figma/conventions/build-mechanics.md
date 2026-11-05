@@ -106,7 +106,9 @@ imported.width)`, then move **all** `imported.children` (via `findAll`, not `fin
   resolved value as its color — never a placeholder.** After `setBoundVariableForPaint`, a master
   can keep rendering the placeholder color even though the binding is correct and instances
   resolve fine. Build the paint from `variable.resolveForConsumer(node).value` before binding.
-  Easy to miss: only the masters look wrong, the documentation instances look right.
+  Easy to miss: only the masters look wrong, the documentation instances look right. Include the
+  alpha: a transparent token on an opaque placeholder renders as a solid shape. (From: `ds-close`,
+  05.11.2026 — transparent `base` background rendered as a black circle, navy icon as black.)
 - **Every skill-authored label/annotation text on the documentation page — never the component's
   own content — binds its fill to `🔗 Alias/🔤 Text/Color/Primary` (`VariableID:137:288`), never a
   hardcoded literal color**, even when the literal happens to match the token's resolved value

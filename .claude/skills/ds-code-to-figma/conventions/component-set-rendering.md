@@ -80,10 +80,13 @@ COMPONENT node` when set on a variant child, and auto-assignment never populates
   render inside an absolute-positioned overlay frame, even when its `absoluteTransform` is
   independently verified mathematically correct.** Suspected cause: clip-testing or render-bounds
   computation using the node's pre-rotation bounding box, which can sit entirely outside the
-  parent's bounds even though the post-rotation geometry is entirely inside them. **Fix: build a
-  vertical divider as a thin stroked `RECTANGLE` instead** — `fills: []`, near-zero `width` (e.g.
-  `0.01`), the real target height, only `strokeLeftWeight` set. Renders identically to a dashed
-  vertical line with none of the rotated-`LINE` risk. Horizontal (non-rotated) `LINE` nodes are
+  parent's bounds even though the post-rotation geometry is entirely inside them. **Fix: clone the template's
+  vertical divider prototype** (a `RECTANGLE`, `fills: []`, 0.01 wide, `strokeLeftWeight` 2,
+  dashed) and change only height and position.
+- **The `Grid` overlay must come after the component set in its parent** (`Column Labels`, set,
+  `Grid`). Below the set it is fully covered by the set's own fill — every divider exists, reports
+  a correct `absoluteRenderBounds`, and still doesn't show. (From: `ds-close`, 05.11.2026 — the
+  new set was placed after `Grid`.) Horizontal (non-rotated) `LINE` nodes are
   unaffected — this is specific to rotation.
 - **Setting `layoutPositioning = 'ABSOLUTE'` in the same script call as a later operation that
   throws rolls back the `ABSOLUTE` write too**, even though it executed and returned successfully

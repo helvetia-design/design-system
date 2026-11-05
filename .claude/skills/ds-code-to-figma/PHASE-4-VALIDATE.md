@@ -11,6 +11,8 @@ Verify the built Figma component set against the confirmed mapping file `<name>.
 - The component's name, category folder, JSDoc lead, and `packages/core/package.json` `version`.
 - Every resolved Figma variable id from Phase 1 (`tokens:` list) and every nested DS component's
   Figma component key (Phase 1, step 4).
+- The component's visual test: `test/<name>.visual.html` and the `*-Desktop-Chrome-linux.png`
+  snapshots in `test/<name>.visual.play.ts-snapshots/`.
 
 ## References
 
@@ -22,7 +24,7 @@ Verify the built Figma component set against the confirmed mapping file `<name>.
 
 1. Load `figma-use` (mandatory before any `use_figma` call; all calls in this phase are read-only)
    and create a session against `figma.config.json`'s `componentLibraryFileKey`. **Locate the
-   nodes** by the mapping-file fields Phase 3 wrote (`figmaMasterNodeId`,
+   nodes** by the mapping-file fields Phase 3 wrote (`sets:` → each `figmaMasterNodeId`,
    `figmaDocFrameNodeId`, `figmaPage`). If a node is missing, mark every check on it
    `fail` (`node not found`).
 2. **Check the documentation frame header** against `PHASE-3-BUILD.md` → "Documentation frame
@@ -35,8 +37,8 @@ Verify the built Figma component set against the confirmed mapping file `<name>.
 3. **Check the prop/state mapping against the confirmed `<name>.figma.md`** from Phase 2:
    a. Every prop and state listed there is present on the built component set(s) — nothing
    dropped, nothing extra. Every name in `componentPropertyDefinitions`, every variant option
-   value and `sub-label` is lowercase with spaces, and every set name is flat PascalCase with the
-   default set bare, per `PHASE-2-PROPOSE.md` → "Naming"
+   value is lowercase with spaces, every set name is flat PascalCase with the default set bare,
+   and every `sub-label` equals its set name, per `PHASE-2-PROPOSE.md` → "Naming"
    (list each wrong name). Same layers/different token → a variant property on the
    `COMPONENT_SET`, never a shared "style" variant.
    b. **Top-level splits** — walk `PHASE-2-PROPOSE.md` → "Top-level splits" in order, per prop:
@@ -45,12 +47,17 @@ Verify the built Figma component set against the confirmed mapping file `<name>.
    2. Inverted axis → separate `<Component>` and `<Component>Inverted` sets.
    3. Over-500 split → the split axis and set names match the mitigation recorded in
       `<name>.figma.md`, and every set has ≤500 variants (count the real children).
-      c. No set exists without one of these three rules behind it, and the number and names of the
-      sets match `<name>.figma.md`. Flag any prop/state that was merged, split, or skipped
-      differently than the confirmed mapping file.
+
+   c. No set exists without one of these three rules behind it, and the number and names of the
+   sets match `<name>.figma.md`. Flag any prop/state that was merged, split, or skipped
+   differently than the confirmed mapping file.
+
 4. **Check token and nested-component bindings** on every variant:
    a. Every fill, stroke, spacing, radius, size and text style is bound to a variable from the
-   Phase 1 `tokens:` list — no hardcoded value, no variable outside that list.
+   Phase 1 `tokens:` list — no hardcoded value, no variable outside that list. **Every bound
+   paint's stored colour and opacity equal the variable's resolved value for that node**
+   (`variable.resolveForConsumer(node).value`, alpha included); a mismatch is a `fail` even when
+   the binding itself is correct (see `conventions/build-mechanics.md` → "Color and paint").
    b. Every nested instance's main component key matches the Phase 1 key for that DS component —
    no detached instance, no local copy.
    c. Every icon slot from the mapping file has its `INSTANCE_SWAP` property (lowercase name,
@@ -59,31 +66,69 @@ Verify the built Figma component set against the confirmed mapping file `<name>.
    code per variant.
 5. **Check the component set's layout against the template** (`🗂️ Template / Category` →
    `Labeled component set` in `PHASE-3-BUILD.md`):
-   a. The set has both the outer dashed stroke around the whole grid and the inner dashed divider
-   lines at every cell boundary (`divider-row-<n>` / `divider-col-<n>`), cloned from the template —
-   stroke colour, `dashPattern` and weight identical to the template node, never redrawn or
-   missing.
-   b. Every column and row label is present and centred within ±1px: column values centred on
-   their column, the column axis name centred on the set, row values vertically centred on the
-   rows they cover, and the row axis name on the lane's left edge, on the same line as the column
-   values.
-   c. **Ordering** per `conventions/component-set-rendering.md` → "Option and axis ordering": the
-   top-left cell and the first variant layer is the default variant (every axis at its code
-   default), `state` is the column axis when the component has one (without `state`, either placement
-   of `size` passes), and every
-   axis's remaining options follow canonical order.
-6. **Write the validation report** (see [Output](#output)).
+   a. **Outer stroke and grid dividers**, per set. Find the set's own `Grid` through its parent
+   (`set.parent` → the sibling named `Grid` in the same `Column + Box`) and check only that node's
+   `children` — never a name search across the page, which picks up other frames' dividers.
+   - The outer dashed stroke around the whole grid exists, with stroke colour, `dashPattern` and
+     weight identical to the template node.
+   - **Count:** exactly `cols − 1` × `divider-col-<n>` and `rows − 1` × `divider-row-<n>`.
+     Report found vs. expected for each (e.g. `divider-col: 0 / 4`).
+   - **Geometry:** each divider sits on its cell boundary (±1px) and spans the full set height
+     (`divider-col`) or width (`divider-row`).
+   - **Layer order:** `Grid`'s index in `Column + Box` is greater than the set's (`Column
+Labels`, set, `Grid`). Below the set, the set's fill covers every divider.
+   - **Renders:** each is `visible`, opacity > 0, with a non-empty `absoluteRenderBounds` — a
+     rotated `LINE` can report correct values and still not render (see
+     `conventions/component-set-rendering.md`).
+   - **Styling:** type, width/height on the thin axis, fills, strokes, stroke weights
+     (incl. `strokeLeftWeight`) and `dashPattern` identical to the template prototype — quote
+     both values.
+     Any miss is a `fail`; styling alone never passes this check.
+     b. Every column and row label is present and centred within ±1px: column values centred on
+     their column, the column axis name centred on the set, row values vertically centred on the
+     rows they cover, and the row axis name on the lane's left edge, on the same line as the column
+     values.
+     c. **Ordering** per `conventions/component-set-rendering.md` → "Option and axis ordering": the
+     top-left cell and the first variant layer is the default variant (every axis at its code
+     default), `state` is the column axis when the component has one (without `state`, either placement
+     of `size` passes), and every
+     axis's remaining options follow canonical order.
+     d. **Inverted background:** every `…Inverted` stack sits on a dark background cloned from the
+     template's `Inverted` stack — same fill and variable binding as that template node (the dark
+     `Alias/Surface/Primary`, per `conventions/page-structure.md`). A light or missing background is a
+     `fail`.
+6. **Compare against the visual test snapshots** — a quick look, not a pixel diff:
+   a. Read `packages/core/src/components/<category>/<name>/test/<name>.visual.html` to see which
+   attributes each test case renders, and the matching `*-Desktop-Chrome-linux.png` files in
+   `test/<name>.visual.play.ts-snapshots/` (one per case, e.g. `close-sizes-…`, `close-inverted-…`).
+   b. Take one `get_screenshot` of each labeled set (set, labels and `Grid`) and name its node id
+   in the report. Check every vertical and horizontal grid line is visible in it; a missing line
+   is a `fail` even if step 5a passed.
+   c. For every snapshot case, compare it with the Figma variant(s) that have the same props
+   (default state): shape and silhouette, background present or not, glyph, colours (incl. the
+   inverted set against the dark background), and the size relation between `size` options. Any
+   visible difference is a `fail` naming the case, the variant, and what differs (e.g.
+   `close-sizes: snapshot shows a navy × with no background, Figma shows a black filled circle`).
+   d. Skip, and don't list as checks: states the snapshots don't show (hover, focus, active,
+   disabled) and snapshot cases for props the confirmed mapping file deliberately excludes (e.g. a
+   `button` mode). No snapshot folder → mark this check `not verified`.
+7. **Write the validation report** (see [Output](#output)).
 
 ## Rules
 
 - MUST validate actual Figma nodes — never assume a tool operation succeeded.
+- MUST quote evidence for every `pass`: the node id(s) read and the measured values (count,
+  x/y, width/height, variable id, `absoluteRenderBounds`, screenshot node id). A check without
+  evidence is `not verified`, never `pass`.
+- MUST NOT turn a `not verified` check into `pass` (e.g. by calling it "expected"); any
+  `not verified` makes the verdict `blocked`.
 - MUST NOT modify Figma during validation.
 
 ## Output
 
-`<name>.figma-validation.md` next to `<name>.figma.md`: one entry per check from steps 2–5 with its
+`<name>.figma-validation.md` next to `<name>.figma.md`: one entry per check from steps 2–6 with its
 result (`pass` / `fail` / `not verified`), the affected node name/id, and for each failure what was
-expected vs. found. End with an overall verdict:
+expected vs. found — with the evidence required by [Rules](#rules). End with an overall verdict:
 
 - `pass` — every check passed.
 - `fail` — at least one check failed.

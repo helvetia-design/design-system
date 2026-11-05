@@ -25,14 +25,14 @@ user sign-off on it — before anything is built.
 #### Naming
 
 - **Properties — lowercase, words separated by spaces:** component property names (variant,
-  boolean, instance swap, text), variant option values and `sub-label`s. Convert camelCase by
+  boolean, instance swap, text) and variant option values. Convert camelCase by
   splitting words — `labelPosition` → `label position`, `brandIcon` → `brand icon`; a boolean show
   property is `show <name>` (e.g. `show icon`).
 - **Component set and swap-library component names — PascalCase, flat, no `/`:** the default set (the one holding the code
   default of every split axis) gets the bare component name; every other set appends its split
   option(s) — `Button` + `ButtonInverted`, `Pagination` + `PaginationDots` +
   `PaginationDotsInverted`. The category page already groups sets in the assets panel, so no
-  slash folders.
+  slash folders. Each stack's `sub-label` shows its exact set name.
 - Template layer names and the header's `component` text keep their own case.
 
 #### Top-level splits
