@@ -34,9 +34,9 @@ Verify the built Figma component set against the confirmed mapping file `<name>.
    `link-github`) carry the correct, non-blank hyperlink per that section's URL rules.
 3. **Check the prop/state mapping against the confirmed `<name>.figma.md`** from Phase 2:
    a. Every prop and state listed there is present on the built component set(s) — nothing
-   dropped, nothing extra. Every name in `componentPropertyDefinitions`, every variant option
-   value and `sub-label` is lowercase with spaces, and every set name is flat PascalCase with the
-   default set bare, per `PHASE-2-PROPOSE.md` → "Naming"
+   dropped, nothing extra. Every name in `componentPropertyDefinitions` and every variant option
+   value is lowercase with spaces, every set name is flat PascalCase with the default set bare, and
+   every `sub-label` equals its set's name, per `PHASE-2-PROPOSE.md` → "Naming"
    (list each wrong name). Same layers/different token → a variant property on the
    `COMPONENT_SET`, never a shared "style" variant.
    b. **Top-level splits** — walk `PHASE-2-PROPOSE.md` → "Top-level splits" in order, per prop:
@@ -67,6 +67,9 @@ Verify the built Figma component set against the confirmed mapping file `<name>.
    their column, the column axis name centred on the set, row values vertically centred on the
    rows they cover, and the row axis name on the lane's left edge, on the same line as the column
    values.
+   c. Every axis's options are in the order from `conventions/component-set-rendering.md` →
+   "Option and axis ordering": code default first, so the default variant sits in the top-left
+   cell of every set.
 6. **Write the validation report** (see [Output](#output)).
 
 ## Rules

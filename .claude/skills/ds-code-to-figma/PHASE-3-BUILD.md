@@ -168,15 +168,16 @@ values**; clone a prototype and change only text and positions.
 1. **Stacks — one per top-level split option from Phase 2** (`PHASE-2-PROPOSE.md` → "Top-level
    splits"). Name each stack's `sub-label` and set:
 
-   | Top-level split             | Stacks                                    | `sub-label`                                            | Set name (e.g.)                                                                |
-   | --------------------------- | ----------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------ |
-   | None                        | one                                       | removed                                                | `Button`                                                                       |
-   | Rule 1 or 3 only            | one per option of the split axis          | `default` / `<split>`                                  | `Pagination`, `PaginationDots`                                                 |
-   | Rule 2 (inverted axis) only | default, inverted                         | `default` / `inverted`                                 | `Button`, `ButtonInverted`                                                     |
-   | Rule 1 or 3 **and** rule 2  | one per combination, rule 1/3 split outer | `default`, `inverted`, `<split>`, `<split> / inverted` | `Pagination`, `PaginationInverted`, `PaginationDots`, `PaginationDotsInverted` |
+   | Top-level split             | Stacks                                    | Set name and `sub-label` (e.g.)                                                |
+   | --------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------ |
+   | None                        | one                                       | `Button`; `sub-label` removed                                                  |
+   | Rule 1 or 3 only            | one per option of the split axis          | `Pagination`, `PaginationDots`                                                 |
+   | Rule 2 (inverted axis) only | default, inverted                         | `Button`, `ButtonInverted`                                                     |
+   | Rule 1 or 3 **and** rule 2  | one per combination, rule 1/3 split outer | `Pagination`, `PaginationInverted`, `PaginationDots`, `PaginationDotsInverted` |
 
-   Set names follow `PHASE-2-PROPOSE.md` → "Naming": PascalCase, flat, the default set bare. The
-   `sub-label` never repeats the component name — the frame title already shows it.
+   Set names follow `PHASE-2-PROPOSE.md` → "Naming": PascalCase, flat, the default set bare. Each
+   `sub-label` is its set's name, exactly — what the canvas shows is what Assets and instance names
+   show. With a single stack the `sub-label` is removed; the frame title already names it.
 
    Source every inverted stack from the template's `Inverted` stack and every other stack from its
    `Primary` stack. Delete template stacks that aren't needed.
@@ -187,7 +188,8 @@ values**; clone a prototype and change only text and positions.
 3. **Axes → grid.** Per `PHASE-2-PROPOSE.md` step 2: `size` is the innermost column axis; every
    other axis is a row, nested outer→inner by ascending option count (ties: prop declaration order).
    Order the options within each axis per `conventions/component-set-rendering.md` → "Option and
-   axis ordering" — smallest left/top, largest right/bottom.
+   axis ordering" — code default first, then smallest left/top, largest right/bottom, so the
+   default variant is the top-left cell.
 4. **Fixed cell grid, not Figma's native arrangement.** Cell = the largest variant in the whole set
    **plus 16px on every side** (width from the widest variant, height from the tallest). One
    uniform cell size. Centre each variant in its cell by computed x/y, then resize the set to
@@ -220,7 +222,7 @@ in the template yet: on the first asset component, **stop and ask the user** how
 before building it, then record the answer here.
 
 **Hard rules (check before asking for approval):** options ordered per convention · every
-property name, option value and `sub-label` lowercase, every set name PascalCase per
+property name and option value lowercase, every set name PascalCase and every `sub-label` equal to its set name per
 `PHASE-2-PROPOSE.md` → "Naming" · fixed uniform cell grid · dashed outer stroke
 **and** inner dashed grid lines · outside labels naming every axis and option · variant layers in
 grid reading order · no Figma default layer names · no styling literal written by this skill.

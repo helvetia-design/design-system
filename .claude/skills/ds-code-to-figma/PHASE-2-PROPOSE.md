@@ -25,9 +25,11 @@ user sign-off on it — before anything is built.
 #### Naming
 
 - **Properties — lowercase, words separated by spaces:** component property names (variant,
-  boolean, instance swap, text), variant option values and `sub-label`s. Convert camelCase by
+  boolean, instance swap, text) and variant option values. Convert camelCase by
   splitting words — `labelPosition` → `label position`, `brandIcon` → `brand icon`; a boolean show
   property is `show <name>` (e.g. `show icon`).
+- **`sub-label` = its set's name**, exactly (`Spinner`, `SpinnerInverted`), so the canvas shows
+  what Assets and instance names show.
 - **Component set and swap-library component names — PascalCase, flat, no `/`:** the default set (the one holding the code
   default of every split axis) gets the bare component name; every other set appends its split
   option(s) — `Button` + `ButtonInverted`, `Pagination` + `PaginationDots` +
@@ -76,12 +78,13 @@ Phase 3. This ASCII sketch is a planning/counting aid, **not** a literal renderi
 "Labeled component set" (that section places the real `COMPONENT_SET` and lets Figma's
 `combineAsVariants()` arrange it). Put the sketch in the same draft and **state which case
 applies** before asking for approval. Order every axis's options per
-`conventions/component-set-rendering.md` → "Option and axis ordering" (smallest left/top, largest
-right/bottom) so the approved sketch already shows the final order:
+`conventions/component-set-rendering.md` → "Option and axis ordering" (code default first, then
+smallest left/top, largest right/bottom — the default variant is the top-left cell) so the approved
+sketch already shows the final order:
 
 - **2 axes (normal case)**: one grid, e.g. `state` (rows) × `size` (columns).
   ```
-             sm        base
+             base      sm
   default  [cell]    [cell]
   hover    [cell]    [cell]
   active   [cell]    [cell]
@@ -93,10 +96,10 @@ right/bottom) so the approved sketch already shows the final order:
     options outermost; ties broken by prop declaration order, first-declared outermost). No
     height-based rebalancing.
   - In ASCII, print the outermost row label once per group, blank beneath (merged-cell look).
-  - Example — `size` (sm/lg), `color` (6 options), `pulse` (2 options): `pulse` outermost,
+  - Example — `size` (base/lg), `color` (6 options), `pulse` (2 options): `pulse` outermost,
     `color` inside it, `size` on columns.
     ```
-                      sm      lg
+                      base    lg
     false   default  [cell]  [cell]
             disabled [cell]  [cell]
             info     [cell]  [cell]
@@ -142,8 +145,8 @@ across the whole library file) — staying under it leaves headroom for other co
 
 Write the proposed grouping (table result + grid sketch + count) into `<name>.figma.md` and
 present it to the user for review. **Pre-flight before presenting:** verify every axis's
-`figmaOptions:` and the ASCII sketch follow the ordering rules (smallest at the left or top, e.g.
-`sm` before `base`) and every name follows [Naming](#naming) — checked, not assumed.
+`figmaOptions:` and the ASCII sketch follow the ordering rules (code default first, e.g. `base`
+before `sm`; the default variant in the top-left cell) and every name follows [Naming](#naming) — checked, not assumed.
 
 ### 5. Wait for confirmation
 

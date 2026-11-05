@@ -6,15 +6,18 @@ index.
 ## Option and axis ordering
 
 Single source of truth — `PHASE-2-PROPOSE.md` (grid sketch) and `PHASE-3-BUILD.md` (build) both
-follow it. Direction is always **smallest/first at the left (column axes) or top (row axes),
-largest/last at the right or bottom**.
+follow it.
+
+**The code default comes first on every axis** — first column, top row — so the default variant
+always sits in the top-left cell. The remaining options follow the rules below, smallest/first at
+the left (column axes) or top (row axes), largest/last at the right or bottom.
 
 1. **T-shirt scale:** `3xs · 2xs · xs · sm · base · md · lg · xl · 2xl · 3xl`. A component uses
-   only the subset it has; `base` always sits between `sm` and `md`, even if one of them is absent
-   (`xs / base / lg`).
+   only the subset it has. The default (usually `base`) moves to the front and the rest keep
+   this order: `base · sm · md · lg`, `base · xs · lg`.
 2. **`state`:** `default / hover / focus / active / disabled / loading` (only those the component
    has). `readonly` is out of scope for Figma.
-3. **Boolean axes:** `false` first, then `true`.
+3. **Boolean axes:** `false` first, then `true` (unless the code default is `true`).
 4. **Any other axis:** source order of the TypeScript union/enum. Never alphabetical.
 5. **Mixed axis** (scale members plus other values, e.g. `sm | base | lg | full`): scale members
    first in scale order, then the non-scale values in source order.

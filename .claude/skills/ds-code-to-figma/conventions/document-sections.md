@@ -52,7 +52,7 @@ A nested `Preview` you create (rather than clone) starts at the master's fixed w
   `Preview` slot.
 - **Anatomy**: `Section` `Flat`; one nested `Default` `Preview` inside the outer slot holds the
   diagram and legend.
-- **Specs**: `Section` `Flat`; one nested `Default` `Preview` per Variants-axis option (e.g.
-  `base`/`lg`/`sm`), stacked, each holding that option's preview and legend card.
+- **Specs**: `Section` `Flat`; up to three nested `Default` `Preview`s, stacked — drawn spec,
+  sizes table, behavior. See `specs.md` → "Section layout".
 - **Component Set**: not a `Section`/`Preview` — see `../PHASE-3-BUILD.md`'s "Labeled component
   set". The labeled set never sits inside another bordered `Preview`.

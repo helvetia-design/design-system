@@ -21,6 +21,8 @@ user _approving_ it — never auto-appended.
   Set axis labeling, sizing/grid mechanics, screenshot reliability for this section (Phase 3).
 - [`conventions/document-sections.md`](conventions/document-sections.md) — `Section` / `Preview` /
   `Title` mechanics for the Copy me, Anatomy and Specs sections (Phases 6–8).
+- [`conventions/specs.md`](conventions/specs.md) — which sizes Specs shows (groups, triage rules)
+  and how each one is drawn (kinds, line styles, section layout) (Phases 1 and 8).
 - [`conventions/build-mechanics.md`](conventions/build-mechanics.md) — general Figma Plugin API
   gotchas that apply across any phase: platform limits, variant-set mechanics, auto-layout
   sizing, vector import, color/paint, focus states.
@@ -45,7 +47,7 @@ Use these terms, and only these, in every phase and topic file.
 | **wrapper + swap library**                    | The content-selection pattern (`conventions/content-selection-and-mitigations.md`). Not a top-level split.                                  | wrapper + Instance Swap split                                    |
 | **documentation frame**                       | `<Component> Documentation` on the category page.                                                                                           |                                                                  |
 | **`Documentation` / `Component Sets` column** | The two `body` columns of the documentation frame (layer names).                                                                            | left `documentation` column, 🔒 Component Set panel              |
-| **naming**                                    | Properties, option values, `sub-label`s: lowercase with spaces. Set names: flat PascalCase (`PHASE-2-PROPOSE.md` → "Naming").               | `Show icon`, `labelPosition`, `button/primary`                   |
+| **naming**                                    | Properties, option values: lowercase with spaces. Set names: flat PascalCase; `sub-label` = set name (`PHASE-2-PROPOSE.md` → "Naming").     | `Show icon`, `labelPosition`, `button/primary`                   |
 | **default set**                               | The component set holding every split axis's code default; carries the bare name (`Button`).                                                | primary set                                                      |
 | **checkpoint** (🟡) / **hard stop** (🛑)      | Per [`DECISIONS.md`](DECISIONS.md). Lowercase in prose.                                                                                     | HARD STOP                                                        |
 

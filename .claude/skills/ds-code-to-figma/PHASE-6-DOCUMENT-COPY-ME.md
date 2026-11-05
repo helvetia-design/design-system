@@ -30,9 +30,9 @@ Build this right after [`PHASE-4-VALIDATE.md`](PHASE-4-VALIDATE.md) returns `pas
 `Documentation` column** — don't create a new `Section`. It is the first one in the column; hard stop if no `kind=copy-me` placeholder exists
 (see `conventions/document-sections.md`). Insert one **instance** of the default variant **directly into the `Preview`'s slot** — no further nesting — the single
 "drag this into your design" example. Use a Figma `INSTANCE` (`variant.createInstance()`) of the
-finished component-set variant — never the variant node itself. If the component has any boolean
-`show <name>` property (per Phase 2's conditional-render rule), override it to `true` on this instance
-for readability, while the component set's own default stays whatever matches code.
+finished component-set variant — never the variant node itself. Override nothing: every property,
+`show <name>` booleans included, keeps the set's default, so Copy me shows exactly what the
+component renders with no props set — the same variant as the set's top-left cell.
 
 Iterate on it with the user in Figma before moving on, same discipline as every other section.
 
@@ -44,7 +44,7 @@ Iterate on it with the user in Figma before moving on, same discipline as every 
 ## Completion Criteria
 
 - The filled `Section` uses `kind=copy-me` and `Default` variant, with the default-variant
-  instance inserted directly into the `Preview`'s slot.
+  instance inserted directly into the `Preview`'s slot, with no property overridden.
 - The section has been iterated on and confirmed with the user in Figma.
 
 ## Next Phase

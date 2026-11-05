@@ -17,7 +17,8 @@ have produced, and closes with an explicit `Next:` pointer to the following file
 
 1. [`PHASE-1-ANALYZE.md`](PHASE-1-ANALYZE.md) — read the component's code (props, anatomy,
    pseudo-states, text attributes) and resolve every value to a Figma design token, hard-stopping
-   on anything that can't be resolved. Writes the draft `<name>.figma.md`.
+   on anything that can't be resolved, then measures the component's sizes on the dev server and
+   triages which ones Specs shows. Writes the draft `<name>.figma.md`.
 2. [`PHASE-2-PROPOSE.md`](PHASE-2-PROPOSE.md) — turn the draft into a concrete Figma
    variant-grouping proposal (variant vs. instance-swap vs. top-level split, grid sketch, 500-variant
    budget check) and get the user's explicit sign-off before anything is built.
@@ -35,7 +36,8 @@ have produced, and closes with an explicit `Next:` pointer to the following file
 7. [`PHASE-7-DOCUMENT-ANATOMY.md`](PHASE-7-DOCUMENT-ANATOMY.md) — build "🏗️ Anatomy", the second
    section of the left column (the placeholder is deleted when the component has no `@part` tags).
 8. [`PHASE-8-DOCUMENT-SPECS.md`](PHASE-8-DOCUMENT-SPECS.md) — build "📐 Specs", the last section of
-   the left column; this is the last phase.
+   the left column: a drawn spec, a sizes table and, for content-driven components, a behavior
+   card; this is the last phase.
 
 ### Graph
 
@@ -53,7 +55,9 @@ flowchart TD
         P1a["Read component code<br/>.tsx / .host.scss"]:::code --> P1anat["Extract anatomy from<br/>@part tags"]:::code
         P1anat --> P1anatC{{"User reviews<br/>anatomy list"}}:::human
         P1anatC --> P1b["Resolve design tokens<br/>(read-only Figma variables)"]:::figma
-        P1b --> P1c["Write draft<br/>name.figma.md"]:::code
+        P1b --> P1m["Measure sizes on the<br/>dev server, classify"]:::code
+        P1m --> P1mC{{"User confirms<br/>specs triage"}}:::human
+        P1mC --> P1c["Write draft<br/>name.figma.md"]:::code
     end
 
     P1G --> P2G
@@ -122,7 +126,7 @@ flowchart TD
 
     subgraph P8G["Phase 8 — Specs"]
         direction LR
-        P8a["Build one spec card<br/>per Variants-axis option"]:::figma --> P8b{{"User confirms<br/>Specs"}}:::human
+        P8a["Drawn spec + sizes table<br/>(+ behavior card)"]:::figma --> P8b{{"User confirms<br/>Specs"}}:::human
     end
 
     P8G --> Done(["Done: component live in Figma"]):::phase
@@ -132,7 +136,7 @@ flowchart TD
 🟣 **figma** — a `use_figma`/`get_screenshot` call against the live Figma file.
 🟡 **human** — a required stop-and-wait checkpoint; never assume approval and keep going.
 
-The human checkpoints (Phase 1's anatomy review, Phase 2's mapping confirmation, Phase 3's
+The human checkpoints (Phase 1's anatomy review and specs triage, Phase 2's mapping confirmation, Phase 3's
 first-variant and documentation-frame approvals in Figma, and the Copy me / Anatomy / Specs
 confirmations in Phases 6–8) are the only _required_ stops. Phases 4–5 run on their own and stop
 only on a `blocked` verdict or a repair hard stop. For the full list of every checkpoint and
