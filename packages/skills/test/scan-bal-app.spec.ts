@@ -336,6 +336,9 @@ describe('app migration.md', () => {
       'same name and a `.ts` extension',
       'per-file summary',
       'git commit',
+      'the call keeps only its `icons` entry',
+      'plus `useBaloiseDesignSystem` when its call was deleted',
+      'kept with only its `icons` entry until the last `bal-*` component is migrated',
     ]) {
       expect(migration, phrase).toContain(phrase)
     }
