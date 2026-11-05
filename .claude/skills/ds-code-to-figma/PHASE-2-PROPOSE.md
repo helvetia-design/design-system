@@ -78,26 +78,31 @@ Phase 3. This ASCII sketch is a planning/counting aid, **not** a literal renderi
 "Labeled component set" (that section places the real `COMPONENT_SET` and lets Figma's
 `combineAsVariants()` arrange it). Put the sketch in the same draft and **state which case
 applies** before asking for approval. Order every axis's options per
-`conventions/component-set-rendering.md` → "Option and axis ordering" (code default first, then
-smallest left/top, largest right/bottom — the default variant is the top-left cell) so the approved
+`conventions/component-set-rendering.md` → "Option and axis ordering" (code default first, so the
+top-left cell is the default variant; then smallest left/top, largest right/bottom) so the approved
 sketch already shows the final order:
 
-- **2 axes (normal case)**: one grid, e.g. `state` (rows) × `size` (columns).
+**Column axis — hard rule, overrides the `size` placement:** `state` is always the single column
+axis, so each row reads left to right from the default variant through its states (`default ·
+hover · focus · active · …`). `size` then moves to the rows. Only a component with no `state`
+axis puts `size` on the column — there the placement doesn't matter; the default just keeps
+runs consistent.
+
+- **2 axes (normal case)**: one grid, e.g. `size` (rows) × `state` (columns).
   ```
-             base      sm
-  default  [cell]    [cell]
-  hover    [cell]    [cell]
-  active   [cell]    [cell]
+          default  hover   active
+  base    [cell]   [cell]  [cell]
+  sm      [cell]   [cell]  [cell]
   ```
 - **3+ same-layer axes (Primer-style nested matrix)**: fold all axes into one matrix with nested
   row groups — don't stack repeated 2-axis grids. Fixed assignment, no per-component judgment:
-  - `size` is always the single, innermost **column** axis.
+  - The column axis per the hard rule above (`state`, else `size`).
   - Every other axis goes on **rows**, nested outer→inner by **ascending option count** (fewest
     options outermost; ties broken by prop declaration order, first-declared outermost). No
     height-based rebalancing.
   - In ASCII, print the outermost row label once per group, blank beneath (merged-cell look).
   - Example — `size` (base/lg), `color` (6 options), `pulse` (2 options): `pulse` outermost,
-    `color` inside it, `size` on columns.
+    `color` inside it, `size` on columns (no `state` axis).
     ```
                       base    lg
     false   default  [cell]  [cell]
@@ -145,8 +150,9 @@ across the whole library file) — staying under it leaves headroom for other co
 
 Write the proposed grouping (table result + grid sketch + count) into `<name>.figma.md` and
 present it to the user for review. **Pre-flight before presenting:** verify every axis's
-`figmaOptions:` and the ASCII sketch follow the ordering rules (code default first, e.g. `base`
-before `sm`; the default variant in the top-left cell) and every name follows [Naming](#naming) — checked, not assumed.
+`figmaOptions:` and the ASCII sketch follow both ordering hard rules (code default first —
+top-left cell = default variant; then smallest at the left or top, e.g. `base · sm · lg`),
+`state` is the column axis and every name follows [Naming](#naming) — checked, not assumed.
 
 ### 5. Wait for confirmation
 
@@ -171,7 +177,8 @@ exact diff and get approval before writing it — never auto-append.
 ## Completion Criteria
 
 - The variant count is ≤500 (after any mitigation round-trip with the user).
-- Every axis's options are in canonical order (checked, not assumed).
+- Every axis's options are ordered code default first, then canonical order (checked, not
+  assumed).
 - The user has explicitly confirmed or edited the grouping and sketch — not an assumed approval.
 - Any new heuristic was shown as a diff and approved before being written.
 

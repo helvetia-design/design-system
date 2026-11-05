@@ -41,7 +41,7 @@ props:
   options: [sm, base]
   figmaProperty: size
   figmaPropertyType: variant
-  figmaOptions: [base, sm] # canonical order: code default first (implicit default `base`), then scale order
+  figmaOptions: [base, sm] # code default first (top-left = default variant), then canonical order
 - name: label
   type: string
   figmaProperty: null

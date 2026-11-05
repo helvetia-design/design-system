@@ -157,13 +157,6 @@ export class Button implements DsComponentInterface {
   readonly flat: boolean = false
 
   /**
-   * If `true` the button is outlined
-   */
-  @Prop()
-  @Type('boolean')
-  readonly outlined: boolean = false
-
-  /**
    * If `true` the button is inverted
    */
   @Prop({ reflect: true })

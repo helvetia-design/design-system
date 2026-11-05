@@ -185,11 +185,11 @@ values**; clone a prototype and change only text and positions.
 2. **Combine** the stack's variants into a `COMPONENT_SET` with `combineAsVariants()`. Clone the
    template set's fill, stroke (dashed, purple, variable-bound) and corner radius onto it by
    copying them from the template set — never recreate them.
-3. **Axes → grid.** Per `PHASE-2-PROPOSE.md` step 2: `size` is the innermost column axis; every
-   other axis is a row, nested outer→inner by ascending option count (ties: prop declaration order).
+3. **Axes → grid.** Per `PHASE-2-PROPOSE.md` step 2: `state` is the column axis (`size` only when
+   there is no `state` axis); every other axis is a row, nested outer→inner by ascending option count (ties: prop declaration order).
    Order the options within each axis per `conventions/component-set-rendering.md` → "Option and
-   axis ordering" — code default first, then smallest left/top, largest right/bottom, so the
-   default variant is the top-left cell.
+   axis ordering" — code default first (top-left cell = default variant), then smallest left/top,
+   largest right/bottom.
 4. **Fixed cell grid, not Figma's native arrangement.** Cell = the largest variant in the whole set
    **plus 16px on every side** (width from the widest variant, height from the tallest). One
    uniform cell size. Centre each variant in its cell by computed x/y, then resize the set to
@@ -221,7 +221,8 @@ for the content axis, below `Component Sets` in the documentation frame. Its lay
 in the template yet: on the first asset component, **stop and ask the user** how it should look
 before building it, then record the answer here.
 
-**Hard rules (check before asking for approval):** options ordered per convention · every
+**Hard rules (check before asking for approval):** default variant in the top-left cell and first
+in layer order · `state` on the column axis · remaining options ordered per convention · every
 property name and option value lowercase, every set name PascalCase and every `sub-label` equal to its set name per
 `PHASE-2-PROPOSE.md` → "Naming" · fixed uniform cell grid · dashed outer stroke
 **and** inner dashed grid lines · outside labels naming every axis and option · variant layers in

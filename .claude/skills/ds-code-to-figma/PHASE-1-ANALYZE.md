@@ -29,8 +29,8 @@ Read the component's code and produce the draft mapping that Phase 2 proposes a 
    `@Prop()`** — ignore `@Method`, `@Event`, and private `@State`. Note each prop's type
    (`@OneOf([...])` enum, boolean, string, number) and default. Write every enum's
    `figmaOptions:` in canonical order per `conventions/component-set-rendering.md` → "Option and
-   axis ordering" (code default first, the rest in scale order: `base · sm · md · lg`). The
-   implicit unset default is named `base`.
+   axis ordering": code default first (hard rule A), then canonical order (hard rule B) — e.g.
+   `base · sm · md · lg`. The implicit unset default is named `base`.
 2. Extract the component's **anatomy** — its named visual parts — from the class-level `@part`
    JSDoc tags (e.g. `ds-button`: `@part native`, `@part spinner`, `@part icon`, `@part label`,
    `@part icon-right`). Cross-check every `@part` tag against a real `part="..."` attribute in
