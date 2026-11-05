@@ -11,6 +11,7 @@ Read the component's code and produce the draft mapping that Phase 2 proposes a 
 - Design tokens: `packages/tokens/tokens/Base.tokens.json`
 - Figma Variables: `.claude/skills/ds-code-to-figma/references/figma-tokens/Base.tokens.json`
 - Any nested DS components' already-written `<child>.figma.md` files
+- The component's `*.visual.html` under `test/`, rendered by the dev server (step 6)
 
 ## References
 
@@ -20,6 +21,7 @@ Read the component's code and produce the draft mapping that Phase 2 proposes a 
 - `docs/adr/0017-direct-commit-variableid-backfill.md` — why variable ids already live in
   `Base.tokens.json`
 - `packages/styles/src/scss/mixins/breakpoint.mixin.scss` — full breakpoint mixin set, for detecting responsive bindings
+- `conventions/specs.md` — groups and rules for the specs triage (step 6)
 
 ## Instructions
 
@@ -164,13 +166,64 @@ Tokens` collection has exactly those three. Any other mixin (`desktop-lg`, `desk
      its `device:` binding rather than a single static token. Surface every gap now, as a batch,
      using the same hard-stop flow as step 5, rather than discovering missing tokens one at a time
      mid-build.
-6. Write all of the above into `<name>.figma.md` (create it if it doesn't exist) as a draft, per
-   [`examples/mapping-file-format.md`](examples/mapping-file-format.md). Include the `specs:` list —
-   the values (fixed or min width/height, padding/gaps, fixed sizes of nested elements, radius,
-   border width, typography) per option of the Variants axis that Phase 8's "📐 Specs" section
-   will show, each pointing at its Figma variable. It's a view onto the completeness checklist
-   from step 5b, not new analysis. Leave out calculated inner content sizes and the radius of a
-   circle (see `PHASE-8-DOCUMENT-SPECS.md`).
+6. **Specs triage** — decide which sizes Phase 8's "📐 Specs" section shows. Rules:
+   `conventions/specs.md`. Numbers come from the browser, groups come from the SCSS.
+   - 6a. **Measure.** Start the dev server from the repo root (`pnpm start`) if it isn't
+     running, and open the component's `test/*.visual.html`. For every option of the Variants axis (one element each; default
+     values for every other prop), read the host and every `[part]` in its `shadowRoot`:
+     ```js
+     const px = v => parseFloat(v) || 0
+     const measure = el => {
+       const cs = getComputedStyle(el),
+         r = el.getBoundingClientRect()
+       return {
+         width: r.width,
+         height: r.height,
+         minWidth: cs.minWidth,
+         minHeight: cs.minHeight,
+         maxWidth: cs.maxWidth,
+         maxHeight: cs.maxHeight,
+         padding: [cs.paddingTop, cs.paddingRight, cs.paddingBottom, cs.paddingLeft].map(px),
+         margin: [cs.marginTop, cs.marginRight, cs.marginBottom, cs.marginLeft].map(px),
+         gap: [cs.rowGap, cs.columnGap].map(px),
+         border: [cs.borderTopWidth, cs.borderRightWidth, cs.borderBottomWidth, cs.borderLeftWidth].map(px),
+         radius: [
+           cs.borderTopLeftRadius,
+           cs.borderTopRightRadius,
+           cs.borderBottomRightRadius,
+           cs.borderBottomLeftRadius,
+         ],
+         font: { size: cs.fontSize, weight: cs.fontWeight, lineHeight: cs.lineHeight, family: cs.fontFamily },
+       }
+     }
+     const host = document.querySelector('ds-<name>[size="sm"]') // one per option
+     const parts = [...host.shadowRoot.querySelectorAll('[part]')]
+     ;({ host: measure(host), parts: Object.fromEntries(parts.map(p => [p.getAttribute('part'), measure(p)])) })
+     ```
+     Then run the behavior probe (`conventions/specs.md` → "Behavior probe") once, on the
+     default option. An option missing from `*.visual.html` is not measured: its values come from
+     the tokens resolved in step 5, and the triage marks it `unmeasured`. Stop the dev server when
+     done if this step started it.
+   - 6b. **Classify.** Put every measured value into one group from `conventions/specs.md` →
+     "Groups", using the SCSS declaration (file:line) that sets it, and match it to its token from
+     step 5. Values nobody declares (`0` paddings, `auto` sizes, `normal` gaps) are dropped, not
+     listed — except a box size, which becomes `derived`.
+   - 6c. **🟡 Present the triage** in the conversation as one table, one row per property:
+
+     ```
+     # | property | kind | group | sm | base | lg | token | source | proposal | instance | reason
+     ```
+
+     `proposal` is `drawn` (marker + table row), `table` (table row only, rare), `behavior` or
+     `skip`. `instance` says where a drawn row goes: `main`, or an extra instance (`min-content`,
+     `focus`, …) per `conventions/specs.md` → "Section layout".
+     Put rows whose proposal follows directly from the group rules first and collapsed; list the
+     rows that need a decision (marked "ask" in the rules, measured ≠ token, `unmeasured`, outer
+     margins) separately, each with a one-line recommendation. Wait for the user to confirm or
+     change it.
+7. Write all of the above into `<name>.figma.md` (create it if it doesn't exist) as a draft, per
+   the schema in `examples/mapping-file-format.md`, including the confirmed `specs:` from step 6.
+   Skipped rows stay in `specs:` with `show: skip` and their reason, so a re-run doesn't ask again.
 
 ## Output
 
@@ -182,7 +235,8 @@ A draft mapping file `<name>.figma.md`, written per
 - Pseudo-class states from `<name>.host.scss`
 - Resolved token/variable id for every CSS-var binding, including responsive `device:` bindings
 - Nested DS component references (their Figma component keys)
-- The completeness checklist and the `specs:` list
+- The completeness checklist
+- The confirmed `specs:` triage (measured values, group, token, proposal per property)
 
 ## Completion Criteria
 
@@ -193,8 +247,10 @@ A draft mapping file `<name>.figma.md`, written per
   stop and resolved with the user — none left as a guess or silent default.
 - Responsive (device-mode) bindings are identified and recorded under `device:`.
 - The completeness checklist has no unresolved gaps.
+- Every measured size is in the specs triage with a group and a proposal, and the user confirmed
+  it; every measured ≠ token mismatch was decided with the user.
 
 ## Next Phase
 
 Proceed to [`PHASE-2-PROPOSE.md`](PHASE-2-PROPOSE.md) only once the draft `<name>.figma.md`
-(props, anatomy, states, resolved tokens, completeness checklist) exists.
+(props, anatomy, states, resolved tokens, completeness checklist, confirmed specs triage) exists.

@@ -28,6 +28,8 @@ user sign-off on it — before anything is built.
   boolean, instance swap, text) and variant option values. Convert camelCase by
   splitting words — `labelPosition` → `label position`, `brandIcon` → `brand icon`; a boolean show
   property is `show <name>` (e.g. `show icon`).
+- **`sub-label` = its set's name**, exactly (`Spinner`, `SpinnerInverted`), so the canvas shows
+  what Assets and instance names show.
 - **Component set and swap-library component names — PascalCase, flat, no `/`:** the default set (the one holding the code
   default of every split axis) gets the bare component name; every other set appends its split
   option(s) — `Button` + `ButtonInverted`, `Pagination` + `PaginationDots` +

@@ -27,7 +27,7 @@ top (row axes), largest/last at the right or bottom**:
    the rest keep scale order: `base · xs · sm · md · lg`.
 2. **`state`:** `default / hover / focus / active / disabled / loading` (only those the component
    has). `readonly` is out of scope for Figma.
-3. **Boolean axes:** `false` first, then `true`.
+3. **Boolean axes:** `false` first, then `true` (unless the code default is `true`).
 4. **Any other axis:** source order of the TypeScript union/enum. Never alphabetical.
 5. **Mixed axis** (scale members plus other values, e.g. `sm | base | lg | full`): scale members
    first in scale order, then the non-scale values in source order.

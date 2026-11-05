@@ -21,6 +21,8 @@ user _approving_ it — never auto-appended.
   Set axis labeling, sizing/grid mechanics, screenshot reliability for this section (Phase 3).
 - [`conventions/document-sections.md`](conventions/document-sections.md) — `Section` / `Preview` /
   `Title` mechanics for the Copy me, Anatomy and Specs sections (Phases 6–8).
+- [`conventions/specs.md`](conventions/specs.md) — which sizes Specs shows (groups, triage rules)
+  and how each one is drawn (kinds, line styles, section layout) (Phases 1 and 8).
 - [`conventions/build-mechanics.md`](conventions/build-mechanics.md) — general Figma Plugin API
   gotchas that apply across any phase: platform limits, variant-set mechanics, auto-layout
   sizing, vector import, color/paint, focus states.

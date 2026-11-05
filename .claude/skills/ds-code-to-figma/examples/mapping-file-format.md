@@ -101,24 +101,55 @@ props:
   figmaVariableId: null # the routing/Device variable is hand-created by Phase 3, not resolved by
   # css-token-lookup.mjs — see device: above and PHASE-3-BUILD.md step 3
   resolved: true
-  specs: # one entry per option of the Variants axis, shown in Phase 8's "📐 Specs" section
-  base:
-  - kind: size # size | icon | spacing | radius (| type, once added)
-    label: Size # Size (width = height, same variable) | Width | Height | Min width | Min height | Padding | Gap | Radius | …
-    px: 24
-    token: 🧩 Component/Close/Size/Base # exact Figma variable name
-  - kind: spacing
-    label: Padding
-    px: 5 # actual value used (marker + legend Value)
-    token: 🧩 Component/Close/Padding/Base
-    calc: '(10px) ÷ 2' # only when px is calculated from the variable; shown in the legend
-  - kind: size
-    label: Height
-    px: 32 # Desktop-mode value, shown as the reference figure — see device: above for the
-    # full mobile/tablet/desktop breakdown
-    token: 🧩 Component/Logo/Size/Base/Device # the routing variable, not a static token — see
-    # device: above
-    \`\`\`
+  specs: # confirmed specs triage (PHASE-1-ANALYZE.md step 6), rendered by Phase 8. Rules:
+  # conventions/specs.md
+  drawnOption: base # the Variants-axis option shown on the drawn card
+  options: [base, sm, lg] # table columns, canonical order; [] when there is no Variants axis
+  behavior: # triage rows proposed as `behavior` land here, not in rows:. Omit when the size
+  # never changes with content/container (icon, spinner)
+  width: hug # hug | fill — from the behavior probe
+  overflow: truncate # truncate | wrap | overflow (flag overflow in the triage)
+  rows: # numbered in this order on the drawn card and in the table: size → spacing → shape → type
+  - property: Min height # Width | Height | Size (w = h) | Min/Max width/height | Padding X/Y/L/R | Gap | Radius | Border width | Focus ring | Type (<part>)
+    kind: size # size | spacing | shape | type
+    group: limit # fixed | inner spacing | limit | behavior | derived | outer margin | hit area | context-dependent | typography
+    show: drawn # drawn (marker + table row) | table (table row only, rare) | skip
+    instance: main # drawn rows only: main | min-content | focus | … — see conventions/specs.md → "Section layout"
+    source: button.host.scss:42 # the SCSS declaration that sets it
+    values: # one per option; measured px + its token (exact Figma variable name)
+    sm: { px: 32, token: 🧩 Component/Button/Size/SM/MinHeight }
+    base: { px: 48, token: 🧩 Component/Button/Size/Base/MinHeight }
+    lg: { px: 56, token: 🧩 Component/Button/Size/LG/MinHeight }
+  - property: Padding X
+    kind: spacing
+    group: context-dependent
+    show: drawn
+    source: logo.host.scss:12
+    values:
+    base: { px: { mobile: 16, tablet: 16, desktop: 24 }, token: 🧩 Component/Logo/Padding/Device } # routing variable — see device: above
+  - property: Type (label)
+    kind: type
+    group: typography
+    show: drawn
+    source: button.host.scss:60
+    values:
+    base: { px: 16, token: 🔤 Text/Size/Base, weight: 700, lineHeight: 1.3, family: BaloiseCreateHeadline }
+  - property: Height
+    kind: size
+    group: derived
+    show: skip
+    reason: "padding + line-height; min height already covers it" # required when show is skip, or when the user changed the default proposal
+    values:
+    base: { px: 48 }
+  - property: Margin
+    kind: spacing
+    group: outer margin
+    show: skip
+    reason: "margin-block on :host — layout's job; reported as a code smell"
+    values:
+    base: { px: 8 }
+  # A measured ≠ token mismatch the user resolved keeps both: { px: 15, token: …, tokenPx: 16, note: "…" }
+  \`\`\`
 
 Notes on this mapping, open questions, and rationale for any non-obvious grouping decision go
 here as prose, below the YAML block.
