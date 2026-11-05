@@ -32,7 +32,7 @@ Distribution is `npx @helvetia-design/skills add`. There is no Claude Code plugi
 Paths below are inside `skills/ds-migrate-from-baloise/`.
 
 1. Add `components/<name>/migration.md`. The first heading is the menu title.
-2. Write the confirm-then-rewrite steps and the prop mapping in that file. When the component needs a finder, add a dependency-free `scripts/scan-bal-<name>.mjs` that prints JSON findings and does not edit files, and invoke it from the migration file.
+2. Write the confirm-then-rewrite steps and the prop mapping in that file. End the Report step with a numbered checklist of every item it reports, as `components/select/migration.md` does. `test/report-contract.spec.ts` checks that Report section and pins the number of attention and coverage items per component, so add an entry for `<name>` to its `expectedCounts` table. When the component needs a finder, add a dependency-free `scripts/scan-bal-<name>.mjs` that prints JSON findings and does not edit files, and invoke it from the migration file.
 3. When the legacy component has child tags, add an entry per child to `CHILD_SLUGS` in `scripts/scan-migratable.mjs`. Without it **Detect** reports the child as its own unmigratable component, when the parent migration already covers it.
 4. Stop there. **Manual** lists the new file automatically. **Detect** suggests it automatically when the consumer project uses the matching component.
 
@@ -43,7 +43,8 @@ Conventions that hold across every component:
 - **The scanner stays flat.** It prints `{ total, files: [{ file, findings: [{ line, snippet }] }] }` and nothing else. Reach comes from widening the single `USAGE_RE`, not from adding fields — toast matches `balToastController`, accordion matches the four `BalAccordion*` bindings and `BalAccordionBundle`.
 - **Never put a shared event name in a component regex.** `balChange` alone is emitted by 26 legacy components, so it would report checkbox, input, and dropdown usages as findings for whichever component you are migrating.
 - **`CHILD_SLUGS` stays explicit.** Never fold by prefix: `bal-input-slider` becomes `ds-slider`, a separate component, not part of the input migration.
-- **Anything with no `ds-*` equivalent is reported, never commented into the consumer's code.** The migration file's final step enumerates each loss for the summary. See `components/tooltip/migration.md` and `components/accordion/migration.md`.
+- **Anything with no `ds-*` equivalent is reported, never commented into the consumer's code.** The migration file's final step enumerates each loss for the report. See `components/tooltip/migration.md` and `components/accordion/migration.md`.
+- **The Report step writes to `ds-migration-report.md`, following `shared/report.md`.** The file sits at the consumer's project root. Init creates it, or whichever step runs first, and every later run appends one section. A line that needs a decision or an action from the consumer goes under "Needs your attention" and into chat. A line that only proves a check ran goes to the file only. Every Report step ends with a numbered checklist, and the step is not done until each number has its own outcome line in the file, found or none found.
 - **When the component has methods or events, the migration file carries the sibling-file rule.** Angular splits a component across `x.component.html` and `x.component.ts`, and the class file often calls `present()` or handles an event without ever naming the tag, so the scan cannot see it. The migration file tells the agent to open the same-basename `.ts` beside every `.html` finding. See `components/accordion/migration.md`.
 - **The directory is always the legacy slug**, because Detect derives it from the `bal-*` tag. When the component is renamed, the first heading names both sides so the Manual menu stays readable: `components/app/migration.md` opens with `# app → root`.
 - **Fixtures are written inline in the spec** with the local `write()` helper. `test/fixtures/` predates that and serves spinner only; do not extend it.
@@ -52,7 +53,7 @@ Done when **Components** lists the new heading and choosing it follows that file
 
 ### Icons travel with the component migration
 
-Every component migration also migrates the icons from `@baloise/ds-icons` and `@baloise/ds-brand-icons` in the files it touches, following `shared/icons.md`. The **Assets** menu item applies the same file to every other file that still uses legacy icons, such as a constants file with no `bal-*` tag, and deletes the legacy config call once no `bal-*` component is left. `SKILL.md` hooks that file into the Scan, Rewrite and Report steps of whichever component file is chosen, so a new component gets icon handling without mentioning it. `shared/` sits outside `components/` so that **Manual** does not list it.
+Every component migration also migrates the icons from `@baloise/ds-icons` and `@baloise/ds-brand-icons` in the files it touches, following `shared/icons.md`. The **Assets** menu item applies the same file to every other file that still uses legacy icons, such as a constants file with no `bal-*` tag, and deletes the legacy config call once no `bal-*` component is left. `SKILL.md` hooks that file into the Scan, Rewrite and Report steps of whichever component file is chosen, so a new component gets icon handling without mentioning it. `shared/` sits outside `components/` so that **Manual** does not list it. `shared/report.md` sits there too. It defines the report file that every Report step writes. `shared/field.md` adds its `F1.`, `F2.`, ... items to the checklist of a form component, `shared/icons.md` adds its `I1.`, `I2.`, ... items after them, and `shared/legacy-config.md` adds its `L1.`, `L2.`, ... items last.
 
 - **UI icon** — an icon resolved by name through the design system config (`ds-icon name="…"`, and the `icon` props of other components). A wrong name fails silently at runtime.
 - **Brand icon** — an illustration passed as a raw SVG string to `ds-brand-icon` (`svg`) or as a URL (`src`). There is no name lookup. A wrong symbol fails at build time.
@@ -91,7 +92,7 @@ This package publishes as `@helvetia-design/skills`, inside the `@helvetia-desig
 
 ### The skill never commits
 
-The copied skill edits the consumer's files and leaves everything unstaged. It never runs `git add` or `git commit`. That is the same "leave changes for the user" rule this monorepo uses, applied to a stranger's production codebase.
+The copied skill edits the consumer's files and leaves everything unstaged, including `ds-migration-report.md`. It never runs `git add` or `git commit`. That is the same "leave changes for the user" rule this monorepo uses, applied to a stranger's production codebase.
 
 ## Key Constraints
 
@@ -113,7 +114,7 @@ pnpm --filter @helvetia-design/skills lint
 ```
 
 Done when every spec under `test/` passes and eslint exits 0. That is the CLI specs,
-`test/detect-baloise.spec.ts`, `test/scan-migratable.spec.ts`, and one
+`test/detect-baloise.spec.ts`, `test/scan-migratable.spec.ts`, `test/report-contract.spec.ts`, and one
 `test/scan-bal-<component>.spec.ts` per supported component.
 
 Adding a component adds its own spec file; it does not change this paragraph. Do not

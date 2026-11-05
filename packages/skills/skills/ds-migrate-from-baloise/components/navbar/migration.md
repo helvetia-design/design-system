@@ -102,18 +102,23 @@ Do not rewrite these. Report each call with file and line.
 
 ## 4. Report
 
-Print a per-file summary of what changed. End with the items below, each with file and line:
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-- every navbar that was not migrated because of `interface="simple"` or a dynamic `interface`, with its child tags and imports left in place
-- every dropped `container` value (`detail-page`, `blog-page`, `wide`) and every dynamic `container` binding
-- every dropped `bal-navbar-brand` prop (`logo`, `logoSize`, `logoBrand`, `logoLabel`, `logoClickable`, `simple`, `animated`), so the consumer builds the brand content in the `brand` slot
-- every direct child of a migrated navbar that is still without a `slot`, because it does not render
-- every `bal-navbar-brand` that had no `href` and became a `<div slot="brand">`
-- every `balWillAnimate` and `balDidAnimate` listener, with the new event names, and every `balNavigate` listener, with `click` on the brand as the replacement
-- every `toggleMenu()` and brand `toggle()` call, with `toggleSidebar()` as the replacement
-- every `BalProps.BalNavbarInterface` and `BalEvents.BalNavbar*` type reference that needs a manual check
-- every legacy selector that no longer applies, such as `.bal-navbar`, `.bal-navbar__nav`, `.bal-navbar__brand`, `.bal-navbar__menu`, `.bal-navbar--is-light` and the `is-simple` and `context-*` modifiers. `ds-app-navbar` renders in shadow DOM, so these are lost. The navbar is styleable through `part="nav"`, `part="hamburger"` and `part="sidebar"`
+Needs your attention when found:
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+1. Every navbar that was not migrated because of `interface="simple"`, with its child tags and imports left in place. Name file and line.
+2. Every navbar that was not migrated because of a dynamic `interface`, with its child tags and imports left in place. Name file and line.
+3. Every dropped `container` value (`detail-page`, `blog-page`, `wide`).
+4. Every dynamic `container` binding.
+5. Every dropped `bal-navbar-brand` prop (`logo`, `logoSize`, `logoBrand`, `logoLabel`, `logoClickable`, `simple`, `animated`), so the consumer builds the brand content in the `brand` slot.
+6. Every direct child of a migrated navbar that is still without a `slot`, because it does not render.
+7. Every `bal-navbar-brand` that had no `href` and became a `<div slot="brand">`.
+8. Every `balWillAnimate` and `balDidAnimate` listener, with the new event names.
+9. Every `balNavigate` listener, with `click` on the brand as the replacement.
+10. Every `toggleMenu()` and brand `toggle()` call, with `toggleSidebar()` as the replacement.
+11. Every `BalProps.BalNavbarInterface` and `BalEvents.BalNavbar*` type reference that needs a manual check.
+12. Every legacy selector that no longer applies, such as `.bal-navbar`, `.bal-navbar__nav`, `.bal-navbar__brand`, `.bal-navbar__menu`, `.bal-navbar--is-light` and the `is-simple` and `context-*` modifiers. `ds-app-navbar` renders in shadow DOM, so these are lost. The navbar is styleable through `part="nav"`, `part="hamburger"` and `part="sidebar"`.
 
-Done when the summary is printed and the working tree is still unstaged.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

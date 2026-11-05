@@ -60,13 +60,17 @@ Apply every rule in `shared/field.md` to each remaining `bal-field`. That file c
 
 ## 4. Report
 
-Print a per-file summary of what changed. End with the items below, each with file and line:
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found. The `F1.`, `F2.`, ... items from the Report section of `shared/field.md` follow them.
 
-- every `bal-form-col` with a dynamic `size` left in place
-- every `bal-field` left in place, with the reason. For a legacy `bal-*` control, name the component migration to run first. For a native element, say so.
-- every `bal-field-message` outside a `bal-field` that has no control before it
-- the field items that `shared/field.md` lists
+Needs your attention when found:
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+1. Every `bal-form-col` with a dynamic `size` left in place.
 
-Done when the summary is printed and the working tree is still unstaged.
+Coverage only, written to the file:
+
+2. Every `bal-form-grid` rewritten to `<div class="ds-form">`.
+3. Every `bal-form-col` rewritten to `<div class="ds-form-col">`, with its `desktop:is-N` class.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

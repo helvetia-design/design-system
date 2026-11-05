@@ -78,15 +78,28 @@ Angular splits a component across `x.component.html` and `x.component.ts`, and t
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `required` that was set to false, every `step="any"` that was added or substituted, every `step` literal turned into a string, every `balTabindex` that was renamed, every event handler that was renamed, and every unsupported prop (`hasTicks`), `balKeyPress` handler, dynamic `step` binding, method call, and detail-type use that needs manual rework.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Report these logic changes the scan cannot see, so the consumer can check them:
+Needs your attention when found:
 
-- **Empty value**: a slider can never be empty. A legacy `value=""`, `null` or `undefined` now resolves to `min`. List each static or bound value that can be empty.
-- **Value type**: handlers and form controls now receive a `number`, never a string or `null`.
+1. Every unsupported `hasTicks` left in place. It has no effect now.
+2. Every `balKeyPress` handler, listed as "event no longer fires, needs manual rework".
+3. Every dynamic `step` binding. The value must now be a string, or `"any"`.
+4. Every `getInputElement()` call, listed as "return type changed, check the caller".
+5. Every `setAriaForm()` call, listed as "method no longer available, needs manual rework".
+6. Every detail-type use, listed as "type needs manual rework".
+7. Every static or bound value that can be empty. A slider can never be empty, so a legacy `value=""`, `null` or `undefined` now resolves to `min`.
+8. One-time note: handlers and form controls now receive a `number`, never a string or `null`.
+9. Every selector that targets the legacy element and that the scan cannot see, such as classes starting with `bal-input-slider` and `data-testid="bal-input-slider"`. Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.
 
-Also list every selector that targeted the legacy element and that the scan cannot see (classes starting with `bal-input-slider`, `data-testid="bal-input-slider"`). Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.
+Coverage only, written to the file:
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+10. Every `required` that was set to false.
+11. Every `step="any"` that was added or substituted.
+12. Every `step` literal turned into a string.
+13. Every `balTabindex` that was renamed.
+14. Every event handler that was renamed.
 
-Done when the summary is printed and the working tree is still unstaged.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

@@ -41,4 +41,24 @@ Delete the `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-me
 
 ## Report
 
-Add to the component's summary, per file: every field wrapper that was removed, every `size`, `weight`, `horizontal`, `inverted`, `expandedOnMobile`, `hideTitleOnDesktop` and `small` that was dropped, every `required` that now reaches the native control, every control that now shows the "(optional)" suffix the legacy label did not show, every message, `valid` state, `loading` or field label that the target control cannot carry, every dynamic `valid` binding, every danger message on a control without an `invalid` binding, every markup label, description or invalid text that needs a matching prop, every `bal-field-hint` moved to `ds-hint`, every `loading` the control cannot take, and every `bal-field` left in place with the reason.
+These items follow the component's own checklist items and come before the `I` items of `shared/icons.md`. Each one gets its own line in `ds-migration-report.md`, as `shared/report.md` describes.
+
+Needs your attention when found:
+
+- F1. Every `bal-field` left in place, with the reason. For a legacy `bal-*` control, name the component migration to run first. For a native element, say so.
+- F2. Every `bal-field-message` outside a `bal-field` that has no control before it, left in place.
+- F3. Every message, `valid` state, `loading` or field label that the target control cannot carry, as lost, with the control.
+- F4. Every dynamic `valid` binding.
+- F5. Every danger message on a control without an `invalid` binding.
+- F6. Every markup label, description or invalid text that needs a matching prop.
+- F7. Every control that now shows the "(optional)" suffix the legacy label did not show.
+- F8. Every `required` that now reaches the native control. Native validation applies now.
+- F9. Every `bal-field-hint` moved to `ds-hint`, flagged for visual review of the placement.
+- F10. Every dropped `hideTitleOnDesktop` and `small` on `bal-field-hint`.
+- F11. Every dropped `horizontal` and `inverted` on `bal-field`.
+- F12. Every dropped `size` and `weight` on `bal-field-label`.
+- F13. Every dropped `expandedOnMobile` on `bal-field-control`.
+
+Coverage only, written to the file:
+
+- F14. Every field wrapper that was removed.

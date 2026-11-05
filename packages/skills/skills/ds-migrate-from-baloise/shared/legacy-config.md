@@ -14,7 +14,7 @@ node <this-skill-directory>/scripts/scan-bal-app.mjs <project-root>
 
 The `app` migration already ran this script in its Scan step. Reuse those findings instead of running it again.
 
-Keep only the call sites of the three calls, not the import lines. The other findings are `bal-app` usages, which the `app` migration handles. When no call site is listed, there is nothing to delete. Skip the rest of this file and report nothing.
+Keep only the call sites of the three calls, not the import lines. The other findings are `bal-app` usages, which the `app` migration handles. When no call site is listed, there is nothing to delete. Skip the rest of this file and write each of its Report items as `none found`.
 
 Then answer one question: is a `bal-*` component left? Run:
 
@@ -45,4 +45,15 @@ Check the answer again after the Rewrite step. When the Rewrite left a usage of 
 
 ## Report
 
-Add to the summary, per call: whether it stayed or was deleted, every value carried over and where, and every `logger` and `httpFormSubmit` deleted with it. The `icons` value stays or goes with the call.
+These items come last, after the `I` items of `shared/icons.md`. Each one gets its own line in `ds-migration-report.md`, as `shared/report.md` describes. The `icons` value stays or goes with the call.
+
+Needs your attention when found:
+
+- L1. Every legacy config call deleted.
+- L2. Every config value carried over with a deleted call, and where it went.
+- L3. Every `logger` deleted with the call.
+- L4. Every `httpFormSubmit` deleted with the call.
+
+Coverage only, written to the file:
+
+- L5. Every legacy config call that stayed, with the note that it stays until the last `bal-*` component is migrated.

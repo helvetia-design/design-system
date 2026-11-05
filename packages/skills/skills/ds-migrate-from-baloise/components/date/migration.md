@@ -71,26 +71,34 @@ When the value in `balChange` or `balInput` is read, note that it is `string | u
 
 ### Methods
 
-`setFocus()`, `setBlur()`, and `getInputElement()` keep their names. `open()`, `close()`, `toggle()`, `select()`, and `setAriaForm()` do not exist on `ds-datepicker`. Do not rewrite or remove calls to them and do not invent a replacement. List each call by file and line as "method no longer available, needs manual rework". `select(date)` can often be replaced by setting `value`, say so in the summary, but do not change the code.
+`setFocus()`, `setBlur()`, and `getInputElement()` keep their names. `open()`, `close()`, `toggle()`, `select()`, and `setAriaForm()` do not exist on `ds-datepicker`. Do not rewrite or remove calls to them and do not invent a replacement. List each call by file and line as "method no longer available, needs manual rework". `select(date)` can often be replaced by setting `value`, say so in the report, but do not change the code.
 
 Angular splits a component across `x.component.html` and `x.component.ts`, and the class file often calls these methods through `@ViewChild` or `viewChild` without naming the tag, so the scan cannot see it. For every `.html` finding, open the same-basename `.ts` file beside it and check it for those calls and for `balChange`, `balInput`, `balIconClick`, and `INVALID_VALUE`. React and plain HTML callers hold the element in a ref or a query result, so look for calls on that variable in the same file.
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `required` that was set to false, every dropped `triggerIcon`, `closeOnSelect`, and `allowInvalidValue`, every event handler that was renamed, and every handler and method call that needs manual rework.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Report these logic changes the scan cannot see, so the consumer can check them:
+Needs your attention when found:
 
-- **`INVALID_VALUE`**: `ds-datepicker` never emits it. Search the consumer code for the string `INVALID_VALUE`. Every place that compares against it, and every file where `allowInvalidValue` was dropped, needs manual review.
-- **Empty value**: a cleared field now yields `null` where `bal-date` yielded `undefined`. Code that checks `=== undefined` needs review. List each handler or form binding that reads the value.
+1. Every dropped `allowInvalidValue`.
+2. Every event handler that needs manual rework.
+3. Every method call that needs manual rework. Say that `select(date)` can often be replaced by setting `value`.
+4. Every place that compares against the string `INVALID_VALUE`. Search the consumer code for it, because `ds-datepicker` never emits it.
+5. Every file where `allowInvalidValue` was dropped, reviewed for logic that relies on `INVALID_VALUE`.
+6. Every handler or form binding that reads the value. A cleared field now yields `null` where `bal-date` yielded `undefined`, so code that checks `=== undefined` needs review.
+7. Every field without `triggerIcon`. `bal-date` opened the popup on a click into the input, and `ds-datepicker` opens it only from the calendar button. Do not add attributes to compensate.
+8. Every dropped `closeOnSelect` that was set to false. `ds-datepicker` closes the popup after every selection, so that behaviour is lost.
+9. One-time note: `ds-datepicker` has `label`, `description`, and `color`. Fields may need a `label` now. Do not add one yourself.
+10. Every selector that targets the legacy elements and that the scan cannot see. The legacy component set the classes `bal-date`, `bal-date__icon`, `bal-date__icon--is-clickable`, `bal-date__popup`, and `bal-date__popup--is-visible` on its host and its parts, and rendered `bal-input-date`, `bal-input-group`, and `bal-date-calendar` inside. Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.
 
-Also report the rendering differences, so the consumer can check them. Do not add attributes to compensate:
+Coverage only, written to the file:
 
-- `bal-date` opened the popup on a click into the input unless `triggerIcon` was set. `ds-datepicker` opens it only from the calendar button, so every field without `triggerIcon` now behaves differently. `ds-datepicker` also closes the popup after every selection, so a dropped `closeOnSelect` set to false is a lost behaviour.
-- `ds-datepicker` has `label`, `description`, and `color`. Fields may need a `label` now. Do not add one yourself.
+11. Every `required` that was set to false.
+12. Every dropped `triggerIcon`.
+13. Every dropped `closeOnSelect`.
+14. Every event handler that was renamed.
 
-Also list every selector that targeted the legacy elements and that the scan cannot see. The legacy component set the classes `bal-date`, `bal-date__icon`, `bal-date__icon--is-clickable`, `bal-date__popup`, and `bal-date__popup--is-visible` on its host and its parts, and rendered `bal-input-date`, `bal-input-group`, and `bal-date-calendar` inside. Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
-
-Done when the summary is printed and the working tree is still unstaged.
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

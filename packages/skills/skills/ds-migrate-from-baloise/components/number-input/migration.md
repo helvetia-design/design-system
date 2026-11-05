@@ -78,19 +78,24 @@ Angular splits a component across `x.component.html` and `x.component.ts`, and t
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `required` that was set to false, every event handler that was renamed, and every method call, handler and detail-type use that needs manual rework.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Report the accessibility change first, because it is a WCAG regression and the scan cannot see it:
+Needs your attention when found:
 
-- **Label moved**: the legacy input was linked to a surrounding `bal-field-label` and `bal-field-message` through `setAriaForm()` (`aria-labelledby`, `aria-describedby`). `ds-number-input` renders its own field, so `shared/field.md` moves that label and message onto its `label`, `description` and `invalidText` props and removes the wrapper. List every file where that happened, and every `bal-field` left in place.
+1. Every file where `shared/field.md` moved the label and message of a surrounding `bal-field` onto the `label`, `description` and `invalidText` props, and every `bal-field` left in place. The legacy input was linked to that label and message through `setAriaForm()` (`aria-labelledby`, `aria-describedby`). A `bal-field` left in place keeps a label that is no longer linked, which is a WCAG regression the scan cannot see.
+2. Every method call that needs manual rework.
+3. Every handler that needs manual rework.
+4. Every detail-type use that needs manual rework.
+5. Every bound `value` that is a string or that can be `undefined`. `value` is now `number | null`. The legacy type was `number | string | undefined`.
+6. Every usage without its own `pattern`. The legacy input always set an auto-generated `pattern` (thousand separators, decimals, `suffix`). `ds-number-input` only sets a `pattern` the consumer passes, so native pattern validation is gone for these usages.
+7. Every selector that targeted the legacy element or its input and that the scan cannot see (`bal-number-input` classes, `data-testid="bal-number-input"`, `.input`, `.is-danger`, `.is-disabled`). The legacy input was in the light DOM, so tests and styles that query them break. The native input is reachable with `::part(input)` for styles, and the parts `prefix`, `suffix`, `decrement` and `increment` are reachable the same way. Do not rewrite those selectors yourself. Report them.
+8. One-time note: `ds-number-input` renders increment and decrement buttons (`::part(increment)`, `::part(decrement)`). The legacy component had none. The field looks different, and layouts around it may need a check.
 
-Report these other changes the scan cannot see, so the consumer can check them:
+Coverage only, written to the file:
 
-- **Value type**: `value` is `number | null`. The legacy type was `number | string | undefined`. List each bound value that is a string or that can be `undefined`.
-- **Pattern**: the legacy input always set an auto-generated `pattern` (thousand separators, decimals, `suffix`). `ds-number-input` only sets a `pattern` the consumer passes. Native pattern validation is gone for every usage without its own `pattern`.
-- **Shadow DOM**: the legacy input was in the light DOM. Selectors that reach into it break. List every selector that targeted the legacy element or its input and that the scan cannot see (`bal-number-input` classes, `data-testid="bal-number-input"`, `.input`, `.is-danger`, `.is-disabled`). Tests and styles that query them break. The native input is reachable with `::part(input)` for styles, and the parts `prefix`, `suffix`, `decrement` and `increment` are reachable the same way. Do not rewrite those selectors yourself. Report them.
-- **Increment and decrement buttons**: `ds-number-input` renders increment and decrement buttons (`::part(increment)`, `::part(decrement)`). The legacy component had none. Tell the consumer the field looks different and layouts around it may need a check.
+9. Every `required` that was set to false.
+10. Every event handler that was renamed.
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 
-Done when the summary is printed and the working tree is still unstaged.
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

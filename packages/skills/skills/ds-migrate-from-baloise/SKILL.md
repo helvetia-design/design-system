@@ -5,7 +5,7 @@ description: Migrate a consuming app from the Baloise Design System (bal-*) to t
 
 # ds-migrate-from-baloise
 
-This skill edits files in the consumer's repository and leaves every change unstaged. Reviewing and committing is the consumer's job. This skill never runs `git add` or `git commit`.
+This skill edits files in the consumer's repository and leaves every change unstaged, including the report file `ds-migration-report.md` that `shared/report.md` describes. Reviewing and committing is the consumer's job. This skill never runs `git add` or `git commit`.
 
 ## Menu
 
@@ -85,7 +85,7 @@ If `status` is `ready`, show the detected framework, package manager, version, a
 
    - Local form when the target file is `.scss`/`.sass` instead (regardless of `framework`): use `@import '@helvetia-design/styles/css/design-system';`, or `@use` if that is the at-rule already used by Baloise lines in that same file.
 
-4. Report the resolved `version`, the aliases written, the install command, and every file touched.
+4. Write the Init section of `ds-migration-report.md` as `shared/report.md` describes. Create the file when it is missing, so this section is its first entry. Under `### Setup`, list the resolved `version`, the aliases written, and the install command. Under `### Files changed`, list every file touched. Every existing `@helvetia-design/*` value that step 1 left unchanged goes under **Needs your attention**, with both values. In chat, show the whole section (attention lines, Setup, and Files changed) and end with the line `Report written to ds-migration-report.md.`
 5. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.
 
 ### Components
@@ -99,18 +99,20 @@ Every component migration also migrates the legacy icons in the files it touches
 
 - After the file's Scan step, run the icon scan from `shared/icons.md` for every file with a finding, and show its findings with the component findings. The file's single confirmation covers both.
 - In the Rewrite step, apply the icon rules to those files as well.
-- In the Report step, add the icon items to the summary.
+- In the Report step, append the `I1.`, `I2.`, ... items from the Report section of `shared/icons.md` to the checklist, after the component items.
+
+Every Report step writes to `ds-migration-report.md` as `shared/report.md` describes, and shows only the items that need attention in chat.
 
 Every form component migration also removes the legacy field wrapper around the controls it migrates. Follow `shared/field.md` alongside the chosen file:
 
 - In the Rewrite step, apply its rules to every migrated control that sits inside `bal-field` or `bal-field-control`, or that a `bal-field-message` directly follows, in the same pass.
-- In the Report step, add the field items to the summary.
+- In the Report step, append the `F1.`, `F2.`, ... items from the Report section of `shared/field.md` to the checklist, after the component items and before the icon items.
 
 Every component migration also decides about the legacy config call. Follow `shared/legacy-config.md` after the icon rules:
 
 - After the file's Scan step, run its Scan section. When no `bal-*` component will be left, show each legacy config call with the component findings as a call to delete. The file's single confirmation covers it.
 - In the Rewrite step, after the icon and field rules, apply its Decide section.
-- In the Report step, add its items to the summary.
+- In the Report step, append the `L1.`, `L2.`, ... items from the Report section of `shared/legacy-config.md` to the checklist, after the icon items.
 
 #### Manual
 
@@ -146,5 +148,5 @@ Migrate every legacy icon left in the project, following `shared/icons.md`. Comp
 2. When step 1 listed icon findings, ask one yes/no: rewrite every listed usage and delete every listed call? When it listed only calls to delete, ask one yes/no: delete every listed call? On no, stop with the files unchanged. When it listed neither, say there are no legacy icons left to migrate and skip step 3.
 3. When the icon scan found anything, apply every rule in `shared/icons.md` to the listed files.
 4. Apply the Decide section of `shared/legacy-config.md`.
-5. Print a per-file summary with the items from the Report section of `shared/icons.md` and of `shared/legacy-config.md`. Skip the final whole-project scan of `shared/icons.md`, which this step already is.
+5. Append an `assets` section to `ds-migration-report.md` as `shared/report.md` describes. Its checklist holds the `I1.`, `I2.`, ... items from the Report section of `shared/icons.md`, then the `L1.`, `L2.`, ... items from the Report section of `shared/legacy-config.md`. Skip the final whole-project scan of `shared/icons.md`, which this step already is.
 6. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.
