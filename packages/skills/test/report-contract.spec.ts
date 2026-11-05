@@ -37,12 +37,13 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'button': { attention: 11, coverage: 4 },
   'card': { attention: 9, coverage: 3 },
   'carousel': { attention: 21, coverage: 6 },
-  'checkbox': { attention: 10, coverage: 3 },
+  'checkbox': { attention: 10, coverage: 2 },
   'close': { attention: 2, coverage: 1 },
   'content': { attention: 4, coverage: 2 },
   'data': { attention: 6, coverage: 1 },
   'date': { attention: 10, coverage: 4 },
   'divider': { attention: 4, coverage: 2 },
+  'field': { attention: 1, coverage: 2 },
   'file-upload': { attention: 3, coverage: 1 },
   'footer': { attention: 8, coverage: 4 },
   'heading': { attention: 6, coverage: 4 },
@@ -61,9 +62,9 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'pagination': { attention: 6, coverage: 4 },
   'popup': { attention: 17, coverage: 4 },
   'progress-bar': { attention: 6, coverage: 3 },
-  'radio': { attention: 11, coverage: 3 },
-  'segment': { attention: 8, coverage: 1 },
-  'select': { attention: 13, coverage: 1 },
+  'radio': { attention: 11, coverage: 2 },
+  'segment': { attention: 8, coverage: 0 },
+  'select': { attention: 13, coverage: 0 },
   'shape': { attention: 5, coverage: 1 },
   'sheet': { attention: 7, coverage: 0 },
   'snackbar': { attention: 14, coverage: 5 },
@@ -232,6 +233,18 @@ describe('shared/icons.md Report', () => {
     const numbers = [...report.matchAll(/^- I(\d+)\. /gm)].map(([, number]) => Number(number))
 
     expect(report).toContain('`shared/report.md`')
+    expect(numbers.length).toBeGreaterThan(0)
+    expect(numbers).toEqual(numbers.map((_, index) => index + 1))
+  })
+})
+
+describe('shared/field.md Report', () => {
+  it('lists the field items as a continuous F-numbered checklist', () => {
+    const report = section(read('shared/field.md'), '## Report')
+    const numbers = [...report.matchAll(/^- F(\d+)\. /gm)].map(([, number]) => Number(number))
+
+    expect(report).toContain('`shared/report.md`')
+    expect(report).not.toContain('summary')
     expect(numbers.length).toBeGreaterThan(0)
     expect(numbers).toEqual(numbers.map((_, index) => index + 1))
   })

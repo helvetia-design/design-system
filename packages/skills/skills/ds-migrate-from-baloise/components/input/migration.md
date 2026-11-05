@@ -6,6 +6,8 @@ The legacy folder has one consumer child tag, `bal-input-date`. It is a text fie
 
 Other legacy tags that start with `bal-input` are different components and are not part of this migration: `bal-input-group`, `bal-input-slider` (see `components/input-slider/migration.md`), `bal-input-stepper` (see `components/input-stepper/migration.md`). `bal-number-input` is a separate component too. The scan does not list them.
 
+A surrounding `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrapper is handled by `shared/field.md` in the Rewrite step, in the same pass. `components/field/migration.md` migrates `bal-form-grid` and `bal-form-col`.
+
 ## 1. Scan
 
 `<project-root>` is the consumer project root that contains the app lockfile. When the skill is invoked from that root, use the current directory.

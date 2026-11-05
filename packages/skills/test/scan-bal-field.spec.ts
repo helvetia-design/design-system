@@ -1,0 +1,368 @@
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { afterEach, describe, expect, it } from 'vitest'
+import { run, scanBalField } from '../skills/ds-migrate-from-baloise/scripts/scan-bal-field.mjs'
+import { scanMigratable } from '../skills/ds-migrate-from-baloise/scripts/scan-migratable.mjs'
+
+const SKIP_DIRS = ['node_modules', 'dist', 'build', 'out', '.next', '.angular', '.git', '.claude', 'coverage']
+
+const scratches: string[] = []
+
+afterEach(() => {
+  for (const dir of scratches) rmSync(dir, { recursive: true, force: true })
+  scratches.length = 0
+})
+
+function createScratchDir() {
+  const dir = mkdtempSync(join(tmpdir(), 'ds-migrate-field-'))
+  scratches.push(dir)
+  return dir
+}
+
+function write(root: string, rel: string, contents: string) {
+  const file = join(root, rel)
+  mkdirSync(dirname(file), { recursive: true })
+  writeFileSync(file, contents)
+}
+
+describe('scanBalField', () => {
+  it('lists React tags and import symbols and skips comments, strings, and dist', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'App.tsx',
+      [
+        "import { BalField, BalFieldLabel, BalFormGrid } from '@baloise/ds-react'",
+        "const _note = 'bal-field'",
+        "const _example = '<BalField invalid></BalField>'",
+        'const _trailing = true // <BalFormCol />',
+        'type Size = BalProps.BalFormColSize',
+        'export function App() {',
+        '  return (',
+        '    <BalFormGrid>',
+        '      <BalFormCol size="half">',
+        '        <BalField>',
+        '          <BalFieldLabel>Name</BalFieldLabel>',
+        '        </BalField>',
+        '      </BalFormCol>',
+        '    </BalFormGrid>',
+        '  )',
+        '}',
+        '',
+      ].join('\n'),
+    )
+    write(root, 'dist/ignored.tsx', '<bal-field></bal-field>\n<BalField />\n')
+
+    expect(scanBalField(root)).toEqual({
+      total: 11,
+      files: [
+        {
+          file: 'App.tsx',
+          findings: [
+            { line: 1, snippet: "import { BalField, BalFieldLabel, BalFormGrid } from '@baloise/ds-react'" },
+            { line: 1, snippet: "import { BalField, BalFieldLabel, BalFormGrid } from '@baloise/ds-react'" },
+            { line: 1, snippet: "import { BalField, BalFieldLabel, BalFormGrid } from '@baloise/ds-react'" },
+            { line: 8, snippet: '<BalFormGrid>' },
+            { line: 9, snippet: '<BalFormCol size="half">' },
+            { line: 10, snippet: '<BalField>' },
+            { line: 11, snippet: '<BalFieldLabel>' },
+            { line: 11, snippet: '</BalFieldLabel>' },
+            { line: 12, snippet: '</BalField>' },
+            { line: 13, snippet: '</BalFormCol>' },
+            { line: 14, snippet: '</BalFormGrid>' },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('does not match bal-form, longer names, event types, or ambient size types', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'index.html',
+      [
+        '<bal-form></bal-form>',
+        '<bal-field-foo></bal-field-foo>',
+        '<bal-form-gridx></bal-form-gridx>',
+        '<bal-form-col-other></bal-form-col-other>',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'types.ts',
+      [
+        'type A = BalFieldCustomEvent<string>',
+        'type B = BalProps.BalFormColSize',
+        'type C = BalProps.BalFieldLabelSize',
+        'const BalForm = 1',
+        'const BalFieldish = 2',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalField(root)).toEqual({ total: 0, files: [] })
+  })
+
+  it('lists Angular template tags and skips comments and non-template strings', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'app.component.html',
+      [
+        '<!-- <bal-field></bal-field> -->',
+        '<p>Mention bal-field in text only.</p>',
+        '<bal-form-grid>',
+        '  <bal-form-col size="half">',
+        '    <bal-field [invalid]="bad">',
+        '      <bal-field-message color="danger">Required</bal-field-message>',
+        '    </bal-field>',
+        '  </bal-form-col>',
+        '</bal-form-grid>',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'inline.component.ts',
+      [
+        "import { BalField } from '@baloise/ds-angular'",
+        '@Component({',
+        '  imports: [BalField],',
+        '  template: `<bal-field-hint subject="x">y</bal-field-hint>`,',
+        '})',
+        'export class InlineComponent {}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalField(root)).toEqual({
+      total: 12,
+      files: [
+        {
+          file: 'app.component.html',
+          findings: [
+            { line: 3, snippet: '<bal-form-grid>' },
+            { line: 4, snippet: '<bal-form-col size="half">' },
+            { line: 5, snippet: '<bal-field [invalid]="bad">' },
+            { line: 6, snippet: '<bal-field-message color="danger">' },
+            { line: 6, snippet: '</bal-field-message>' },
+            { line: 7, snippet: '</bal-field>' },
+            { line: 8, snippet: '</bal-form-col>' },
+            { line: 9, snippet: '</bal-form-grid>' },
+          ],
+        },
+        {
+          file: 'inline.component.ts',
+          findings: [
+            { line: 1, snippet: "import { BalField } from '@baloise/ds-angular'" },
+            { line: 3, snippet: 'imports: [BalField],' },
+            { line: 4, snippet: '<bal-field-hint subject="x">' },
+            { line: 4, snippet: '</bal-field-hint>' },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('lists HTML tags outside src, including a multiline opening tag, and skips markdown', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'index.html',
+      [
+        '<bal-field',
+        '  horizontal',
+        '  required',
+        '>',
+        '  <bal-field-control iconLeft="search"></bal-field-control>',
+        '</bal-field>',
+        '',
+      ].join('\n'),
+    )
+    write(root, 'notes.md', '<bal-field></bal-field>\n')
+
+    expect(scanBalField(root)).toEqual({
+      total: 4,
+      files: [
+        {
+          file: 'index.html',
+          findings: [
+            { line: 1, snippet: '<bal-field horizontal required>' },
+            { line: 5, snippet: '<bal-field-control iconLeft="search">' },
+            { line: 5, snippet: '</bal-field-control>' },
+            { line: 6, snippet: '</bal-field>' },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('skips usages that live only under dependency or build directory names', () => {
+    const root = createScratchDir()
+    write(root, 'page.html', '<bal-form-col></bal-form-col>\n')
+    for (const dir of SKIP_DIRS) {
+      write(root, `${dir}/page.html`, '<bal-form-col></bal-form-col>\n')
+      write(root, `src/${dir}/nested.html`, '<BalFormCol></BalFormCol>\n')
+    }
+
+    expect(scanBalField(root)).toEqual({
+      total: 2,
+      files: [
+        {
+          file: 'page.html',
+          findings: [
+            { line: 1, snippet: '<bal-form-col>' },
+            { line: 1, snippet: '</bal-form-col>' },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('prints grouped findings as JSON and does not edit files', () => {
+    const root = createScratchDir()
+    const contents = '<bal-form-grid></bal-form-grid>\n'
+    write(root, 'index.html', contents)
+    let text = ''
+
+    const code = run(root, {
+      write(chunk: string) {
+        text += chunk
+      },
+    })
+
+    expect(code).toBe(0)
+    expect(JSON.parse(text)).toEqual({
+      total: 2,
+      files: [
+        {
+          file: 'index.html',
+          findings: [
+            { line: 1, snippet: '<bal-form-grid>' },
+            { line: 1, snippet: '</bal-form-grid>' },
+          ],
+        },
+      ],
+    })
+    expect(readFileSync(join(root, 'index.html'), 'utf8')).toBe(contents)
+  })
+})
+
+describe('Detect', () => {
+  it('suggests field once and folds every child tag into it', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'index.html',
+      [
+        '<bal-form-grid><bal-form-col>',
+        '<bal-field><bal-field-label>x</bal-field-label><bal-field-message>y</bal-field-message></bal-field>',
+        '</bal-form-col></bal-form-grid>',
+        '',
+      ].join('\n'),
+    )
+
+    const { suggested, notYet } = scanMigratable(root)
+
+    expect(suggested).toEqual([{ name: 'field', total: 10 }])
+    expect(notYet).toEqual([])
+  })
+
+  it('suggests field for a lone bal-form-grid', () => {
+    const root = createScratchDir()
+    write(root, 'index.html', '<bal-form-grid></bal-form-grid>\n')
+
+    expect(scanMigratable(root).suggested).toEqual([{ name: 'field', total: 2 }])
+  })
+})
+
+const SKILL_DIR = join(dirname(fileURLToPath(import.meta.url)), '../skills/ds-migrate-from-baloise')
+
+describe('field migration.md', () => {
+  it('titles the component field → form and documents the mapping', () => {
+    const migration = readFileSync(join(SKILL_DIR, 'components/field/migration.md'), 'utf8')
+
+    expect(migration.trimStart().startsWith('# field → form\n')).toBe(true)
+    for (const phrase of [
+      'scan-bal-field.mjs',
+      'one yes/no',
+      'ds-form-col',
+      'ds-form',
+      'className',
+      'shared/field.md',
+      'per-file summary',
+      'git commit',
+    ]) {
+      expect(migration, phrase).toContain(phrase)
+    }
+  })
+
+  it('pairs each legacy size with its desktop column class per table row', () => {
+    const migration = readFileSync(join(SKILL_DIR, 'components/field/migration.md'), 'utf8')
+
+    for (const [size, columns] of [
+      ['half', 6],
+      ['one-third', 4],
+      ['two-thirds', 8],
+      ['one-quarter', 3],
+      ['three-quarters', 9],
+    ] as const) {
+      expect(migration, size).toMatch(new RegExp(`size="${size}"[^\\n]*desktop:is-${columns}\\b`))
+    }
+  })
+
+  it('does not unwrap a bal-field around a native element', () => {
+    const migration = readFileSync(join(SKILL_DIR, 'components/field/migration.md'), 'utf8')
+
+    expect(migration).not.toContain('or native')
+    expect(readFileSync(join(SKILL_DIR, 'shared/field.md'), 'utf8')).not.toContain('or native')
+  })
+})
+
+describe('shared/field.md wiring', () => {
+  it('is referenced from SKILL.md and from every form component migration', () => {
+    expect(readFileSync(join(SKILL_DIR, 'SKILL.md'), 'utf8')).toContain('shared/field.md')
+
+    for (const component of [
+      'checkbox',
+      'radio',
+      'segment',
+      'select',
+      'input',
+      'textarea',
+      'number-input',
+      'label',
+      'input-slider',
+      'input-stepper',
+      'date',
+      'file-upload',
+    ]) {
+      const migration = readFileSync(join(SKILL_DIR, `components/${component}/migration.md`), 'utf8')
+      expect(migration, component).toContain('shared/field.md')
+      expect(migration, component).not.toContain('Leave every `bal-field*` tag exactly as it is')
+    }
+  })
+
+  it('documents the unwrap rules', () => {
+    const rules = readFileSync(join(SKILL_DIR, 'shared/field.md'), 'utf8')
+
+    for (const phrase of [
+      'invalidText',
+      'description',
+      'ds-hint',
+      'DsHint',
+      'DsIcon',
+      'helper',
+      '(optional)',
+      'slot="start"',
+      'slot="end"',
+      'ds-checkbox-group',
+    ]) {
+      expect(rules, phrase).toContain(phrase)
+    }
+  })
+})

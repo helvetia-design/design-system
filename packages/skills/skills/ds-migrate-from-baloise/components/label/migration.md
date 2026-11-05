@@ -2,7 +2,7 @@
 
 Migrate every `bal-label` usage to `ds-label`. Init has already added the `@helvetia-design/*` packages. This task rewrites usages only.
 
-The legacy folder has one element and no child tags. `bal-field`, `bal-field-label` and `bal-data-label` are different components and are not part of this migration.
+The legacy folder has one element and no child tags. `bal-field`, `bal-field-label` and `bal-data-label` are different components and are not part of this migration. A `bal-label` inside `bal-field-label`, or a direct child of `bal-field`, is skipped only when its `bal-field` is unwrapped in the same pass. `shared/field.md` then folds its text into the `label` prop of the control.
 
 `ds-label` renders in shadow DOM and behaves differently by default. `bal-label` was single-line (`white-space: pre`) and only wrapped with `multiline`. `ds-label` wraps by default and `noWrap` truncates with an ellipsis. It is also `display: block` where `bal-label` was inline. No markup change is needed for this. Mention it once in the report.
 
@@ -64,9 +64,14 @@ Neither `bal-label` nor `ds-label` has a public event. Nothing to rewrite.
 
 `setAriaForm()` and `configChanged()` were `@internal` and are not a consumer API. `ds-label` has no `setAriaForm()`.
 
-### Lost linking inside `bal-field`
+### Inside `bal-field`
 
-A `bal-label` inside `bal-field` got its `for` and `id` from the field. `ds-label` is not linked by a parent, so it needs an explicit `htmlFor` that matches the control's `id`. Do not add it: the scan cannot see the control. For every migrated label without `htmlFor`, list it in the report.
+A `bal-label` inside `bal-field-label`, or a direct child of `bal-field`, got its `for` and `id` from the field. Two cases apply.
+
+- The `bal-field` is unwrapped in the same pass, because its control is already `ds-*` or migrated now. Skip the `bal-label`. `shared/field.md` turns its text into the `label` prop of the control, and `ds-*` links its own label.
+- The `bal-field` stays in place, because its control is still a legacy `bal-*` tag. Migrate the `bal-label` to `ds-label` as usual and list it in the report as "inside a `bal-field` that stays until `<control>` is migrated".
+
+A `bal-label` outside any `bal-field` is migrated as above.
 
 ## 4. Report
 
@@ -78,7 +83,7 @@ Needs your attention when found:
 2. Every dynamic `size` binding left unchanged. The value set is different.
 3. Every `weight` left for manual review.
 4. Every `hovered` or `pressed` left for manual review.
-5. Every migrated label without `htmlFor`, which may have been linked by `bal-field`. It needs an explicit `htmlFor` that matches the control's `id`.
+5. Every migrated label inside a `bal-field` that stays until its control is migrated, as "inside a `bal-field` that stays until `<control>` is migrated". It stays unlinked until then.
 
 Coverage only, written to the file:
 

@@ -6,6 +6,8 @@ The legacy folder holds `bal-date-calendar` and `bal-date-calendar-cell`. Both a
 
 The component is renamed. The old tag is `bal-date`, the new tag is `ds-datepicker`.
 
+A surrounding `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrapper is handled by `shared/field.md` in the Rewrite step, in the same pass. `components/field/migration.md` migrates `bal-form-grid` and `bal-form-col`.
+
 ## 1. Scan
 
 `<project-root>` is the consumer project root that contains the app lockfile. When the skill is invoked from that root, use the current directory.

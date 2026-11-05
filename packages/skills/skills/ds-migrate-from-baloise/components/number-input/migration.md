@@ -6,7 +6,7 @@ The scan lists the `bal-number-input` tag and the React and Angular symbol `BalN
 
 The legacy component has no slots. `ds-number-input` adds a default slot and an `invalid-text` slot. Nothing to migrate, leave them unused.
 
-The legacy folder has no consumer child tags. `bal-input`, `bal-input-stepper` and `bal-input-slider` are different components and are not part of this migration. The scan does not list them. The surrounding `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrapper is not part of it either: leave it untouched.
+The legacy folder has no consumer child tags. `bal-input`, `bal-input-stepper` and `bal-input-slider` are different components and are not part of this migration. The scan does not list them. The surrounding `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrapper is handled by `shared/field.md` in the Rewrite step, in the same pass.
 
 ## 1. Scan
 
@@ -82,7 +82,7 @@ Write the report as `shared/report.md` describes, with the per-file summary unde
 
 Needs your attention when found:
 
-1. Every surrounding `bal-field` that carries a label or message, by file. The label is no longer linked, and this is a WCAG regression the scan cannot see. The legacy input was linked to a surrounding `bal-field-label` and `bal-field-message` through `setAriaForm()` (`aria-labelledby`, `aria-describedby`). `ds-number-input` renders its own field and only sets `aria-describedby` to its own description. Tell the consumer to move the label and message to the `label`, `description` and `invalidText` props of `ds-number-input`.
+1. Every file where `shared/field.md` moved the label and message of a surrounding `bal-field` onto the `label`, `description` and `invalidText` props, and every `bal-field` left in place. The legacy input was linked to that label and message through `setAriaForm()` (`aria-labelledby`, `aria-describedby`). A `bal-field` left in place keeps a label that is no longer linked, which is a WCAG regression the scan cannot see.
 2. Every method call that needs manual rework.
 3. Every handler that needs manual rework.
 4. Every detail-type use that needs manual rework.
