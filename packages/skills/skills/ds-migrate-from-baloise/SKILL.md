@@ -101,10 +101,15 @@ Every component migration also migrates the legacy icons in the files it touches
 - In the Rewrite step, apply the icon rules to those files as well.
 - In the Report step, add the icon items to the summary.
 
+Every form component migration also removes the legacy field wrapper around the controls it migrates. Follow `shared/field.md` alongside the chosen file:
+
+- In the Rewrite step, apply its rules to every migrated control that sits inside `bal-field` or `bal-field-control`, or that a `bal-field-message` directly follows, in the same pass.
+- In the Report step, add the field items to the summary.
+
 Every component migration also decides about the legacy config call. Follow `shared/legacy-config.md` after the icon rules:
 
 - After the file's Scan step, run its Scan section. When no `bal-*` component will be left, show each legacy config call with the component findings as a call to delete. The file's single confirmation covers it.
-- In the Rewrite step, after the icon rules, apply its Decide section.
+- In the Rewrite step, after the icon and field rules, apply its Decide section.
 - In the Report step, add its items to the summary.
 
 #### Manual

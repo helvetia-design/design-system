@@ -4,6 +4,8 @@ Migrate every `bal-textarea` usage to `ds-textarea`. Init has already added the 
 
 The legacy folder has no child tags. `bal-textarea` is the only tag in this migration.
 
+A surrounding `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrapper is handled by `shared/field.md` in the Rewrite step, in the same pass. `components/field/migration.md` migrates `bal-form-grid` and `bal-form-col`.
+
 ## 1. Scan
 
 `<project-root>` is the consumer project root that contains the app lockfile. When the skill is invoked from that root, use the current directory.
