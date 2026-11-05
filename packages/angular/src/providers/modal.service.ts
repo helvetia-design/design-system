@@ -1,5 +1,6 @@
 import { Injectable, Type } from '@angular/core'
 import { ComponentRef, ModalOptions, dsModalController } from '@helvetia-design/core'
+import { defineCustomElement as defineDsModal } from '@helvetia-design/core/components/ds-modal.js'
 import { AngularDelegate } from './angular-delegate'
 import { DsModalRef } from './modal-ref'
 
@@ -7,7 +8,9 @@ import { DsModalRef } from './modal-ref'
   providedIn: 'root',
 })
 export class DsModalService {
-  constructor(private readonly angularDelegate: AngularDelegate) {}
+  constructor(private readonly angularDelegate: AngularDelegate) {
+    defineDsModal()
+  }
 
   async create<T>(
     component: Type<T>,
