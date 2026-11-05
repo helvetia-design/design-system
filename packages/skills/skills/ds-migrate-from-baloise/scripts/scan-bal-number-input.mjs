@@ -6,14 +6,15 @@ import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-
 
 const USAGE_RE = /<\/?bal-number-input(?![\w-])|<\/?BalNumberInput\b|\bBalNumberInput\b/g
 
-export function scanBalNumberInput(rootDir) {
+export function scanBalNumberInput(rootDir, paths = []) {
   const found = []
-  scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found))
-  return group(found)
+  const unmatched = scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found), { paths })
+  const result = group(found)
+  return unmatched.length > 0 ? { ...result, unmatched } : result
 }
 
-export function run(rootDir, stdout) {
-  stdout.write(`${JSON.stringify(scanBalNumberInput(rootDir), null, 2)}\n`)
+export function run(rootDir, stdout, paths = []) {
+  stdout.write(`${JSON.stringify(scanBalNumberInput(rootDir, paths), null, 2)}\n`)
   return 0
 }
 
@@ -61,7 +62,7 @@ function isMainModule() {
 if (isMainModule()) {
   const root = process.argv[2] ? resolve(process.argv[2]) : process.cwd()
   try {
-    process.exit(run(root, process.stdout))
+    process.exit(run(root, process.stdout, process.argv.slice(3)))
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
     process.exit(1)

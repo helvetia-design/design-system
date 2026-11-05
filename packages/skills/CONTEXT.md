@@ -25,7 +25,7 @@ Distribution is `npx @helvetia-design/skills add`. There is no Claude Code plugi
 
 ### One `migration.md` per component
 
-**Components** offers two paths. **Manual** lists `components/*.md` and `components/*/migration.md` by the first heading. **Detect** runs `scripts/scan-migratable.mjs` and suggests only used `bal-*` components with a matching `components/<name>/migration.md`. Both paths dispatch to that migration file.
+**Components** offers three paths. **Manual** lists `components/*.md` and `components/*/migration.md` by the first heading. **Detect** runs `scripts/scan-migratable.mjs` and suggests only used `bal-*` components with a matching `components/<name>/migration.md`. Both dispatch to that migration file, unless the user answers yes to the cascade question. **Scope** takes paths and runs a batch over them. See "Batch: scope and cascade".
 
 ### Adding the next component
 
@@ -40,7 +40,7 @@ Accordion is the template: `components/accordion/migration.md` (heading `accordi
 
 Conventions that hold across every component:
 
-- **The scanner stays flat.** It prints `{ total, files: [{ file, findings: [{ line, snippet }] }] }` and nothing else. Reach comes from widening the single `USAGE_RE`, not from adding fields — toast matches `balToastController`, accordion matches the four `BalAccordion*` bindings and `BalAccordionBundle`.
+- **The scanner stays flat.** It prints `{ total, files: [{ file, findings: [{ line, snippet }] }] }` and nothing else. The one addition is `unmatched`, present only when a path argument matched no source file. Reach comes from widening the single `USAGE_RE`, not from adding fields — toast matches `balToastController`, accordion matches the four `BalAccordion*` bindings and `BalAccordionBundle`.
 - **Never put a shared event name in a component regex.** `balChange` alone is emitted by 26 legacy components, so it would report checkbox, input, and dropdown usages as findings for whichever component you are migrating.
 - **`CHILD_SLUGS` stays explicit.** Never fold by prefix: `bal-input-slider` becomes `ds-slider`, a separate component, not part of the input migration.
 - **Anything with no `ds-*` equivalent is reported, never commented into the consumer's code.** The migration file's final step enumerates each loss for the summary. See `components/tooltip/migration.md` and `components/accordion/migration.md`.
@@ -62,6 +62,21 @@ Every component migration also migrates the icons from `@baloise/ds-icons` and `
 `app` does not copy `icons` onto `ds-root`. The Registration rules in `shared/icons.md` handle it.
 
 `scripts/scan-icon-imports.mjs` takes the component's finding files as extra arguments and scans only those. Without them it scans the whole project, which the Assets step uses and the component report uses to point at files Assets still has to migrate. `test/scan-icon-imports.spec.ts` checks the map against `@helvetia-design/assets`, the one workspace devDependency of this package.
+
+### Batch: scope and cascade
+
+A **batch** migrates every `bal-*` component in a set of files in one run, following `shared/batch.md`. It has two entry points. **Scope** takes paths from the user. The **cascade question** follows Manual and Detect: when the chosen component's files also use other migratable components, the user can migrate them all in one batch.
+
+A batch exists because parents style or query their children by tag across families. `ds-button-group` styles `::slotted(ds-button)` and `ds-checkbox-group` queries `ds-checkbox`. Migrating one family at a time leaves a `ds-*` parent around `bal-*` children, which loses layout or wiring without an error.
+
+- **Scanners accept paths.** Every `scan-bal-*.mjs`, `scan-icon-imports.mjs` and `scan-migratable.mjs` takes files and folders after `<project-root>`. A folder limits the walk to its subtree. The filter lives in `scanSourceFiles` in `scripts/source-scan.mjs`, which returns the paths that matched no source file. A path inside a skipped folder such as `dist` counts as unmatched. With paths, `scan-migratable.mjs` also prints `files`, the component totals per file.
+- **Fixed rewrite order.** Structural parents run first (`card`, `modal`, `list`, `accordion`, `tabs`, `steps`, `navbar`, `sheet`, `popup`), leaves last (`button`, `close`, `icon`, `text`, `heading`, `badge`, `tag`, `divider`), everything else alphabetical in between. Sibling rules in a `migration.md` name `bal-*` tags, such as the card rule that wraps a `bal-close` next to the title. Running close first would leave that rule without a match. `shared/batch.md` also says that such a rule matches the `ds-*` form.
+- **Batch mode is one clause in `SKILL.md`.** Inside a batch a `migration.md` runs only its Rewrite step and hands back its Report items. No `migration.md` mentions batches.
+- **Once per batch:** the confirmation, the empty legacy import cleanup, the icon rules from `shared/icons.md`, and the whole-project check for remaining `bal-*` components.
+- **Shared files are reported, not blocked.** A file in the set that is imported from outside it is listed with its importers before the confirmation.
+- **No tree resolution.** A batch does not follow imports or Angular selectors into other folders. The user adds those folders to the scope.
+
+When you add a migration, place it in the order list in `shared/batch.md` when it restructures children or is a leaf that other migrations wrap. Otherwise the alphabetical middle group covers it.
 
 ### Steps: panels mode and navigation mode
 
@@ -126,7 +141,7 @@ Done when:
 
 ### Menu (Claude)
 
-In the scratch directory, invoke `/ds-migrate-from-baloise`. Done when Init runs `scripts/detect-baloise.mjs`, Components offers **Manual** and **Detect**, Manual lists exactly one entry per `components/*/migration.md` (named after its first heading, e.g. `app → root`) and nothing else, Detect suggests a component only when the project uses it and that migration exists, Assets scans the whole project with `scan-icon-imports.mjs` and follows `shared/icons.md`, and CSS utils reports "coming soon" and stops.
+In the scratch directory, invoke `/ds-migrate-from-baloise`. Done when Init runs `scripts/detect-baloise.mjs`, Components offers **Manual**, **Detect** and **Scope**, Manual lists exactly one entry per `components/*/migration.md` (named after its first heading, e.g. `app → root`) and nothing else, Detect suggests a component only when the project uses it and that migration exists, Manual and Detect ask the cascade question only when the chosen component's files use another migratable component, Scope runs `scan-migratable.mjs` with the given paths and follows `shared/batch.md`, Assets scans the whole project with `scan-icon-imports.mjs` and follows `shared/icons.md`, and CSS utils reports "coming soon" and stops.
 
 Against a project with no `@baloise/ds-*` dependency and no CSS/JS import, Init says "no Baloise Design System installation detected, nothing to migrate" and does not edit files. Against a project that has both, Init adds the `@helvetia-design/*` packages from the script JSON, runs that JSON's `installCommand`, inserts the new import beside the untouched `@baloise/*` import, and leaves the result unstaged.
 
