@@ -66,7 +66,7 @@ Copy as-is, in every form: `label`, `placement`, `arrow`, `backdrop`, `closable`
 | `reference`                                                                               | _(no equivalent)_            | Drop it in every form. `ds-popup` anchors to its trigger. Report each one.                                                                                                                                                                                                                |
 | `contentWidth`                                                                            | _(no equivalent)_            | Drop it in every form. Legacy set `--bal-popup-variant-popover-max-width` from it. Report each one.                                                                                                                                                                                       |
 | _(none)_                                                                                  | `role`, `group`, `trapFocus` | New props. Nothing to migrate from. Leave them unset.                                                                                                                                                                                                                                     |
-| `[placement]="x"`, `[attr.offset]="x"`, `closable={x}`, and the same for any renamed prop | leave the binding            | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line in the summary.                                                                                                                                                                           |
+| `[placement]="x"`, `[attr.offset]="x"`, `closable={x}`, and the same for any renamed prop | leave the binding            | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line in the report.                                                                                                                                                                            |
 
 ### Tags and imports
 
@@ -95,25 +95,35 @@ Angular splits a component across `x.component.html` and `x.component.ts`, and t
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `bal-popup` trigger attribute renamed to `data-popup`, every `bal-popup-*` override moved onto the popup, every `active` renamed to `open`, every animate event split into its pair, and every dynamic binding left for the caller.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Also list each loss:
+Needs your attention when found:
 
-- every `variant="drawer"`, `variant="fullscreen"` and dynamically bound `variant`, with its file and line, left as legacy `bal-popup` and not migrated. Name `ds-drawer` and `ds-modal` with `fullscreen` as the targets, and say they are different elements with their own trigger wiring
-- every popup with more than one trigger whose `bal-popup-*` attributes were left in place, with every trigger's file and line
-- every dropped `reference`, `contentWidth` and `bal-popup-reference`
-- every `balChange` handler, and every call to `setMinWidth()`, `_present()`, `_dismiss()` or `_emitChange()`
-- every type reference such as `BalProps.BalPopupVariant` or `BalEvents.BalPopupChangeDetail` that the scan cannot see. These resolve from the ambient namespaces and stop compiling once `@baloise/ds-core` is removed. `@helvetia-design/core` does not export the matching `PopupPlacement` or `PopupRole` types yet
+1. Every dynamic binding left for the caller.
+2. Every `variant="drawer"`, left as legacy `bal-popup` and not migrated. Name file and line. Name `ds-drawer` as the target, and say it is a different element with its own trigger wiring.
+3. Every `variant="fullscreen"`, left as legacy `bal-popup` and not migrated. Name file and line. Name `ds-modal` with `fullscreen` as the target, and say it is a different element with its own trigger wiring.
+4. Every dynamically bound `variant`, left as legacy `bal-popup` and not migrated. Name file and line. Name `ds-drawer` and `ds-modal` with `fullscreen` as the possible targets.
+5. Every popup with more than one trigger whose `bal-popup-*` attributes were left in place. Name every trigger's file and line.
+6. Every dropped `reference`. `ds-popup` anchors to its trigger only.
+7. Every dropped `contentWidth`.
+8. Every dropped `bal-popup-reference`. `ds-popup` anchors to its trigger only.
+9. Every `balChange` handler.
+10. Every call to `setMinWidth()`, `_present()`, `_dismiss()` or `_emitChange()`.
+11. Every type reference that the scan cannot see, such as `BalProps.BalPopupVariant` or `BalEvents.BalPopupChangeDetail`. These resolve from the ambient namespaces and stop compiling once `@baloise/ds-core` is removed. `@helvetia-design/core` does not export the matching `PopupPlacement` or `PopupRole` types yet.
+12. Every popup that sets `label`, as needing a heading in its slot content. Legacy rendered `label` as a visible heading above the content, with the close button beside it. `ds-popup` uses `label` only as the panel's `aria-label`, so the accessible name survives but nothing is shown. Do not build the heading markup.
+13. Every popup with `closable` set. Legacy only rendered the close button when `label` was set, because it lived in the title row. `ds-popup` renders it whenever `closable` is set. Do not add attributes or markup to compensate.
+14. Every popup without an explicit `offset`. It now sits 8px from its trigger, where legacy sat flush. Check spacing-sensitive layouts.
+15. Every popup with `backdrop` set. `ds-popup` traps focus inside the panel, because `trapFocus` follows `backdrop` by default. Legacy did not trap focus.
+16. Every file with a lost test hook. The test ids `bal-popup-label`, `bal-popup-close` and `bal-popup-content` are gone, as is the non-standard `aria-presented` attribute on the host. `@baloise/ds-testing`'s `balPopupIsOpen` and `balPopupIsClosed` assert on `aria-presented` and break. `ds-popup` exposes `part="panel"`, `part="backdrop"`, `part="arrow"` and `part="close"`, and `data-testid="ds-popup-panel"` on the panel. Do not rewrite the tests.
+17. Every lost selector. `ds-popup` uses shadow DOM. The legacy classes `bal-popup`, `bal-popup__container`, `bal-popup__container--variant-*`, `bal-popup__arrow`, `bal-popup__backdrop`, `bal-popup__inner`, `bal-popup__inner__head` and `bal-popup__inner__content` are gone, as is the runtime trigger class `bal-popup-variant-popover-trigger`. The `bal-stack`, `bal-heading` and `bal-close` elements the legacy popup rendered were in the light DOM and are now encapsulated. Do not rewrite those selectors yourself. Report them.
 
-Also report these rendering and behaviour differences, so the consumer can check them. Do not add attributes or markup to compensate:
+Coverage only, written to the file:
 
-- **Visible title**: legacy rendered `label` as a visible heading above the content, with the close button beside it. `ds-popup` uses `label` only as the panel's `aria-label`, so the accessible name survives but nothing is shown. Do not build the heading markup. List each popup that sets `label` as needing a heading in its slot content.
-- **Close button**: legacy only rendered it when `label` was set, because it lived in the title row. `ds-popup` renders it whenever `closable` is set.
-- **Offset**: every popup without an explicit `offset` now sits 8px from its trigger, where legacy sat flush. Check spacing-sensitive layouts.
-- **Focus**: `ds-popup` traps focus inside the panel when `backdrop` is set, because `trapFocus` follows `backdrop` by default. Legacy did not trap focus.
-- **Test hooks**: the test ids `bal-popup-label`, `bal-popup-close` and `bal-popup-content` are gone, as is the non-standard `aria-presented` attribute on the host. `@baloise/ds-testing`'s `balPopupIsOpen` and `balPopupIsClosed` assert on `aria-presented` and break. `ds-popup` exposes `part="panel"`, `part="backdrop"`, `part="arrow"` and `part="close"`, and `data-testid="ds-popup-panel"` on the panel. Do not rewrite the tests. List each file.
-- **Lost selectors**: `ds-popup` uses shadow DOM. The legacy classes `bal-popup`, `bal-popup__container`, `bal-popup__container--variant-*`, `bal-popup__arrow`, `bal-popup__backdrop`, `bal-popup__inner`, `bal-popup__inner__head` and `bal-popup__inner__content` are gone, as is the runtime trigger class `bal-popup-variant-popover-trigger`. The `bal-stack`, `bal-heading` and `bal-close` elements the legacy popup rendered were in the light DOM and are now encapsulated. Do not rewrite those selectors yourself. Report them.
+18. Every `bal-popup` trigger attribute renamed to `data-popup`.
+19. Every `bal-popup-*` override moved onto the popup.
+20. Every `active` renamed to `open`.
+21. Every animate event split into its pair.
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 
-Done when the summary is printed and the working tree is still unstaged.
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

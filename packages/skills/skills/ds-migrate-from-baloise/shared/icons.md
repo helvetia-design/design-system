@@ -106,12 +106,31 @@ Then decide about the legacy registration with the answer from the Scan:
 
 ## Report
 
-Run the icon scan once more without file arguments:
+In a component migration, run the icon scan once more without file arguments:
 
 ```bash
 node <this-skill-directory>/scripts/scan-icon-imports.mjs <project-root>
 ```
 
-List every file it reports that this migration did not touch. Those files still use legacy icons. Say that the **Assets** menu item migrates them.
+The **Assets** step skips this scan, because it already scanned the whole project.
 
-Add to the component's summary: every icon name rewritten from `approximated`, every name under `lost` or `changed` left unchanged and where, every non-literal name, every symbol renamed, every `lost` icon left on `@baloise/ds-icons`, every custom icon carried over and where, every unreachable registration key dropped, every namespace use left unchanged, and whether the legacy registration was deleted or kept. When imports from `@baloise/ds-icons` or `@baloise/ds-brand-icons` remain, say that those packages must stay installed.
+These items follow the component's own checklist items, in this order. Each one gets its own line in `ds-migration-report.md`, as `shared/report.md` describes.
+
+Needs your attention when found:
+
+- I1. Every file the final icon scan reports that this migration did not touch. Those files still use legacy icons. Say that the **Assets** menu item migrates them. In the **Assets** step, write `noted, this step scanned the whole project`.
+- I2. Every icon name rewritten from `approximated`, and where.
+- I3. Every name under `lost` left unchanged, and where.
+- I4. Every name under `changed` left unchanged, and where.
+- I5. Every non-literal icon name, with the note that a runtime value starting with `alert` or `info` must be passed as `alert-triangle` or `info-circle`, and that runtime values must follow `icon-name-map.json`.
+- I6. Every `lost` icon left on `@baloise/ds-icons`, and where.
+- I7. Every custom icon carried over, and where.
+- I8. Every custom icon that replaces a pre-registered standard glyph.
+- I9. Every unreachable registration key dropped.
+- I10. Every namespace use left unchanged.
+- I11. When imports from `@baloise/ds-icons` or `@baloise/ds-brand-icons` remain, the note that those packages must stay installed.
+
+Coverage only, written to the file:
+
+- I12. Every symbol renamed.
+- I13. Whether the legacy registration was deleted or kept. When it was kept, the note that it stays until the last `bal-*` component is migrated.

@@ -51,8 +51,8 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 | `color` omitted, `color=""`, `color="primary"`, `color="info"` or `color="blue"`               | omit `color`            | `ds-heading` has no `color` prop. These legacy values all resolved to the default colour, so the visible colour does not change. Drop `color`, also in the `'…'`, `{"…"}`, and `{'…'}` forms.                                                                                                 |
 | `color="white"`                                                                                | `inverted`              | HTML and Angular: write `inverted="true"`. React: write `inverted`. When `inverted` is already true, drop `color` and keep it. When `inverted` is false, replace that false value with the true form and drop `color`. Do **not** write `color="inverted"`: `ds-heading` has no `color` prop. |
 | `color="success"` / `color="warning"` / `color="danger"`                                       | _(no equivalent value)_ | Drop `color`. The heading renders in the default colour. Do not pick a substitute. Report each one by file, line, and old value. Also drop the `'…'`, `{"…"}`, and `{'…'}` forms.                                                                                                             |
-| `[level]="x"`, `[attr.level]="x"`, `level={x}`, and the same for `visualLevel` and `autoLevel` | leave the binding       | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line in the summary, saying which values the caller must now pass.                                                                                                                                 |
-| `[color]="x"`, `[attr.color]="x"`, `color={x}`                                                 | remove the binding      | `ds-heading` has no `color` prop and the value cannot be mapped statically. Remove the binding and list the file and line in the summary, so the caller can switch to `inverted` where the value was `white`.                                                                                 |
+| `[level]="x"`, `[attr.level]="x"`, `level={x}`, and the same for `visualLevel` and `autoLevel` | leave the binding       | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line in the report, saying which values the caller must now pass.                                                                                                                                  |
+| `[color]="x"`, `[attr.color]="x"`, `color={x}`                                                 | remove the binding      | `ds-heading` has no `color` prop and the value cannot be mapped statically. Remove the binding and list the file and line in the report, so the caller can switch to `inverted` where the value was `white`.                                                                                  |
 
 Size tokens in `level` split across two props, because legacy `HEADING_TAGS` and `HEADING_SIZES` disagreed. `level="x-large"` rendered an `h2` at the size `h3` normally gets, so `level="h2"` alone would enlarge the text.
 
@@ -83,18 +83,24 @@ Neither component emits events and neither has public methods. There is nothing 
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `level` that was split into `level` and `visualLevel`, every renamed size token, every `color="white"` rewritten to `inverted`, every `primary`, `info` and `blue` dropped as default, every dropped `success`, `warning`, and `danger`, and every dynamic binding left for the caller.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Also list each loss:
+Needs your attention when found:
 
-- every dropped `color="success"`, `color="warning"`, or `color="danger"`, with its file, line, and old value, now rendered in the default colour
-- every type reference such as `BalProps.BalHeadingLevel` that the scan cannot see. These resolve from the ambient `BalProps` namespace and stop compiling once `@baloise/ds-core` is removed from the project
+1. Every dynamic `level`, `visualLevel` or `autoLevel` binding left for the caller, with the values the caller must now pass.
+2. Every dynamic `color` binding removed, so the caller can switch to `inverted` where the value was `white`.
+3. Every dropped `color="success"`, `color="warning"`, or `color="danger"`, with its file, line, and old value. It now renders in the default colour.
+4. Every type reference such as `BalProps.BalHeadingLevel` that the scan cannot see. These resolve from the ambient `BalProps` namespace and stop compiling once `@baloise/ds-core` is removed from the project.
+5. Every selector that targets the legacy element and that the scan cannot see. `ds-heading` uses shadow DOM and exposes only `part="heading"` on the inner element. The legacy component rendered in the light DOM and set the classes `bal-heading`, `bal-heading__text`, `bal-heading--level-*`, `bal-heading--space-*`, `bal-heading__text--color-*`, `bal-heading__text--size-*`, `bal-heading__text--subtitle`, `bal-heading__text--shadow`, and `bal-heading__text--no-wrap`, plus the test id `data-testid="bal-heading"`. Styles and tests that query any of them break. Do not rewrite those selectors yourself. Report them.
+6. Every heading that relied on the implicit default margin. The legacy stylesheet gave every heading that was not the last child an automatic bottom margin (`--bal-space-x-small`, or `--bal-space-normal` at `level="display"`) without any `space` attribute. `ds-heading` applies margin only from `space`. Do not add attributes to compensate.
 
-Also report these rendering differences, so the consumer can check them. Do not add attributes to compensate:
+Coverage only, written to the file:
 
-- **Lost selectors.** `ds-heading` uses shadow DOM and exposes only `part="heading"` on the inner element. The legacy component rendered in the light DOM and set the classes `bal-heading`, `bal-heading__text`, `bal-heading--level-*`, `bal-heading--space-*`, `bal-heading__text--color-*`, `bal-heading__text--size-*`, `bal-heading__text--subtitle`, `bal-heading__text--shadow`, and `bal-heading__text--no-wrap`, plus the test id `data-testid="bal-heading"`. Styles and tests that query any of them break. Do not rewrite those selectors yourself. Report them.
-- **Default spacing.** The legacy stylesheet gave every heading that was not the last child an automatic bottom margin (`--bal-space-x-small`, or `--bal-space-normal` at `level="display"`) without any `space` attribute. `ds-heading` applies margin only from `space`. List each heading that relied on that implicit margin.
+7. Every `level` that was split into `level` and `visualLevel`.
+8. Every renamed size token.
+9. Every `color="white"` rewritten to `inverted`.
+10. Every `primary`, `info` and `blue` dropped as default.
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 
-Done when the summary is printed and the working tree is still unstaged.
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

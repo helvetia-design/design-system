@@ -74,16 +74,24 @@ Angular splits a component across `x.component.html` and `x.component.ts`, and t
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `steps` that was renamed to `step`, every event handler that was renamed, and every `ev.detail` read on `dsFocus` or `dsBlur`, method call, and detail-type use that needs manual rework.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Report these logic changes the scan cannot see, so the consumer can check them:
+Needs your attention when found:
 
-- **Value range**: every write is resolved onto `[min, max]`, and an empty value (`null`, `undefined`, `NaN`) becomes `min`. That resolution is silent, no `dsChange` fires, so a bound value outside the range stays unchanged on the framework side while the element shows the clamped one. List each static or bound value that can be empty or out of range.
-- **Required**: `ds-counter` defaults `required` to `true`. It only shows once a `label` is set. List every file where the surrounding `bal-field` carries a label, because `ds-counter` has its own `label`, `description` and `invalidText` that can replace that wrapper later.
-- **Appearance**: `ds-counter` takes a `color` and shows the buttons as ghost buttons. Visual snapshots of the legacy outlined buttons break.
+1. Every `ev.detail` read on `dsFocus` or `dsBlur`, listed as "event detail removed, needs manual rework".
+2. Every `getInputElement()` call, listed as "return type changed, check the caller".
+3. Every `setAriaForm()` call, listed as "method no longer available, needs manual rework".
+4. Every detail-type use, listed as "type needs manual rework".
+5. Every static or bound value that can be empty or out of range. Every write is resolved onto `[min, max]`, and an empty value (`null`, `undefined`, `NaN`) becomes `min`. No `dsChange` fires for that, so a bound value outside the range stays unchanged on the framework side while the element shows the clamped one.
+6. Every file where the surrounding `bal-field` carries a label. `ds-counter` defaults `required` to `true`, which only shows once a `label` is set. `ds-counter` has its own `label`, `description` and `invalidText` that can replace that wrapper later.
+7. One-time note: `ds-counter` takes a `color` and shows the buttons as ghost buttons. Visual snapshots of the legacy outlined buttons break.
+8. Every selector that targets the legacy element and that the scan cannot see, such as classes starting with `bal-input-stepper`, `data-testid="bal-input-stepper"`, `bal-input-stepper-decrease`, `bal-input-stepper-increase`, and `bal-input-stepper-text`. Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.
 
-Also list every selector that targeted the legacy element and that the scan cannot see (classes starting with `bal-input-stepper`, `data-testid="bal-input-stepper"`, `bal-input-stepper-decrease`, `bal-input-stepper-increase`, `bal-input-stepper-text`). Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.
+Coverage only, written to the file:
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+9. Every `steps` that was renamed to `step`.
+10. Every event handler that was renamed.
 
-Done when the summary is printed and the working tree is still unstaged.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

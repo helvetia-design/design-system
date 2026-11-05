@@ -54,7 +54,7 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 | `label`, `value`                   | same                         | Copy as-is. Label text written as slotted content (`<bal-segment-item>Text</bal-segment-item>`) carries over unchanged, since `ds-segment-item` has a default slot.                                                                                                                                                     |
 | `disabled`                         | _(no equivalent)_            | Drop it and report each occurrence by file and line as lost: a single item can no longer be disabled, only the whole `ds-segment`. Do not move it onto the group, because that would disable every item.                                                                                                                |
 | `invalid`                          | _(no equivalent)_            | Drop it and report each occurrence by file and line as lost. Validity is only set on the `ds-segment`.                                                                                                                                                                                                                  |
-| `checked`, `focused` (`@internal`) | _(no equivalent)_            | Drop silently. These were never public API. Do not mention them in the summary.                                                                                                                                                                                                                                         |
+| `checked`, `focused` (`@internal`) | _(no equivalent)_            | Drop silently. These were never public API. Do not mention them in the report.                                                                                                                                                                                                                                          |
 | _(none — missing `value`)_         | `value`                      | The legacy item generated a default `value` (`bal-si-<n>`) when none was set. `ds-segment-item` has no default, so an item without `value` has an undefined value. Do not add one: the consumer's expected values are unknown. Report each `bal-segment-item` without a `value` by file and line as a behaviour change. |
 | _(none — new props)_               | `icon`, `svg`, `description` | New capabilities, nothing to migrate from legacy. Leave unset.                                                                                                                                                                                                                                                          |
 
@@ -74,7 +74,7 @@ Only `bal-segment` emits events; `bal-segment-item` has none.
 | `balFocus`  | `dsFocus`  | Same shapes as `balChange`: `addEventListener`, `(balFocus)`, `onBalFocus` become `dsFocus`, `(dsFocus)`, `onDsFocus`. Detail stays `FocusEvent`.                                                         |
 | `balBlur`   | `dsBlur`   | Same shapes as `balFocus`, targeting `blur`.                                                                                                                                                              |
 
-`balSelect` and `balVertical` were `@internal` and never part of the public API. Drop any reference silently, without a summary mention.
+`balSelect` and `balVertical` were `@internal` and never part of the public API. Drop any reference silently, without a mention in the report.
 
 Rewrite only handlers that are attached to the element being migrated. `balChange`, `balFocus` and `balBlur` are emitted by many other legacy components, so never rewrite a handler on another element, and never rename them by search and replace across the file.
 
@@ -84,10 +84,27 @@ The scan does not list a file that only listens and never uses `bal-segment`/`ba
 
 ### Methods
 
-Neither `bal-segment` nor `bal-segment-item` had a public method, and neither has `ds-segment`/`ds-segment-item`. `setAriaForm()` and `setFocus()` on the legacy tags were `@internal`. Drop any reference silently, without a summary mention.
+Neither `bal-segment` nor `bal-segment-item` had a public method, and neither has `ds-segment`/`ds-segment-item`. `setAriaForm()` and `setFocus()` on the legacy tags were `@internal`. Drop any reference silently, without a mention in the report.
 
 ## 4. Report
 
-Print a per-file summary of what changed, including: every `expanded` rewritten to `wide` with its "check behaviour" note; every `scrollable` left in place as having no `ds-*` equivalent; every dropped item `disabled` or `invalid` as lost; every `bal-segment-item` without a `value`; every type reference such as `HTMLBalSegmentElement` or `BalEvents.BalSegmentChange` that the scan cannot see (these resolve from the ambient namespaces and stop compiling once `@baloise/ds-core` is removed); the one-time note about `ds-segment`'s new `required` default being left alone; and the one-time note that `bal-field`/`bal-field-label`/`bal-field-control`/`bal-field-message` wrappers were left untouched because collapsing them is a separate, future migration. End with the note that files which only listen, and have no scanned `.html` of the same name beside them, were not scanned. Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Done when the summary is printed and the working tree is still unstaged.
+Needs your attention when found:
+
+1. Every `expanded` rewritten to `wide`, with its "check behaviour" note.
+2. Every `scrollable` left in place because it has no `ds-*` equivalent. Name file and line for each.
+3. Every dropped item `disabled`, as lost. A single item can no longer be disabled, only the whole `ds-segment`.
+4. Every dropped item `invalid`, as lost. Validity is only set on the `ds-segment`.
+5. Every `bal-segment-item` without a `value`.
+6. Every type reference that the scan cannot see, such as `HTMLBalSegmentElement` or `BalEvents.BalSegmentChange`. These resolve from the ambient namespaces and stop compiling once `@baloise/ds-core` is removed.
+7. One-time note: `ds-segment` defaults `required` to `true` and the migration left it unset. A migrated segment inside a form now validates as required. The consumer can set `required="false"` where it should not apply.
+8. One-time note: files which only listen, and have no scanned `.html` of the same name beside them, were not scanned.
+
+Coverage only, written to the file:
+
+9. One-time note: the `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrappers were left untouched, because collapsing them is a separate, future migration.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

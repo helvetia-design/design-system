@@ -56,7 +56,7 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 - **HTML**: `<bal-modal>`, `<bal-modal-header>` and `<bal-modal-body>` become `<ds-modal>`, `<ds-modal-header>` and `<ds-modal-body>`, including the closing tags.
 - **Angular**: the same tags rewrite in `.html` templates and in inline `template:` strings. When a file imports `BalModal`, `BalModalHeader`, `BalModalBody`, or `BalModalBundle` from `@baloise/ds-angular`, replace them with `import { DsModal, DsModalHeader, DsModalBody } from '@helvetia-design/angular'` and leave the other symbols on the `@baloise` import. Import only the symbols the file uses. `BalModalBundle` was an array of the three legacy classes. In an `imports:` list it becomes `DsModal, DsModalHeader, DsModalBody`. Rename the symbols in `imports: [...]` as well.
-- **React**: `<BalModal>`, `<BalModalHeader>` and `<BalModalBody>` become `<DsModal>`, `<DsModalHeader>` and `<DsModalBody>`, and the closing tags follow. Import them from `@helvetia-design/react`. When the existing `@baloise/ds-react` import also binds other symbols, move only the modal symbols to `import { DsModal } from '@helvetia-design/react'` and leave the other symbols on the `@baloise` import. The generated `DsModal` wrapper is deprecated: it does not keep React `open` state in sync when the modal dismisses itself. JSX still rewrites to `DsModal`. Say in the summary that `Modal` from `@helvetia-design/react` is the preferred wrapper, with `onOpenChange`. Do not rewrite JSX into `Modal`, and do not rewrite it into the `useModal` hook — that hook replaces imperative `balModalController` calls only, which the controller row below covers.
+- **React**: `<BalModal>`, `<BalModalHeader>` and `<BalModalBody>` become `<DsModal>`, `<DsModalHeader>` and `<DsModalBody>`, and the closing tags follow. Import them from `@helvetia-design/react`. When the existing `@baloise/ds-react` import also binds other symbols, move only the modal symbols to `import { DsModal } from '@helvetia-design/react'` and leave the other symbols on the `@baloise` import. The generated `DsModal` wrapper is deprecated: it does not keep React `open` state in sync when the modal dismisses itself. JSX still rewrites to `DsModal`. Say in the report that `Modal` from `@helvetia-design/react` is the preferred wrapper, with `onOpenChange`. Do not rewrite JSX into `Modal`, and do not rewrite it into the `useModal` hook — that hook replaces imperative `balModalController` calls only, which the controller row below covers.
 
 ### Controller and service
 
@@ -127,20 +127,35 @@ A legacy `bal-button` with the `modal-close` attribute closed the surrounding mo
 
 ## 4. Report
 
-Print a per-file summary of what changed. End with the items below, each with file and line:
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-- every dropped `space`, `hasBackdrop`, `backdropDismiss`, `focusTrap` and `cssClass`, and every `backdropDismiss="false"` whose backdrop click now closes the modal
-- every `create` with `component`, with the missing `label` and the header-slot caveat
-- every `create` that was not rewritten because its argument is not an object literal
-- every call on the returned value, every `modalService.dismiss(` and every `getTop()`
-- every `dismiss` call with reordered arguments, and every `dismissAll` call that lost its arguments
-- every read of the `dismiss` result, every `onDidDismiss()` and `onWillDismiss()` call on an element, and every `detail.role` comparison
-- every `modal-close` attribute
-- every `BalProps.BalModal*` type reference that needs a manual check
-- every legacy selector that no longer applies, such as `.bal-modal__header`, `.bal-modal__body`, `.bal-modal__content`, `.bal-modal__container`, `.bal-modal__background`, `.data-test-modal-close` and the `aria-presented` attribute. `ds-modal` renders in shadow DOM, so these are lost. The dialog is styleable through `part="dialog"`, `part="close"`, `part="title"`, `part="body"` and `part="actions"`
-- every `DsModal` in React, with the note that `Modal` is the preferred wrapper
-- in React, every `balModalController` call rewritten to `useModal`, naming the hook as the reason `ds-modal` is registered
+Needs your attention when found:
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+1. Every dropped `backdropDismiss="false"`, whose backdrop click now closes the modal.
+2. Every dropped `hasBackdrop`, especially `hasBackdrop="false"` and `hasBackdrop={false}`. `ds-modal` always renders its backdrop.
+3. Every dropped `cssClass`. `ds-modal` renders in shadow DOM, so a class on the host cannot reach the dialog.
+4. Every dropped `space`.
+5. Every `create` with `component`, with the missing `label` and the header-slot caveat.
+6. Every `create` that was not rewritten because its argument is not an object literal.
+7. Every call on the returned value.
+8. Every `modalService.dismiss(` call.
+9. Every `getTop()` call.
+10. Every `dismiss` call with reordered arguments.
+11. Every `dismissAll` call that lost its arguments.
+12. Every read of the `dismiss` result.
+13. Every `onDidDismiss()` and `onWillDismiss()` call on an element.
+14. Every `detail.role` comparison.
+15. Every `modal-close` attribute.
+16. Every `BalProps.BalModal*` type reference that needs a manual check.
+17. Every legacy selector that no longer applies, such as `.bal-modal__header`, `.bal-modal__body`, `.bal-modal__content`, `.bal-modal__container`, `.bal-modal__background`, `.data-test-modal-close` and the `aria-presented` attribute. `ds-modal` renders in shadow DOM, so these are lost. The dialog is styleable through `part="dialog"`, `part="close"`, `part="title"`, `part="body"` and `part="actions"`.
+18. Every `DsModal` in React, with the note that `Modal` is the preferred wrapper.
 
-Done when the summary is printed and the working tree is still unstaged.
+Coverage only, written to the file:
+
+19. Every dropped `focusTrap`. The native `dialog` element handles focus.
+20. Every other dropped `backdropDismiss`.
+21. In React, every `balModalController` call rewritten to `useModal`, naming the hook as the reason `ds-modal` is registered.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

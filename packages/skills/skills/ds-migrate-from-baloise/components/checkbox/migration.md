@@ -63,7 +63,7 @@ Legacy `interface` (`'checkbox' | 'switch' | 'button' | 'tile'`) lived on `bal-c
 
 Carry over `name`, `value`, `checked`, `disabled`, `readonly`, `required`, `invalid`, `autoInvalidOff`, and the label content unchanged — `ds-toggle` has all of them. Drop `interface`, `tile`, `tileColor`, `flat`, `labelHidden`, and `nonSubmit`: `ds-toggle` has no concept of any of them (it is never a tile, and it is always submitted with the form).
 
-**Flag, do not silently rewrite, when the switch sits inside a `control`-mode group** — a `bal-checkbox-group control [value]="..."` (or `control value="..."`) whose `value` array actually drives or reads this checkbox's checked state. `ds-checkbox-group`'s cascade (`getCheckboxes()`) is hardcoded to `this.el.querySelectorAll('ds-checkbox')`; it will never find a `ds-toggle` sibling, in either direction. Still rewrite the tag to `ds-toggle` (the switch still works standalone), but add exactly this note to the summary for that occurrence: **"visual benefit persists, but value binding breaks"** — the group's `value` array will no longer include or update this toggle.
+**Flag, do not silently rewrite, when the switch sits inside a `control`-mode group** — a `bal-checkbox-group control [value]="..."` (or `control value="..."`) whose `value` array actually drives or reads this checkbox's checked state. `ds-checkbox-group`'s cascade (`getCheckboxes()`) is hardcoded to `this.el.querySelectorAll('ds-checkbox')`; it will never find a `ds-toggle` sibling, in either direction. Still rewrite the tag to `ds-toggle` (the switch still works standalone), but add exactly this note to the report for that occurrence: **"visual benefit persists, but value binding breaks"** — the group's `value` array will no longer include or update this toggle.
 
 A switch inside a plain `bal-checkbox-group` with no `control` (used only for shared layout, label, or fieldset — the common case, including the legacy `Switch` story) needs no flag: nothing was reading its state through the group to begin with.
 
@@ -121,10 +121,31 @@ The scan does not list a file that only listens and never uses `bal-checkbox`/`b
 
 `getOptionByValue()` does not exist on `ds-checkbox-group`. It is tied to the dropped `options` array — flag every call site alongside the `options` occurrence it belongs to.
 
-`updateState()` and `setAriaForm()` on `bal-checkbox`, and `setValue()` on `bal-checkbox-group`, were all `@internal` and never part of the public API. Drop any reference silently, without a summary mention.
+`updateState()` and `setAriaForm()` on `bal-checkbox`, and `setValue()` on `bal-checkbox-group`, were all `@internal` and never part of the public API. Drop any reference silently, without a mention in the report.
 
 ## 4. Report
 
-Print a per-file summary of what changed, including: every `interface="switch"` rewritten to `ds-toggle`, and every one of those flagged with "visual benefit persists, but value binding breaks" because it sat inside a `control`-mode group; every `interface="button"` rewritten to `tile` + `hideTrigger` with its "slight design deviation" note; every dropped `labelHidden`, `flat`, `nonSubmit`, `verticalOnMobile`, and `expanded`; every dropped `options`/`newBalCheckboxOption` flagged for manual conversion to slotted children, together with any `getOptionByValue()` call site tied to it; every `setFocus()`, `setBlur()`, `getInputElement()`, or `getOption()` call flagged as having no replacement; the one-time note about `ds-checkbox-group`'s new `required` default being left alone; and the one-time note that `bal-field`/`bal-field-label`/`bal-field-control`/`bal-field-message` wrappers were left untouched because collapsing them is a separate, future migration. End with the note that files which only listen or only call a method, and have no scanned `.html` of the same name beside them, were not scanned. Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Done when the summary is printed and the working tree is still unstaged.
+Needs your attention when found:
+
+1. Every `interface="switch"` inside a `control`-mode group, flagged "visual benefit persists, but value binding breaks".
+2. Every `interface="button"` rewritten to `tile` + `hideTrigger`, with its "slight design deviation" note.
+3. Every dropped `labelHidden`. The label is now visible.
+4. Every dropped `flat`.
+5. Every dropped `nonSubmit`. The checkbox is now always submitted with the form.
+6. Every dropped `verticalOnMobile`.
+7. Every dropped `expanded`.
+8. Every dropped `options` or `newBalCheckboxOption`, flagged for manual conversion to slotted children, together with every `getOptionByValue()` call tied to it.
+9. Every `setFocus()`, `setBlur()`, `getInputElement()` or `getOption()` call, flagged as having no replacement.
+10. One-time note: files which only listen or only call a method, and have no scanned `.html` of the same name beside them, were not scanned.
+
+Coverage only, written to the file:
+
+11. Every `interface="switch"` rewritten to `ds-toggle`.
+12. One-time note: `ds-checkbox-group` defaults its new `required` prop to `true`, and the migration left it alone. It only shows once the group gets a `label`.
+13. One-time note: the `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrappers were left untouched, because collapsing them is a separate, future migration.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

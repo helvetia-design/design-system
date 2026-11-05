@@ -57,7 +57,7 @@ The evidence, resolving both sides down to their token values:
 | `info-light` (deprecated)                                              | `info`                                                     | **Name collision.** The legacy tint is what new `info` now is. Report each one.                       |
 | `tertiary-purple`, `tertiary-red`, `tertiary-yellow`, `tertiary-green` | `brand-purple`, `brand-red`, `brand-yellow`, `brand-green` | Rename. Both sides are a colour-1 tint.                                                               |
 
-Rewrite the `color='…'`, `color={"…"}`, and `color={'…'}` forms as well as `color="…"`. When `color` is bound to a non-literal expression, leave the expression alone and say in the summary that its values must be remapped by hand against this table.
+Rewrite the `color='…'`, `color={"…"}`, and `color={'…'}` forms as well as `color="…"`. When `color` is bound to a non-literal expression, leave the expression alone and say in the report that its values must be remapped by hand against this table.
 
 ### Shape: a named submit button stops submitting its name and value
 
@@ -136,8 +136,29 @@ The scan does not list a file that only listens and never uses `bal-button`/`bal
 
 ## 4. Report
 
-Print a per-file summary of what changed, including: every `color` rewritten across the four name collisions (`tertiary` to `ghost`, `light` to `tertiary`, `info` to `secondary`, `info-light` to `info`), called out by name so a reviewer does not read them as mistakes; every `color` left as a non-literal expression for manual remapping; every `element-type="submit"` with `name` or `value`, flagged "name/value no longer reach the submitted form data"; every dropped `rounded` and `isActive`; every dropped `[balPopup]`/`balPopup={…}` binding; every numeric `value` written as a string; every `href=""` that is now a `<button>` instead of an `<a>`; and every `BalButtonBundle` expanded into `DsButton` and `DsButtonGroup`. Add the one-time notes that `loading` now also disables the button and that `outlined` is inert on both sides. End with the note that files which only listen, and have no scanned `.html` of the same name beside them, were not scanned.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Needs your attention when found:
 
-Done when the summary is printed and the working tree is still unstaged.
+1. Every `color` rewritten from `tertiary` to `ghost`, called out by name so a reviewer does not read it as a mistake.
+2. Every `color` rewritten from `light` to `tertiary`, called out by name.
+3. Every `color` rewritten from `info` to `secondary`, called out by name.
+4. Every `color` rewritten from `info-light` to `info`, called out by name.
+5. Every `color` left as a non-literal expression for manual remapping.
+6. Every `element-type="submit"` with `name` or `value`, flagged "name/value no longer reach the submitted form data".
+7. Every dropped `rounded`.
+8. Every dropped `isActive`.
+9. Every `href=""` that is now a `<button>` instead of an `<a>`.
+10. One-time note: `loading` now also disables the button.
+11. One-time note: files which only listen, and have no scanned `.html` of the same name beside them, were not scanned.
+
+Coverage only, written to the file:
+
+12. Every dropped `[balPopup]` or `balPopup={…}` binding.
+13. Every numeric `value` written as a string.
+14. Every `BalButtonBundle` expanded into `DsButton` and `DsButtonGroup`.
+15. One-time note: `outlined` is inert on both sides.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

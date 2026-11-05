@@ -109,10 +109,32 @@ The scan does not list a file that only listens and never uses `bal-radio`/`bal-
 
 `getOptionByValue()` does not exist on `ds-radio-group`. It is tied to the dropped `options` array — flag every call site alongside the `options` occurrence it belongs to.
 
-`setBlur()`, `setButtonTabindex()`, `updateState()` and `setAriaForm()` on `bal-radio`, and `setValue()` and `setAriaForm()` on `bal-radio-group`, were all `@internal` and never part of the public API. Drop any reference silently, without a summary mention.
+`setBlur()`, `setButtonTabindex()`, `updateState()` and `setAriaForm()` on `bal-radio`, and `setValue()` and `setAriaForm()` on `bal-radio-group`, were all `@internal` and never part of the public API. Drop any reference silently, without a mention in the report.
 
 ## 4. Report
 
-Print a per-file summary of what changed, including: every `interface="button"` rewritten to `tile` + `hideTrigger` with its "slight design deviation" note; every dropped `labelHidden`, `flat`, `nonSubmit`, `verticalOnMobile`, and `expanded`, and every empty `color` dropped; every dropped `options`/`newBalRadioOption` flagged for manual conversion to slotted children, together with any `getOptionByValue()` call site tied to it; every `getInputElement()` or `getOption()` call flagged as having no replacement; every `bal-radio-icon`/`BalRadioIcon` left in place as having no `ds-*` equivalent; every type reference such as `HTMLBalRadioElement`, `BalProps.BalRadioInterface` or `BalEvents.BalRadioChange` that the scan cannot see (these resolve from the ambient namespaces and stop compiling once `@baloise/ds-core` is removed); the one-time note about `ds-radio-group`'s new `required` default being left alone; and the one-time note that `bal-field`/`bal-field-label`/`bal-field-control`/`bal-field-message` wrappers were left untouched because collapsing them is a separate, future migration. End with the note that files which only listen or only call a method, and have no scanned `.html` of the same name beside them, were not scanned. Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Done when the summary is printed and the working tree is still unstaged.
+Needs your attention when found:
+
+1. Every `interface="button"` rewritten to `tile` + `hideTrigger`, with its "slight design deviation" note.
+2. Every dropped `labelHidden`. `ds-radio` always renders its label slot.
+3. Every dropped `flat`.
+4. Every dropped `nonSubmit`. `ds-radio` is always submitted with the form.
+5. Every dropped `verticalOnMobile`.
+6. Every dropped `expanded`.
+7. Every dropped `options` or `newBalRadioOption`, flagged for manual conversion to slotted children, together with any `getOptionByValue()` call site tied to it.
+8. Every `getInputElement()` or `getOption()` call, flagged as having no replacement.
+9. Every `bal-radio-icon` or `BalRadioIcon` left in place because it has no `ds-*` equivalent. Name file and line for each.
+10. Every type reference that the scan cannot see, such as `HTMLBalRadioElement`, `BalProps.BalRadioInterface` or `BalEvents.BalRadioChange`. These resolve from the ambient namespaces and stop compiling once `@baloise/ds-core` is removed.
+11. One-time note: files which only listen or only call a method, and have no scanned `.html` of the same name beside them, were not scanned.
+
+Coverage only, written to the file:
+
+12. Every empty `color` dropped.
+13. One-time note: `ds-radio-group` has a new `required` prop that defaults to `true`, and the migration left it unset. It is inert unless the consumer later adopts the group's own `label` prop.
+14. One-time note: the `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrappers were left untouched, because collapsing them is a separate, future migration.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

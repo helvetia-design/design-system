@@ -43,7 +43,7 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 | `background="white"`                                          | `background="light"`    | Rename the value. Also rewrite `background='white'`, `background={"white"}`, and `background={'white'}`.                                                                                                                                                                                                                                                         |
 | `background="grey"`                                           | `background="dark"`     | Rename the value. Also rewrite the other quote forms.                                                                                                                                                                                                                                                                                                            |
 | `background` omitted                                          | `background="light"`    | The default flipped. `bal-progress-bar` defaulted to `white` and `ds-progress-bar` defaults to `dark`, so an element without the attribute changes from a white track to a grey one. Write `background="light"` (HTML), `[background]="'light'"` (Angular), or `background="light"` (React) to keep the legacy rendering. Report each file where this was added. |
-| `[background]="x"`, `[attr.background]="x"`, `background={x}` | leave the binding       | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line in the summary, saying that `white` must now be passed as `light` and `grey` as `dark`.                                                                                                                                                                          |
+| `[background]="x"`, `[attr.background]="x"`, `background={x}` | leave the binding       | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line in the report, saying that `white` must now be passed as `light` and `grey` as `dark`.                                                                                                                                                                           |
 
 ### Tags and imports
 
@@ -61,19 +61,23 @@ Neither component has a public method a consumer calls. `configChanged()` is `@i
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `background="light"` that was added because the default flipped, every `white` renamed to `light`, every `grey` renamed to `dark`, and every dynamic `background` binding left for the caller.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Report the accessibility change first, because the scan cannot see it and it can regress a working setup:
+Needs your attention when found:
 
-- **Now announced**: `bal-progress-bar` set `aria-hidden="true"` on its host and had no `role`, so screen readers skipped it entirely. `ds-progress-bar` sets `role="progressbar"`, a translated `aria-label` such as `Fortschritt: 50%`, and `aria-valuenow`, `aria-valuemin` and `aria-valuemax`. Any consumer that added its own visually hidden text or live region beside the legacy bar now has the progress announced twice. List every file with a finding so the consumer can check for a duplicate announcement and remove its own wrapper if needed.
+1. Every file with a finding, because the bar is now announced. `bal-progress-bar` set `aria-hidden="true"` on its host and had no `role`, so screen readers skipped it entirely. `ds-progress-bar` sets `role="progressbar"`, a translated `aria-label` such as `Fortschritt: 50%`, and `aria-valuenow`, `aria-valuemin` and `aria-valuemax`. Any consumer that added its own visually hidden text or live region beside the legacy bar now has the progress announced twice. The consumer checks for a duplicate announcement and removes its own wrapper if needed.
+2. Every dynamic `background` binding left for the caller.
+3. Every binding whose value is not guaranteed to be within range. The rendered bar is clamped to 0 to 100, but `aria-valuenow` and the `aria-label` percentage use the raw value. A `value` above 100 or below 0 now announces that raw number against a maximum of 100.
+4. Every lost selector. `ds-progress-bar` uses shadow DOM and exposes `part="line"` on the filled element. The legacy classes `bal-progress-bar`, `bal-progress-bar__line`, `bal-progress-bar__line--color-*`, `bal-progress-bar__line--animated`, `bal-progress-bar__line--full` and the ten host modifiers `bal-progress-bar--background-{white,grey}-of-{primary,purple,yellow,red,green}` are gone. The new host carries `is-light` or `is-dark` and one of `is-primary`, `is-purple`, `is-yellow`, `is-red` and `is-green` instead. Tests and styles that query any of them break. Do not rewrite those selectors yourself. Report them.
+5. Every stylesheet that sets a `--bal-progress-bar-*` variable. The legacy `--bal-progress-bar-background-white`, `--bal-progress-bar-background-grey`, `--bal-progress-bar-line-color-*` and `--bal-progress-bar-line-radius` are replaced by `--ds-progress-bar-*` tokens with a different shape. The background is now per colour and per theme, such as `--ds-progress-bar-primary-background-dark` and `--ds-progress-bar-primary-background-light`.
+6. Every use of the ambient `BalProps.BalProgressBarBackground` and `BalProps.BalProgressBarColor`. They resolve from the global namespace, not an import, so the scan cannot see them. They stop compiling once `@baloise/ds-core` is removed, and `@helvetia-design/core` does not export the matching types yet. List each use and leave it.
 
-Report these other differences, so the consumer can check them. Do not add attributes to compensate:
+Coverage only, written to the file:
 
-- **Out-of-range values**: the rendered bar is clamped to 0–100, but `aria-valuenow` and the `aria-label` percentage use the raw value. A `value` above 100 or below 0 now announces that raw number against a maximum of 100. List every binding whose value is not guaranteed to be within range.
-- **Lost selectors**: `ds-progress-bar` uses shadow DOM and exposes `part="line"` on the filled element. The legacy classes `bal-progress-bar`, `bal-progress-bar__line`, `bal-progress-bar__line--color-*`, `bal-progress-bar__line--animated`, `bal-progress-bar__line--full` and the ten host modifiers `bal-progress-bar--background-{white,grey}-of-{primary,purple,yellow,red,green}` are gone. The new host carries `is-light` or `is-dark` and one of `is-primary`, `is-purple`, `is-yellow`, `is-red` and `is-green` instead. Tests and styles that query any of them break. Do not rewrite those selectors yourself. Report them.
-- **CSS custom properties**: the legacy `--bal-progress-bar-background-white`, `--bal-progress-bar-background-grey`, `--bal-progress-bar-line-color-*` and `--bal-progress-bar-line-radius` are replaced by `--ds-progress-bar-*` tokens with a different shape: the background is now per colour and per theme, such as `--ds-progress-bar-primary-background-dark` and `--ds-progress-bar-primary-background-light`. List every stylesheet that sets a `--bal-progress-bar-*` variable.
-- **Type references**: the ambient `BalProps.BalProgressBarBackground` and `BalProps.BalProgressBarColor` resolve from the global namespace, not an import, so the scan cannot see them. They stop compiling once `@baloise/ds-core` is removed, and `@helvetia-design/core` does not export the matching types yet. List each use and leave it.
+7. Every `background="light"` that was added because the default flipped.
+8. Every `white` renamed to `light`.
+9. Every `grey` renamed to `dark`.
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 
-Done when the summary is printed and the working tree is still unstaged.
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

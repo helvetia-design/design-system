@@ -42,10 +42,10 @@ When a finding is in an Angular `x.component.html`, also open the `x.component.t
 | `message`                                                             | `message`                | Copy as-is. Legacy wrote `message` with `innerHTML`. `ds-snackbar` renders it as text, so markup in the string is visible as text. Mention each `message` that contains markup. Slotted children stay as children.                                                                                                                                                                                 |
 | `color` omitted or `color=""`                                         | omit `color`             | Leave `color` unset.                                                                                                                                                                                                                                                                                                                                                                               |
 | `color="primary"` / `"info"` / `"success"` / `"warning"` / `"danger"` | same                     | Copy as-is, including the `'...'`, `{"..."}` and `{'...'}` forms. `primary` is deprecated in favor of `info` in `ds-snackbar`. Do not rewrite it. Mention each `primary`.                                                                                                                                                                                                                          |
-| `color` not a string literal                                          | leave the expression     | Do not guess a runtime color. Say in the summary that `primary`, `info`, `success`, `warning` and `danger` are the accepted values.                                                                                                                                                                                                                                                                |
+| `color` not a string literal                                          | leave the expression     | Do not guess a runtime color. Say in the report that `primary`, `info`, `success`, `warning` and `danger` are the accepted values.                                                                                                                                                                                                                                                                 |
 | _(always shown)_                                                      | `closable`               | Legacy always drew the close control and had no prop for it. `ds-snackbar` defaults `closable` to `false`. HTML and Angular: write `closable="true"`. React: write `closable`. On a declarative element the close control only emits `dsCloseClick` and does not hide the element, so the consumer must handle it (set `visible` to `false` or remove the node). Mention each added close control. |
 | `icon`                                                                | `icon`                   | Copy the value, then apply the icon name rule from `shared/icons.md`.                                                                                                                                                                                                                                                                                                                              |
-| `icon` omitted                                                        | omit `icon`              | Leave `icon` and `svg` unset. `ds-snackbar` derives `information`, `check`, `alert` or `bell` from `color`. Legacy drew an info mark when no color was set, so the default icon is now a bell. Mention that once in the summary.                                                                                                                                                                   |
+| `icon` omitted                                                        | omit `icon`              | Leave `icon` and `svg` unset. `ds-snackbar` derives `information`, `check`, `alert` or `bell` from `color`. Legacy drew an info mark when no color was set, so the default icon is now a bell. Mention that once in the report.                                                                                                                                                                    |
 | `action`                                                              | `action`                 | Copy as-is. The legacy action button only rendered when `action` was set, and so does the new one.                                                                                                                                                                                                                                                                                                 |
 | `href`                                                                | `actionHref`             | Rename, keeping the value form.                                                                                                                                                                                                                                                                                                                                                                    |
 | `target`                                                              | `actionTarget`           | Rename, keeping the value form.                                                                                                                                                                                                                                                                                                                                                                    |
@@ -97,14 +97,33 @@ Rewrite `balClose` and `balAction` listeners only on a migrated element. Both na
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every added close control (for a declarative element, say that the consumer must hide or remove it on `dsCloseClick`), every added `actionTarget="_self"`, every `icon` left for manual checking, every removed `duration`, every `message` whose markup is now text, every `color="primary"`, every deleted `closeIn`, every `close()` that no longer removes the element, every `closeHandler` or `actionHandler` that now receives the id, every `balClose` or `balAction` listener whose detail is no longer the snackbar id, every `create` that now returns an id, every dropped `animated`, `container`, `icon` or `setQueue`, and every `BalSnackbarService` replaced by `DsSnackbarService`.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Also report what the scan cannot see:
+Needs your attention when found:
 
-- Ambient type references `BalProps.BalSnackbar*`, `BalEvents.BalSnackbar*`, and `HTMLBalSnackbarElement`. Grep for them and rename by hand. The scan does list `Components.BalSnackbar`, because it matches the bare `BalSnackbar` symbol. Treat it as a type reference too.
-- The role changed from `alertdialog` to `status`.
-- Legacy `bal-snackbar__*` classes and `data-testid="bal-snackbar-close"` and `"bal-snackbar-action"` selectors no longer match, because `ds-snackbar` uses shadow DOM.
+1. Every added close control. For a declarative element, say that the consumer must hide or remove it on `dsCloseClick`.
+2. Every `icon` left for manual checking.
+3. Every removed `duration`. A declarative snackbar no longer closes itself.
+4. Every `message` whose markup is now text.
+5. Every deleted `closeIn`.
+6. Every `close()` that no longer removes the element.
+7. Every `closeHandler` or `actionHandler` that now receives the id.
+8. Every `balClose` or `balAction` listener whose detail is no longer the snackbar id.
+9. Every `create` that now returns an id.
+10. Every dropped `icon` on `create`. The icon now comes from `color`.
+11. Every dropped `setQueue`. There is no queue-limit API.
+12. Every ambient type reference `BalProps.BalSnackbar*`, `BalEvents.BalSnackbar*` and `HTMLBalSnackbarElement`. The scan cannot see them. Grep for them and rename by hand. The scan does list `Components.BalSnackbar`, because it matches the bare `BalSnackbar` symbol. Treat it as a type reference too.
+13. One-time note: the role changed from `alertdialog` to `status`.
+14. Every legacy `bal-snackbar__*` class and `data-testid="bal-snackbar-close"` and `"bal-snackbar-action"` selector. They no longer match, because `ds-snackbar` uses shadow DOM.
 
-In React, also list every `balSnackbarController` call rewritten to `useSnackbar`, naming the hook as the reason the alert host is registered. Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Coverage only, written to the file:
 
-Done when the summary is printed and the working tree is still unstaged.
+15. Every added `actionTarget="_self"`.
+16. Every `color="primary"`.
+17. Every dropped `animated` and `container`.
+18. Every `BalSnackbarService` replaced by `DsSnackbarService`.
+19. In React, every `balSnackbarController` call rewritten to `useSnackbar`, naming the hook as the reason the alert host is registered.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.
