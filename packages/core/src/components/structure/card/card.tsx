@@ -165,6 +165,7 @@ export class Card implements DsComponentInterface {
         <slot name="picture"></slot>
         <article
           id="card"
+          part="card"
           class={{
             [`is-fullheight`]: this.fullheight,
             [`align-${this.align}`]: hasValue(this.align),

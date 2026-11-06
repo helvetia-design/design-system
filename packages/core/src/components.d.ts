@@ -440,11 +440,6 @@ export namespace Components {
          */
         "noWrap": boolean;
         /**
-          * If `true` the button is outlined
-          * @default false
-         */
-        "outlined": boolean;
-        /**
           * Specifies the relationship of the target object to the link object. The value is a space-separated list of [link types](https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types).
           * @default ''
          */
@@ -5569,11 +5564,6 @@ declare namespace LocalJSX {
          */
         "onDsNavigate"?: (event: DsButtonCustomEvent<ButtonNavigateDetail>) => void;
         /**
-          * If `true` the button is outlined
-          * @default false
-         */
-        "outlined"?: boolean;
-        /**
           * Specifies the relationship of the target object to the link object. The value is a space-separated list of [link types](https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types).
           * @default ''
          */
@@ -9262,7 +9252,6 @@ declare namespace LocalJSX {
         "square": boolean;
         "wide": boolean;
         "flat": boolean;
-        "outlined": boolean;
         "inverted": boolean;
         "loading": boolean;
         "icon": string;

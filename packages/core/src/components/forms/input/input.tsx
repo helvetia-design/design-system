@@ -52,9 +52,11 @@ import {
  * Input renders a text input field with validation, masking, autocomplete, and optional help/error messaging.
  *
  * @slot invalid-text - Overrides the `invalidText` prop with custom markup, shown instead of the description when `invalid` is `true`.
+ * @part inner - The field's outer wrapper element.
+ * @part label - The field's label element.
+ * @part control - The wrapper around the native input and its start/end slots.
  * @part input - The native HTML input element.
- * @part prefix - The prefix wrapper (if used).
- * @part suffix - The suffix wrapper (if used).
+ * @part description - The description or invalid-text message element below the control.
  */
 @Component({
   tag: 'ds-input',
