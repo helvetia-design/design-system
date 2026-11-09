@@ -7,14 +7,15 @@ import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-
 const USAGE_RE =
   /<\/?bal-modal(?:-header|-body)?(?![\w-])|<\/?BalModal(?:Header|Body)?\b|\b(?:balModalController|BalModalController|BalModalService|BalModalOptions|BalModalBundle|BalModalHeader|BalModalBody|BalModal)\b/g
 
-export function scanBalModal(rootDir) {
+export function scanBalModal(rootDir, paths = []) {
   const found = []
-  scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found))
-  return group(found)
+  const unmatched = scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found), { paths })
+  const result = group(found)
+  return unmatched.length > 0 ? { ...result, unmatched } : result
 }
 
-export function run(rootDir, stdout) {
-  stdout.write(`${JSON.stringify(scanBalModal(rootDir), null, 2)}\n`)
+export function run(rootDir, stdout, paths = []) {
+  stdout.write(`${JSON.stringify(scanBalModal(rootDir, paths), null, 2)}\n`)
   return 0
 }
 
@@ -62,7 +63,7 @@ function isMainModule() {
 if (isMainModule()) {
   const root = process.argv[2] ? resolve(process.argv[2]) : process.cwd()
   try {
-    process.exit(run(root, process.stdout))
+    process.exit(run(root, process.stdout, process.argv.slice(3)))
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
     process.exit(1)

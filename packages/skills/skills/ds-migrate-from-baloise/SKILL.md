@@ -13,7 +13,7 @@ On invocation, present this menu and wait for one choice:
 
 1. **Init** — bootstrap Helvetia packages alongside the existing Baloise install
 2. **Components** — migrate a specific `bal-*` component to `ds-*`
-3. **CSS utils (coming soon)**
+3. **CSS utils** — rewrite legacy Baloise utility classes and delete the Baloise utilities line once none is left
 4. **Assets** — migrate legacy icons in files that no component migration touches, move fonts and favicons to `@helvetia-design/assets`, and delete the legacy config call once no `bal-*` component is left
 
 Then follow only the matching section below. Stop when that section says to stop.
@@ -101,8 +101,9 @@ Present this menu and wait for one choice:
 
 1. **Manual** — choose from every available component migration
 2. **Detect** — scan the project and suggest applicable component migrations
+3. **Scope** — migrate every `bal-*` component in the files and folders you name
 
-Every component migration also migrates the legacy icons in the files it touches. Follow `shared/icons.md` alongside the chosen file:
+Every component migration also migrates the legacy icons in the files it touches. Outside a batch, follow `shared/icons.md` alongside the chosen file:
 
 - After the file's Scan step, run the icon scan from `shared/icons.md` for every file with a finding, and show its findings with the component findings. The file's single confirmation covers both.
 - In the Rewrite step, apply the icon rules to those files as well.
@@ -121,9 +122,11 @@ Every component migration also decides about the legacy config call. Follow `sha
 - In the Rewrite step, after the icon and field rules, apply its Decide section.
 - In the Report step, append the `L1.`, `L2.`, ... items from the Report section of `shared/legacy-config.md` to the checklist, after the icon items.
 
+Inside a batch (see `shared/batch.md`), a `migration.md` runs only its Rewrite step, on the batch file list. It skips its Scan display, its Confirm step and its stop. It still applies `shared/field.md`. It skips the icon import and Registration rules and `shared/legacy-config.md`, which the batch runs once at the end. It hands the outcome of its Report items back to the batch instead of writing its own report section.
+
 #### Manual
 
-List every file matching `components/*.md` or `components/*/migration.md` in this skill folder. Build a picker from each file's title (the first Markdown heading). Dispatch to the chosen file's instructions.
+List every file matching `components/*.md` or `components/*/migration.md` in this skill folder. Build a picker from each file's title (the first Markdown heading). Wait for one choice, then ask the cascade question below.
 
 If that list is empty, report that no component migrations are available yet, then stop.
 
@@ -141,11 +144,46 @@ Show `notYet`, if it is not empty, as used components that cannot be migrated by
 
 If `suggested` is empty, report that none of the used components has an available migration, then stop.
 
-Build a picker from every entry in `suggested`, showing its `name` and `total`. Wait for one choice, then dispatch to `components/<name>/migration.md`.
+Build a picker from every entry in `suggested`, showing its `name` and `total`. Wait for one choice, then ask the cascade question below.
 
-### CSS utils (coming soon)
+#### Cascade question
 
-Report "coming soon" and stop.
+After Manual or Detect, run the chosen component's scanner, `scripts/scan-bal-<name>.mjs`, as its `migration.md` Scan step describes. When `total` is 0, dispatch to `components/<name>/migration.md`, which reports that there is nothing to migrate.
+
+Otherwise run the migratable scan on the files it found:
+
+```bash
+node <this-skill-directory>/scripts/scan-migratable.mjs <project-root> <file> [<file> ...]
+```
+
+When `suggested` lists no component besides the chosen one, dispatch to `components/<name>/migration.md`.
+
+Otherwise ask one yes/no, naming the other components with their `total`: also migrate the other `bal-*` components in these files? On yes, follow `shared/batch.md` with those files and that JSON. On no, dispatch to `components/<name>/migration.md`, as without the question.
+
+#### Scope
+
+Ask for one or more paths relative to `<project-root>`, such as a feature folder or a page. Folders include every source file below them.
+
+```bash
+node <this-skill-directory>/scripts/scan-migratable.mjs <project-root> <path> [<path> ...]
+```
+
+When the JSON has an `unmatched` list, show it, ask for corrected paths, and run the scan again.
+
+Then follow `shared/batch.md` with those paths and that JSON.
+
+Scope does not follow imports. A child component in another folder stays `bal-*` until you add that folder to the paths.
+
+### CSS utils
+
+Rewrite the legacy Baloise utility classes in the project to their Helvetia names, following `shared/css-utils.md`, and delete the Baloise utilities line once no legacy class is left. Component migrations do not rewrite utility classes. This step covers them for the whole project or for a path list.
+
+1. Ask whether to scan the whole project or a list of paths. Run the Scan section of `shared/css-utils.md`, with the paths when the user gave any. Show the findings grouped by file (path, line, snippet, and each class move), the total per group, and the `dynamic` list. Then decide whether the Baloise utilities line can go: it can when a whole-project scan (the same one, when no paths were given) reports no `lost` move, no `dynamic` place and no move outside the scanned files. In that case, list each Baloise utilities line that the Legacy utilities line section of `shared/css-utils.md` would delete after the findings.
+2. When step 1 listed class moves with a `to`, ask one yes/no: rewrite every listed class and delete every listed line? When it listed only lines to delete, ask one yes/no: delete every listed line? On no, stop with the files unchanged. When it listed neither, say that nothing can be rewritten or deleted, naming the `lost` moves and `dynamic` places, and skip to step 5.
+3. Apply the Rewrite section of `shared/css-utils.md` to every listed move.
+4. Apply the Legacy utilities line section of `shared/css-utils.md`. It scans the whole project again and deletes only the lines that step 2 confirmed.
+5. Append a `css-utils` section to `ds-migration-report.md` as `shared/report.md` describes. Its checklist holds the `U1.`, `U2.`, ... items from the Report section of `shared/css-utils.md`.
+6. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.
 
 ### Assets
 

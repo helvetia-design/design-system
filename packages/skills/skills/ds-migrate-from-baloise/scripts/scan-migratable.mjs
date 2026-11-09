@@ -75,33 +75,48 @@ function isBundle(slug) {
   return slug.endsWith('-bundle')
 }
 
-export function scanMigratable(rootDir) {
+export function scanMigratable(rootDir, paths = []) {
   const available = availableMigrations()
   const totals = new Map()
+  const perFile = new Map()
 
-  scanSourceFiles(rootDir, ({ masked }) => {
-    COMPONENT_RE.lastIndex = 0
-    let match
-    while ((match = COMPONENT_RE.exec(masked)) !== null) {
-      const slug = match[1] ?? componentNameToSlug(match[2] ?? match[3])
-      if (isBundle(slug)) continue
-      const name = CHILD_SLUGS.get(slug) ?? slug
-      totals.set(name, (totals.get(name) ?? 0) + 1)
-    }
-  })
+  const unmatched = scanSourceFiles(
+    rootDir,
+    ({ file, masked }) => {
+      const fileTotals = new Map()
+      COMPONENT_RE.lastIndex = 0
+      let match
+      while ((match = COMPONENT_RE.exec(masked)) !== null) {
+        const slug = match[1] ?? componentNameToSlug(match[2] ?? match[3])
+        if (isBundle(slug)) continue
+        const name = CHILD_SLUGS.get(slug) ?? slug
+        totals.set(name, (totals.get(name) ?? 0) + 1)
+        fileTotals.set(name, (fileTotals.get(name) ?? 0) + 1)
+      }
+      if (fileTotals.size > 0) perFile.set(file, fileTotals)
+    },
+    { paths },
+  )
 
-  const used = [...totals.entries()]
-    .map(([name, total]) => ({ name, total }))
-    .sort((a, b) => a.name.localeCompare(b.name))
-
-  return {
+  const used = toComponents(totals)
+  const result = {
     suggested: used.filter(component => available.has(component.name)),
     notYet: used.filter(component => !available.has(component.name)),
   }
+  if (paths.length === 0) return result
+
+  const files = [...perFile.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([file, fileTotals]) => ({ file, components: toComponents(fileTotals) }))
+  return unmatched.length > 0 ? { ...result, files, unmatched } : { ...result, files }
 }
 
-export function run(rootDir, stdout) {
-  stdout.write(`${JSON.stringify(scanMigratable(rootDir), null, 2)}\n`)
+function toComponents(totals) {
+  return [...totals.entries()].map(([name, total]) => ({ name, total })).sort((a, b) => a.name.localeCompare(b.name))
+}
+
+export function run(rootDir, stdout, paths = []) {
+  stdout.write(`${JSON.stringify(scanMigratable(rootDir, paths), null, 2)}\n`)
   return 0
 }
 
@@ -135,7 +150,7 @@ function isMainModule() {
 if (isMainModule()) {
   const root = process.argv[2] ? resolve(process.argv[2]) : process.cwd()
   try {
-    process.exit(run(root, process.stdout))
+    process.exit(run(root, process.stdout, process.argv.slice(3)))
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
     process.exit(1)

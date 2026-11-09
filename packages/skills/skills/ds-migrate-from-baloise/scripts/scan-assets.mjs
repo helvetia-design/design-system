@@ -30,7 +30,7 @@ export function scanAssets(rootDir) {
       if (file.endsWith('.json') && !JSON_FILES.has(basename(file))) return
       collect(file, text, found)
     },
-    EXTENSIONS,
+    { extensions: EXTENSIONS },
   )
   const { total, files } = group(found)
   return { total, project: describeProject(root), files }
