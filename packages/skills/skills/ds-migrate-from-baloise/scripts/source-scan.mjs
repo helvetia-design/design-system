@@ -1,7 +1,19 @@
 import { readdirSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { extname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 
-const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', 'out', '.next', '.angular', '.git', '.claude', 'coverage'])
+const SKIP_DIRS = new Set([
+  'node_modules',
+  'dist',
+  'build',
+  'out',
+  '.next',
+  '.angular',
+  '.git',
+  '.claude',
+  'coverage',
+  '.nx',
+  'storybook-static',
+])
 const EXTENSIONS = new Set(['.tsx', '.jsx', '.html', '.ts'])
 
 /**

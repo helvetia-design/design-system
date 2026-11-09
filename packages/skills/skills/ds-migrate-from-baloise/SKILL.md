@@ -14,7 +14,7 @@ On invocation, present this menu and wait for one choice:
 1. **Init** — bootstrap Helvetia packages alongside the existing Baloise install
 2. **Components** — migrate a specific `bal-*` component to `ds-*`
 3. **CSS utils** — rewrite legacy Baloise utility classes and delete the Baloise utilities line once none is left
-4. **Assets** — migrate legacy icons in files that no component migration touches, and delete the legacy config call once no `bal-*` component is left
+4. **Assets** — migrate legacy icons in files that no component migration touches, move fonts and favicons to `@helvetia-design/assets`, and delete the legacy config call once no `bal-*` component is left
 
 Then follow only the matching section below. Stop when that section says to stop.
 
@@ -68,6 +68,8 @@ If `status` is `ready`, show the detected framework, package manager, version, a
      @import '@helvetia-design/styles/css/utilities';
      ```
 
+     The inserted `css/font` line keeps the `@font-face` rules of `css/all`, which load the fonts from www.baloise.ch. Do not insert `design-system.local` here. **Assets** replaces that line with self-hosted fonts.
+
    - For every other `imports` entry with `kind` `bootstrap`, add the `@helvetia-design` equivalent immediately below that line. Leave the original line unchanged.
    - When the line is HTML, CSS, or a side-effect import, duplicate the line. In the duplicate only, apply this package map: `@baloise/ds-core` → `@helvetia-design/core`, `@baloise/ds-react` → `@helvetia-design/react`, `@baloise/ds-angular` → `@helvetia-design/angular`, and `@baloise/ds-styles` → `@helvetia-design/styles`.
    - When the line is JSON, such as an `angular.json` styles entry, insert a sibling string with that same package replacement. Keep the file valid JSON. Do not copy surrounding keys, and do not duplicate the whole file when the match is only one string.
@@ -90,7 +92,7 @@ If `status` is `ready`, show the detected framework, package manager, version, a
 
    - Local form when the target file is `.scss`/`.sass` instead (regardless of `framework`): use `@import '@helvetia-design/styles/css/design-system';`, or `@use` if that is the at-rule already used by Baloise lines in that same file.
 
-4. Write the Init section of `ds-migration-report.md` as `shared/report.md` describes. Create the file when it is missing, so this section is its first entry. Under `### Setup`, list the resolved `version`, the aliases written, and the install command. Under `### Files changed`, list every file touched. Every existing `@helvetia-design/*` value that step 1 left unchanged goes under **Needs your attention**, with both values. In chat, show the whole section (attention lines, Setup, and Files changed) and end with the line `Report written to ds-migration-report.md.`
+4. Write the Init section of `ds-migration-report.md` as `shared/report.md` describes. Create the file when it is missing, so this section is its first entry. Under `### Setup`, list the resolved `version`, the aliases written, and the install command. Under `### Files changed`, list every file touched. Every existing `@helvetia-design/*` value that step 1 left unchanged goes under **Needs your attention**, with both values. So does every `css/all` line that step 3 commented out, with file and line and the note that the inserted `css/font` line loads the fonts from www.baloise.ch until **Assets** runs. In chat, show the whole section (attention lines, Setup, and Files changed) and end with the line `Report written to ds-migration-report.md.`
 5. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.
 
 ### Components
@@ -185,11 +187,12 @@ Rewrite the legacy Baloise utility classes in the project to their Helvetia name
 
 ### Assets
 
-Migrate every legacy icon left in the project, following `shared/icons.md`. Component migrations already handle the icons in the files they touch. This step covers the rest, such as a constants file that imports `balBrandIcon*` symbols but has no `bal-*` tag. It also deletes the legacy config call once no `bal-*` component is left, following `shared/legacy-config.md`.
+Migrate every legacy icon left in the project, following `shared/icons.md`. Component migrations already handle the icons in the files they touch. This step covers the rest, such as a constants file that imports `balBrandIcon*` symbols but has no `bal-*` tag. It also moves the fonts and favicons to `@helvetia-design/assets`, following `shared/fonts-favicons.md`, and deletes the legacy config call once no `bal-*` component is left, following `shared/legacy-config.md`.
 
-1. Run the icon scan from `shared/icons.md` without file arguments, so it covers the whole project. Show the findings grouped by file (path, line, snippet) and end with the total count. Then run the Scan section of `shared/legacy-config.md`. No component is being migrated here, so every `bal-*` component that `scan-migratable.mjs` reports counts as left. List each call it marks for deletion after the icon findings.
-2. When step 1 listed icon findings, ask one yes/no: rewrite every listed usage and delete every listed call? When it listed only calls to delete, ask one yes/no: delete every listed call? On no, stop with the files unchanged. When it listed neither, say there are no legacy icons left to migrate and skip step 3.
+1. Run the icon scan from `shared/icons.md` without file arguments, so it covers the whole project. Show the findings grouped by file (path, line, snippet) and end with the total count. Then run `scan-assets.mjs` from the Scan section of `shared/fonts-favicons.md`, and show its findings grouped by file the same way, with its total count and the `project` values. Then run the Scan section of `shared/legacy-config.md`. No component is being migrated here, so every `bal-*` component that `scan-migratable.mjs` reports counts as left. List each call it marks for deletion after the icon and asset findings.
+2. When step 1 listed icon or asset findings, ask one yes/no: rewrite every listed usage and delete every listed call? This one answer covers the icons, the fonts and favicons, and the legacy config calls. When it listed only calls to delete, ask one yes/no: delete every listed call? On no, stop with the files unchanged. When it listed neither, say there are no legacy icons, fonts or favicons left to migrate and skip steps 3 and 4.
 3. When the icon scan found anything, apply every rule in `shared/icons.md` to the listed files.
-4. Apply the Decide section of `shared/legacy-config.md`.
-5. Append an `assets` section to `ds-migration-report.md` as `shared/report.md` describes. Its checklist holds the `I1.`, `I2.`, ... items from the Report section of `shared/icons.md`, then the `L1.`, `L2.`, ... items from the Report section of `shared/legacy-config.md`. Skip the final whole-project scan of `shared/icons.md`, which this step already is.
-6. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.
+4. When `scan-assets.mjs` found anything, apply the sections of `shared/fonts-favicons.md` in this order: Dependencies, then Fonts, then Favicons.
+5. Apply the Decide section of `shared/legacy-config.md`.
+6. Append an `assets` section to `ds-migration-report.md` as `shared/report.md` describes. Its checklist holds the `I1.`, `I2.`, ... items from the Report section of `shared/icons.md`, then the `A1.`, `A2.`, ... items from the Report section of `shared/fonts-favicons.md`, then the `L1.`, `L2.`, ... items from the Report section of `shared/legacy-config.md`. Skip the final whole-project scan of `shared/icons.md`, which this step already is.
+7. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.
