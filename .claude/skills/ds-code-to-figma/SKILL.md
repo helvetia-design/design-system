@@ -9,6 +9,11 @@ description: Push a Helvetia Design System component from code into the Figma co
 
 Generate Figma components that accurately represent the existing Web Components and reuse existing design system resources.
 
+The unit of work is a **family**: the documentation owner (the component with a Storybook page)
+plus its sub-components (e.g. `ds-tabs` + `ds-tab` + `ds-tab-panel`). One run builds every set of
+the family into the owner's one documentation frame — see
+[`conventions/families.md`](conventions/families.md).
+
 ## Workflow
 
 Each phase lives in its own file — read the current phase's file when you reach it, don't load
@@ -147,7 +152,8 @@ hard-stop condition across all eight phases in one place, see [`DECISIONS.md`](D
 - NEVER generate Code Connect mappings
 - NEVER invent a hardcoded value — always resolve to a Figma variable (design token)
 - NEVER commit — leave changes unstaged for the user to review
-- MUST treat a hard stop (missing token, missing nested child mapping) as a stop-and-wait point, not a failure to work around — surface it and wait for the user's decision
+- MUST treat a hard stop (missing token, missing nested component mapping) as a stop-and-wait point, not a failure to work around — surface it and wait for the user's decision
+- MUST run on the documentation owner and build the whole family; a sub-component never runs alone (`conventions/families.md`)
 
 ## Instructions
 
@@ -161,10 +167,12 @@ reusing existing components, since the same discipline applies here.
   `REPLACE_WITH_FIGMA_FILE_KEY` placeholder). If it's still the placeholder, stop and ask the
   user for the file key before doing anything else.
 - The target component must already exist in code (`packages/core/src/components/<category>/<name>/`).
-- If the component nests another DS component (e.g. a button using an icon), the nested
-  component's own `<child>.figma.md` must already exist and record a Figma component key. If it
-  doesn't, stop and tell the user to run this skill on the child component first — do not
-  recreate the child or fall back to a plain shape.
+- If the family uses a **nested component** (an independent DS component from another family, e.g.
+  a button using an icon), the nested component's own `<child>.figma.md` must already exist and
+  record a Figma component key. If it doesn't, stop and tell the user to run this skill on the
+  nested component first — do not recreate it or fall back to a plain shape.
+- **Sub-components** (same family folder, no Storybook page of their own) are the exception: they
+  are not a prerequisite — this run builds them, per `conventions/families.md`.
 
 ## References
 
@@ -173,6 +181,8 @@ Read only the documentation needed for the task:
 - [`CONVENTIONS.md`](CONVENTIONS.md) — cross-phase rules (category copy, no-lock, no assumed attributes), indexed by topic into
   [`conventions/`](conventions/) (tokens & props, content-selection & mitigations, page structure, Component Set
   rendering, general build mechanics).
+- [`conventions/families.md`](conventions/families.md) — owner / sub-component resolution, lockstep
+  phases, parent-set props, slots, anatomy and specs for families (every phase).
 - [`DECISIONS.md`](DECISIONS.md) — every checkpoint and hard-stop condition across all eight
   phases, in one place.
 - `PHASE-1-ANALYZE.md` … `PHASE-8-DOCUMENT-SPECS.md` — the full workflow, one file per phase (see
@@ -185,7 +195,7 @@ Read only the documentation needed for the task:
 ## Validation
 
 - All applicable styles must use design tokens.
-- Nested components must use existing instances.
+- Nested components and sub-components must use instances of their own sets.
 - Icon slots (`ds-icon` / `ds-brand-icon`) use one `INSTANCE_SWAP` property each.
 - Report unresolved mappings.
 - All Figma component keys must be written back to `<name>.figma.md` for future reference.
@@ -194,7 +204,8 @@ Read only the documentation needed for the task:
 
 Provide:
 
-- `<name>.figma.md` lives at `packages/core/src/components/<category>/<name>/<name>.figma.md`.
+- `<name>.figma.md` next to each family member's `.tsx` — one per member (owner and every
+  sub-component).
 - `PHASE-2-PROPOSE.md`'s mapping table, `CONVENTIONS.md` and `conventions/*.md` are updated only when the user approves a new rule addition.
 - Created Figma component — documentation frames and component set
 - Validation results — `<name>.figma-validation.md` (Phase 4, with the Phase 5 repair log)

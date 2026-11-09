@@ -11,16 +11,27 @@ Two kinds of pause, treated differently:
 - 🛑 **Hard stop** — something is missing or ambiguous that this skill must never guess, invent,
   or silently work around. Report it and ask; don't continue until resolved.
 
+## Families
+
+A family (owner + sub-components, `conventions/families.md`) adds **no extra checkpoints**
+beyond one first-variant checkpoint per set in Phase 3: anatomy review, specs triage, token-gap
+batch and grouping sign-off happen once for the whole family; Phases 6–8 run for the owner only.
+
 ## Phase 1 — Analyze
 
+- 🛑 **Family member without a documentation owner** (step 0): a family folder with no
+  `doc-config.ts` owner, or several owners plus a member with none (`alert-container`) — ask which
+  owner documents it. Naming a sub-component is **not** a stop: redirect to the owner in one line.
 - 🟡 **Anatomy review** (step 2): print the extracted `@part` list (letter, part name,
-  description) in the conversation before writing anything to `<name>.figma.md`.
+  description) in the conversation before writing anything to `<name>.figma.md`. For a family:
+  print the family first, then one merged list.
 - 🛑 **`@part` tag ↔ `part="..."` attribute mismatch** (step 2): a JSDoc tag with no matching
   render attribute, or vice versa — ask the user to fix the component or explicitly accept the
   mismatch.
-- 🛑 **Missing nested-child mapping** (step 4): a nested DS component (e.g. `<ds-icon>`) whose own
-  `<child>.figma.md` doesn't exist or has no recorded component key — stop per `SKILL.md`'s
-  Prerequisites; don't recreate the child or fall back to a plain shape.
+- 🛑 **Missing nested-component mapping** (step 4): a nested component from another family (e.g.
+  `<ds-icon>`) whose own `<child>.figma.md` doesn't exist or has no recorded component key — stop
+  per `SKILL.md`'s Prerequisites; don't recreate it or fall back to a plain shape. Never applies to
+  a sub-component: this run builds it.
 - 🛑 **Unresolvable CSS-var token** (step 5): any value bound to `var(--ds-...)` with no matching
   Figma variable — ask the user to pick an existing token or explicitly accept a one-off
   hardcode. Never guess, never invent a new token.
@@ -49,7 +60,8 @@ Two kinds of pause, treated differently:
   present the count, the dominant-axis breakdown, and the recommended mitigation(s); loop until
   the count is ≤500 after the user picks.
 - 🟡 **Grouping sign-off** (step 5): stop and wait for the user to confirm or edit the mapping
-  directly in `<name>.figma.md` before Phase 3 starts. Never proceed on assumed approval.
+  directly in `<name>.figma.md` before Phase 3 starts. Never proceed on assumed approval. For a
+  family: one sign-off covering every member, the `drivenBy` props and the slot default fills.
 - 🟡 **New Phase 2 heuristic** (step 6): show the user the exact diff and get approval
   before writing it — never auto-append.
 
@@ -66,7 +78,8 @@ Two kinds of pause, treated differently:
   rather than shipping a dead link.
 - 🟡 **First-variant checkpoint** (step 4): give the user a Figma link to the default
   variant and wait for their confirmation in Figma before fanning out the rest of the component set — catches a structural
-  mistake once, before it's replicated across every variant.
+  mistake once, before it's replicated across every variant. For a family: once per set, in build
+  order (contained sub-components → owner → wrapping sub-components).
 - 🛑 **Icon-slot binding refused**: the Plugin API won't bind the parent `INSTANCE_SWAP` to the
   glyph inside the icon wrapper — ask before falling back to nesting the glyph library directly
   (`conventions/content-selection-and-mitigations.md` → "Icon slots in a parent component").

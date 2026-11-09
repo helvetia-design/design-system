@@ -66,6 +66,12 @@ short title text (`Drawn spec — base`, `Sizes`, `Behavior`) bound to
 Use the default set's instances only, never an `…Inverted` set — an inverted split changes
 colors, not geometry, so its numbers would only repeat.
 
+**Family** (`conventions/families.md` §6): Specs is built once, on the owner, from the owner's
+`specs:` — which holds every member's rows, each with `set:`. The drawn spec uses the owner's
+default instance; contained sub-component rows are drawn on the sub-component instances inside it.
+Rows with `show: table` from a wrapping sub-component appear only in the Sizes table. In the
+table, prefix each sub-component row's property with its set name (`Tab · Padding X`).
+
 ### 2. Drawn spec
 
 1. A `stage` frame (no auto-layout, so markers can sit at calculated positions). Row 1: the

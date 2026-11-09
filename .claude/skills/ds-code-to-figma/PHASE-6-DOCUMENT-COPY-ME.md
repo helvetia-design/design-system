@@ -34,6 +34,9 @@ finished component-set variant — never the variant node itself. Override nothi
 `show <name>` booleans included, keeps the set's default, so Copy me shows exactly what the
 component renders with no props set — the same variant as the set's top-left cell.
 
+For a family, this is the **owner's** default variant only (its slots keep their default fill);
+sub-components get no Copy me (`conventions/families.md` §2).
+
 Iterate on it with the user in Figma before moving on, same discipline as every other section.
 
 ## Output

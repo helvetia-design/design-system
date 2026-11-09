@@ -2,7 +2,9 @@
 
 ## Objective
 
-Read the component's code and produce the draft mapping that Phase 2 proposes a grouping against.
+Read the code of every family member and produce the draft mapping files that Phase 2 proposes a
+grouping against. Steps 1–5 run **per member**; the anatomy review, the token-gap batch (5b) and
+the specs triage (6) are presented **once for the whole family** (`conventions/families.md` §2).
 
 ## Inputs
 
@@ -22,15 +24,24 @@ Read the component's code and produce the draft mapping that Phase 2 proposes a 
   `Base.tokens.json`
 - `packages/styles/src/scss/mixins/breakpoint.mixin.scss` — full breakpoint mixin set, for detecting responsive bindings
 - `conventions/specs.md` — groups and rules for the specs triage (step 6)
+- `conventions/families.md` — family resolution (step 0), merged anatomy, family specs triage
 
 ## Instructions
 
-1. Read `packages/core/src/components/<category>/<name>/<name>.tsx` and extract every **public
-   `@Prop()`** — ignore `@Method`, `@Event`, and private `@State`. Note each prop's type
+0. **Resolve the family** per `conventions/families.md` §1: family folder, `@Component` members,
+   documentation owner (the member with a `doc-config.ts`), each sub-component's relation
+   (`contained` / `wrapping`). 🛑 Hard stop on a member with no owner. If the user named a
+   sub-component, redirect to the owner in one line. Print the family before step 2's anatomy
+   review. A family of one continues exactly as below.
+1. Read `packages/core/src/components/<category>/<name>/<name>.tsx` (for a family: each member's
+   `.tsx`) and extract every **public `@Prop()`** — ignore `@Method`, `@Event`, and private `@State`. Note each prop's type
    (`@OneOf([...])` enum, boolean, string, number) and default. Write every enum's
    `figmaOptions:` in canonical order per `conventions/component-set-rendering.md` → "Option and
    axis ordering": code default first (hard rule A), then canonical order (hard rule B) — e.g.
    `base · sm · md · lg`. The implicit unset default is named `base`.
+   - On a sub-component, also extract every `@internal` prop the owner sets ("Set by ds-…") and
+     record it with `drivenBy: <owner tag>.<owner prop>` (`conventions/families.md` §3). Find the
+     owner prop by reading where the owner writes it (e.g. `ds-tabs`' `updateChildren()`).
 2. Extract the component's **anatomy** — its named visual parts — from the class-level `@part`
    JSDoc tags (e.g. `ds-button`: `@part native`, `@part spinner`, `@part icon`, `@part label`,
    `@part icon-right`). Cross-check every `@part` tag against a real `part="..."` attribute in
@@ -43,6 +54,11 @@ Read the component's code and produce the draft mapping that Phase 2 proposes a 
    one-line description taken verbatim from the `@part` JSDoc line. If the component has no
    `@part` tags at all, skip the anatomy section entirely (note why in the draft; this is not a
    gap to flag).
+   - **Family:** cross-check every member's `@part`s, but present and write **one merged list in
+     the owner's mapping file** — owner parts, one entry per contained sub-component, sub-letters
+     only for a sub-component with more than one `@part` (`conventions/families.md` §5).
+     Sub-component mapping files have no `anatomy:`. The owner's list is skipped only when it has
+     no `@part`s and no contained sub-components.
 3. Read the component's `<name>.host.scss` and scan for **pseudo-class states** —
    `:hover`, `:focus`, `:active`, `:disabled`, and any loading-related
    class/attribute selector. These don't show up as props but still need a Figma
@@ -65,10 +81,15 @@ Read the component's code and produce the draft mapping that Phase 2 proposes a 
      Plugin API can bind: `PHASE-3-BUILD.md` → "Text property bindings") — and flag these as inherited-context
      bindings, not literal bindings to something the component's own code sets. Never leave an
      attribute unbound/assumed because the component's SCSS doesn't mention it.
-4. Identify any **nested DS component** usage (e.g. `<ds-icon>` inside `ds-button`'s render). For
+4. Identify any **nested component** usage (e.g. `<ds-icon>` inside `ds-button`'s render) — an
+   independent DS component from another family. For
    each one, read its `<child>.figma.md` and pull the default set's `figmaComponentKey` (first
    entry of `sets:`). If missing,
-   stop per `SKILL.md`'s Prerequisites section above. Mark every nested `ds-icon` /
+   stop per `SKILL.md`'s Prerequisites section above. **Sub-components are not nested components
+   here:** record them as `nested:` entries with `subComponent: true` and `relation`, key `null`
+   until Phase 3 builds them — never a hard stop. Also record each code `@slot` that takes
+   sub-component instances under `slots:` (default fill proposed in Phase 2;
+   `conventions/families.md` §4). Mark every nested `ds-icon` /
    `ds-brand-icon` as an **icon slot** (see `conventions/content-selection-and-mitigations.md` →
    "Icon slots in a parent component"): record the code prop driving it, whether `ds-brand-icon`
    can fill the same slot, and how code sets its `size` and color.
@@ -217,12 +238,18 @@ Tokens` collection has exactly those three. Any other mixin (`desktop-lg`, `desk
      `proposal` is `drawn` (marker + table row), `table` (table row only, rare), `behavior` or
      `skip`. `instance` says where a drawn row goes: `main`, or an extra instance (`min-content`,
      `focus`, …) per `conventions/specs.md` → "Section layout".
+     **Family:** measure every member (sub-components inside the owner's visual test where
+     they're contained), add a `set` column and group the rows by set — still one table, one
+     checkpoint. Rows of a wrapping sub-component are `table` only (`conventions/families.md` §6).
      Put rows whose proposal follows directly from the group rules first and collapsed; list the
      rows that need a decision (marked "ask" in the rules, measured ≠ token, `unmeasured`, outer
      margins) separately, each with a one-line recommendation. Wait for the user to confirm or
      change it.
 7. Write all of the above into `<name>.figma.md` (create it if it doesn't exist) as a draft, per
    the schema in `examples/mapping-file-format.md`, including the confirmed `specs:` from step 6.
+   One file per family member, next to its `.tsx`. The owner's file holds `anatomy:` and every
+   `specs:` row (each with `set:`); each sub-component's file holds `owner:` and no
+   `anatomy:`/`specs:`.
    Skipped rows stay in `specs:` with `show: skip` and their reason, so a re-run doesn't ask again.
 
 ## Output
@@ -240,7 +267,9 @@ A draft mapping file `<name>.figma.md`, written per
 
 ## Completion Criteria
 
-- Every public prop is extracted and typed.
+- The family is resolved (owner, sub-components with relation) and every member has a draft
+  mapping file.
+- Every public prop is extracted and typed; every parent-set prop carries `drivenBy`.
 - Every `@part` tag matches a real `part="..."` attribute in `render()` (or the mismatch was
   resolved with the user).
 - Every CSS-var token resolves to a real Figma variable id, or was explicitly flagged as a hard

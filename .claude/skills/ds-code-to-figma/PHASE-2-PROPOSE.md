@@ -8,6 +8,8 @@ user sign-off on it — before anything is built.
 ## Inputs
 
 - The draft `<name>.figma.md` produced by Phase 1: props, anatomy, states, and resolved tokens all written down.
+- For a family: every member's draft mapping file. **One proposal, one sign-off for the whole
+  family** — steps 1–4 run per member, step 5 waits once (`conventions/families.md` §2).
 
 ## References
 
@@ -68,6 +70,8 @@ top-level split (rule 1).**
 | Pseudo-class or state-ish prop (`:hover`, `:focus`, `:active`, `disabled`, `loading`) | **One** `state` variant property: `default` / `hover` / `focus` / `active` / `disabled` / `loading` (only those the component has)                                                        | Never separate axes, never separate booleans.                                                                                                                                                               |
 | Free-text prop (e.g. `label`)                                                         | Instance text override — never a variant property                                                                                                                                         | Ships with **placeholder text on every variant member**, not empty. If the member should show the true code default and that default is `''`, ask the user which policy applies.                            |
 | Free-text prop guarded in `render()` (e.g. `hasValue(label) && <span>`)               | Text override **plus** a boolean `show <name>` component property bound to the layer's `visible` via `componentPropertyReferences` on every variant                                       | Default the boolean to the code's real default. Empty text alone isn't enough — Figma won't collapse the auto-layout gap/width the way code omits the element. Check every text-override prop's `render()`. |
+| Parent-set prop on a sub-component (`@internal`, "Set by ds-…", `drivenBy`)           | Mapped by the rows above like any prop (visual → variant axis on the sub-component's set; no visual effect → excluded). Every owner variant pre-sets its sub-component instances to match | `conventions/families.md` §3. An inverted parent-set prop mirrors the owner's rule-2 split (`Tab` / `TabInverted`).                                                                                         |
+| Code `@slot` that takes sub-component instances                                       | One native Figma `SLOT`, preferred instances = the sub-component's sets, default fill proposed here                                                                                       | `conventions/families.md` §4. Propose count, which instance shows non-default props, placeholder text (tabs: 3 × `Tab`, first `selected=true`).                                                             |
 | Prop whose effect depends on another prop                                             | Its own independent variant axis                                                                                                                                                          | Never collapsed or special-cased (e.g. `labelPosition` only shows when `label` is set, but stays an axis).                                                                                                  |
 | Anything else / ambiguous                                                             | Flag explicitly                                                                                                                                                                           | Never guess.                                                                                                                                                                                                |
 
@@ -125,6 +129,7 @@ Compute the total before presenting anything. 500 is this skill's own conservati
 Figma limit (Figma only warns about "thousands" per set and a shared ~2 GB per-tab memory budget
 across the whole library file) — staying under it leaves headroom for other components.
 
+- For a family, check each member's mapping file on its own.
 - **Count** = sum, across every top-level split, of the product of that split's crossed
   variant-property option counts (every property, including `state`).
 - **Exclude** lightweight Instance Swap library members (single `COMPONENT`s, not crossed sets).
@@ -157,7 +162,8 @@ top-left cell = default variant; then smallest at the left or top, e.g. `base ·
 ### 5. Wait for confirmation
 
 **Stop and wait for the user to confirm or edit** the mapping in the file before proceeding to
-Phase 3. Do not proceed on an assumed approval.
+Phase 3. Do not proceed on an assumed approval. For a family, present every member's grouping,
+the `drivenBy` props and the slot default fills together and wait once.
 
 ### 6. Propose new heuristics
 

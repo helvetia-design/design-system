@@ -8,6 +8,12 @@ the cloned frame's Anatomy `Section` placeholder** (the one with `Title` `kind=a
 `body` › `Documentation`) so no empty Anatomy frame is left behind, then go straight to
 [`PHASE-8-DOCUMENT-SPECS.md`](PHASE-8-DOCUMENT-SPECS.md).
 
+For a family, Anatomy is built once, on the owner, from the owner's merged `anatomy:` list (owner
+`@part`s + one entry per contained sub-component + sub-letters, `conventions/families.md` §5). A
+sub-component entry's marker points at the first sub-component instance in the diagram; a
+sub-letter (`B1`) points at that part inside the same instance. The owner's list is absent only
+when it has no `@part`s and no contained sub-components.
+
 Build this right after "Copy me" is confirmed, before
 [`PHASE-8-DOCUMENT-SPECS.md`](PHASE-8-DOCUMENT-SPECS.md) — unless there are no parts, in which case this phase only deletes the placeholder.
 
@@ -54,7 +60,8 @@ the `Anatomy/Legend item` component is missing.
      carries the bottom padding, so the section reads about 30 / 24 / 30 (top / gap / bottom).
 3. **Legend — one `Anatomy/Legend item` instance per part.** The component lives on
    `🧰 Annotations` (find it by name; `3008:1677` is a hint only) and renders
-   `"<letter> · <part> — <description>"`, letter and part Bold, the rest Regular. Clone the first instance in `legend` for each part and
+   `"<letter> · <part> — <description>"`, letter and part Bold, the rest Regular. For a
+   sub-component entry, `Part` is its set name and tag (`Tab (ds-tab)`). Clone the first instance in `legend` for each part and
    delete the unused ones. Set only its three text properties with `setProperties` — `Letter`,
    `Part`, `Description` (look the keys up by prefix; they carry a `#<id>` suffix). Never detach
    or restyle an instance. Name each instance `<letter> · <part>`.

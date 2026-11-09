@@ -23,6 +23,14 @@ explicit user confirmation on.
 
 ## Instructions
 
+**Family** (`conventions/families.md` §2, §4, §7): step 2 runs once, for the owner. Steps 3–5
+run **per set, in build order** — contained sub-components → owner → wrapping sub-components —
+each set getting its own first-variant checkpoint (step 4), all stacks in the owner's one `Sets`
+frame. Instances of a sub-component's set replace the code's slotted children: build each code
+`@slot` from `slots:` as a native Figma `SLOT` with its preferred instances and the confirmed
+default fill, and pre-set every `drivenBy` prop on those instances to match the variant. Step 6
+runs once, for the whole frame; step 7 writes back into every member's mapping file.
+
 1. Load `figma-use` (mandatory before any `use_figma` call) and create a session against
    `figma.config.json`'s `componentLibraryFileKey`.
 2. **Find or create the component's shared category page and its documentation frame**, per
@@ -124,7 +132,9 @@ Responsive Tokens` first — **reuse it if it already exists** rather than creat
    `Header` and the finished component set(s) — give them the link to the frame and wait. Any change loops back to step 5. Don't continue to Phase 4 on an
    assumed approval.
 7. Write `sets:` (name, `figmaComponentKey`, `figmaMasterNodeId` per set, default set first),
-   `figmaPage` and `figmaDocFrameNodeId` back into the mapping file.
+   `figmaPage` and `figmaDocFrameNodeId` back into the mapping file. For a family: into every
+   member's file (`figmaDocFrameNodeId` is the owner's frame in all of them), and each
+   sub-component's key into the owner's matching `nested:` entry.
 
 ### Category pages
 
@@ -183,6 +193,10 @@ values**; clone a prototype and change only text and positions.
    Set names follow `PHASE-2-PROPOSE.md` → "Naming": PascalCase, flat, the default set bare. Each
    stack's `sub-label` is **exactly its set name**, so the heading matches what designers find in
    the assets panel.
+
+   **Family:** every member adds its own stacks per this table, in build order
+   (`Tab`, `TabPanel`, `Tabs`). With more than one stack in `Sets`, every stack keeps its
+   `sub-label` — the "None" row's removal applies only to a family of one.
 
    Source every inverted stack from the template's `Inverted` stack and every other stack from its
    `Primary` stack. Delete template stacks that aren't needed.
@@ -302,7 +316,10 @@ re-set all three hyperlinks, unconditionally, even if they look correct. A human
   `🗂️ Template / Category` (no styling values written by this skill), with the header filled,
   `review-status` at `status=review` and all three links hyperlinked.
 - `sets:` (every set, default first), `figmaPage` and `figmaDocFrameNodeId` are written back into
-  the mapping file.
+  every family member's mapping file.
+- For a family: every sub-component set was built before the sets that instantiate it, each with
+  its own confirmed first variant; every `slots:` entry is a native `SLOT` with its preferred
+  instances and default fill; every `drivenBy` prop matches its owner variant.
 
 ## Next Phase
 

@@ -16,6 +16,9 @@ Fix every check marked `fail` in `<name>.figma-validation.md` directly in Figma,
 
 ## Instructions
 
+**Family:** repair every member whose `<name>.figma-validation.md` has a `fail`, then re-run Phase 4
+for the whole family. The retry limit counts family iterations.
+
 1. Load `figma-use` (mandatory before any `use_figma` call) and create a session against
    `figma.config.json`'s `componentLibraryFileKey`.
 2. **Read the reported issues** from `<name>.figma-validation.md`: collect every check marked

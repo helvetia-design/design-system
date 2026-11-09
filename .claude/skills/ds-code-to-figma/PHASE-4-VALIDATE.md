@@ -22,6 +22,10 @@ Verify the built Figma component set against the confirmed mapping file `<name>.
 
 ## Instructions
 
+**Family** (`conventions/families.md` §2): run steps 1 and 3–7 per member's mapping file, one
+`<name>.figma-validation.md` each; step 2 (header) only for the owner. The family verdict is the
+worst of all reports (`fail` > `blocked` > `pass`) and decides [Next Phase](#next-phase).
+
 1. Load `figma-use` (mandatory before any `use_figma` call; all calls in this phase are read-only)
    and create a session against `figma.config.json`'s `componentLibraryFileKey`. **Locate the
    nodes** by the mapping-file fields Phase 3 wrote (`sets:` → each `figmaMasterNodeId`,
@@ -59,7 +63,13 @@ Verify the built Figma component set against the confirmed mapping file `<name>.
    (`variable.resolveForConsumer(node).value`, alpha included); a mismatch is a `fail` even when
    the binding itself is correct (see `conventions/build-mechanics.md` → "Color and paint").
    b. Every nested instance's main component key matches the Phase 1 key for that DS component —
-   no detached instance, no local copy.
+   no detached instance, no local copy. Sub-component instances match the key the
+   sub-component's own mapping file recorded in Phase 3 (the `…Inverted` set inside an
+   `…Inverted` owner set).
+   d. **Family only:** every `slots:` entry is a native `SLOT` on every variant, with the recorded
+   preferred instances and the confirmed default fill (count, non-default props, text); every
+   `drivenBy` prop on every sub-component instance matches the owner variant it sits in (e.g.
+   every `Tab` inside `Tabs vertical=true` has `vertical=true`).
    c. Every icon slot from the mapping file has its `INSTANCE_SWAP` property (lowercase name,
    bound on every variant), the right `preferredValues` (icon library, plus brand-icon library
    where applicable), and no exposed nested instance properties; nested icon `size`/color match

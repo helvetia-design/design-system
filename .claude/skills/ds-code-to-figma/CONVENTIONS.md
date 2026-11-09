@@ -23,6 +23,8 @@ user _approving_ it — never auto-appended.
   `Title` mechanics for the Copy me, Anatomy and Specs sections (Phases 6–8).
 - [`conventions/specs.md`](conventions/specs.md) — which sizes Specs shows (groups, triage rules)
   and how each one is drawn (kinds, line styles, section layout) (Phases 1 and 8).
+- [`conventions/families.md`](conventions/families.md) — documentation owner and sub-components:
+  family resolution, lockstep phases, parent-set props, slots, anatomy and specs (every phase).
 - [`conventions/build-mechanics.md`](conventions/build-mechanics.md) — general Figma Plugin API
   gotchas that apply across any phase: platform limits, variant-set mechanics, auto-layout
   sizing, vector import, color/paint, focus states.
@@ -43,6 +45,11 @@ Use these terms, and only these, in every phase and topic file.
 | **stack**                                     | One labeled set plus its `sub-label` (= set name) inside `Sets` — one per top-level split option.                                           |                                                                  |
 | **top-level split**                           | One component set per option, only per `PHASE-2-PROPOSE.md` → "Top-level splits" rule 1 (structure), 2 (inverted) or 3 (count).             | structural split, separate top-level components                  |
 | **inverted axis**                             | An `inverted` prop; its sets are `<Component>` / `<Component>Inverted`.                                                                     | dark-context axis, true `inverted` axis, `inverted`-split        |
+| **family**                                    | Every `@Component` in one family folder (`<category>/<family>/`): one owner plus its sub-components (`conventions/families.md`).            | component group, compound component                              |
+| **documentation owner** / **owner**           | The family member with its own Storybook page; owns the one documentation frame (`packages/core/CONTEXT.md`).                               | parent, main component                                           |
+| **sub-component**                             | A family member with no Storybook page of its own; built in the owner's run, stacked in the owner's frame.                                  | child component, companion                                       |
+| **nested component**                          | An independent DS component from another family used inside a member (`ds-icon`); must already be in Figma.                                 | child component, inner component                                 |
+| **parent-set prop**                           | A sub-component prop the owner sets (`@internal`, "Set by ds-…"); recorded as `drivenBy` (`conventions/families.md` §3).                    | internal axis                                                    |
 | **icon slot**                                 | A nested `ds-icon` / `ds-brand-icon` in a parent; always one `INSTANCE_SWAP` property (`conventions/content-selection-and-mitigations.md`). | exposed icon instance                                            |
 | **wrapper + swap library**                    | The content-selection pattern (`conventions/content-selection-and-mitigations.md`). Not a top-level split.                                  | wrapper + Instance Swap split                                    |
 | **documentation frame**                       | `<Component> Documentation` on the category page.                                                                                           |                                                                  |

@@ -2,7 +2,8 @@
 
 `<name>.figma.md` lives at `packages/core/src/components/<category>/<name>/<name>.figma.md`,
 co-located with the component's other files. It's both the input spec you confirm in Phases 1–2
-and the output record Phase 3 writes back into.
+and the output record Phase 3 writes back into. A family has one file per member, next to each
+member's `.tsx` — see [Family fields](#family-fields) below.
 
 ```markdown
 # <name> → Figma mapping
@@ -153,4 +154,81 @@ props:
 
 Notes on this mapping, open questions, and rationale for any non-obvious grouping decision go
 here as prose, below the YAML block.
+```
+
+## Family fields
+
+Only for a family with sub-components (`../conventions/families.md`). A family of one has none of
+these.
+
+**Owner** (`tabs/tabs/tabs.figma.md`) — adds to the schema above:
+
+```yaml
+nested:
+  - childTag: ds-tab
+    childMappingFile: ../tab/tab.figma.md
+    subComponent: true # built in this run — never a missing-mapping hard stop
+    relation: contained # contained (renders inside the owner) | wrapping (renders the owner inside itself)
+    figmaComponentKey: null # filled by Phase 3 from tab.figma.md → sets[0]
+  - childTag: ds-tab-panel
+    childMappingFile: ../tab-panel/tab-panel.figma.md
+    subComponent: true
+    relation: contained
+    figmaComponentKey: null
+slots: # one per code @slot that takes sub-component instances — in the file of the component that declares the @slot
+  - codeSlot: tab # '' for the default slot
+    figmaSlot: tabs # lowercase
+    preferred: [Tab] # TabsInverted's slot prefers TabInverted
+    defaultFill: '3 × Tab — first selected=true; labels "Tab 1", "Tab 2", "Tab 3"' # confirmed in Phase 2
+  - codeSlot: ''
+    figmaSlot: tab panels
+    preferred: [TabPanel]
+    defaultFill: '1 × TabPanel (the selected one)'
+anatomy: # merged list for the whole family
+  - letter: A
+    part: tablist
+    description: 'The tablist container.'
+  - letter: B
+    subComponent: ds-tab # one entry per contained sub-component
+    part: Tab (ds-tab)
+    description: 'Tab renders a single tab button inside a ds-tabs group.'
+  # a sub-component with more than one @part adds B1, B2, … ; a single @part collapses into its entry
+specs:
+  rows:
+    - property: Padding X
+      set: Tab # every row names its set; sub-component rows live here, not in their own file
+      # …rest as in the schema above
+```
+
+**Sub-component** (`tabs/tab/tab.figma.md`) — the schema above, plus `owner:`, minus `anatomy:` and
+`specs:`:
+
+```yaml
+owner: ../tabs/tabs.figma.md # documentation owner; its frame is this file's figmaDocFrameNodeId
+sets:
+  - name: Tab
+    figmaComponentKey: null
+    figmaMasterNodeId: null
+  - name: TabInverted # inverted mirror of the owner's split
+    figmaComponentKey: null
+    figmaMasterNodeId: null
+figmaPage: Core / Navigation
+figmaDocFrameNodeId: null # = the owner's "Tabs Documentation" frame
+props:
+  - name: inverted
+    type: boolean
+    drivenBy: ds-tabs.inverted # parent-set prop (@internal, "Set by ds-tabs")
+    figmaPropertyType: top-level-split (rule 2, mirrors owner)
+  - name: vertical
+    type: boolean
+    drivenBy: ds-tabs.vertical
+    figmaProperty: vertical
+    figmaPropertyType: variant
+  - name: selected
+    type: boolean # public, set per instance by the designer — no drivenBy
+    figmaProperty: selected
+    figmaPropertyType: variant
+  - name: name
+    type: string
+    figmaPropertyType: excluded # identifier, no visual effect
 ```
