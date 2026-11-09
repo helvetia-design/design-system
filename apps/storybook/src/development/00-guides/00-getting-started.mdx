@@ -326,18 +326,17 @@ Create an `index.html` file in your project root and add the following:
     />
 
     <!-- Required: design tokens (--ds-* CSS custom properties). Load before ds-styles -->
-    <link rel="stylesheet" href="node_modules/@helvetia-design/tokens/css/base" />
+    <link rel="stylesheet" href="node_modules/@helvetia-design/tokens/dist/css/base.tokens.css" />
     <!-- Required: CSS reset, structural styles, and CSS-only component classes (e.g. class="ds-button") -->
-    <link rel="stylesheet" href="node_modules/@helvetia-design/styles/css/design-system" />
+    <link rel="stylesheet" href="node_modules/@helvetia-design/styles/dist/css/design-system.css" />
     <!-- Optional: only needed if you use utility classes (spacing, layout, typography, color helpers, etc. — e.g. class="mt-base" below) -->
-    <link rel="stylesheet" href="node_modules/@helvetia-design/styles/css/utilities" />
+    <link rel="stylesheet" href="node_modules/@helvetia-design/styles/dist/css/utilities.css" />
 
     <!-- Register the web components used in markup -->
     <script
       type="module"
       src="node_modules/@helvetia-design/core/dist/design-system/design-system.esm.js"
     ></script>
-    <script nomodule src="node_modules/@helvetia-design/core/dist/design-system/design-system.js"></script>
 
   </head>
 
@@ -369,9 +368,9 @@ live in `<head>`; `ds-root` wraps the page content in `<body>`.
   one you really need alongside tokens. `utilities.css` (spacing, layout, typography, color
   helpers, e.g. `.mt-base` used below) is entirely optional — drop it if you don't use utility
   classes. See **Development/Theming** for the Orange Vacations brand token files.
-- **`<script type="module">` / `<script nomodule>`** — registers the web components (`<ds-root>`,
-  `<ds-stage>`, etc.) used in markup. The `nomodule` variant is a fallback for browsers without
-  ES module support.
+- **`<script type="module">`** — registers the web components (`<ds-root>`, `<ds-stage>`, etc.)
+  used in markup. Only an ES module build is shipped — the design system's default target already
+  assumes evergreen browsers, so there is no `nomodule` fallback bundle.
 - **`<ds-root>`** — the root layout web component; wrap your page content in it.
 - **`<h1 class="ds-heading">` / `<button class="ds-button">`** — plain HTML styled with a CSS
   class. No script needed for these — only elements that need JS behavior (like `<ds-root>`) are
@@ -519,16 +518,15 @@ Prototyping or don't want to install anything? Load everything straight from
 [jsDelivr](https://www.jsdelivr.com/), a CDN, by adding these to `<head></head>`:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helvetia-design/tokens/css/base" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helvetia-design/styles/css/design-system" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helvetia-design/styles/css/utilities" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helvetia-design/tokens/dist/css/base.tokens.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helvetia-design/styles/dist/css/design-system.min.css" />
+
+<!-- Optional: only needed if you use utility classes (spacing, layout, typography, color helpers, etc. — e.g. class="mt-base" below) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@helvetia-design/styles/dist/css/utilities.min.css" />
+
 <script
   type="module"
   src="https://cdn.jsdelivr.net/npm/@helvetia-design/core/dist/design-system/design-system.esm.js"
-></script>
-<script
-  nomodule
-  src="https://cdn.jsdelivr.net/npm/@helvetia-design/core/dist/design-system/design-system.js"
 ></script>
 ```
 
@@ -540,11 +538,25 @@ section above — only where the CSS/JS come from changes.
 <InfoQuote>
 **TIP**
 
-Not recommended for production — it depends on a third party to host and distribute the assets.
-Pin a specific version rather than relying on the latest one:
-`https://cdn.jsdelivr.net/npm/@helvetia-design/styles@16/css`
+jsDelivr serves files as-is from the package — it does not resolve npm's `package.json` `exports`
+map, so the path after the package name must be the real file path inside the published package
+(e.g. `dist/css/base.tokens.css`), not a subpath key like `css/base`.
+
+Pin a specific version instead of relying on the latest one by adding `@<version>` after the
+package name, e.g.:
+
+```
+https://cdn.jsdelivr.net/npm/@helvetia-design/styles@16/dist/css/design-system.css
+```
 
 </InfoQuote>
+
+<WarningQuote>
+**Note**
+
+Not recommended for production — it depends on a third party to host and distribute the assets.
+
+</WarningQuote>
 
 </HTMLFramework>
 
