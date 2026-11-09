@@ -59,7 +59,7 @@ When unsure, treat the line as needing attention. A skipped item costs more than
 
 ## Checklist
 
-The Report step of every component file ends with a numbered list of items. Some need attention when found, the rest are coverage only. When the run also follows `shared/field.md`, its items follow the component items with an `F` prefix: `F1.`, `F2.`, and so on. When the run also follows `shared/icons.md`, its items come next with an `I` prefix: `I1.`, `I2.`, and so on. The items of `shared/legacy-config.md` come last with an `L` prefix: `L1.`, `L2.`, and so on.
+The Report step of every component file ends with a numbered list of items. Some need attention when found, the rest are coverage only. When the run also follows `shared/field.md`, its items follow the component items with an `F` prefix: `F1.`, `F2.`, and so on. When the run also follows `shared/icons.md`, its items come next with an `I` prefix: `I1.`, `I2.`, and so on. In the **Assets** step, the items of `shared/fonts-favicons.md` come next with an `A` prefix: `A1.`, `A2.`, and so on. The items of `shared/legacy-config.md` come last with an `L` prefix: `L1.`, `L2.`, and so on.
 
 Write one checklist line per numbered item, with the same number, in the same order. Never merge two items into one line, and never skip one. Each line has one outcome:
 

@@ -221,6 +221,24 @@ describe('SKILL.md', () => {
     expect(section(skill, '### Assets')).toContain('`shared/report.md`')
   })
 
+  it('runs scan-assets.mjs and shared/fonts-favicons.md in the Assets step', () => {
+    const assets = section(skill, '### Assets')
+
+    expect(assets).toContain('`scan-assets.mjs`')
+    expect(assets).toContain('`shared/fonts-favicons.md`')
+  })
+
+  it('orders the Assets checklist as I items, then A items, then L items', () => {
+    const assets = section(skill, '### Assets')
+    const icons = assets.indexOf('`I1.`')
+    const fonts = assets.indexOf('`A1.`')
+    const config = assets.indexOf('`L1.`')
+
+    expect(icons).toBeGreaterThan(-1)
+    expect(fonts).toBeGreaterThan(icons)
+    expect(config).toBeGreaterThan(fonts)
+  })
+
   it('keeps the report file unstaged', () => {
     expect(skill).toContain('leaves every change unstaged, including the report file `ds-migration-report.md`')
     expect(skill).toContain('never runs `git add` or `git commit`')
@@ -259,5 +277,36 @@ describe('shared/legacy-config.md Report', () => {
     expect(report).not.toContain('summary')
     expect(numbers.length).toBeGreaterThan(0)
     expect(numbers).toEqual(numbers.map((_, index) => index + 1))
+  })
+})
+
+describe('shared/fonts-favicons.md', () => {
+  const rules = read('shared/fonts-favicons.md')
+
+  it('lists the asset items as a continuous A-numbered checklist', () => {
+    const report = section(rules, '## Report')
+    const numbers = [...report.matchAll(/^- A(\d+)\. /gm)].map(([, number]) => Number(number))
+
+    expect(report).toContain('`shared/report.md`')
+    expect(report).not.toContain('summary')
+    expect(numbers.length).toBeGreaterThan(0)
+    expect(numbers).toEqual(numbers.map((_, index) => index + 1))
+  })
+
+  it('forbids fonts.css and fonts.cdn.css and never instructs writing them', () => {
+    expect(rules).toContain(
+      'Never write an import of `@helvetia-design/assets/src/fonts/css/fonts.css` or `@helvetia-design/assets/src/fonts/css/fonts.cdn.css`.',
+    )
+
+    const instructions = rules
+      .split('\n')
+      .filter(line => /fonts(?:\.cdn)?\.css/.test(line) && /\b(?:write|import|add|use)\b/i.test(line))
+      .filter(line => !line.startsWith('Never write an import of'))
+    expect(instructions).toEqual([])
+  })
+
+  it('never points $font-path at a remote host', () => {
+    expect(rules).not.toMatch(/\$font-path:\s*['"]?https?:/)
+    expect(rules).toContain("with ($font-path: '/assets/fonts')")
   })
 })

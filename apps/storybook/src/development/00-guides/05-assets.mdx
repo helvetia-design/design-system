@@ -10,70 +10,105 @@ import { Banner, Footer, InfoQuote, Lead, LinkCard, LinkCards } from '../../../.
 Install it once, then copy over whichever assets your application needs.
 
 ```bash
-npm add -D @helvetia-design/assets copyfiles
+npm add @helvetia-design/assets
 ```
 
-<InfoQuote>
-  **copyfiles** copies the files you need into your own `src/assets` folder at install time, so
-  they're under version control with the rest of your app rather than reached into inside
-  `node_modules` at runtime.
-</InfoQuote>
+With pnpm, add it as a direct dependency even when another `@helvetia-design/*` package already
+pulls it in. pnpm only links declared packages into `node_modules`, and the copy steps below read
+from `node_modules/@helvetia-design/assets`.
 
 ## Font
 
-By default, `@helvetia-design/styles/css/design-system` ships with **no** `@font-face` rules — text
-renders in the browser's fallback font until you self-host the BaloiseCreate fonts.
+`@helvetia-design/styles/css/design-system` ships with **no** `@font-face` rules. Text renders in
+the browser's fallback font until you self-host the BaloiseCreate fonts.
+
+<InfoQuote>
+  Do not use `@helvetia-design/assets/src/fonts/css/fonts.css` or `fonts.cdn.css`. They load the
+  fonts from www.baloise.ch and cdn.jsdelivr.net, which sends the IP address of every visitor to a
+  third party. Under the Swiss nDSG that is a disclosure of personal data. Self-host the files instead.
+</InfoQuote>
 
 <br/>
 
-**1. Copy the font files**
+**1. Put the font files where the app serves `/assets/fonts`**
 
-Add a copy script to your `package.json`. `postinstall` keeps it running automatically whenever
-`@helvetia-design/assets` is installed or updated.
+The target folder depends on how your app serves static files. The `public/` folder or the build
+config decides, not the framework name.
+
+A `public/` folder, a `vite.config.*` or a `next.config.*` at the project root: copy the eight `.woff`
+and `.woff2` files into `public/assets/fonts`. Vite and Next serve `public/` even before the folder
+exists, and the copy creates it. The script uses Node only, so it needs no extra dependency.
+`postinstall` keeps the files in sync whenever `@helvetia-design/assets` is installed or updated.
 
 ```json
 "scripts": {
   "postinstall": "npm run copy:assets",
   "copy:assets": "npm run copy:fonts",
-  "copy:fonts": "copyfiles --flat node_modules/@helvetia-design/assets/src/fonts/*.woff2 node_modules/@helvetia-design/assets/src/fonts/*.woff src/assets/fonts"
+  "copy:fonts": "node -e \"require('node:fs').cpSync('node_modules/@helvetia-design/assets/src/fonts','public/assets/fonts',{recursive:true,filter:s=>!s.endsWith('css')})\""
 }
 ```
 
-```bash
-npm install
+Otherwise, Angular with `src/assets` in `angular.json`: let the build copy the files. Add this entry
+to the `assets` array of your build target. No copy script is needed.
+
+```json
+{ "glob": "*.{woff,woff2}", "input": "node_modules/@helvetia-design/assets/src/fonts", "output": "assets/fonts" }
 ```
+
+Plain HTML: copy the files into the folder your web server serves as `/assets/fonts`.
 
 **2. Use the self-hosted stylesheet**
 
-Swap `css/design-system` for the `css/design-system.local` variant, which points its
-`@font-face` rules at `/assets/fonts/` — the folder you just copied the files into.
+Swap `css/design-system` for the `css/design-system.local` variant. Its `@font-face` rules point at
+`/assets/fonts/`, the folder from step 1.
+
+```ts
+import '@helvetia-design/styles/css/design-system.local'
+```
 
 ```html
-<link rel="stylesheet" href="node_modules/@helvetia-design/styles/css/design-system.local" />
+<link rel="stylesheet" href="node_modules/@helvetia-design/styles/dist/css/design-system.local.css" />
 ```
 
 <InfoQuote>
-  Also using `css/utilities`? It stays the same either way — only the main bundle has a `.local`
+  Also using `css/utilities`? It stays the same either way. Only the main bundle has a `.local`
   variant.
 </InfoQuote>
+
+**SCSS**
+
+Building your styles with SCSS instead? Load the fonts through the `fonts/scss` export and set
+`$font-path` to the folder from step 1. Always set it, because its default points at www.baloise.ch.
+Keep the plain `css/design-system` import in that case, so the fonts are declared only once.
+
+```scss
+@use '@helvetia-design/assets/fonts/scss' with ($font-path: '/assets/fonts');
+```
 
 ## Favicon
 
 **1. Copy the favicon files**
 
-Favicons ship in six colors (`primary`, `green`, `purple`, `red`, `white`, `yellow`) — swap the
+Favicons ship in six colors (`primary`, `green`, `purple`, `red`, `white`, `yellow`). Swap the
 folder name in the path below to pick one.
+
+A `public/` folder, a `vite.config.*` or a `next.config.*` at the project root: add `copy:favicons`
+and run it from `copy:assets`. With the scripts from the Font section, this keeps one `postinstall`
+that runs both copies. Using favicons without fonts, drop `npm run copy:fonts &&`.
 
 ```json
 "scripts": {
   "postinstall": "npm run copy:assets",
-  "copy:assets": "npm run copy:favicons",
-  "copy:favicons": "copyfiles --flat node_modules/@helvetia-design/assets/src/favicons/primary/* src/assets/favicons"
+  "copy:assets": "npm run copy:fonts && npm run copy:favicons",
+  "copy:fonts": "<from the Font section>",
+  "copy:favicons": "node -e \"require('node:fs').cpSync('node_modules/@helvetia-design/assets/src/favicons/primary','public/assets/favicons',{recursive:true})\""
 }
 ```
 
-```bash
-npm install
+Otherwise, Angular with `src/assets` in `angular.json`:
+
+```json
+{ "glob": "**/*", "input": "node_modules/@helvetia-design/assets/src/favicons/primary", "output": "assets/favicons" }
 ```
 
 **2. Reference them in `index.html`**

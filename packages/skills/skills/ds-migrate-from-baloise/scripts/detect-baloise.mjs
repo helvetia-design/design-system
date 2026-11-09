@@ -7,12 +7,17 @@ import { promisify } from 'node:util'
 
 const LEGACY_SCOPE = '@baloise'
 const TARGET_SCOPE = '@helvetia-design'
-const INSTALL_NAMES = ['angular', 'core', 'react', 'styles']
-const SHORT_NAMES = [...INSTALL_NAMES, 'icons', 'brand-icons']
-const ICON_PACKAGES = new Set([`${LEGACY_SCOPE}/ds-icons`, `${LEGACY_SCOPE}/ds-brand-icons`])
+const STYLES_NAME = 'styles'
+const INSTALL_NAMES = ['angular', 'core', 'react', STYLES_NAME]
+const ICON_NAMES = ['icons', 'brand-icons']
+const FONT_FAVICON_NAMES = ['fonts', 'favicons']
+const SHORT_NAMES = [...INSTALL_NAMES, ...ICON_NAMES]
+const DEPENDENCY_NAMES = [...SHORT_NAMES, ...FONT_FAVICON_NAMES]
+const ASSET_NAMES = [...ICON_NAMES, STYLES_NAME, ...FONT_FAVICON_NAMES]
+const ASSET_PACKAGES = new Set(ASSET_NAMES.map(short => `${LEGACY_SCOPE}/ds-${short}`))
 const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', 'out', '.next', '.angular', '.git', '.claude', 'coverage'])
 const LOCKFILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'npm-shrinkwrap.json'])
-const IMPORT_EXTENSIONS = new Set([
+export const IMPORT_EXTENSIONS = new Set([
   '.html',
   '.htm',
   '.ts',
@@ -39,6 +44,7 @@ const MISSING_LATEST = `npm view ${targetPackageName('core')} dist-tags did not 
 const execFileAsync = promisify(execFile)
 const PACKAGE_RE = new RegExp(`${LEGACY_SCOPE}/ds-(?:${SHORT_NAMES.join('|')})\\b`)
 const INSTALL_RE = new RegExp(`^${LEGACY_SCOPE}/ds-(?:${INSTALL_NAMES.join('|')})$`)
+const DEPENDENCY_RE = new RegExp(`${LEGACY_SCOPE}/ds-(?:${DEPENDENCY_NAMES.join('|')})\\b`)
 
 export async function readNpmDistTags(execImpl = execFileAsync) {
   const { stdout } = await execImpl('npm', ['view', targetPackageName('core'), 'dist-tags', '--json'], {
@@ -95,7 +101,7 @@ function detectPackageManager(rootDir) {
   return 'npm'
 }
 
-function detectFramework(manifest) {
+export function detectFramework(manifest) {
   const names = new Set(dependencyNames(manifest))
   if (names.has('@angular/core')) return 'angular'
   if (names.has('react') || names.has('react-dom')) return 'react'
@@ -117,8 +123,11 @@ function detectFramework(manifest) {
  * linked, those imports fail to resolve. Declaring what the skill tells the consumer to import
  * is the fix.
  *
- * `assets` is added only when the app declared `@baloise/ds-icons` or `@baloise/ds-brand-icons`
- * directly, because only then does it import icon symbols itself.
+ * `assets` is added when the app declared `@baloise/ds-icons` or `@baloise/ds-brand-icons`
+ * directly, because then it imports icon symbols itself. It is also added for `@baloise/ds-styles`,
+ * `@baloise/ds-fonts` and `@baloise/ds-favicons`, because the Assets step copies the self-hosted
+ * fonts and favicons from `node_modules/@helvetia-design/assets`, which pnpm only links when the
+ * app declares it.
  */
 function aliasesFor(framework, version, dependencies) {
   const shared = {
@@ -126,7 +135,7 @@ function aliasesFor(framework, version, dependencies) {
     [targetPackageName('styles')]: version,
     [targetPackageName('tokens')]: version,
   }
-  if (dependencies.some(name => ICON_PACKAGES.has(name))) shared[targetPackageName('assets')] = version
+  if (dependencies.some(name => ASSET_PACKAGES.has(name))) shared[targetPackageName('assets')] = version
   if (framework === 'react') return { [targetPackageName('react')]: version, ...shared }
   if (framework === 'angular') return { [targetPackageName('angular')]: version, ...shared }
   return shared
@@ -142,7 +151,7 @@ function dependencyNames(manifest) {
 }
 
 function baloiseDependencies(manifest) {
-  return [...new Set(dependencyNames(manifest).filter(name => PACKAGE_RE.test(name)))].sort()
+  return [...new Set(dependencyNames(manifest).filter(name => DEPENDENCY_RE.test(name)))].sort()
 }
 
 function scan(rootDir) {
@@ -230,7 +239,7 @@ function isIgnorableLine(line) {
   return trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*') || trimmed.startsWith('<!--')
 }
 
-function readJson(filePath) {
+export function readJson(filePath) {
   try {
     return JSON.parse(readFileSync(filePath, 'utf8'))
   } catch {

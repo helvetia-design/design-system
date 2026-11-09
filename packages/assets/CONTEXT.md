@@ -99,6 +99,7 @@ Assets are packaged and published as part of the npm release process. Consumers 
 
 - Import assets directly: `import checkIcon from '@helvetia-design/assets/icons/check.svg'`
 - Reference asset URLs: `@helvetia-design/assets/fonts/brand-font.woff2`
+- Load the self-hosted fonts in SCSS through the `./fonts/scss` export: `@use '@helvetia-design/assets/fonts/scss' with ($font-path: '/assets/fonts')`. Always set `$font-path`, because its default is a www.baloise.ch URL.
 - Use asset-based components: `<ds-icon name="check">`
 
 ## Key Constraints
