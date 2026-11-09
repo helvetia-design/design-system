@@ -41,14 +41,14 @@ in `bal-*` terms), `components/button/migration.md` (parent styles children by t
   The JSON shape `{ total, files }` does not change. Unknown paths come back as `unmatched`,
   exactly like `scan-icon-imports.mjs` does today.
 - **`scan-migratable.mjs` gains a per-file breakdown.** With path arguments it limits the walk
-  and adds `files: [{ file, components: [{ name, total }] }]` to `suggested` and `notYet`.
+  and adds `files: [{ file, components: [{ name, total }] }]` next to `suggested` and `notYet`.
 - **Angular sibling files travel in pairs.** For every `.html` in the file set the skill adds
   the `.ts` with the same basename, and the other way round, before the batch starts.
 - **Fixed rewrite order.** Structural migrations first, leaves last, everything else in
   alphabetical order in between:
   1. `card`, `modal`, `list`, `accordion`, `tabs`, `steps`, `navbar`, `sheet`, `popup`
   2. every other migration, alphabetical
-  3. `button`, `close`, `icon`, `text`, `heading`, `badge`, `tag`, `divider`
+  3. `field`, `button`, `close`, `icon`, `text`, `heading`, `badge`, `tag`, `divider`
   Sibling rules in a `migration.md` are written in `bal-*` terms ("wrap the `bal-close` next to
   the title"). Running close before card would leave that rule without a match. The batch text
   states that sibling rules match both the `bal-` form and the already rewritten `ds-` form.
@@ -145,8 +145,8 @@ every scanner.
     listed with its outside importers before the confirmation.
   - Detect, choose card, answer the cascade question with no. Done when only card is rewritten,
     as today.
-  - Scope with a `bal-field` in it. Done when `bal-field` is listed under `notYet`, the batch
-    still runs, and the legacy config call stays with that reason in the report.
+  - Scope with a `bal-select` inside a `bal-field`. Done when `select` removes the `bal-field`
+    around its control, `field` runs after it, and no `bal-field` is left in the file set.
 - `harness/inventory.mjs` before and after on the scoped folder. Done when `introduced` is
   empty and every `remaining` entry is named in the report.
 

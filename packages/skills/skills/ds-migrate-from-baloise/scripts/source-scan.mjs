@@ -26,7 +26,11 @@ export function scanSourceFiles(rootDir, collect, { extensions = EXTENSIONS, pat
     const target = resolvePath(root, path)
     if (target.real === root) {
       walk(root, root, collectOnce, extensions)
-    } else if (!target.real || target.rel.split('/').some(part => part === '..' || SKIP_DIRS.has(part))) {
+    } else if (
+      !target.real ||
+      isAbsolute(target.rel) ||
+      target.rel.split('/').some(part => part === '..' || SKIP_DIRS.has(part))
+    ) {
       unmatched.add(target.rel)
     } else if (statSync(target.real).isDirectory()) {
       walk(root, target.real, collectOnce, extensions)

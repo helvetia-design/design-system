@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
@@ -106,6 +107,18 @@ describe.each(SCANNERS)('scan-bal-%s with paths', slug => {
       'src/page/page.html',
     ])
     expect(result.unmatched).toEqual(['src/nope.ts'])
+  })
+
+  it('forwards path arguments from the command line', () => {
+    const root = createScratchDir()
+    write(root, 'src/page/page.html', `<bal-${slug}></bal-${slug}>\n`)
+    write(root, 'src/outside.html', `<bal-${slug}></bal-${slug}>\n`)
+
+    const output = execFileSync(process.execPath, [join(SCRIPTS_DIR, `scan-bal-${slug}.mjs`), root, 'src/page'], {
+      encoding: 'utf8',
+    })
+
+    expect(JSON.parse(output).files.map(({ file }: { file: string }) => file)).toEqual(['src/page/page.html'])
   })
 
   it('keeps the output shape without unmatched paths', async () => {

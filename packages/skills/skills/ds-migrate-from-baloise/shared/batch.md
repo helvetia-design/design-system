@@ -17,7 +17,7 @@ A batch exists because a parent and its children must change together. `ds-butto
 
    When the JSON has an `unmatched` list, those paths are not source files or folders under `<project-root>`. Fix the paths and run the scan again before you continue.
 
-3. The migration list is every entry in `suggested`. `files` lists, per file, every component it uses. Keep only files that use at least one component from `suggested` as the file set.
+3. The migration list is every entry in `suggested`. Run the scanner of every migration in the list on the same paths, as in step 4 below. The file set is every file that at least one of these scanners reports. Do not filter by `files`: it counts tags and `Bal*` names only, so it misses a class file that uses only a controller or service such as `balToastController` or `BalModalService`.
 
 If `suggested` is empty, report that the files use no component with an available migration, show `notYet`, and stop.
 
@@ -72,6 +72,8 @@ For each migration, in order:
    node <this-skill-directory>/scripts/scan-bal-<name>.mjs <project-root> <file> [<file> ...]
    ```
 
+   For `app`, run `scan-bal-app.mjs <project-root>` without file arguments instead. Its legacy config calls usually sit in a startup file outside the file set, and they hold the values for the Config section of `components/app/migration.md`. Rewrite only the `bal-app` usages in the file set.
+
 3. Apply its **Rewrite** step to those findings only. Skip its **Scan** display, its **Confirm** step and its stop.
 4. For a form control migration, apply `shared/field.md` in the same pass, as `SKILL.md` describes.
 5. Skip the icon import and Registration rules from `shared/icons.md` and every rule from `shared/legacy-config.md`. Steps 6 and 7 run them once for the whole batch. Keep applying the icon name rule to icon props that the migration file copies.
@@ -94,7 +96,7 @@ Done when no touched file has an empty legacy import.
 Follow `shared/icons.md` once for the union of every file the batch touched:
 
 - Run its **Scan** with those files as arguments.
-- Run its `scan-migratable.mjs` call without path arguments, so it covers the whole project. The batch rewrite has already happened, so ignore no component.
+- Run the final icon scan from its **Report** section, `scan-icon-imports.mjs <project-root>` without file arguments, so it covers the whole project.
 - Apply every rule, including Registration. The legacy registration usually sits in a startup file outside the file set. Edit it there.
 - Note the outcome of every `I` item from its **Report** section.
 
@@ -104,7 +106,7 @@ Done when every icon rule has been applied to the touched files.
 
 ## 7. Legacy config
 
-Follow `shared/legacy-config.md` once for the whole project. The batch rewrite has already happened, so run its `scan-migratable.mjs` call again without path arguments, and count every component it lists as left. Then apply its **Decide** section and note the outcome of every `L` item.
+Follow `shared/legacy-config.md` once for the whole project. Run its `scan-bal-app.mjs <project-root>` call without path arguments, even when `app` ran in this batch, and do not reuse the findings of a scan on the file set. The batch rewrite has already happened, so run its `scan-migratable.mjs` call again without path arguments, and count every component it lists as left. Then apply its **Decide** section and note the outcome of every `L` item.
 
 When a `bal-*` component is left, name the remaining components with their `total` under L5.
 
