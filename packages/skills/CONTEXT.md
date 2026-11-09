@@ -25,7 +25,7 @@ Distribution is `npx @helvetia-design/skills add`. There is no Claude Code plugi
 
 ### One `migration.md` per component
 
-**Components** offers two paths. **Manual** lists `components/*.md` and `components/*/migration.md` by the first heading. **Detect** runs `scripts/scan-migratable.mjs` and suggests only used `bal-*` components with a matching `components/<name>/migration.md`. Both paths dispatch to that migration file.
+**Components** offers three paths. **Manual** lists `components/*.md` and `components/*/migration.md` by the first heading. **Detect** runs `scripts/scan-migratable.mjs` and suggests only used `bal-*` components with a matching `components/<name>/migration.md`. Both dispatch to that migration file, unless the user answers yes to the cascade question. **Scope** takes paths and runs a batch over them. See "Batch: scope and cascade".
 
 ### Adding the next component
 
@@ -40,7 +40,7 @@ Accordion is the template: `components/accordion/migration.md` (heading `accordi
 
 Conventions that hold across every component:
 
-- **The scanner stays flat.** It prints `{ total, files: [{ file, findings: [{ line, snippet }] }] }` and nothing else. Reach comes from widening the single `USAGE_RE`, not from adding fields — toast matches `balToastController`, accordion matches the four `BalAccordion*` bindings and `BalAccordionBundle`.
+- **The scanner stays flat.** It prints `{ total, files: [{ file, findings: [{ line, snippet }] }] }` and nothing else. The one addition is `unmatched`, present only when a path argument matched no source file. Reach comes from widening the single `USAGE_RE`, not from adding fields — toast matches `balToastController`, accordion matches the four `BalAccordion*` bindings and `BalAccordionBundle`.
 - **Never put a shared event name in a component regex.** `balChange` alone is emitted by 26 legacy components, so it would report checkbox, input, and dropdown usages as findings for whichever component you are migrating.
 - **`CHILD_SLUGS` stays explicit.** Never fold by prefix: `bal-input-slider` becomes `ds-slider`, a separate component, not part of the input migration.
 - **Anything with no `ds-*` equivalent is reported, never commented into the consumer's code.** The migration file's final step enumerates each loss for the report. See `components/tooltip/migration.md` and `components/accordion/migration.md`.
@@ -62,11 +62,48 @@ Every component migration also migrates the icons from `@baloise/ds-icons` and `
 
 `app` does not copy `icons` onto `ds-root`. The Registration rules in `shared/icons.md` handle it.
 
-`scripts/scan-icon-imports.mjs` takes the component's finding files as extra arguments and scans only those. Without them it scans the whole project, which the Assets step uses and the component report uses to point at files Assets still has to migrate. `test/scan-icon-imports.spec.ts` checks the map against `@helvetia-design/assets`, the one workspace devDependency of this package.
+`scripts/scan-icon-imports.mjs` takes the component's finding files as extra arguments and scans only those. Without them it scans the whole project, which the Assets step uses and the component report uses to point at files Assets still has to migrate. `test/scan-icon-imports.spec.ts` checks the map against `@helvetia-design/assets`, a workspace devDependency of this package, as `test/css-utils-map.spec.ts` does with `@helvetia-design/styles`.
+
+### Batch: scope and cascade
+
+A **batch** migrates every `bal-*` component in a set of files in one run, following `shared/batch.md`. It has two entry points. **Scope** takes paths from the user. The **cascade question** follows Manual and Detect: when the chosen component's files also use other migratable components, the user can migrate them all in one batch.
+
+A batch exists because parents style or query their children by tag across families. `ds-button-group` styles `::slotted(ds-button)` and `ds-checkbox-group` queries `ds-checkbox`. Migrating one family at a time leaves a `ds-*` parent around `bal-*` children, which loses layout or wiring without an error.
+
+- **Scanners accept paths.** Every `scan-bal-*.mjs`, `scan-icon-imports.mjs` and `scan-migratable.mjs` takes files and folders after `<project-root>`. A folder limits the walk to its subtree. The filter lives in `scanSourceFiles` in `scripts/source-scan.mjs`, which returns the paths that matched no source file. A path inside a skipped folder such as `dist` counts as unmatched. With paths, `scan-migratable.mjs` also prints `files`, the component totals per file.
+- **Fixed rewrite order.** Structural parents run first (`card`, `modal`, `list`, `accordion`, `tabs`, `steps`, `navbar`, `sheet`, `popup`), `field` and the leaves last (`field`, `button`, `close`, `icon`, `text`, `heading`, `badge`, `tag`, `divider`), everything else alphabetical in between. Sibling rules in a `migration.md` name `bal-*` tags, such as the card rule that wraps a `bal-close` next to the title. Running close first would leave that rule without a match. `shared/batch.md` also says that such a rule matches the `ds-*` form.
+- **`field` runs after the form controls.** Each control migration removes the `bal-field` around its own controls via `shared/field.md`. The `field` migration then takes the grid and every `bal-field` that is left.
+- **Batch mode is one clause in `SKILL.md`.** Inside a batch a `migration.md` runs only its Rewrite step, still applies `shared/field.md`, and hands back the outcome of its Report items. No `migration.md` mentions batches.
+- **Once per batch:** the confirmation, the empty legacy import cleanup, `shared/icons.md`, `shared/legacy-config.md`, and one `<date> batch: ...` section in `ds-migration-report.md` with one coverage checklist per migration.
+- **Shared files are reported, not blocked.** A file in the set that is imported from outside it is listed with its importers before the confirmation.
+- **No tree resolution.** A batch does not follow imports or Angular selectors into other folders. The user adds those folders to the scope.
+
+When you add a migration, place it in the order list in `shared/batch.md` when it restructures children or is a leaf that other migrations wrap. Otherwise the alphabetical middle group covers it.
 
 ### Legacy config call stays until the last `bal-*` component
 
 The legacy config call (`initializeBaloiseDesignSystem`, `useBaloiseDesignSystem`, `provideBaloiseDesignSystem`) fills the only config that `bal-*` components read, so no migration deletes it while one `bal-*` component is left. The `app` migration copies its values onto `ds-root` and leaves the call unchanged. `shared/legacy-config.md` is the one place that deletes it: `SKILL.md` runs it at the end of every component migration and in **Assets**, and it deletes the call only when `scan-migratable.mjs` reports no other `bal-*` component.
+
+### CSS utils: curated map, raw-text scanner, legacy utilities line
+
+The **CSS utils** menu item rewrites legacy Baloise utility classes in the consumer's markup, following `shared/css-utils.md`, and deletes the Baloise utilities line once no legacy class is left. Component migrations do not rewrite classes. It follows the Assets pattern: a map in `shared/`, a scanner in `scripts/`, a rule file in `shared/`, and a section in `SKILL.md`.
+
+- **Map** — `shared/css-utils-map.json` lists only the classes that differ. Groups: `variants` (`renamed` prefixes such as `widescreen` to `desktop-lg`; `lost` prefixes `widescreen-only` and `high-definition-only`; `unchanged`, every Helvetia prefix the scanner splits off; `identical`, prefixed tokens that keep their name although the prefix is renamed, such as the grid's `widescreen:is-half`; `unsupported`, prefixed tokens whose base exists in Helvetia without that variant, such as `desktop:w-full`), `structure` (`grid`, `col`, `container` to `ds-*`), `structureLost` (modifiers the `ds-*` counterpart lacks: `container` with `is-detail-page` or `is-blog-page` on one element, also across class contexts, is reported as one lost pair), `renamed` (same value), `approximated` (closest class, value changes) and `lost`. The CSS values decide the group, not the name: `radius-normal` and `radius` are both 0.25rem, so it is `renamed`. Spacing aliases such as `mb-small` are identical and not listed. No mapped value is a key.
+- **Regenerate** — the diff is generated, the map is curated. `scripts/diff-css-utils.mjs` (package root, not payload) prints `identical`, `baloiseOnly`, `helvetiaOnly` and the suffix, variant, structure and `title` renames it can `propose`. `diffStylesheets` runs `extractClasses` on both sides.
+
+  ```bash
+  npm pack @baloise/ds-styles@19 --pack-destination <tmp> && tar -xzf <tmp>/baloise-ds-styles-*.tgz -C <tmp>
+  B=<tmp>/package/css; H=../styles/dist/css
+  node scripts/diff-css-utils.mjs --baloise $B/utilities/all.css --baloise $B/utilities/grid.css --baloise "$B/core.css#container" \
+    --helvetia $H/utilities.css --helvetia $H/design-system.css \
+    --classes-out test/fixtures/css-utils/baloise-<version>-classes.txt --modifiers-out test/fixtures/css-utils/baloise-<version>-modifiers.txt
+  ```
+
+  The v19 grid lives in `utilities/grid.css` and `.container` in `core.css`, so the generator takes several files; `#container` keeps only the rules of that class. The two fixtures are generated data files, not component fixtures, so they are the one exception to the `test/fixtures/` rule. `test/css-utils-map.spec.ts` reads Helvetia CSS from `@helvetia-design/styles` and fails on every Baloise class the map does not resolve to a Helvetia class or to `lost`, so a new Baloise or Helvetia release shows the exact tokens to sort.
+
+- **Scanner** — `scripts/scan-css-utils.mjs` reads class strings from the raw text, because `source-scan.mjs` masks every string. It reuses the walk, `scanSourceFiles` with `paths`, `endOfString` and `maskComments`, which blanks comments only and, in `.html` and `.vue`, treats only `<!--` as a comment outside `<script>` and `<style>`. It rewrites nothing and prints `{ total, files: [{ file, findings: [{ line, snippet, classes: [{ from, to, group }] }] }], dynamic: [...] }`. Class contexts: `class` (quoted or unquoted), static `ngClass`, `routerLinkActive`, `active-class` and `exact-active-class`, `className` and JSX `class={…}` (string, `{'…'}`, static parts of a template literal), `[class]`, `[ngClass]`, `[routerLinkActive]` and Vue `:class`/`v-bind:class`/`:active-class`/`:exact-active-class` (string, array, object with quoted or bare keys), `[class.<name>]`, `@HostBinding('class.<name>')`, `classList.add/remove/toggle/contains`, Angular `host: { class }` and `'[class.<name>]'` keys, and inline `template:` strings. Map lookups use `Map`, so `toString` or `constructor` in a class string maps to nothing.
+- **Dynamic** — every place the scan sees but cannot rewrite goes to `dynamic`, never silently away, because a miss would let the step delete the Baloise utilities line while a legacy class is in use. Reasons: `template substitution`, `interpolation` and `string concatenation` (the static parts are still mapped), `non-literal class binding` (a variable, a computed key or a spread in `[ngClass]` or `:class`, or a mapped object key in a `className={cx({ … })}` call), `string literal outside a class context` (a code literal or a literal in a bound attribute such as `:title` or `[attr.class]` that contains a mapped class; `const spacing = 'mt-normal'` holds only an identical class and is not listed), `selector` (`'.grid > .col'`, `'class.grid'`), `class input` (a static `styleClass="…"` or `body-class="…"` on a component, which places the classes itself), `selector in a stylesheet` (a mapped class selector in `.css`, `.scss`, `.sass`, `.less` or a `<style>` block, comments skipped; `@extend` lines may show up but `@extend` itself is out of scope), and `possibly commented` (a class context in a `.tsx`, `.jsx` or `.js` file behind a `//` or inside `/* … */`, which may be JSX text such as `https://x.ch` or `/tmp/*`).
+- **Legacy utilities line** — after the rewrite a whole-project scan decides. With no class move, no `lost` move and no `dynamic` place left, the step deletes every Baloise utilities line that `detect-baloise.mjs` lists and the utilities TODO comment Init put above it. It keeps the shared TODO of the bundled `css/all` block and never touches the Helvetia utilities line. An uncommented `@baloise/ds-styles/css/all` line is reported, not edited.
 
 ### Field wrapper travels with the control migration
 
@@ -99,7 +136,7 @@ The copied skill edits the consumer's files and leaves everything unstaged, incl
 - **CLI surface is `add` only** — no arguments, no `list`, no per-skill selection.
 - **Payload stays uncompiled** — Markdown and dependency-free JS only. Do not import from this package's `dist/` or from other workspace packages.
 - **Overwrite is the update path** — `add` replaces the destination folder; do not add a separate `update` command.
-- **Coming-soon menu items report "coming soon" and stop** — they exist to show eventual scope, not as errors.
+- **No menu item is "coming soon" any more** — Init, Components, CSS utils and Assets are all implemented. A future placeholder item reports "coming soon" and stops; it shows eventual scope, not an error.
 
 ## Testing
 
@@ -135,13 +172,13 @@ node /absolute/path/to/packages/skills/dist/cli.js add
 Done when:
 
 1. stdout is `Copied ds-migrate-from-baloise to <scratch>/.claude/skills/ds-migrate-from-baloise`
-2. that folder contains `SKILL.md` with the 4-item menu (Init / Components / CSS utils (coming soon) / Assets) and the line that the skill never runs `git add` or `git commit`
+2. that folder contains `SKILL.md` with the 4-item menu (Init / Components / CSS utils / Assets), `shared/css-utils.md`, `shared/css-utils-map.json` and `scripts/scan-css-utils.mjs`, and the line that the skill never runs `git add` or `git commit`
 3. `node …/dist/cli.js` with no args, or with `list`, prints `Usage: skills add` and exits 1
 4. after writing a stale `SKILL.md` and `stale.txt` into the destination, a second `add` restores `SKILL.md` and removes `stale.txt`
 
 ### Menu (Claude)
 
-In the scratch directory, invoke `/ds-migrate-from-baloise`. Done when Init runs `scripts/detect-baloise.mjs`, Components offers **Manual** and **Detect**, Manual lists exactly one entry per `components/*/migration.md` (named after its first heading, e.g. `app → root`) and nothing else, Detect suggests a component only when the project uses it and that migration exists, Assets scans the whole project with `scan-icon-imports.mjs` and follows `shared/icons.md`, and CSS utils reports "coming soon" and stops.
+In the scratch directory, invoke `/ds-migrate-from-baloise`. Done when Init runs `scripts/detect-baloise.mjs`, Components offers **Manual**, **Detect** and **Scope**, Manual lists exactly one entry per `components/*/migration.md` (named after its first heading, e.g. `app → root`) and nothing else, Detect suggests a component only when the project uses it and that migration exists, Manual and Detect ask the cascade question only when the chosen component's files use another migratable component, Scope runs `scan-migratable.mjs` with the given paths and follows `shared/batch.md`, Assets scans the whole project with `scan-icon-imports.mjs` and follows `shared/icons.md`, and CSS utils scans the whole project or a path list with `scan-css-utils.mjs`, asks one yes/no, rewrites from `shared/css-utils.md`, and deletes the Baloise utilities line only when a second whole-project scan reports no class move, no `lost` move and no `dynamic` place.
 
 Against a project with no `@baloise/ds-*` dependency and no CSS/JS import, Init says "no Baloise Design System installation detected, nothing to migrate" and does not edit files. Against a project that has both, Init adds the `@helvetia-design/*` packages from the script JSON, runs that JSON's `installCommand`, inserts the new import beside the untouched `@baloise/*` import, and leaves the result unstaged.
 
