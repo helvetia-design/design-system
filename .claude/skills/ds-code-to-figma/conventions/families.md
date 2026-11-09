@@ -46,12 +46,12 @@ Phases 1–5 cover the whole family; Phases 6–8 cover the owner only.
 
 | Phase      | Family behaviour                                                                                                                                                                                                                                                     |
 | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 Analyze  | One mapping file per member, next to its `.tsx`. **One** anatomy review (merged list, §5), **one** specs triage (grouped by set, §6), **one** batch of token gaps for the family.                                                                                    |
+| 1 Analyze  | One mapping file per member, next to its `.tsx`. **One** anatomy review (merged list, §5), **one** measurements triage (grouped by set, §6), **one** batch of token gaps for the family.                                                                             |
 | 2 Propose  | **One** proposal and **one** sign-off covering every set of the family, including the parent-set props (§3) and slot default fills (§4). The 500-variant check runs per mapping file.                                                                                |
 | 3 Build    | One documentation frame (the owner's). **Build order**: contained sub-components → owner → wrapping sub-components (each set needs the sets it instantiates). The **first-variant checkpoint runs per set**. The documentation-frame approval runs once, at the end. |
 | 4 Validate | Run per mapping file, one `<name>.figma-validation.md` each. Header checks only on the owner's. The **family verdict** is the worst of all reports (`fail` > `blocked` > `pass`).                                                                                    |
 | 5 Repair   | Per failing mapping file; the 3-iteration limit counts family re-validations, not per file.                                                                                                                                                                          |
-| 6–8 Docs   | Owner only. Copy me is the owner's default variant. Anatomy and Specs cover sub-components per §5 and §6.                                                                                                                                                            |
+| 6–8 Docs   | Owner only. Copy me is the owner's default variant. Anatomy and Measurements cover sub-components per §5 and §6.                                                                                                                                                     |
 
 ## 3. Parent-set props (`drivenBy`)
 
@@ -101,12 +101,12 @@ Wrapping sub-components get **no** entry: they aren't inside the owner's diagram
 Phase 7 deletes the Anatomy placeholder only when the owner has no `@part`s **and** no contained
 sub-components.
 
-## 6. Specs
+## 6. Measurements
 
 - **Phase 1 measures the whole family.** The triage table gets a `set` column and is grouped by set
-  (`Tabs` / `Tab` / `TabPanel`); still one checkpoint. All rows live in the **owner's** `specs:`
-  (each with `set:`); sub-component mapping files have no `specs:`.
-- **Drawn spec** = the owner's default instance only. It already contains contained sub-component
+  (`Tabs` / `Tab` / `TabPanel`); still one checkpoint. All rows live in the **owner's** `measurements:`
+  (each with `set:`); sub-component mapping files have no `measurements:`.
+- **Drawing** = the owner's default instance only. It already contains contained sub-component
   instances, so their padding, gap and indicator are drawn in context.
 - **Wrapping sub-components** can't be drawn on the owner's instance: their rows are `table` only.
 - The Sizes table prefixes every sub-component row's property with its set name

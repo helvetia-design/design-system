@@ -175,51 +175,64 @@ tokens:
       bound to whichever of the color tokens above applies per state/inverted/disabled — not an
       Instance Swap, since code offers no way to swap this glyph.
 
-specs:
-  base:
-    - kind: size
-      label: Size
-      px: 24
-      token: 🧩 Component/Close/Size/Base
-    - kind: spacing
-      label: Padding
-      px: 10
-      token: 🧩 Component/Close/Padding/Base
-    - kind: size
-      label: Icon size
-      px: 14
-      token: 'derived: Size/Base (24) − Padding/Base (10)'
-      calc: '24px − 10px'
-  sm:
-    - kind: size
-      label: Size
-      px: 14
-      token: 🧩 Component/Close/Size/SM
-    - kind: spacing
-      label: Padding
-      px: 6
-      token: 🧩 Component/Close/Padding/SM
-    - kind: size
-      label: Icon size
-      px: 8
-      token: 'derived: Size/SM (14) − Padding/SM (6)'
-      calc: '14px − 6px'
-  md:
-    - kind: size
-      label: Size
-      px: 32
-      token: 🧩 Component/Close/Size/MD
-    - kind: spacing
-      label: Padding
-      px: 14
-      token: 🧩 Component/Close/Padding/MD
-    - kind: size
-      label: Icon size
-      px: 18
-      token: 'derived: Size/MD (32) − Padding/MD (14)'
-      calc: '32px − 14px'
-  # Radius omitted per PHASE-8 rule: --ds-close-radius resolves to Alias/Radius/Rounded
-  # (Global/Dimension/Radius/9999) — a fully-rounded/circular shape, radius not shown for circles.
+measurements: # confirmed measurements triage (06.11.2026, measured on the dev server)
+  drawnOption: base
+  drawnState: hover # default has a transparent background, so the circle the Size line measures
+  # can't be seen; hover fills it
+  drawnStateReason: 'default background is transparent — the 24px circle is only visible on hover; confirmed by the user 06.11.2026'
+  options: [base, sm, md]
+  rows:
+    - property: Size (w = h)
+      kind: size
+      group: fixed
+      show: drawn
+      instance: main
+      source: close.mixin.scss:48
+      values:
+        base: { px: 24, token: 🧩 Component/Close/Size/Base }
+        sm: { px: 14, token: 🧩 Component/Close/Size/SM }
+        md: { px: 32, token: 🧩 Component/Close/Size/MD }
+    - property: Icon size
+      kind: size
+      group: fixed
+      show: drawn
+      instance: main
+      source: close.mixin.scss:67 # ::after min/max = size − padding token
+      values:
+        base: { px: 14, token: 🧩 Component/Close/Size/Base − 🧩 Component/Close/Padding/Base }
+        sm: { px: 8, token: 🧩 Component/Close/Size/SM − 🧩 Component/Close/Padding/SM }
+        md: { px: 18, token: 🧩 Component/Close/Size/MD − 🧩 Component/Close/Padding/MD }
+    - property: Focus ring
+      kind: shape
+      group: fixed
+      show: drawn
+      instance: focus
+      source: close.mixin.scss:100 # focus-shadow mixin: 2px border color + 3px focus color
+      values:
+        base: { px: '2 + 3', token: null }
+    - property: Padding
+      kind: spacing
+      group: fixed
+      show: skip
+      reason: 'not a CSS padding — the token is subtracted from the size to get the icon size (visible inset 5 / 3 / 7 per side); shown inside the Icon size token instead'
+      values:
+        base: { px: 10, token: 🧩 Component/Close/Padding/Base }
+        sm: { px: 6, token: 🧩 Component/Close/Padding/SM }
+        md: { px: 14, token: 🧩 Component/Close/Padding/MD }
+    - property: Radius
+      kind: shape
+      group: fixed
+      show: skip
+      reason: 'circle (9999) — no radius on a circle or pill'
+      values:
+        base: { px: 9999, token: 🧩 Component/Close/Radius }
+    - property: Hit area
+      kind: size
+      group: hit area
+      show: skip
+      reason: 'equals the visible box (no outline to draw); sm is 14 × 14, below WCAG 2.5.8 24 × 24 — reported as an a11y finding, consumers need enough spacing'
+      values:
+        sm: { px: 14 }
 ```
 
 ## Notes
@@ -230,6 +243,10 @@ specs:
   rendering path (size / inverted / state) is in scope.
 - All CSS-var tokens resolved locally via `css-token-lookup.mjs` — zero hard stops, zero missing
   tokens.
+- **Measurements findings (06.11.2026):** `sm` is a 14 × 14 target, below WCAG 2.5.8's 24 × 24
+  (allowed only with enough spacing around it). With `size="sm"` the host is 14 × **24**: the
+  `inline-block` host takes the 24px line height, so a small close still takes 24px of vertical
+  space in a layout — a code smell, not drawn.
 - The "X" glyph has no CSS-var binding (it's a literal inline SVG in the component's own SCSS,
   not a token or a nested `ds-icon`) — flagged and resolved above as a static vector, not an
   Instance Swap.

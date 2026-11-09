@@ -16,13 +16,13 @@ Relevant to Phase 3's category-page setup and documentation frame. See
   page.
 - **One documentation frame per documentation owner (Storybook page), never per sub-component.**
   Every sub-component set is an extra stack in the owner's `Component Sets` column, in build order;
-  Copy me, Anatomy and Specs are built once, for the owner (`families.md`,
+  Copy me, Anatomy and Measurements are built once, for the owner (`families.md`,
   [ADR-0036](../../../../docs/adr/0036-figma-doc-unit-follows-storybook-page.md)).
 - **One documentation frame per owner, always — a hard invariant, with no exception for an
   inverted axis.** An inverted axis only affects the `Component Sets` column: both the default and the `…Inverted` component sets are shown stacked vertically inside
   the _same_ single frame's `Component Sets` column, each under its own plain text sub-label, with
   only the `inverted` display clone's `fills` swapped to the dark `Alias/Surface/Primary`
-  background. Every other section (Copy me, Anatomy, Specs) is built once, from the default
+  background. Every other section (Copy me, Anatomy, Measurements) is built once, from the default
   set's instances only. See `PHASE-3-BUILD.md`'s "Labeled component set" section for the full
   mechanism.
 - **Never lock any Figma node this skill builds** — no component set, no display clone,

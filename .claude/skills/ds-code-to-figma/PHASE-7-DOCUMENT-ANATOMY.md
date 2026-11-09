@@ -6,7 +6,7 @@ Fill in the second section of the `Documentation` column: "🏗️ Anatomy". Whe
 component's `<name>.figma.md` has no `anatomy:` list (no `@part` tags found in Phase 1), **delete
 the cloned frame's Anatomy `Section` placeholder** (the one with `Title` `kind=anatomy` in
 `body` › `Documentation`) so no empty Anatomy frame is left behind, then go straight to
-[`PHASE-8-DOCUMENT-SPECS.md`](PHASE-8-DOCUMENT-SPECS.md).
+[`PHASE-8-DOCUMENT-MEASUREMENTS.md`](PHASE-8-DOCUMENT-MEASUREMENTS.md).
 
 For a family, Anatomy is built once, on the owner, from the owner's merged `anatomy:` list (owner
 `@part`s + one entry per contained sub-component + sub-letters, `conventions/families.md` §5). A
@@ -15,7 +15,7 @@ sub-letter (`B1`) points at that part inside the same instance. The owner's list
 when it has no `@part`s and no contained sub-components.
 
 Build this right after "Copy me" is confirmed, before
-[`PHASE-8-DOCUMENT-SPECS.md`](PHASE-8-DOCUMENT-SPECS.md) — unless there are no parts, in which case this phase only deletes the placeholder.
+[`PHASE-8-DOCUMENT-MEASUREMENTS.md`](PHASE-8-DOCUMENT-MEASUREMENTS.md) — unless there are no parts, in which case this phase only deletes the placeholder.
 
 ## Inputs
 
@@ -66,7 +66,7 @@ the `Anatomy/Legend item` component is missing.
    `Part`, `Description` (look the keys up by prefix; they carry a `#<id>` suffix). Never detach
    or restyle an instance. Name each instance `<letter> · <part>`.
 
-The `kind=anatomy` placeholder already sits between Copy me and Specs in the cloned frame, so
+The `kind=anatomy` placeholder already sits between Copy me and Measurements in the cloned frame, so
 nothing is appended or moved. Iterate on it with the user in Figma before moving on.
 
 ## Output
@@ -84,5 +84,5 @@ nothing is appended or moved. Iterate on it with the user in Figma before moving
 
 ## Next Phase
 
-Proceed to [`PHASE-8-DOCUMENT-SPECS.md`](PHASE-8-DOCUMENT-SPECS.md) once Anatomy is built and
+Proceed to [`PHASE-8-DOCUMENT-MEASUREMENTS.md`](PHASE-8-DOCUMENT-MEASUREMENTS.md) once Anatomy is built and
 confirmed (or immediately, once the placeholder is deleted).

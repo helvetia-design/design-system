@@ -14,7 +14,7 @@ Two kinds of pause, treated differently:
 ## Families
 
 A family (owner + sub-components, `conventions/families.md`) adds **no extra checkpoints**
-beyond one first-variant checkpoint per set in Phase 3: anatomy review, specs triage, token-gap
+beyond one first-variant checkpoint per set in Phase 3: anatomy review, measurements triage, token-gap
 batch and grouping sign-off happen once for the whole family; Phases 6–8 run for the owner only.
 
 ## Phase 1 — Analyze
@@ -44,10 +44,12 @@ batch and grouping sign-off happen once for the whole family; Phases 6–8 run f
 - 🛑 **Completeness-checklist gap** (step 5b): any node/attribute combination in the explicit
   completeness checklist with no resolved token — surface every gap as a batch before Phase 2, not
   discovered piecemeal mid-build.
-- 🟡 **Specs triage** (step 6c): present every measured size with its group, token and proposal
+- 🟡 **Measurements triage** (step 6c): present every measured size with its group, token and proposal
   (`drawn` / `table` / `behavior` / `skip`) and wait for confirmation. Rows marked "ask" in
-  `conventions/specs.md`, measured ≠ token mismatches, unmeasured options and outer margins are
-  listed separately, each with a recommendation.
+  `conventions/measurements.md`, measured ≠ token mismatches, unmeasured options and outer margins are
+  listed separately, each with a recommendation. So is a `drawnColor` other than the default color
+  option: say which marker the default would hide and wait for the user to confirm the switch.
+  Same for a `drawnState` other than the default state.
 
 ## Phase 2 — Propose grouping
 
@@ -106,14 +108,14 @@ batch and grouping sign-off happen once for the whole family; Phases 6–8 run f
   `<name>.figma.md` has no `anatomy:` list (no `@part` tags) — delete the cloned frame's Anatomy
   `Section` placeholder (no Anatomy frame) and go straight to Phase 8.
 
-## Phase 8 — Document: Specs
+## Phase 8 — Document: Measurements
 
 - 🛑 **Annotation component missing** (step 0): a `Spec/*` component or variant from the table in
-  `PHASE-8-DOCUMENT-SPECS.md` isn't on `🧰 Annotations` — list what's missing and ask the user to
+  `PHASE-8-DOCUMENT-MEASUREMENTS.md` isn't on `🧰 Annotations` — list what's missing and ask the user to
   add it; never draw a one-off marker by hand.
-- 🛑 **Old `specs:` format**: the mapping file still has the flat per-option list — re-run Phase 1
-  step 6 (specs triage) first.
-- 🟡 **Iteration before moving on**: confirm Specs with the user before finishing the skill.
+- 🛑 **Old `measurements:` format**: the mapping file still has the flat per-option list — re-run Phase 1
+  step 6 (measurements triage) first.
+- 🟡 **Iteration before moving on**: confirm Measurements with the user before finishing the skill.
 
 ## Cross-cutting
 

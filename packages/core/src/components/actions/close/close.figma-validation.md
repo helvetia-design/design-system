@@ -89,3 +89,20 @@ dividers rendering cleanly in `Close`, same in `CloseInverted` against the dark 
 Every check in scope passed. The `not verified` entries in step 6 are expected exclusions
 (`button`/`buttonColor`/`buttonSize` skipped per explicit user instruction; CSS-var theming demo;
 pseudo-states not present in static snapshots) — none represent an unresolved gap.
+
+## Repair log
+
+### 06.11.2026 — focus ring (found while building Measurements, not by a Phase 4 check)
+
+- **Fail:** the 6 `state=focus` variants (`Close` `3917:1000`, `3917:1021`, `3917:1042`;
+  `CloseInverted` `3917:1064`, `3917:1085`, `3917:1106`) grew the variant by 8px and drew a 4px
+  gap + 2px outside stroke. Code (`focus-shadow` mixin): 2px `Focus/Color/Border` + 3px focus
+  color directly on the edge, no size change.
+- **Change:** each variant back to its own size (24 / 14 / 32, re-centered in its cell, clipping
+  off); `focus-ring` = ellipse at −5 with a 3px inside stroke bound to `Focus/Color/Base`
+  (`Inverted` on `CloseInverted`); new `focus-ring-inner` = ellipse at −2 with a 2px inside stroke
+  bound to `Focus/Color/Border`; both behind `button` and `icon`, paints set from the resolved
+  variable values. Icon restored to the default variant's size (14 / 8 / 18) after the resize.
+- **Evidence:** screenshots of `3917:1055` and `3917:1119` show the white + purple / white + yellow
+  ring on all three sizes; the Measurements focus marker (`3909:1136`) was re-placed on the new
+  24px instance.

@@ -1564,9 +1564,11 @@ completenessChecklist:
   spinner: ds-spinner instance (sm), logo size Space/24, disabled colors from disabled-base-text + Global/Color/Grey/4
   gaps: none
 
-specs: # specs triage confirmed 05.11.2026, every shown row drawn (instances: main, min-content, focus) (PHASE-1-ANALYZE.md step 6); measured on the dev server
+measurements: # measurements triage confirmed 05.11.2026 (PHASE-1-ANALYZE.md step 6), re-triaged 05.11.2026; measured on the dev server
+  drawnColor: secondary
+  drawnColorReason: 'primary and every status color draw the border in the fill color, so the 2px border and the padding inside it cannot be seen — secondary is the first option where border ≠ fill; confirmed by the user 05.11.2026'
   drawnOption: base
-  options: [sm, base, lg]
+  options: [base, sm, lg] # code default first, like the component set
   behavior:
     width: hug # `wide` prop: fill
     overflow: wrap # `no-wrap` prop: truncate
@@ -1578,20 +1580,9 @@ specs: # specs triage confirmed 05.11.2026, every shown row drawn (instances: ma
       instance: main
       source: button.style.scss:95
       values:
-        sm: { px: 32, token: 🧩 Component/Button/Size/SM/MinHeight }
         base: { px: 48, token: 🧩 Component/Button/Size/Base/MinHeight }
+        sm: { px: 32, token: 🧩 Component/Button/Size/SM/MinHeight }
         lg: { px: 56, token: 🧩 Component/Button/Size/LG/MinHeight }
-    - property: Min width
-      kind: size
-      group: limit
-      show: drawn
-      instance: min-content
-      reason: 'drawn on a short-label instance — only binds for very short or icon-only content'
-      source: button.style.scss:94
-      values:
-        sm: { px: 32, token: 🧩 Component/Button/Size/SM/MinWidth }
-        base: { px: 48, token: 🧩 Component/Button/Size/Base/MinWidth }
-        lg: { px: 56, token: 🧩 Component/Button/Size/LG/MinWidth }
     - property: Icon size (left)
       kind: size
       group: fixed
@@ -1600,8 +1591,8 @@ specs: # specs triage confirmed 05.11.2026, every shown row drawn (instances: ma
       source: button.tsx:486 (ds-icon size follows the button size)
       reason: 'lg renders a 32px icon in a 56px button — documented as the code does it'
       values:
-        sm: { px: 14, token: 🧩 Component/Icon/Size/SM }
         base: { px: 16, token: 🧩 Component/Icon/Size/Base }
+        sm: { px: 14, token: 🧩 Component/Icon/Size/SM }
         lg: { px: 32, token: 🧩 Component/Icon/Size/LG }
     - property: Icon size (right)
       kind: size
@@ -1610,8 +1601,8 @@ specs: # specs triage confirmed 05.11.2026, every shown row drawn (instances: ma
       instance: main
       source: button.tsx:502 (size="sm" in every size)
       values:
-        sm: { px: 14, token: 🧩 Component/Icon/Size/SM }
         base: { px: 14, token: 🧩 Component/Icon/Size/SM }
+        sm: { px: 14, token: 🧩 Component/Icon/Size/SM }
         lg: { px: 14, token: 🧩 Component/Icon/Size/SM }
     - property: Padding X
       kind: spacing
@@ -1620,8 +1611,8 @@ specs: # specs triage confirmed 05.11.2026, every shown row drawn (instances: ma
       instance: main
       source: button.style.scss:97
       values:
-        sm: { px: 12, token: 🧩 Component/Button/Size/SM/PaddingX }
         base: { px: 24, token: 🧩 Component/Button/Size/Base/PaddingX }
+        sm: { px: 12, token: 🧩 Component/Button/Size/SM/PaddingX }
         lg: { px: 24, token: 🧩 Component/Button/Size/LG/PaddingX }
     - property: Gap
       kind: spacing
@@ -1630,8 +1621,8 @@ specs: # specs triage confirmed 05.11.2026, every shown row drawn (instances: ma
       instance: main
       source: button.style.scss:96
       values:
-        sm: { px: 8, token: 🧩 Component/Button/Size/SM/Gap }
         base: { px: 8, token: 🧩 Component/Button/Size/Base/Gap }
+        sm: { px: 8, token: 🧩 Component/Button/Size/SM/Gap }
         lg: { px: 8, token: 🧩 Component/Button/Size/LG/Gap }
     - property: Radius
       kind: shape
@@ -1640,20 +1631,20 @@ specs: # specs triage confirmed 05.11.2026, every shown row drawn (instances: ma
       instance: main
       source: button.style.scss:91
       values:
-        sm: { px: 4, token: 🧩 Component/Button/Size/SM/Radius }
         base: { px: 4, token: 🧩 Component/Button/Size/Base/Radius }
+        sm: { px: 4, token: 🧩 Component/Button/Size/SM/Radius }
         lg: { px: 4, token: 🧩 Component/Button/Size/LG/Radius }
     - property: Border width
       kind: shape
       group: fixed
       show: drawn
-      instance: min-content
-      reason: 'drawn on the short-label instance, where the leader has room'
+      instance: main
+      reason: 'drawn on the secondary main instance — invisible on primary (border = fill)'
       source: button.style.scss:101
       values:
-        sm: { px: 2, token: 🧩 Component/Button/Color/Primary/Base/Border (width) }
-        base: { px: 2, token: 🧩 Component/Button/Color/Primary/Base/Border (width) }
-        lg: { px: 2, token: 🧩 Component/Button/Color/Primary/Base/Border (width) }
+        base: { px: 2, token: 🧩 Component/Button/Color/Secondary/Base/Border/BorderWidth }
+        sm: { px: 2, token: 🧩 Component/Button/Color/Secondary/Base/Border/BorderWidth }
+        lg: { px: 2, token: 🧩 Component/Button/Color/Secondary/Base/Border/BorderWidth }
     - property: Focus ring
       kind: shape
       group: fixed
@@ -1663,25 +1654,25 @@ specs: # specs triage confirmed 05.11.2026, every shown row drawn (instances: ma
       source: packages/styles/src/scss/mixins/general.mixin.scss:37 (focus-shadow)
       values:
         base: { px: '2 + 3', token: null }
-    - property: Type (label)
+    - property: Text (label)
       kind: type
       group: typography
       show: drawn
       instance: main
       source: button.style.scss:86
       values:
-        sm:
-          {
-            px: 14,
-            token: 🧩 Component/Button/Size/SM/FontSize,
-            weight: 700,
-            lineHeight: 1.3,
-            family: BaloiseCreateHeadline,
-          }
         base:
           {
             px: 16,
             token: 🧩 Component/Button/Size/Base/FontSize,
+            weight: 700,
+            lineHeight: 1.3,
+            family: BaloiseCreateHeadline,
+          }
+        sm:
+          {
+            px: 14,
+            token: 🧩 Component/Button/Size/SM/FontSize,
             weight: 700,
             lineHeight: 1.3,
             family: BaloiseCreateHeadline,
@@ -1700,8 +1691,8 @@ specs: # specs triage confirmed 05.11.2026, every shown row drawn (instances: ma
       show: skip
       reason: 'equals min height for single-line labels'
       values:
-        sm: { px: 32 }
         base: { px: 48 }
+        sm: { px: 32 }
         lg: { px: 56 }
     - property: Padding Y
       kind: spacing
@@ -1710,6 +1701,16 @@ specs: # specs triage confirmed 05.11.2026, every shown row drawn (instances: ma
       reason: 'browser default padding-block on <button>, not a token — open code finding (Phase 7)'
       values:
         base: { px: 1 }
+    - property: Min width
+      kind: size
+      group: limit
+      show: skip
+      reason: 'never binds — border + padding alone are 52px (base) / 28px (sm), above the 48 / 32 min width; only an empty label would hit it'
+      source: button.style.scss:94
+      values:
+        base: { px: 48, token: 🧩 Component/Button/Size/Base/MinWidth }
+        sm: { px: 32, token: 🧩 Component/Button/Size/SM/MinWidth }
+        lg: { px: 56, token: 🧩 Component/Button/Size/LG/MinWidth }
 ```
 
 ## Notes
@@ -1837,7 +1838,7 @@ disabled / loading (rule 2), `color` in `BUTTON_COLORS` source order (rule 4).
 
 - **Copy me** (`Section` 3044:462): one `Button/Primary` instance (`primary` / `base` / `default`, node 3051:482) with both `Show icon` toggles on, per the Phase 4 rule. Kept as is; see the skill TODO about using the plain default instead.
 - **Anatomy** (`Section` 3044:463), approved deviation (04.11.2026): **two instances** instead of the template's one, because no single state shows all five parts (`loading` shows the spinner and hides both icons). Left: `primary` / `base` / `loading` (markers A and B; A sits on the container's top edge just left of B, so the markers read A–E left to right). Right: `primary` / `base` / `default` with both icons on (markers C, D, E). Markers sit above the instances in the layer order.
-- **Specs** (`Section` 3044:464), rebuilt 05.11.2026 with the reworked Specs phase (markers v2): drawn spec with three instances — main `base` with icons (markers 1, 3–7, 10), `Min content` `OK` (2 min width, 8 border) and `Focus` (9 focus ring); sizes table rows 1–10; behavior card with one wrapping long label (`Hug ↔ (wide: Fill) · Wraps (no-wrap: Truncates)`). The left icon at `lg` is 32px (ds-icon `size` follows the button size) — documented as the code does it. The focus ring (2px + 3px) has no token.
+- **Measurements** (`Section` 3044:464), rebuilt 05.11.2026 (markers v3, v4: soft pills, padding pills `end`/`start`, gap pills on callouts; text box on the label, `Text (label)`, content-sized table columns): drawing on `secondary` (the border is invisible on primary) with two instances — main `base` with icons (markers 1–7, 9) and `Focus` (8 focus ring); pill labels; padding tints inside the border; sizes table rows 1–9, `base` first; min width skipped (never binds); behavior card with one wrapping long label (`Hug ↔ (wide: Fill) · Wraps (no-wrap: Truncates)`). The left icon at `lg` is 32px (ds-icon `size` follows the button size) — documented as the code does it. The focus ring (2px + 3px) has no token.
 
 ## Phase 7 — review (04.11.2026)
 

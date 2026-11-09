@@ -23,7 +23,7 @@ have produced, and closes with an explicit `Next:` pointer to the following file
 1. [`PHASE-1-ANALYZE.md`](PHASE-1-ANALYZE.md) — read the component's code (props, anatomy,
    pseudo-states, text attributes) and resolve every value to a Figma design token, hard-stopping
    on anything that can't be resolved, then measures the component's sizes on the dev server and
-   triages which ones Specs shows. Writes the draft `<name>.figma.md`.
+   triages which ones Measurements shows. Writes the draft `<name>.figma.md`.
 2. [`PHASE-2-PROPOSE.md`](PHASE-2-PROPOSE.md) — turn the draft into a concrete Figma
    variant-grouping proposal (variant vs. instance-swap vs. top-level split, grid sketch, 500-variant
    budget check) and get the user's explicit sign-off before anything is built.
@@ -40,8 +40,8 @@ have produced, and closes with an explicit `Next:` pointer to the following file
    section of the left column.
 7. [`PHASE-7-DOCUMENT-ANATOMY.md`](PHASE-7-DOCUMENT-ANATOMY.md) — build "🏗️ Anatomy", the second
    section of the left column (the placeholder is deleted when the component has no `@part` tags).
-8. [`PHASE-8-DOCUMENT-SPECS.md`](PHASE-8-DOCUMENT-SPECS.md) — build "📐 Specs", the last section of
-   the left column: a drawn spec, a sizes table and, for content-driven components, a behavior
+8. [`PHASE-8-DOCUMENT-MEASUREMENTS.md`](PHASE-8-DOCUMENT-MEASUREMENTS.md) — build "📏 Measurements", the last section of
+   the left column: a drawing, a sizes table and, for content-driven components, a behavior
    card; this is the last phase.
 
 ### Graph
@@ -61,7 +61,7 @@ flowchart TD
         P1anat --> P1anatC{{"User reviews<br/>anatomy list"}}:::human
         P1anatC --> P1b["Resolve design tokens<br/>(read-only Figma variables)"]:::figma
         P1b --> P1m["Measure sizes on the<br/>dev server, classify"]:::code
-        P1m --> P1mC{{"User confirms<br/>specs triage"}}:::human
+        P1m --> P1mC{{"User confirms<br/>measurements triage"}}:::human
         P1mC --> P1c["Write draft<br/>name.figma.md"]:::code
     end
 
@@ -129,9 +129,9 @@ flowchart TD
 
     P7G --> P8G
 
-    subgraph P8G["Phase 8 — Specs"]
+    subgraph P8G["Phase 8 — Measurements"]
         direction LR
-        P8a["Drawn spec + sizes table<br/>(+ behavior card)"]:::figma --> P8b{{"User confirms<br/>Specs"}}:::human
+        P8a["Drawing + sizes table<br/>(+ behavior card)"]:::figma --> P8b{{"User confirms<br/>Measurements"}}:::human
     end
 
     P8G --> Done(["Done: component live in Figma"]):::phase
@@ -141,8 +141,8 @@ flowchart TD
 🟣 **figma** — a `use_figma`/`get_screenshot` call against the live Figma file.
 🟡 **human** — a required stop-and-wait checkpoint; never assume approval and keep going.
 
-The human checkpoints (Phase 1's anatomy review and specs triage, Phase 2's mapping confirmation, Phase 3's
-first-variant and documentation-frame approvals in Figma, and the Copy me / Anatomy / Specs
+The human checkpoints (Phase 1's anatomy review and measurements triage, Phase 2's mapping confirmation, Phase 3's
+first-variant and documentation-frame approvals in Figma, and the Copy me / Anatomy / Measurements
 confirmations in Phases 6–8) are the only _required_ stops. Phases 4–5 run on their own and stop
 only on a `blocked` verdict or a repair hard stop. For the full list of every checkpoint and
 hard-stop condition across all eight phases in one place, see [`DECISIONS.md`](DECISIONS.md).
@@ -182,10 +182,10 @@ Read only the documentation needed for the task:
   [`conventions/`](conventions/) (tokens & props, content-selection & mitigations, page structure, Component Set
   rendering, general build mechanics).
 - [`conventions/families.md`](conventions/families.md) — owner / sub-component resolution, lockstep
-  phases, parent-set props, slots, anatomy and specs for families (every phase).
+  phases, parent-set props, slots, anatomy and measurements for families (every phase).
 - [`DECISIONS.md`](DECISIONS.md) — every checkpoint and hard-stop condition across all eight
   phases, in one place.
-- `PHASE-1-ANALYZE.md` … `PHASE-8-DOCUMENT-SPECS.md` — the full workflow, one file per phase (see
+- `PHASE-1-ANALYZE.md` … `PHASE-8-DOCUMENT-MEASUREMENTS.md` — the full workflow, one file per phase (see
   "## Workflow" above).
 - [`packages/tokens/CONTEXT.md`](../../../packages/tokens/CONTEXT.md) — token layers and naming.
 - [`packages/core/CONTEXT.md`](../../../packages/core/CONTEXT.md) — component categories and

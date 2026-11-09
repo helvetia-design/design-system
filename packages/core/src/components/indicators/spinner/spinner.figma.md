@@ -1,6 +1,6 @@
 # spinner → Figma mapping
 
-> **Status: all phases done (rebuilt 04.11.2026 on the new template; legend, Anatomy spacing, sub-labels and label bindings updated to the revised rules the same day). Specs accepted as is, pending the Specs rework.**
+> **Status: all phases done (rebuilt 04.11.2026 on the new template; legend, Anatomy spacing, sub-labels and label bindings updated to the revised rules the same day). Measurements accepted as is, pending the Measurements rework.**
 
 ```yaml
 figmaComponentKey: null # four top-level sets, see figmaSets below
@@ -194,7 +194,7 @@ tokens:
     resolved: true
     note: 'inherited-context; STRING "NONE" — not a bindable field, applied as unbound literal NONE'
 
-specs: # per option of the Variants axis (size)
+measurements: # per option of the Variants axis (size)
   base:
     - { kind: size, label: Logo size, px: 64, token: 🧩 Component/Spinner/Logo/Size/MD }
     - { kind: size, label: Circle size, px: 24, token: 🧩 Component/Spinner/Circle/Size/MD }
@@ -212,7 +212,7 @@ specs: # per option of the Variants axis (size)
 ## Notes
 
 - The logo glyph renders at ~86.3% of its container (`logo-size`), measured per `conventions/tokens-and-props.md`; Phase 3 must account for this rather than assuming 100%.
-- Circle radius is a full circle (50%) and is left out of `specs:`.
+- Circle radius is a full circle (50%) and is left out of `measurements:`.
 - Label position/gap only applies when `label` is set; `labelPosition` is irrelevant without a label (Phase 2 must handle this to avoid redundant variants).
 - No `device:` section: the SCSS has no breakpoint mixins.
 - Completeness checklist: every node (inner logo, inner circle, label text, gap) has all attributes bound or explicitly accepted; no unresolved gaps.
