@@ -51,12 +51,14 @@ describe('skills add', () => {
     expect(copiedSkill).toContain('Manual')
     expect(copiedSkill).toContain('Detect')
     expect(copiedSkill).toContain('CSS utils (coming soon)')
-    expect(copiedSkill).toContain('Assets (coming soon)')
+    expect(copiedSkill).not.toContain('Assets (coming soon)')
+    expect(copiedSkill).toContain('shared/icons.md')
     expect(copiedSkill).toContain('@helvetia-design/core')
     expect(copiedSkill).toContain('@helvetia-design/styles')
     expect(copiedSkill).toMatch(/never runs `git add`/i)
     expect(copiedSkill).toMatch(/git commit/i)
     expect(existsSync(join(cwd, SKILL_RELATIVE_PATH, 'scripts', 'scan-migratable.mjs'))).toBe(true)
+    expect(existsSync(join(cwd, SKILL_RELATIVE_PATH, 'shared', 'icon-name-map.json'))).toBe(true)
   })
 
   it('overwrites a previous copy on re-run', async () => {

@@ -7,7 +7,9 @@ import { promisify } from 'node:util'
 
 const LEGACY_SCOPE = '@baloise'
 const TARGET_SCOPE = '@helvetia-design'
-const SHORT_NAMES = ['angular', 'core', 'react', 'styles']
+const INSTALL_NAMES = ['angular', 'core', 'react', 'styles']
+const SHORT_NAMES = [...INSTALL_NAMES, 'icons', 'brand-icons']
+const ICON_PACKAGES = new Set([`${LEGACY_SCOPE}/ds-icons`, `${LEGACY_SCOPE}/ds-brand-icons`])
 const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', 'out', '.next', '.angular', '.git', '.claude', 'coverage'])
 const LOCKFILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'npm-shrinkwrap.json'])
 const IMPORT_EXTENSIONS = new Set([
@@ -36,6 +38,7 @@ const MISSING_LATEST = `npm view ${targetPackageName('core')} dist-tags did not 
 
 const execFileAsync = promisify(execFile)
 const PACKAGE_RE = new RegExp(`${LEGACY_SCOPE}/ds-(?:${SHORT_NAMES.join('|')})\\b`)
+const INSTALL_RE = new RegExp(`^${LEGACY_SCOPE}/ds-(?:${INSTALL_NAMES.join('|')})$`)
 
 export async function readNpmDistTags(execImpl = execFileAsync) {
   const { stdout } = await execImpl('npm', ['view', targetPackageName('core'), 'dist-tags', '--json'], {
@@ -69,7 +72,7 @@ export async function detectBaloise(rootDir, options = {}) {
     dependencies: found.dependencies,
     imports: found.imports,
     version,
-    aliases: aliasesFor(framework, version),
+    aliases: aliasesFor(framework, version, found.dependencies),
   }
 }
 
@@ -99,23 +102,34 @@ function detectFramework(manifest) {
   return 'html'
 }
 
-function aliasesFor(framework, version) {
-  if (framework === 'react') {
-    return {
-      [targetPackageName('react')]: version,
-      [targetPackageName('styles')]: version,
-    }
-  }
-  if (framework === 'angular') {
-    return {
-      [targetPackageName('angular')]: version,
-      [targetPackageName('styles')]: version,
-    }
-  }
-  return {
+/**
+ * Every framework gets `tokens` and `core` on top of its own binding package, because the
+ * migration makes the consumer import both directly:
+ *
+ * - `tokens` — Init writes an `@helvetia-design/tokens/css/base` import into the consumer's own
+ *   entry file (the `normalize` and bundled `css/all` rules in SKILL.md).
+ * - `core` — the controller and option types live there and are not re-exported by the binding
+ *   packages, so `AlertController`, `Alert`, `ModalController` and `ModalOptions` are imported
+ *   from `@helvetia-design/core` even in a React or Angular app.
+ *
+ * Both currently resolve anyway, as transitive dependencies, but only because npm and Yarn
+ * flatten `node_modules`. Under pnpm's default layout, where only declared dependencies are
+ * linked, those imports fail to resolve. Declaring what the skill tells the consumer to import
+ * is the fix.
+ *
+ * `assets` is added only when the app declared `@baloise/ds-icons` or `@baloise/ds-brand-icons`
+ * directly, because only then does it import icon symbols itself.
+ */
+function aliasesFor(framework, version, dependencies) {
+  const shared = {
     [targetPackageName('core')]: version,
     [targetPackageName('styles')]: version,
+    [targetPackageName('tokens')]: version,
   }
+  if (dependencies.some(name => ICON_PACKAGES.has(name))) shared[targetPackageName('assets')] = version
+  if (framework === 'react') return { [targetPackageName('react')]: version, ...shared }
+  if (framework === 'angular') return { [targetPackageName('angular')]: version, ...shared }
+  return shared
 }
 
 function dependencyNames(manifest) {
@@ -171,7 +185,8 @@ function walk(rootDir, dir, packages, imports) {
     if (entry.name === 'package.json') {
       const manifest = readJson(filePath)
       const dependencies = manifest ? baloiseDependencies(manifest) : []
-      if (dependencies.length > 0) {
+      // An icon-only manifest, such as a workspace root, must not win over the app manifest.
+      if (dependencies.some(name => INSTALL_RE.test(name))) {
         packages.push({ manifest, packageJsonPath: toPosix(rootDir, filePath), dependencies })
       }
       continue

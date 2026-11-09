@@ -5,7 +5,7 @@ description: Migrate a consuming app from the Baloise Design System (bal-*) to t
 
 # ds-migrate-from-baloise
 
-This skill edits files in the consumer's repository and leaves every change unstaged. Reviewing and committing is the consumer's job. This skill never runs `git add` or `git commit`.
+This skill edits files in the consumer's repository and leaves every change unstaged, including the report file `ds-migration-report.md` that `shared/report.md` describes. Reviewing and committing is the consumer's job. This skill never runs `git add` or `git commit`.
 
 ## Menu
 
@@ -14,7 +14,7 @@ On invocation, present this menu and wait for one choice:
 1. **Init** — bootstrap Helvetia packages alongside the existing Baloise install
 2. **Components** — migrate a specific `bal-*` component to `ds-*`
 3. **CSS utils (coming soon)**
-4. **Assets (coming soon)**
+4. **Assets** — migrate legacy icons in files that no component migration touches, and delete the legacy config call once no `bal-*` component is left
 
 Then follow only the matching section below. Stop when that section says to stop.
 
@@ -54,12 +54,17 @@ If `status` is `ready`, show the detected framework, package manager, version, a
      ```
 
    - `font`, `structure`, `core`: leave these three lines unchanged and keep them. Immediately above the first of the three (or, if `normalize` was on the line directly above, immediately below the two new imports), insert one comment noting they must be removed manually once the migration is verified, e.g. `/* TODO: remove these legacy Baloise imports once the Helvetia migration is verified */`. Insert that comment once, not once per line.
-   - Baloise **utilities** line (`css/utilities/all`, any of the nine category files, or `css/utilities/<name>`): do not duplicate this line. Replace it in place with the `@helvetia-design/styles/css/utilities` equivalent, using the matching at-rule or the equivalent local form for the project's `framework`. This avoids both utility stylesheets being loaded and clashing.
-   - Bundled `css/all`: this one file already contains normalize + font + structure + core + utilities together, so — unlike `font`/`structure`/`core` — it cannot be left in place: that would duplicate the utility classes too. Treat it like `normalize`: comment out the original line in place, and immediately below it insert all three, using the matching at-rule:
+   - Baloise **utilities** line (`css/utilities/all`, any of the nine category files, or `css/utilities/<name>`): leave the line unchanged and keep it. The app markup still uses the legacy utility classes, and many of them have no Helvetia equivalent. Insert the `@helvetia-design/styles/css/utilities` equivalent once, immediately below the last Baloise utilities line, using the matching at-rule or the equivalent local form for the project's `framework`. The Helvetia line must load after the Baloise one, so Helvetia wins where both define the same class. Immediately above the first Baloise utilities line, insert one comment noting it must be removed manually once the migration is verified, e.g. `/* TODO: remove the legacy Baloise utilities once no legacy utility class is left */`.
+   - Bundled `css/all`: this one file contains normalize + font + structure + core + utilities together. Its normalize clashes with the Helvetia design system, so comment out the original line in place. Immediately below it, insert the Helvetia base imports, then the legacy parts without normalize, then the Helvetia utilities, using the matching at-rule:
 
      ```scss
      @import '@helvetia-design/tokens/css/base';
      @import '@helvetia-design/styles/css/design-system';
+     /* TODO: remove these legacy Baloise imports once the Helvetia migration is verified */
+     @import '@baloise/ds-styles/css/font';
+     @import '@baloise/ds-styles/css/structure';
+     @import '@baloise/ds-styles/css/core';
+     @import '@baloise/ds-styles/css/utilities/all';
      @import '@helvetia-design/styles/css/utilities';
      ```
 
@@ -67,7 +72,7 @@ If `status` is `ready`, show the detected framework, package manager, version, a
    - When the line is HTML, CSS, or a side-effect import, duplicate the line. In the duplicate only, apply this package map: `@baloise/ds-core` → `@helvetia-design/core`, `@baloise/ds-react` → `@helvetia-design/react`, `@baloise/ds-angular` → `@helvetia-design/angular`, and `@baloise/ds-styles` → `@helvetia-design/styles`.
    - When the line is JSON, such as an `angular.json` styles entry, insert a sibling string with that same package replacement. Keep the file valid JSON. Do not copy surrounding keys, and do not duplicate the whole file when the match is only one string.
    - If that duplicate would still be an `http://` or `https://` URL, do not write the URL. Insert the local form below instead.
-   - Do not duplicate `kind` `reference` lines. Those are component imports; migrating them is a later menu item.
+   - Do not duplicate `kind` `reference` lines. Those are component and icon imports; **Components** migrates them.
    - If there is no `bootstrap` import, insert the local form immediately after the first `reference` line, without editing that line.
    - Skip the insert when the same `@helvetia-design` line is already the next line.
    - Local form when `framework` is `html`:
@@ -85,7 +90,7 @@ If `status` is `ready`, show the detected framework, package manager, version, a
 
    - Local form when the target file is `.scss`/`.sass` instead (regardless of `framework`): use `@import '@helvetia-design/styles/css/design-system';`, or `@use` if that is the at-rule already used by Baloise lines in that same file.
 
-4. Report the resolved `version`, the aliases written, the install command, and every file touched.
+4. Write the Init section of `ds-migration-report.md` as `shared/report.md` describes. Create the file when it is missing, so this section is its first entry. Under `### Setup`, list the resolved `version`, the aliases written, and the install command. Under `### Files changed`, list every file touched. Every existing `@helvetia-design/*` value that step 1 left unchanged goes under **Needs your attention**, with both values. In chat, show the whole section (attention lines, Setup, and Files changed) and end with the line `Report written to ds-migration-report.md.`
 5. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.
 
 ### Components
@@ -94,6 +99,25 @@ Present this menu and wait for one choice:
 
 1. **Manual** — choose from every available component migration
 2. **Detect** — scan the project and suggest applicable component migrations
+
+Every component migration also migrates the legacy icons in the files it touches. Follow `shared/icons.md` alongside the chosen file:
+
+- After the file's Scan step, run the icon scan from `shared/icons.md` for every file with a finding, and show its findings with the component findings. The file's single confirmation covers both.
+- In the Rewrite step, apply the icon rules to those files as well.
+- In the Report step, append the `I1.`, `I2.`, ... items from the Report section of `shared/icons.md` to the checklist, after the component items.
+
+Every Report step writes to `ds-migration-report.md` as `shared/report.md` describes, and shows only the items that need attention in chat.
+
+Every form component migration also removes the legacy field wrapper around the controls it migrates. Follow `shared/field.md` alongside the chosen file:
+
+- In the Rewrite step, apply its rules to every migrated control that sits inside `bal-field` or `bal-field-control`, or that a `bal-field-message` directly follows, in the same pass.
+- In the Report step, append the `F1.`, `F2.`, ... items from the Report section of `shared/field.md` to the checklist, after the component items and before the icon items.
+
+Every component migration also decides about the legacy config call. Follow `shared/legacy-config.md` after the icon rules:
+
+- After the file's Scan step, run its Scan section. When no `bal-*` component will be left, show each legacy config call with the component findings as a call to delete. The file's single confirmation covers it.
+- In the Rewrite step, after the icon and field rules, apply its Decide section.
+- In the Report step, append the `L1.`, `L2.`, ... items from the Report section of `shared/legacy-config.md` to the checklist, after the icon items.
 
 #### Manual
 
@@ -121,6 +145,13 @@ Build a picker from every entry in `suggested`, showing its `name` and `total`. 
 
 Report "coming soon" and stop.
 
-### Assets (coming soon)
+### Assets
 
-Report "coming soon" and stop.
+Migrate every legacy icon left in the project, following `shared/icons.md`. Component migrations already handle the icons in the files they touch. This step covers the rest, such as a constants file that imports `balBrandIcon*` symbols but has no `bal-*` tag. It also deletes the legacy config call once no `bal-*` component is left, following `shared/legacy-config.md`.
+
+1. Run the icon scan from `shared/icons.md` without file arguments, so it covers the whole project. Show the findings grouped by file (path, line, snippet) and end with the total count. Then run the Scan section of `shared/legacy-config.md`. No component is being migrated here, so every `bal-*` component that `scan-migratable.mjs` reports counts as left. List each call it marks for deletion after the icon findings.
+2. When step 1 listed icon findings, ask one yes/no: rewrite every listed usage and delete every listed call? When it listed only calls to delete, ask one yes/no: delete every listed call? On no, stop with the files unchanged. When it listed neither, say there are no legacy icons left to migrate and skip step 3.
+3. When the icon scan found anything, apply every rule in `shared/icons.md` to the listed files.
+4. Apply the Decide section of `shared/legacy-config.md`.
+5. Append an `assets` section to `ds-migration-report.md` as `shared/report.md` describes. Its checklist holds the `I1.`, `I2.`, ... items from the Report section of `shared/icons.md`, then the `L1.`, `L2.`, ... items from the Report section of `shared/legacy-config.md`. Skip the final whole-project scan of `shared/icons.md`, which this step already is.
+6. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.

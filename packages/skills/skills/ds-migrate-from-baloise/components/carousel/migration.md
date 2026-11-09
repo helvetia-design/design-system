@@ -87,7 +87,7 @@ When there is no `href` but `elementType`, `name` (the button's form name — di
 | `controls="dots"`  | `controls="dots"`   | Copy as-is.                                                                                                                                                                                     |
 | `controls="large"` | `controls="large"`  | Copy as-is.                                                                                                                                                                                     |
 | `controls="none"`  | `controls="none"`   | Copy as-is.                                                                                                                                                                                     |
-| `controls="small"` | `controls="large"`  | `ds-carousel` has only one arrow-button size. Rewrite to `large`, the nearest shape (prev/next arrow buttons). Mention the size change in the summary.                                          |
+| `controls="small"` | `controls="large"`  | `ds-carousel` has only one arrow-button size. Rewrite to `large`, the nearest shape (prev/next arrow buttons). Mention the size change in the report.                                           |
 | `controls="tabs"`  | _(no equivalent)_   | `ds-carousel` has no tab-style pagination (a row of buttons showing each item's label). Drop the attribute — it falls back to the `dots` default — and flag every occurrence for manual review. |
 
 ### `interface` → `variant`
@@ -96,8 +96,8 @@ When there is no `href` but `elementType`, `name` (the button's form name — di
 | ----------------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | omitted, `interface=""` | omit `variant`   | `slide` is the default on both sides.                                                                                                                                                                                                                                                           |
 | `interface="image"`     | omit `variant`   | `slide` is the nearest match (one item visible at a time, scroll-snap). The legacy `aspectRatio` prop enforced a fixed image aspect ratio via padding; `ds-carousel-item` has no such prop — the `<img>` now sizes by its natural content. Mention every `aspectRatio` found (see Props below). |
-| `interface="card"`      | `variant="tile"` | `tile` is the nearest match (multiple items, horizontal scroll, edge-fade on overflow). The legacy bleed-margin and shadow styling is superseded by the new tile styling — nothing for the consumer to do, just mention the visual change in the summary.                                       |
-| `interface="product"`   | `variant="tile"` | Same as `card`. The legacy fixed-width colored product buttons are superseded by the new tile + item `color` styling (see Props below) — mention the visual change in the summary.                                                                                                              |
+| `interface="card"`      | `variant="tile"` | `tile` is the nearest match (multiple items, horizontal scroll, edge-fade on overflow). The legacy bleed-margin and shadow styling is superseded by the new tile styling — nothing for the consumer to do, just mention the visual change in the report.                                        |
+| `interface="product"`   | `variant="tile"` | Same as `card`. The legacy fixed-width colored product buttons are superseded by the new tile + item `color` styling (see Props below) — mention the visual change in the report.                                                                                                               |
 
 ### Other `bal-carousel` props
 
@@ -159,6 +159,41 @@ The scan does not list a file that only listens or only calls a method and never
 
 ## 4. Report
 
-Print a per-file summary of what changed, including: every synthesized `ds-carousel-item` name; every `value` rewritten from an index to a name, and every `value` left as a non-literal expression needing a name-based state change; every `controls="small"` rewritten to `large`; every dropped `controls="tabs"`; every `interface`→`variant` collapse and its associated visual-detail note (aspect ratio, card bleed styling, product button styling); every dropped `controlsOverflow`, `inverted`, `fullHeight`, `aspectRatio`, `controlsSticky`, `scrollY`, `border`, `htmlRole`, and `space`; every item rewritten into a wrapped `<a>` (with `navigation` added) or `<button>` (flagged for review); every dropped `color="white"`; every dropped `svg` with the `ds-brand-icon` guidance; every `label` moved into slot text versus dropped; every `balNavigate`/`balFocus`/`balBlur` rewritten to native events; every handler whose event detail changed from a number to `{ value }`; and every `previous()`, `next()`, or `setFocus()` call flagged as having no replacement. End with the note that files which only listen or only call a method, and have no scanned `.html` of the same name beside them, were not scanned. Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Done when the summary is printed and the working tree is still unstaged.
+Needs your attention when found:
+
+1. Every `value` left as a non-literal expression. The surrounding state must now hold the item name, not an index.
+2. Every `controls="small"` rewritten to `large`.
+3. Every dropped `controls="tabs"`.
+4. Every `interface="image"` collapsed to the default `variant`, with the note that the images lost their fixed aspect ratio.
+5. Every `interface="card"` collapsed to `variant="tile"`, with the note that the card bleed styling changed.
+6. Every `interface="product"` collapsed to `variant="tile"`, with the note that the product button styling changed.
+7. Every dropped `controlsOverflow`.
+8. Every dropped `inverted`.
+9. Every dropped `fullHeight`.
+10. Every dropped `aspectRatio`.
+11. Every dropped `scrollY` that was `false`.
+12. Every dropped `border`.
+13. Every dropped `space`, with a pointer to the `--carousel-gap` CSS custom property.
+14. Every item rewritten into a wrapped `<button>`, flagged for visual and behaviour review.
+15. Every dropped `color="white"`.
+16. Every dropped `svg`, with the guidance to slot a `ds-brand-icon` instead.
+17. Every `label` dropped because the item already had slotted content. The custom aria-label is lost.
+18. Every `balNavigate`, `balFocus` or `balBlur` rewritten to a native event on the wrapped element.
+19. Every handler whose event detail changed from a number to `{ value }`.
+20. Every `previous()`, `next()` or `setFocus()` call, flagged as having no replacement.
+21. One-time note: files which only listen or only call a method, and have no scanned `.html` of the same name beside them, were not scanned.
+
+Coverage only, written to the file:
+
+22. Every synthesized `ds-carousel-item` name.
+23. Every `value` rewritten from an index to a name.
+24. Every dropped `controlsSticky`.
+25. Every dropped `htmlRole`.
+26. Every item rewritten into a wrapped `<a>`, with `navigation` added.
+27. Every `label` moved into the slot as plain text.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

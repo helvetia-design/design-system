@@ -161,22 +161,45 @@ Rewrite `balChange` listeners only on a migrated element. `balChange` is emitted
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `bal-tab-item` split into a tab and panel, every navigation group and the `aria-current` the router must set, every `noPanel` item, every deleted `vertical="mobile"`, `vertical="tablet"`, `optionalTabSelection`, `clickable`, `prevent`, `icon`, `svg`, `bubble`, `subLabel`, `a11yControls` and layout prop, every `active` moved to `value` or dropped, every `balChange` listener whose detail is no longer the tab value string or that relied on a programmatic change, and every import that changed.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Also report what was left in place:
+Needs your attention when found:
 
-- Groups with `accordion` (point to `ds-accordion`), `options`, a static `disabled` or `invisible` item, `handleAsTabList` with `href`, mixed items, or no panel at all, each with the reason.
-- Tabs built in a loop, with the note that the tabs and panels must be rebuilt as children by hand.
-- Items without `value` and items with a dynamic label that could not be rewritten.
-- `select()`, `getOptionByValue()`, `renderLine()`, `closeAccordion()`, `getOptions()`, `setActive()`, `balNavigate`, `balKeyDown`, `balWillAnimate`, `balDidAnimate` and `BalTabOption`.
+1. Every navigation group, with the `aria-current` the router must set.
+2. Every deleted `vertical="mobile"` and `vertical="tablet"`, as a visual change.
+3. Every deleted `optionalTabSelection`, as a functional change. `ds-tabs` selects the first tab when `value` is not set.
+4. Every deleted `clickable`, as a functional change when it was `false`.
+5. Every deleted `prevent`. The slotted `<a>` is left to the consumer's router.
+6. Every deleted `icon`, `svg`, `bubble` and `subLabel`.
+7. Every deleted `a11yControls`.
+8. Every deleted layout prop, as a visual change.
+9. Every `active` dropped.
+10. Every `balChange` listener whose detail is no longer the tab value string.
+11. Every `balChange` listener that relied on a programmatic change. `dsChange` fires on a user click or key press only.
+12. Every group left in place because of `accordion`. Point to `ds-accordion`. Name file and line.
+13. Every group left in place because of `options`. Name file and line.
+14. Every group left in place because of a static `disabled` or `invisible` item. Name file and line.
+15. Every group left in place because of `handleAsTabList` with `href`. Name file and line.
+16. Every group left in place because it mixes items. Name file and line.
+17. Every group left in place because it has no panel at all. Name file and line.
+18. Every set of tabs built in a loop, left in place, with the note that the tabs and panels must be rebuilt as children by hand. Name file and line.
+19. Every item without `value`, left in place. Name file and line.
+20. Every item with a dynamic label that could not be rewritten. Name file and line.
+21. Every left-in-place call to `select()`, `getOptionByValue()`, `renderLine()`, `closeAccordion()`, `getOptions()` or `setActive()`.
+22. Every left-in-place `balNavigate`, `balKeyDown`, `balWillAnimate` or `balDidAnimate` listener.
+23. Every left-in-place `BalTabOption` reference.
+24. Every ambient type reference `BalProps.BalTabs*`, `BalEvents.BalTabs*`, `HTMLBalTabsElement` and `HTMLBalTabItemElement`. The scan cannot see them. Grep for them and rename by hand. The scan does list `Components.BalTabs`, because it matches the bare `BalTabs` symbol. Treat it as a type reference too.
+25. Every legacy `bal-tabs__*` class, the `bal-tab-item` class and `data-testid` selector. They no longer match, because `ds-tabs` uses shadow DOM.
+26. One-time note: in navigation mode, `ds-tabs` takes an accessible `label` for its `<nav>` landmark. Nothing was added. Suggest the consumer adds one that fits the page.
 
-Also report what the scan cannot see:
+Coverage only, written to the file:
 
-- Ambient type references `BalProps.BalTabs*`, `BalEvents.BalTabs*`, `HTMLBalTabsElement` and `HTMLBalTabItemElement`. Grep for them and rename by hand. The scan does list `Components.BalTabs`, because it matches the bare `BalTabs` symbol. Treat it as a type reference too.
-- Legacy `bal-tabs__*` classes, the `bal-tab-item` class and `data-testid` selectors no longer match, because `ds-tabs` uses shadow DOM.
-- In navigation mode, `ds-tabs` takes an accessible `label` for its `<nav>` landmark. Nothing was added. Suggest the consumer adds one that fits the page.
-- Keyboard and roles. In panels mode, arrow keys, Home and End move the tab, and the roles stay `tablist` and `tab`. Navigation mode renders links.
+27. Every `bal-tab-item` split into a tab and panel.
+28. Every `noPanel` item.
+29. Every `active` moved to `value`.
+30. Every import that changed.
+31. One-time note: keyboard and roles. In panels mode, arrow keys, Home and End move the tab, and the roles stay `tablist` and `tab`. Navigation mode renders links.
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 
-Done when the summary is printed and the working tree is still unstaged.
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

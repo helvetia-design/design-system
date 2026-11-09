@@ -22,6 +22,14 @@ on:
   pull_request:
     types: [opened, closed]
 
+# `issue_comment` runs the workflow file from the default branch with the repository default token
+# permissions, which are read-only. The progress/result comments and the screenshot commit both
+# need write access, so grant it explicitly.
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
 jobs:
   assembleInformation:
     name: 📝 Assemble Information

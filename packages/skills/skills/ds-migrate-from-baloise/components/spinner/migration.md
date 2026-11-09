@@ -56,6 +56,12 @@ There are no event changes. Neither `bal-spinner` nor `ds-spinner` emits a custo
 
 ## 4. Report
 
-Print a per-file summary of what changed. Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Done when the summary is printed and the working tree is still unstaged.
+Coverage only, written to the file:
+
+1. Every `bal-spinner` tag rewritten to `ds-spinner`, with its count.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

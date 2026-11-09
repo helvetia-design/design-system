@@ -4,6 +4,8 @@ Migrate every `bal-textarea` usage to `ds-textarea`. Init has already added the 
 
 The legacy folder has no child tags. `bal-textarea` is the only tag in this migration.
 
+A surrounding `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrapper is handled by `shared/field.md` in the Rewrite step, in the same pass. `components/field/migration.md` migrates `bal-form-grid` and `bal-form-col`.
+
 ## 1. Scan
 
 `<project-root>` is the consumer project root that contains the app lockfile. When the skill is invoked from that root, use the current directory.
@@ -76,24 +78,29 @@ The detail types `BalEvents.BalTextarea*Detail` and the wrapper type `BalTextare
 
 ### Methods
 
-`setFocus()`, `setBlur()` and `getInputElement()` keep their names. `setAriaForm()` on `bal-textarea` was `@internal` and never part of the public API. Drop any reference silently, without a summary mention.
+`setFocus()`, `setBlur()` and `getInputElement()` keep their names. `setAriaForm()` on `bal-textarea` was `@internal` and never part of the public API. Drop any reference silently, without a mention in the report.
 
 Angular splits a component across `x.component.html` and `x.component.ts`, and the class file often calls these methods through `@ViewChild` or `viewChild` without naming the tag, so the scan cannot see it. For every `.html` finding, open the same-basename `.ts` file beside it and check it for `setAriaForm` calls and for `balChange`, `balInput`, `balBlur`, `balFocus`, and `balKeyPress`. React and plain HTML callers hold the element in a ref or a query result, so look for calls on that variable in the same file.
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `required` that was set to false, every event handler that was renamed, and every handler, slot content, type, and unsupported prop (`clickable`) that needs manual rework.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Report this logic change the scan cannot see, so the consumer can check it:
+Needs your attention when found:
 
-- **Empty value**: a cleared field now yields `null` where legacy yielded `undefined`. Code that checks `=== undefined` needs review. List each handler or form binding that reads the value.
+1. Every handler that needs manual rework.
+2. Every piece of slot content that needs manual rework.
+3. Every type that needs manual rework.
+4. Every unsupported `clickable` left in place.
+5. Every handler or form binding that reads the value. A cleared field now yields `null` where legacy yielded `undefined`. Code that checks `=== undefined` needs review.
+6. One-time note: `ds-textarea` has `label`, `description` and `color`. Fields may need a `label` now. Do not add one yourself, and do not add attributes to compensate.
+7. Every selector that targeted the legacy element and that the scan cannot see (classes starting with `bal-textarea` and the `bal-textarea-input` test id). Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.
 
-Also report the rendering difference, so the consumer can check it. Do not add attributes to compensate:
+Coverage only, written to the file:
 
-- `ds-textarea` has `label`, `description`, and `color`. Fields may need a `label` now. Do not add one yourself.
+8. Every `required` that was set to false.
+9. Every event handler that was renamed.
 
-Also list every selector that targeted the legacy element and that the scan cannot see (classes starting with `bal-textarea` and the `bal-textarea-input` test id). Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
-
-Done when the summary is printed and the working tree is still unstaged.
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

@@ -1,11 +1,18 @@
 import { Injectable } from '@angular/core'
 import { dsSnackbarController } from '@helvetia-design/core'
+import { defineCustomElement as defineDsAlertContainer } from '@helvetia-design/core/components/ds-alert-container.js'
+import { defineCustomElement as defineDsSnackbar } from '@helvetia-design/core/components/ds-snackbar.js'
 import { toAlert, type DsAlertOptions } from './alert-options'
 
 @Injectable({
   providedIn: 'root',
 })
 export class DsSnackbarService {
+  constructor() {
+    defineDsAlertContainer()
+    defineDsSnackbar()
+  }
+
   /**
    * Shows a snackbar and resolves with its id. Resolves with an empty string when an identical snackbar is
    * already visible.

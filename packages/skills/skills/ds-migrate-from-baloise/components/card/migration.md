@@ -58,7 +58,7 @@ When `bal-card-title` or `bal-card-subtitle` appears as a **direct child of `bal
 
 When `bal-card` has no `bal-card-title` and no `bal-card-subtitle` among its direct children, there is nothing to wrap: just rename the tags in place.
 
-When a `bal-card-title` or `bal-card-subtitle` is nested deeper than a direct child (for example inside its own wrapper `div`), do not guess how far to lift it. Rename the tag in place and report it in the summary as a header grouping that needs manual review.
+When a `bal-card-title` or `bal-card-subtitle` is nested deeper than a direct child (for example inside its own wrapper `div`), do not guess how far to lift it. Rename the tag in place and report it in the report as a header grouping that needs manual review.
 
 ### `bal-card-button`
 
@@ -68,9 +68,9 @@ When a `bal-card-title` or `bal-card-subtitle` is nested deeper than a direct ch
 | ----------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------ |
 | _(always)_              | `color="info"`                     | Legacy always hardcoded `color="info"` internally. Write it explicitly.                          |
 | _(always)_              | `wide`                             | Legacy always hardcoded `expanded` internally, the equivalent of `ds-button`'s `wide`. Write it. |
-| _(always)_              | _(no `bottom-rounded` equivalent)_ | `ds-button` has no bottom-rounded corner variant. Drop it and report it in the summary.          |
-| `icon`                  | `icon`                             | Copy as-is.                                                                                      |
-| `iconRight`             | `iconRight`                        | Copy as-is.                                                                                      |
+| _(always)_              | _(no `bottom-rounded` equivalent)_ | `ds-button` has no bottom-rounded corner variant. Drop it and report it in the report.           |
+| `icon`                  | `icon`                             | Copy the value, then apply the icon name rule from `shared/icons.md`.                            |
+| `iconRight`             | `iconRight`                        | Copy the value, then apply the icon name rule from `shared/icons.md`.                            |
 | `elementType`           | `elementType`                      | Copy as-is.                                                                                      |
 | `disabled`              | `disabled`                         | Copy as-is.                                                                                      |
 | `href`                  | `href`                             | Copy as-is.                                                                                      |
@@ -93,20 +93,20 @@ When a `bal-card-title` or `bal-card-subtitle` is nested deeper than a direct ch
 
 ### Props (`bal-card`)
 
-| old                                     | new (`ds-card`)                         | handling                                                                                                                                                                                                                                          |
-| --------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `flat`                                  | `flat`                                  | Copy as-is.                                                                                                                                                                                                                                       |
-| `inverted`                              | `inverted`                              | Copy as-is. Both mean "card background becomes blue/primary".                                                                                                                                                                                     |
-| `clickable`                             | `clickable`                             | Copy as-is.                                                                                                                                                                                                                                       |
-| `selected`                              | `selected`                              | Copy as-is.                                                                                                                                                                                                                                       |
-| `fullheight`                            | `fullheight`                            | Copy as-is.                                                                                                                                                                                                                                       |
-| `square`                                | _(no equivalent)_                       | Drop it. `ds-card` has no square-corner variant. Mention each dropped `square` in the summary.                                                                                                                                                    |
-| `border` alone (no real `color`)        | `color="dashed"`                        | The legacy border look (`var(--bal-border-width-normal) dashed var(--bal-color-grey)`) is now the `dashed` color value, not a separate prop.                                                                                                      |
-| `border` together with a real `color`   | drop `border`, keep `color`             | `color` can only be one value in `ds-card`. Keep the mapped `color` (below) and drop `border`. Mention every dropped `border` in the summary.                                                                                                     |
-| `space="small"`                         | `space="sm"`                            | Rewrite to the short value.                                                                                                                                                                                                                       |
-| `space="large"`                         | `space="lg"`                            | Rewrite to the short value.                                                                                                                                                                                                                       |
-| `space="medium"` / `space=""` / omitted | omit `space`                            | `ds-card`'s own unset default padding (1.25rem) is the nearest match; it does not scale responsively by breakpoint like the legacy value did. Mention that loss of responsive scaling in the summary whenever `space` was not `small` or `large`. |
-| _(none)_                                | `tile`, `dense`, `imageTeaser`, `align` | New props. Nothing to migrate from. Leave them unset.                                                                                                                                                                                             |
+| old                                     | new (`ds-card`)                         | handling                                                                                                                                                                                                                                         |
+| --------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `flat`                                  | `flat`                                  | Copy as-is.                                                                                                                                                                                                                                      |
+| `inverted`                              | `inverted`                              | Copy as-is. Both mean "card background becomes blue/primary".                                                                                                                                                                                    |
+| `clickable`                             | `clickable`                             | Copy as-is.                                                                                                                                                                                                                                      |
+| `selected`                              | `selected`                              | Copy as-is.                                                                                                                                                                                                                                      |
+| `fullheight`                            | `fullheight`                            | Copy as-is.                                                                                                                                                                                                                                      |
+| `square`                                | _(no equivalent)_                       | Drop it. `ds-card` has no square-corner variant. Mention each dropped `square` in the report.                                                                                                                                                    |
+| `border` alone (no real `color`)        | `color="dashed"`                        | The legacy border look (`var(--bal-border-width-normal) dashed var(--bal-color-grey)`) is now the `dashed` color value, not a separate prop.                                                                                                     |
+| `border` together with a real `color`   | drop `border`, keep `color`             | `color` can only be one value in `ds-card`. Keep the mapped `color` (below) and drop `border`. Mention every dropped `border` in the report.                                                                                                     |
+| `space="small"`                         | `space="sm"`                            | Rewrite to the short value.                                                                                                                                                                                                                      |
+| `space="large"`                         | `space="lg"`                            | Rewrite to the short value.                                                                                                                                                                                                                      |
+| `space="medium"` / `space=""` / omitted | omit `space`                            | `ds-card`'s own unset default padding (1.25rem) is the nearest match; it does not scale responsively by breakpoint like the legacy value did. Mention that loss of responsive scaling in the report whenever `space` was not `small` or `large`. |
+| _(none)_                                | `tile`, `dense`, `imageTeaser`, `align` | New props. Nothing to migrate from. Leave them unset.                                                                                                                                                                                            |
 
 ### `color`
 
@@ -135,7 +135,7 @@ The legacy and new color scales do not line up by name. The hex values behind th
 | `color="green-light"` / `color="green-1"`   | `color="green"`       | exact                                                                                               |
 | `color="green-2"`                           | `color="green"`       | approximate — nearest tier, mention it                                                              |
 | `color="success"`                           | `color="green-dark"`  | approximate — legacy `success` used its own color ramp; `green-dark` is the closest hue, mention it |
-| `color` not a string literal                | leave the expression  | Do not guess a runtime color. Mention it in the summary.                                            |
+| `color` not a string literal                | leave the expression  | Do not guess a runtime color. Mention it in the report.                                             |
 
 ### `bal-card-actions`
 
@@ -148,14 +148,14 @@ The legacy and new color scales do not line up by name. The hex values behind th
 
 ### `bal-card-subtitle`
 
-| old                                                                              | new (`ds-card-subtitle`) | handling                                                                                                                                                                                |
-| -------------------------------------------------------------------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `inverted`                                                                       | `inverted`               | Copy as-is.                                                                                                                                                                             |
-| `bold`                                                                           | `bold`                   | Copy as-is.                                                                                                                                                                             |
-| `color` omitted, `color=""`, `color="primary"`, `color="info"` or `color="blue"` | omit `color`             | `ds-card-subtitle` has no `color` prop. These legacy values all resolved to the default colour, so the visible colour does not change. Drop `color`.                                    |
-| `color="white"`                                                                  | `inverted`               | `ds-card-subtitle` has no `color` prop; set the `inverted` prop instead (it renders white text) and drop `color`. Do **not** write `color="inverted"`.                                  |
-| `color="success"` / `color="warning"` / `color="danger"`                         | _(no equivalent)_        | Drop `color`. The subtitle renders in the default colour. Do not pick a substitute. Mention each one in the summary.                                                                    |
-| `[color]="x"`, `[attr.color]="x"`, `color={x}`                                   | remove the binding       | `ds-card-subtitle` has no `color` prop and the value cannot be mapped statically. Remove the binding and list the file and line in the summary, so the caller can switch to `inverted`. |
+| old                                                                              | new (`ds-card-subtitle`) | handling                                                                                                                                                                               |
+| -------------------------------------------------------------------------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `inverted`                                                                       | `inverted`               | Copy as-is.                                                                                                                                                                            |
+| `bold`                                                                           | `bold`                   | Copy as-is.                                                                                                                                                                            |
+| `color` omitted, `color=""`, `color="primary"`, `color="info"` or `color="blue"` | omit `color`             | `ds-card-subtitle` has no `color` prop. These legacy values all resolved to the default colour, so the visible colour does not change. Drop `color`.                                   |
+| `color="white"`                                                                  | `inverted`               | `ds-card-subtitle` has no `color` prop; set the `inverted` prop instead (it renders white text) and drop `color`. Do **not** write `color="inverted"`.                                 |
+| `color="success"` / `color="warning"` / `color="danger"`                         | _(no equivalent)_        | Drop `color`. The subtitle renders in the default colour. Do not pick a substitute. Mention each one in the report.                                                                    |
+| `[color]="x"`, `[attr.color]="x"`, `color={x}`                                   | remove the binding       | `ds-card-subtitle` has no `color` prop and the value cannot be mapped statically. Remove the binding and list the file and line in the report, so the caller can switch to `inverted`. |
 
 ### `bal-card-title`
 
@@ -177,6 +177,26 @@ Neither component family has any public methods.
 
 ## 4. Report
 
-Print a per-file summary of what changed, including: every synthesized `ds-card-header` and what it wrapped; every `bal-card-button` rewritten into a `ds-button` plus whether a `ds-card-actions` was reused or created, and the dropped `bottom-rounded` look; every dropped `square`; every `border` dropped because a real `color` was also set, and every lone `border` turned into `color="dashed"`; every `space` value that lost its responsive breakpoint scaling; every color rewritten under an "approximate" or "hue only" match in the color table, listed with its old and new value; every `bal-card-title`/`bal-card-subtitle` found nested too deep to auto-wrap into a header; every non-literal `color` expression left untouched on `bal-card`, and every `bal-card-subtitle` `color` binding removed or dropped with no equivalent. Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Done when the summary is printed and the working tree is still unstaged.
+Needs your attention when found:
+
+1. Every `bal-card-button` that lost its `bottom-rounded` look.
+2. Every dropped `square`.
+3. Every `border` dropped because a real `color` was also set.
+4. Every `space` value that lost its responsive breakpoint scaling.
+5. Every color rewritten under an "approximate" or "hue only" match in the color table, with its old and new value.
+6. Every `bal-card-title` or `bal-card-subtitle` nested too deep to wrap into a header automatically. The header grouping needs manual review.
+7. Every non-literal `color` expression left untouched on `bal-card`.
+8. Every `bal-card-subtitle` `color` binding removed. The caller can switch to `inverted`.
+9. Every `bal-card-subtitle` `color` dropped with no equivalent: `success`, `warning` or `danger`.
+
+Coverage only, written to the file:
+
+10. Every synthesized `ds-card-header` and what it wrapped.
+11. Every `bal-card-button` rewritten into a `ds-button`, and whether it reused or created a `ds-card-actions`.
+12. Every lone `border` turned into `color="dashed"`.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.
