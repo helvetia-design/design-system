@@ -4,10 +4,58 @@ import { extname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', 'out', '.next', '.angular', '.git', '.claude', 'coverage'])
 const EXTENSIONS = new Set(['.tsx', '.jsx', '.html', '.ts'])
 
-export function scanSourceFiles(rootDir, collect, extensions = EXTENSIONS) {
+/**
+ * Walks the source files under `rootDir`, or only the files and directories in `paths`, and returns the paths that match no source file.
+ */
+export function scanSourceFiles(rootDir, collect, { extensions = EXTENSIONS, paths = [] } = {}) {
   const root = realpathSync(resolve(rootDir))
   if (!statSync(root).isDirectory()) throw new Error(`Scan root is not a directory: ${root}`)
-  walk(root, root, collect, extensions)
+  if (paths.length === 0) {
+    walk(root, root, collect, extensions)
+    return []
+  }
+
+  const seen = new Set()
+  const collectOnce = source => {
+    if (seen.has(source.file)) return
+    seen.add(source.file)
+    collect(source)
+  }
+  const unmatched = new Set()
+  for (const path of paths) {
+    const target = resolvePath(root, path)
+    if (target.real === root) {
+      walk(root, root, collectOnce, extensions)
+    } else if (
+      !target.real ||
+      isAbsolute(target.rel) ||
+      target.rel.split('/').some(part => part === '..' || SKIP_DIRS.has(part))
+    ) {
+      unmatched.add(target.rel)
+    } else if (statSync(target.real).isDirectory()) {
+      walk(root, target.real, collectOnce, extensions)
+    } else if (extensions.has(extname(target.real))) {
+      readSource(root, target.real, collectOnce)
+    } else {
+      unmatched.add(target.rel)
+    }
+  }
+  return [...unmatched].sort()
+}
+
+function resolvePath(root, path) {
+  const absolute = resolve(root, path)
+  let real
+  try {
+    real = realpathSync(absolute)
+  } catch {
+    return { rel: toPosix(relative(root, absolute)) }
+  }
+  return { real, rel: toPosix(relative(root, real)) }
+}
+
+function toPosix(path) {
+  return path.split(sep).join('/')
 }
 
 function walk(rootDir, dir, collect, extensions) {
@@ -55,7 +103,7 @@ function readSource(rootDir, filePath, collect) {
   let masked
   let comments
   collect({
-    file: relative(rootDir, filePath).split(sep).join('/'),
+    file: toPosix(relative(rootDir, filePath)),
     text,
     get masked() {
       masked ??= maskSource(text, extension === '.html')
@@ -66,34 +114,6 @@ function readSource(rootDir, filePath, collect) {
       return comments
     },
   })
-}
-
-/** Scans the whole root, or only `files` (paths relative to the root), and returns the paths that matched no source file. */
-export function scanSelectedFiles(rootDir, files, collect, extensions) {
-  const root = realpathSync(resolve(rootDir))
-  const only = files.length > 0 ? new Set(files.map(file => toRootRelative(root, file))) : undefined
-  const scanned = new Set()
-  scanSourceFiles(
-    root,
-    source => {
-      if (only && !only.has(source.file)) return
-      scanned.add(source.file)
-      collect(source)
-    },
-    extensions,
-  )
-  return only ? [...only].filter(file => !scanned.has(file)).sort() : []
-}
-
-export function toRootRelative(root, file) {
-  const absolute = resolve(root, file)
-  let real = absolute
-  try {
-    real = realpathSync(absolute)
-  } catch {
-    // A missing file keeps its resolved path and ends up in `unmatched`.
-  }
-  return relative(root, real).split(sep).join('/')
 }
 
 function commentKind(extension) {

@@ -8,7 +8,7 @@ import {
   endOfSubstitution,
   lineText,
   readTag,
-  scanSelectedFiles,
+  scanSourceFiles,
   toSnippet,
 } from './source-scan.mjs'
 
@@ -144,7 +144,10 @@ export function scanCssUtils(rootDir, files = []) {
   const index = loadMap()
   const found = []
   const dynamic = []
-  const unmatched = scanSelectedFiles(rootDir, files, source => collect(source, index, found, dynamic), EXTENSIONS)
+  const unmatched = scanSourceFiles(rootDir, source => collect(source, index, found, dynamic), {
+    extensions: EXTENSIONS,
+    paths: files,
+  })
   const result = { ...group(found), dynamic: sortDynamic(dynamic) }
   return unmatched.length > 0 ? { ...result, unmatched } : result
 }
