@@ -80,7 +80,7 @@ The legacy config call (`initializeBaloiseDesignSystem`, `useBaloiseDesignSystem
 
 The `A` items sit between the `I` items of `shared/icons.md` and the `L` items of `shared/legacy-config.md` in the Assets checklist.
 
-`scripts/scan-assets.mjs` prints `{ total, project: { framework, publicDir, angularAssets }, files }`. `files` keeps the flat `{ file, findings: [{ line, snippet }] }` shape of the component scanners. `project` is the one extra field, because the target folder depends on the project layout, not on any single line: whether `public/` exists or a Vite or Next config sits at the root, and which `angular.json` `assets` entries name `src/assets`. A component scanner never needs that, so it stays flat. `framework` comes from `detectFramework` in `detect-baloise.mjs`. The scanner imports it, `readJson` and `IMPORT_EXTENSIONS` from there instead of copying them, and adds `.mts` and `.cts`.
+`scripts/scan-assets.mjs` prints `{ total, project: { framework, publicDir, angularAssets }, files }`. `files` keeps the flat `{ file, findings: [{ line, snippet }] }` shape of the component scanners. `project` is the one extra field, because the target folder depends on the project layout, not on any single line: whether `public/` exists or a Vite or Next config sits at the root, and which `angular.json` `assets` entries name `src/assets`, including the arrays under `configurations`. A component scanner never needs that, so it stays flat. `framework` comes from `detectFramework` in `detect-baloise.mjs`. The scanner imports it, `readJson` and `IMPORT_EXTENSIONS` from there instead of copying them, and adds `.mts` and `.cts`.
 
 ### Field wrapper travels with the control migration
 

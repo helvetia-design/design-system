@@ -141,6 +141,35 @@ describe('scanAssets', () => {
     ])
   })
 
+  it('lists the src/assets entries of an assets array under configurations as its own item', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'angular.json',
+      JSON.stringify({
+        projects: {
+          app: {
+            architect: {
+              build: {
+                options: { assets: ['src/assets'] },
+                configurations: {
+                  production: { assets: ['src/favicon.ico', 'src/assets'] },
+                  development: { optimization: false },
+                  staging: { assets: ['src/favicon.ico'] },
+                },
+              },
+            },
+          },
+        },
+      }),
+    )
+
+    expect(scanAssets(root).project.angularAssets).toEqual([
+      { project: 'app', target: 'build', entries: ['src/assets'] },
+      { project: 'app', target: 'build', configuration: 'production', entries: ['src/assets'] },
+    ])
+  })
+
   it('reports a public folder for an Angular app and reads angular.json with comments', () => {
     const root = createScratchDir()
     write(root, 'package.json', JSON.stringify({ dependencies: { '@angular/core': '19.0.0' } }))
@@ -406,6 +435,34 @@ describe('scanAssets', () => {
     ])
   })
 
+  it('lists the font-bearing Sass entry points of @baloise/ds-styles', () => {
+    const root = createScratchDir()
+    const lines = [
+      "@use '@baloise/ds-styles/sass/all';",
+      "@import '@baloise/ds-styles/sass/font.sass';",
+      "// @import '~@baloise/ds-styles/sass/basic.scss';",
+      "@use '@baloise/ds-styles/sass/baloise-design-system'",
+      "@use '@baloise/ds-styles/sass/mixins';",
+      "@use '@baloise/ds-styles/sass/all-in-one';",
+    ]
+    write(root, 'src/styles.scss', `${lines.join('\n')}\n`)
+
+    expect(scanAssets(root).files).toEqual([
+      {
+        file: 'src/styles.scss',
+        findings: lines.slice(0, 4).map((snippet, index) => ({ line: index + 1, snippet })),
+      },
+    ])
+  })
+
+  it('lists a msapplication-config meta tag with an unquoted name', () => {
+    const root = createScratchDir()
+    const tag = '<meta name=msapplication-config content="/assets/favicons/browserconfig.xml">'
+    write(root, 'index.html', `${tag}\n<meta name=msapplication-configX content="x">\n`)
+
+    expect(scanAssets(root).files).toEqual([{ file: 'index.html', findings: [{ line: 1, snippet: tag }] }])
+  })
+
   it('does not match utilities, structure, core, normalize, longer font names, or skipped folders', () => {
     const root = createScratchDir()
     write(
@@ -426,6 +483,8 @@ describe('scanAssets', () => {
     write(root, 'tsconfig.json', '{ "paths": { "@baloise/ds-fonts": ["x"] } }\n')
     write(root, 'node_modules/@baloise/ds-styles/index.ts', "import '@baloise/ds-styles/css/font'\n")
     write(root, 'dist/index.html', '<link rel="icon" href="/favicon.ico" />\n')
+    write(root, 'storybook-static/index.html', '<link rel="icon" href="/favicon.ico" />\n')
+    write(root, '.nx/cache/main.ts', "import '@baloise/ds-styles/css/font'\n")
 
     expect(scanAssets(root)).toEqual({
       total: 0,

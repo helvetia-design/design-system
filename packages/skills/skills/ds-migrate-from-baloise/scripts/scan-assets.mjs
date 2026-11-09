@@ -12,14 +12,14 @@ const PUBLIC_DIR_CONFIGS = [
   ...['js', 'mjs', 'cjs', 'ts'].map(ext => `next.config.${ext}`),
 ]
 const LINE_RES = [
-  /@baloise\/ds-styles\/(?:dist\/)?css\/(?:font|all|basic|baloise-design-system)(?:\.min)?(?:\.css)?(?![\w/-])/,
+  /@baloise\/ds-styles\/(?:(?:dist\/)?css|sass)\/(?:font|all|basic|baloise-design-system)(?:\.min)?(?:\.css|\.sass|\.scss)?(?![\w/-])/,
   /@helvetia-design\/styles\/(?:(?:dist\/)?css\/design-system(?:\.local)?(?:\.min)?(?:\.css)?|scss\/design-system(?:\.scss)?)(?![\w/-])/,
   /@baloise\/ds-fonts\b/,
   /@baloise\/ds-favicons\b/,
 ]
 const TAG_START_RE = /<(?:link|meta)\b/gi
 const FAVICON_TAG_RE =
-  /^<link\b[\s\S]*\srel\s*=\s*(["']?)\s*(?:(?:shortcut\s+)?icon|apple-touch-icon(?:-precomposed)?|manifest)\s*\1(?=[\s/>])|^<meta\b[\s\S]*\bname\s*=\s*["']msapplication-config["']/i
+  /^<link\b[\s\S]*\srel\s*=\s*(["']?)\s*(?:(?:shortcut\s+)?icon|apple-touch-icon(?:-precomposed)?|manifest)\s*\1(?=[\s/>])|^<meta\b[\s\S]*\bname\s*=\s*(["']?)msapplication-config\2(?=[\s/>])/i
 
 export function scanAssets(rootDir) {
   const root = realpathSync(resolve(rootDir))
@@ -111,10 +111,14 @@ function angularAssets(root) {
   const result = []
   for (const [project, definition] of Object.entries(config?.projects ?? {})) {
     for (const [target, options] of Object.entries(definition?.architect ?? definition?.targets ?? {})) {
-      const assets = options?.options?.assets
-      if (!Array.isArray(assets)) continue
-      const entries = assets.filter(entry => JSON.stringify(entry).includes('src/assets'))
-      if (entries.length > 0) result.push({ project, target, entries })
+      const sources = [[null, options?.options], ...Object.entries(options?.configurations ?? {})]
+      for (const [configuration, values] of sources) {
+        const assets = values?.assets
+        if (!Array.isArray(assets)) continue
+        const entries = assets.filter(entry => JSON.stringify(entry).includes('src/assets'))
+        if (entries.length === 0) continue
+        result.push(configuration ? { project, target, configuration, entries } : { project, target, entries })
+      }
     }
   }
   return result
