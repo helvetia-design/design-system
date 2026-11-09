@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import {
   baloiseDependencies,
   DEPENDENCY_FIELDS,
+  dependencyNames,
   detectPackageManager,
   installCommand,
   LOCKFILES,
@@ -14,10 +15,12 @@ import { scanMigratable } from './scan-migratable.mjs'
 import { scanSourceFiles, toSnippet } from './source-scan.mjs'
 
 const GATE_EXTENSIONS = new Set([...SOURCE_EXTENSIONS, '.less'])
+const TAG_EXTENSIONS = new Set([...GATE_EXTENSIONS].filter(ext => ext !== '.json'))
 const YAML_EXTENSIONS = new Set(['.yml', '.yaml'])
 const EXTENSIONS = new Set([...GATE_EXTENSIONS, ...YAML_EXTENSIONS])
 const STRING_ENTRY_FILES = new Set(['angular.json', 'project.json'])
 const LEGACY_RE = /@baloise\/ds-[a-z]/
+const TAG_RE = /<\/?(?:bal-[a-z]|Bal[A-Z])/
 const LEGACY_KEY_RE = /^@baloise\/ds-[a-z]/
 const PACKAGE_RE = /@baloise\/ds-[a-z0-9-]+/g
 const DEPENDENCY_LINE_RE = /^\s*"@baloise\/ds-[a-z0-9-]+"\s*:/
@@ -34,25 +37,26 @@ const ASSETS_RES = [
   /@baloise\/ds-styles\/(?:(?:dist\/)?css|sass)\/font(?:\.min)?(?:\.css|\.sass|\.scss)?(?![\w/-])/,
   /@baloise\/ds-fonts\b/,
   /@baloise\/ds-favicons\b/,
+  /@baloise\/ds-(?:brand-)?icons\b/,
 ]
 const UTILITIES_RE = /@baloise\/ds-styles\/(?:dist\/)?css\/utilities\//
 
 export function scanCleanup(rootDir) {
   const root = realpathSync(resolve(rootDir))
   const { suggested, notYet } = scanMigratable(root, [], { extensions: GATE_EXTENSIONS })
-  if (suggested.length > 0 || notYet.length > 0) {
-    return { status: 'incomplete', outstanding: { suggested, notYet } }
-  }
 
+  const hidden = []
   const lines = []
   const manifests = []
   const unreadable = []
   scanSourceFiles(
     root,
-    ({ file, text, comments }) => {
+    source => {
+      const { file, text } = source
       const name = basename(file)
       if (LOCKFILES.has(name)) return
-      let dependencyKeyLines = new Set()
+      if (TAG_EXTENSIONS.has(extname(file))) collectHiddenTags(file, text, source, hidden)
+      let dependencyKeys = []
       if (name === 'package.json') {
         const manifest = parseJson(text)
         if (!manifest) {
@@ -60,14 +64,17 @@ export function scanCleanup(rootDir) {
           return
         }
         manifests.push({ packageJsonPath: file, manifest })
-        dependencyKeyLines = findDependencyKeyLines(text)
+        dependencyKeys = findDependencyKeys(text)
       }
-      collectLines(file, text, comments, dependencyKeyLines, lines)
+      collectLines(file, text, source.comments, dependencyKeys, lines)
     },
     { extensions: EXTENSIONS },
   )
 
-  const byPosition = (a, b) => a.file.localeCompare(b.file) || a.line - b.line
+  if (suggested.length > 0 || notYet.length > 0 || hidden.length > 0) {
+    return { status: 'incomplete', outstanding: { suggested, notYet, hidden: hidden.sort(byPosition) } }
+  }
+
   const removeLines = lines
     .filter(entry => entry.type === 'remove')
     .sort(byPosition)
@@ -99,28 +106,52 @@ export function run(rootDir, stdout) {
   return 0
 }
 
-function collectLines(file, text, comments, dependencyKeyLines, found) {
+function byPosition(a, b) {
+  return a.file.localeCompare(b.file) || a.line - b.line
+}
+
+// The completeness gate reads masked source, where an apostrophe in markup text hides the rest of the line.
+function collectHiddenTags(file, text, source, found) {
+  if (!TAG_RE.test(source.comments)) return
   const raw = text.split('\n')
-  const active = comments.split('\n')
+  const active = source.comments.split('\n')
+  const visible = source.masked.split('\n')
+  active.forEach((line, index) => {
+    if (TAG_RE.test(line) && !TAG_RE.test(visible[index] ?? '')) {
+      found.push({ file, line: index + 1, snippet: toSnippet(raw[index]) })
+    }
+  })
+}
+
+function collectLines(file, text, comments, dependencyKeys, found) {
+  const isYaml = YAML_EXTENSIONS.has(extname(file))
+  const raw = text.split('\n')
+  const plain = blankRanges(text, dependencyKeys).split('\n')
+  // YAML comments start with `#` only, so the script masking would cut a line at the `//` of a URL.
+  const active = isYaml ? plain : blankRanges(comments, dependencyKeys).split('\n')
   const context = {
     isPackageJson: basename(file) === 'package.json',
-    isYaml: YAML_EXTENSIONS.has(extname(file)),
+    isYaml,
     hasStringEntries: STRING_ENTRY_FILES.has(basename(file)),
   }
-  const entries = raw.map((line, index) =>
-    dependencyKeyLines.has(index) ? null : classify(line, active[index] ?? '', context),
-  )
+  const entries = plain.map((line, index) => classify(line, active[index] ?? '', context))
 
   entries.forEach((entry, index) => {
     if (!entry) return
-    if (entry.type === 'todo') Object.assign(entry, resolveTodo(raw, entries, index))
+    if (entry.type === 'todo') Object.assign(entry, resolveTodo(plain, entries, index))
     found.push({ file, line: index + 1, snippet: toSnippet(raw[index]), ...entry })
   })
 }
 
+function blankRanges(text, ranges) {
+  let result = text
+  for (const [start, end] of ranges) result = result.slice(0, start) + ' '.repeat(end - start) + result.slice(end)
+  return result
+}
+
 function classify(line, activeLine, { isPackageJson, isYaml, hasStringEntries }) {
   const statement = activeLine.trim()
-  if (TODO_RE.test(line) && !TODO_RE.test(activeLine)) return { type: 'todo' }
+  if (TODO_RE.test(line) && statement === '') return { type: 'todo' }
   if (!LEGACY_RE.test(line)) return null
   if (!LEGACY_RE.test(activeLine) || (isYaml && statement.startsWith('#'))) return { type: 'commented' }
 
@@ -159,31 +190,25 @@ function parseJson(text) {
   }
 }
 
-// Returns the 0-based lines that hold a key directly inside a top-level dependency field, such as `dependencies`.
-function findDependencyKeyLines(text) {
-  const lines = new Set()
+// Returns the [start, end) offsets of every quoted key directly inside a top-level dependency field, such as `dependencies`.
+function findDependencyKeys(text) {
+  const ranges = []
   const stack = []
   let pendingKey = null
-  let line = 0
   let i = 0
   while (i < text.length) {
     const ch = text[i]
-    if (ch === '\n') line++
     if (ch === '"') {
       let end = i + 1
       while (end < text.length && text[end] !== '"') end += text[end] === '\\' ? 2 : 1
       const value = text.slice(i + 1, end)
       let after = end + 1
-      while (/\s/.test(text[after] ?? '')) {
-        if (text[after] === '\n') line++
-        after++
-      }
+      while (/\s/.test(text[after] ?? '')) after++
       if (text[after] === ':') {
-        const keyLine = line - (text.slice(end, after).match(/\n/g)?.length ?? 0)
         pendingKey = value
         const parent = stack.at(-1)
         if (stack.length === 2 && parent.type === 'object' && DEPENDENCY_FIELDS.includes(parent.key)) {
-          lines.add(keyLine)
+          ranges.push([i, end + 1])
         }
       }
       i = after
@@ -199,17 +224,11 @@ function findDependencyKeyLines(text) {
     }
     i++
   }
-  return lines
+  return ranges
 }
 
 function legacyKeys(manifest) {
-  const names = new Set()
-  for (const field of DEPENDENCY_FIELDS) {
-    const block = manifest[field]
-    if (!block || typeof block !== 'object') continue
-    for (const name of Object.keys(block)) if (LEGACY_KEY_RE.test(name)) names.add(name)
-  }
-  return [...names].sort()
+  return [...new Set(dependencyNames(manifest).filter(name => LEGACY_KEY_RE.test(name)))].sort()
 }
 
 function planDependencies(manifests, keptLines) {

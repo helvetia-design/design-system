@@ -142,7 +142,7 @@ function aliasesFor(framework, version, dependencies) {
   return shared
 }
 
-function dependencyNames(manifest) {
+export function dependencyNames(manifest) {
   const names = []
   for (const field of DEPENDENCY_FIELDS) {
     const block = manifest?.[field]

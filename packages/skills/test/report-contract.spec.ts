@@ -236,6 +236,7 @@ describe('SKILL.md', () => {
     expect(cleanup).toContain('`incomplete`')
     expect(cleanup).toContain('`outstanding.suggested`')
     expect(cleanup).toContain('`outstanding.notYet`')
+    expect(cleanup).toContain('`outstanding.hidden`')
     expect(cleanup).toContain('`nothing-to-clean-up`')
     expect(cleanup).toContain('one yes/no')
     expect(cleanup).toContain('`C1.`')

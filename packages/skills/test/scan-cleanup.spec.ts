@@ -41,6 +41,7 @@ describe('scanCleanup', () => {
       outstanding: {
         suggested: [{ name: 'button', total: 2 }],
         notYet: [{ name: 'unknown-widget', total: 1 }],
+        hidden: [],
       },
     })
   })
@@ -547,6 +548,7 @@ describe('scanCleanup', () => {
           { name: 'tag', total: 1 },
         ],
         notYet: [],
+        hidden: [],
       },
     })
   })
@@ -733,6 +735,213 @@ describe('scanCleanup', () => {
     expect(scanCleanup(root).remove.lines).toEqual([
       { file: 'src/main.mts', line: 1, snippet: "import '@baloise/ds-styles/css/structure.css';", kind: 'import' },
       { file: 'src/theme.less', line: 1, snippet: "@import '@baloise/ds-styles/css/core.css';", kind: 'import' },
+    ])
+  })
+
+  it('refuses while a bal-* tag hides behind an apostrophe or a glob in markup text', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { '@baloise/ds-styles': '19.0.0' } })
+    write(root, 'src/styles.scss', "@import '@baloise/ds-styles/css/core';\n")
+    write(root, 'src/index.html', "<p>Ab CHF 1'000 <bal-tag>Neu</bal-tag></p>\n")
+    write(
+      root,
+      'src/App.vue',
+      '<template>\n  <p>Files under src/* are watched</p>\n  <bal-button>Go</bal-button>\n</template>\n',
+    )
+
+    expect(scanCleanup(root)).toEqual({
+      status: 'incomplete',
+      outstanding: {
+        suggested: [],
+        notYet: [],
+        hidden: [
+          { file: 'src/App.vue', line: 3, snippet: '<bal-button>Go</bal-button>' },
+          { file: 'src/index.html', line: 1, snippet: "<p>Ab CHF 1'000 <bal-tag>Neu</bal-tag></p>" },
+        ],
+      },
+    })
+  })
+
+  it('keeps a YAML or .htm reference that follows a URL', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { '@baloise/ds-fonts': '19.0.0', '@baloise/ds-core': '19.0.0' } })
+    write(root, 'ci.yml', 'steps:\n  - run: curl https://x.com && cp -r node_modules/@baloise/ds-fonts/assets public\n')
+    write(
+      root,
+      'index.htm',
+      '<p>see https://example.com</p><script src="node_modules/@baloise/ds-core/dist/x.js"></script>\n',
+    )
+
+    const result = scanCleanup(root)
+
+    expect(result.keep.lines.map(({ file, line, reason }) => `${file}:${line} ${reason}`)).toEqual([
+      'ci.yml:2 assets',
+      'index.htm:1 manual',
+    ])
+    expect(result.commented).toEqual([])
+    expect(result.remove.dependencies).toEqual([])
+  })
+
+  it('keeps a dependency that a script in a one-line package.json still uses', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'package.json',
+      JSON.stringify({
+        scripts: { 'copy:fonts': 'cp -r node_modules/@baloise/ds-fonts/assets public' },
+        dependencies: { '@baloise/ds-fonts': '19.0.0' },
+      }),
+    )
+
+    const result = scanCleanup(root)
+
+    expect(result.status).toBe('nothing-to-clean-up')
+    expect(result.keep.lines.map(({ file, line, reason }) => `${file}:${line} ${reason}`)).toEqual([
+      'package.json:1 assets',
+    ])
+    expect(result.keep.dependencies).toEqual([
+      {
+        packageJsonPath: 'package.json',
+        field: 'dependencies',
+        name: '@baloise/ds-fonts',
+        reason: 'used',
+        usedBy: ['package.json:1'],
+      },
+    ])
+  })
+
+  it('classifies a legacy line that carries the Init TODO comment as a legacy line, not as the TODO', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { '@baloise/ds-styles': '19.0.0' } })
+    write(root, 'src/styles.scss', `@import '@baloise/ds-styles/css/all'; // ${TODO}\n`)
+
+    const result = scanCleanup(root)
+
+    expect(result.remove).toEqual({ lines: [], dependencies: [] })
+    expect(result.keep.lines.map(({ line, reason }) => `${line} ${reason}`)).toEqual(['1 manual'])
+  })
+
+  it('keeps legacy icon and favicon references for Assets', () => {
+    const root = createScratchDir()
+    writeManifest(root, {
+      dependencies: {
+        '@baloise/ds-icons': '19.0.0',
+        '@baloise/ds-brand-icons': '19.0.0',
+        '@baloise/ds-favicons': '19.0.0',
+      },
+    })
+    write(
+      root,
+      'src/icons.ts',
+      [
+        "import { balIconCheck } from '@baloise/ds-icons'",
+        "import { balBrandIconCar } from '@baloise/ds-brand-icons'",
+        "export const favicon = 'node_modules/@baloise/ds-favicons/assets/primary/favicon.ico'",
+        '',
+      ].join('\n'),
+    )
+
+    const result = scanCleanup(root)
+
+    expect(result.keep.lines.map(({ line, reason }) => `${line} ${reason}`)).toEqual([
+      '1 assets',
+      '2 assets',
+      '3 assets',
+    ])
+    expect(result.remove.dependencies).toEqual([])
+  })
+
+  it('removes a bare string entry in project.json but keeps it in tsconfig.json', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { '@baloise/ds-styles': '19.0.0' } })
+    const styles = [
+      '{',
+      '  "styles": [',
+      '    "node_modules/@baloise/ds-styles/css/core.css",',
+      '    "src/a.css"',
+      '  ]',
+      '}',
+      '',
+    ]
+    write(root, 'project.json', styles.join('\n'))
+    write(root, 'tsconfig.json', styles.join('\n'))
+
+    const result = scanCleanup(root)
+
+    expect(result.remove.lines.map(({ file, line, kind }) => `${file}:${line} ${kind}`)).toEqual([
+      'project.json:3 import',
+    ])
+    expect(result.keep.lines.map(({ file, line, reason }) => `${file}:${line} ${reason}`)).toEqual([
+      'tsconfig.json:3 manual',
+    ])
+  })
+
+  it('removes the TODO when the next kept legacy line is not directly below it', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { react: '19.0.0' } })
+    write(
+      root,
+      'src/main.ts',
+      [
+        `// ${TODO}`,
+        "import '@helvetia-design/styles/css/design-system'",
+        "import '@baloise/ds-styles/css/font.css'",
+        '',
+      ].join('\n'),
+    )
+
+    const result = scanCleanup(root)
+
+    expect(result.remove.lines.map(({ line, kind }) => `${line} ${kind}`)).toEqual(['1 todo'])
+    expect(result.keep.lines.map(({ line, reason }) => `${line} ${reason}`)).toEqual(['3 assets'])
+  })
+
+  it('removes the TODO when only commented-out legacy lines sit between it and the removed imports', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { '@baloise/ds-styles': '19.0.0' } })
+    write(
+      root,
+      'src/main.ts',
+      [`// ${TODO}`, "// import '@baloise/ds-styles/css/all.css'", "import '@baloise/ds-styles/css/core.css'", ''].join(
+        '\n',
+      ),
+    )
+
+    const result = scanCleanup(root)
+
+    expect(result.remove.lines.map(({ line, kind }) => `${line} ${kind}`)).toEqual(['1 todo', '3 import'])
+    expect(result.commented.map(({ line }) => line)).toEqual([2])
+  })
+
+  it('sorts lines by file name, not by directory order', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { '@baloise/ds-styles': '19.0.0' } })
+    write(root, 'src/B.scss', "@import '@baloise/ds-styles/css/core';\n")
+    write(root, 'src/a.scss', "@import '@baloise/ds-styles/css/core';\n")
+
+    expect(scanCleanup(root).remove.lines.map(({ file }) => file)).toEqual(['src/a.scss', 'src/B.scss'])
+  })
+
+  it('removes an uppercase <LINK> tag and keeps a legacy key in a nested dependencies object', () => {
+    const root = createScratchDir()
+    writeManifest(root, { config: { dependencies: { '@baloise/ds-styles': '19.0.0' } } })
+    write(root, 'index.html', '<LINK REL="stylesheet" HREF="node_modules/@baloise/ds-styles/css/core.css">\n')
+
+    const result = scanCleanup(root)
+
+    expect(result.remove).toEqual({
+      lines: [
+        {
+          file: 'index.html',
+          line: 1,
+          snippet: '<LINK REL="stylesheet" HREF="node_modules/@baloise/ds-styles/css/core.css">',
+          kind: 'import',
+        },
+      ],
+      dependencies: [],
+    })
+    expect(result.keep.lines.map(({ file, line, reason }) => `${file}:${line} ${reason}`)).toEqual([
+      'package.json:4 manual',
     ])
   })
 
