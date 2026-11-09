@@ -2,10 +2,9 @@
 import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { detectFramework, IMPORT_EXTENSIONS, readJson } from './detect-baloise.mjs'
+import { detectFramework, readJson, SOURCE_EXTENSIONS } from './detect-baloise.mjs'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
-const EXTENSIONS = new Set([...IMPORT_EXTENSIONS, '.mts', '.cts'])
 const JSON_FILES = new Set(['angular.json', 'package.json', 'project.json'])
 const PUBLIC_DIR_CONFIGS = [
   ...['js', 'mjs', 'cjs', 'ts', 'mts', 'cts'].map(ext => `vite.config.${ext}`),
@@ -30,7 +29,7 @@ export function scanAssets(rootDir) {
       if (file.endsWith('.json') && !JSON_FILES.has(basename(file))) return
       collect(file, text, found)
     },
-    { extensions: EXTENSIONS },
+    { extensions: SOURCE_EXTENSIONS },
   )
   const { total, files } = group(found)
   return { total, project: describeProject(root), files }

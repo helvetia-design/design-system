@@ -16,7 +16,7 @@ const DEPENDENCY_NAMES = [...SHORT_NAMES, ...FONT_FAVICON_NAMES]
 const ASSET_NAMES = [...ICON_NAMES, STYLES_NAME, ...FONT_FAVICON_NAMES]
 const ASSET_PACKAGES = new Set(ASSET_NAMES.map(short => `${LEGACY_SCOPE}/ds-${short}`))
 const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', 'out', '.next', '.angular', '.git', '.claude', 'coverage'])
-const LOCKFILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'npm-shrinkwrap.json'])
+export const LOCKFILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'npm-shrinkwrap.json'])
 export const IMPORT_EXTENSIONS = new Set([
   '.html',
   '.htm',
@@ -32,7 +32,8 @@ export const IMPORT_EXTENSIONS = new Set([
   '.vue',
   '.json',
 ])
-const DEPENDENCY_FIELDS = ['dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies']
+export const SOURCE_EXTENSIONS = new Set([...IMPORT_EXTENSIONS, '.mts', '.cts'])
+export const DEPENDENCY_FIELDS = ['dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies']
 const NOTHING = 'no Baloise Design System installation detected, nothing to migrate'
 
 function targetPackageName(short) {
@@ -88,13 +89,13 @@ export async function run(rootDir, stdout, options = {}) {
   return result.status === 'error' ? 1 : 0
 }
 
-function installCommand(packageManager) {
+export function installCommand(packageManager) {
   if (packageManager === 'pnpm') return 'pnpm install'
   if (packageManager === 'yarn') return 'yarn install'
   return 'npm install'
 }
 
-function detectPackageManager(rootDir) {
+export function detectPackageManager(rootDir) {
   if (existsSync(join(rootDir, 'pnpm-lock.yaml'))) return 'pnpm'
   if (existsSync(join(rootDir, 'yarn.lock'))) return 'yarn'
   if (existsSync(join(rootDir, 'package-lock.json'))) return 'npm'
@@ -150,7 +151,7 @@ function dependencyNames(manifest) {
   return names
 }
 
-function baloiseDependencies(manifest) {
+export function baloiseDependencies(manifest) {
   return [...new Set(dependencyNames(manifest).filter(name => DEPENDENCY_RE.test(name)))].sort()
 }
 

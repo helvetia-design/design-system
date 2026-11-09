@@ -80,7 +80,7 @@ node <this-skill-directory>/scripts/detect-baloise.mjs <project-root>
 A Baloise utilities line is an `imports` entry for `@baloise/ds-styles/css/utilities/all` or a category file under `@baloise/ds-styles/css/utilities/`, with or without `.css`, in any form: a CSS or SCSS `@import` or `@use`, an HTML `<link>`, a TS or JS side-effect import, or an `angular.json` styles entry. For each line:
 
 1. Delete the line. In `angular.json`, delete the string and keep the array valid JSON.
-2. When the line directly above is a comment that mentions the legacy Baloise utilities, such as `/* TODO: remove the legacy Baloise utilities once no legacy utility class is left */`, delete it too. Keep any other comment. The comment above the bundled block (`/* TODO: remove these legacy Baloise imports once the Helvetia migration is verified */`) also covers `font`, `structure` and `core`, so it stays.
+2. When the line directly above is a comment that mentions the legacy Baloise utilities, such as `/* TODO: remove the legacy Baloise utilities once no legacy utility class is left */`, delete it too. Keep any other comment. The comment above the bundled block (`/* TODO: remove these legacy Baloise imports once the Helvetia migration is verified */`) also covers `font`, `structure` and `core`, so it stays. **Cleanup** deletes it once only `structure` and `core` lines are left below it.
 3. Never touch the `@helvetia-design/styles/css/utilities` line.
 
 When `imports` still holds an uncommented `@baloise/ds-styles/css/all` line, that file bundles the utilities with normalize, font, structure and core. Do not edit it. Report that it still loads the legacy utilities.
