@@ -90,14 +90,19 @@ Neither component has a public method a consumer calls. There is no sibling-file
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `direction="row"` that was added, every dynamic `layout`, `direction`, `space*`, `px` or `py` binding left for manual review.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-List every `space-column` usage too, static ones included. Legacy `bal-stack` applied it as a row gap, `ds-stack` applies a column gap, so the spacing can change.
+Needs your attention when found:
 
-Also list each loss: every type reference such as `BalProps.BalStackLayout` that the scan cannot see.
+1. Every dynamic `layout`, `direction`, `space*`, `px` or `py` binding left for manual review.
+2. Every `space-column` usage, static ones included. Legacy `bal-stack` applied it as a row gap, `ds-stack` applies a column gap, so the spacing can change.
+3. Every type reference that the scan cannot see, such as `BalProps.BalStackLayout`.
+4. One-time note, when at least one stack was migrated, one line and not one per usage: the scan cannot see `.bal-stack` and `.bal-stack--*` selectors, and they do not carry over to `ds-stack`, which renders in shadow DOM.
 
-When at least one stack was migrated, add one line, not one per usage: the scan cannot see `.bal-stack` and `.bal-stack--*` selectors, and they do not carry over to `ds-stack`, which renders in shadow DOM.
+Coverage only, written to the file:
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+5. Every `direction="row"` that was added.
 
-Done when the summary is printed and the working tree is still unstaged.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

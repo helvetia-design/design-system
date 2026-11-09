@@ -61,7 +61,7 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 | -------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `editable`, `editable="true"`, `editable={true}`                     | `editable` on the enclosing `ds-data-item`  | Hoist. Remove it from the value and add it to the `bal-data-item` that contains the value. If the item already has `editable`, do not duplicate it.                                    |
 | `multiline`, `multiline="true"`, `multiline={true}`                  | `multiline` on the enclosing `ds-data-item` | Hoist the same way.                                                                                                                                                                    |
-| `[editable]="x"`, `editable={x}`, `[multiline]="x"`, `multiline={x}` | `editable` / `multiline` on the item        | Dynamic value. Do not guess. Leave the binding unchanged and list the file and line in the summary for manual review: both props now belong on `ds-data-item`.                         |
+| `[editable]="x"`, `editable={x}`, `[multiline]="x"`, `multiline={x}` | `editable` / `multiline` on the item        | Dynamic value. Do not guess. Leave the binding unchanged and list the file and line in the report for manual review: both props now belong on `ds-data-item`.                          |
 | `disabled`                                                           | _(no equivalent)_                           | Drop it. The legacy prop only disabled the edit button. `ds-data-item` `disabled` greys out the whole item and means something else, so do not map it. Report each dropped `disabled`. |
 
 ### Tags and imports
@@ -72,7 +72,7 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Events
 
-`bal-data-value` emitted `balClick`, `balFocus`, and `balBlur` from its edit button. `ds-data-item` emits none of them, and its inner `ds-button` is not exposed. Do not rewrite or remove existing handlers (`(balClick)="x()"`, `onBalClick={x}`, `addEventListener('balClick', ...)`). List each one by file and line in the summary as "event no longer emitted, needs manual rework", and do not invent a replacement.
+`bal-data-value` emitted `balClick`, `balFocus`, and `balBlur` from its edit button. `ds-data-item` emits none of them, and its inner `ds-button` is not exposed. Do not rewrite or remove existing handlers (`(balClick)="x()"`, `onBalClick={x}`, `addEventListener('balClick', ...)`). List each one by file and line in the report as "event no longer emitted, needs manual rework", and do not invent a replacement.
 
 ### Methods
 
@@ -80,14 +80,21 @@ Neither component has a public method a consumer calls. There is no sibling-file
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `editable` or `multiline` hoisted to a `ds-data-item`, every dropped `border` and `disabled`, every dynamic `editable` or `multiline` binding left for manual review, and every event handler that no longer fires.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Also report the rendering differences the scan cannot see, so the consumer can check them. Do not add attributes to compensate:
+Needs your attention when found:
 
-- `ds-data` always shows dividers in the vertical layout and has no `border` prop. List every file where `border` was dropped, and every `horizontal` data list, since the horizontal layout may look different.
+1. Every dropped `disabled`. The legacy prop only disabled the edit button.
+2. Every dynamic `editable` or `multiline` binding left for manual review.
+3. Every event handler that no longer fires, listed as "event no longer emitted, needs manual rework".
+4. Every file where `border` was dropped. `ds-data` always shows dividers in the vertical layout and has no `border` prop. Do not add attributes to compensate.
+5. Every `horizontal` data list, since the horizontal layout may look different.
+6. Every selector that targets the legacy elements and that the scan cannot see. The legacy components set the classes `bal-data`, `bal-data--is-horizontal`, `bal-data--has-border`, `bal-data-item`, `bal-data-label`, `bal-data-value`, and `bal-data-value__button` on their hosts, and the edit button carried `data-testid="bal-data-value-button"`. Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.
 
-Also list every selector that targeted the legacy elements and that the scan cannot see. The legacy components set the classes `bal-data`, `bal-data--is-horizontal`, `bal-data--has-border`, `bal-data-item`, `bal-data-label`, `bal-data-value`, and `bal-data-value__button` on their hosts, and the edit button carried `data-testid="bal-data-value-button"`. Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.
+Coverage only, written to the file:
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+7. Every `editable` or `multiline` hoisted to a `ds-data-item`.
 
-Done when the summary is printed and the working tree is still unstaged.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

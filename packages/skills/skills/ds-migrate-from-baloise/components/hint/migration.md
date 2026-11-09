@@ -2,7 +2,7 @@
 
 Migrate every `bal-hint` usage to `ds-hint`. Init has already added the `@helvetia-design/*` packages. This task rewrites usages only.
 
-The legacy folder has two child elements. `bal-hint-title` becomes `ds-hint-title` and `bal-hint-text` becomes `ds-hint-text`. Both still exist as direct children of `ds-hint`, so the rewrite is a rename. Do not fold the title into the new `label` prop. `bal-field-hint` is a different component and is not part of this migration.
+The legacy folder has two child elements. `bal-hint-title` becomes `ds-hint-title` and `bal-hint-text` becomes `ds-hint-text`. Both still exist as direct children of `ds-hint`, so the rewrite is a rename. Do not fold the title into the new `label` prop. `bal-field-hint` is a different component and is not part of this migration. `shared/field.md` moves it to a `ds-hint` and names the `DsHint` import itself. The `BalHint`-only import rules below do not apply to it.
 
 The panel behaves differently on touch viewports: `ds-hint` opens a `ds-drawer` (bottom sheet) there, where `bal-hint` opened a fullscreen popup. The `closeLabel` button now lives in that drawer. No markup change is needed for this.
 
@@ -60,6 +60,12 @@ Neither `bal-hint` nor `ds-hint` has a public event. Nothing to rewrite.
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `small` left for manual review. Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Done when the summary is printed and the working tree is still unstaged.
+Needs your attention when found:
+
+1. Every `small` left for manual review.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

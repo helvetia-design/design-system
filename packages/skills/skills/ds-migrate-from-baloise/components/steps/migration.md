@@ -100,7 +100,7 @@ The `label` is kept on the `ds-step` and its text is also the text of the `<a>`.
 | `color="primary"`                             | omit `color`         | `primary` is the default. Delete the attribute.                                                                                                                                                   |
 | `color` `purple` / `green` / `red` / `yellow` | same                 | Copy as-is, including the `'...'`, `{"..."}` and `{'...'}` forms.                                                                                                                                 |
 | `color="light-blue"`                          | _(no equivalent)_    | Delete the attribute. `ds-steps` has no light-blue. Mention each one as a visual change. Do not pick a replacement color.                                                                         |
-| `color` not a string literal                  | leave the expression | Do not guess a runtime color. Say in the summary that `purple`, `green`, `red` and `yellow` are the accepted values.                                                                              |
+| `color` not a string literal                  | leave the expression | Do not guess a runtime color. Say in the report that `purple`, `green`, `red` and `yellow` are the accepted values.                                                                               |
 | `clickable`                                   | _(no equivalent)_    | Delete the attribute. Mention each one.                                                                                                                                                           |
 | `debounce`                                    | _(no equivalent)_    | Delete the attribute. Mention each one.                                                                                                                                                           |
 | `options`                                     | _(no equivalent)_    | Leave in place and report. `ds-steps` has no `options` prop and builds its steps from `ds-step` children. Say that the steps and panels must be rebuilt as children by hand. Rename the tag only. |
@@ -143,22 +143,35 @@ Rewrite `balChange` listeners only on a migrated element. `balChange` is emitted
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `bal-step-item` split into a step and panel, every navigation group and the `aria-current` the router must set, every deleted `color="light-blue"`, `clickable`, `debounce` and `prevent`, every `active` moved to `value` or dropped because `value` won, every `balChange` listener whose detail is no longer the step value string, and every import that changed.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Also report what was left in place:
+Needs your attention when found:
 
-- Groups that mix items with and without `href`.
-- Steps built in a loop, and every `options` prop, with the note that the steps and panels must be rebuilt as children by hand.
-- Items without `value`.
-- `select()`, `getOptionByValue()`, `getOptions()`, `setActive()`, `balNavigate` and `BalStepOption`.
+1. Every navigation group, with the `aria-current` the router must set.
+2. Every deleted `color="light-blue"`, as a visual change.
+3. Every deleted `clickable`.
+4. Every deleted `prevent`. The slotted `<a>` is left to the consumer's router.
+5. Every `active` dropped because `value` won.
+6. Every `balChange` listener whose detail is no longer the step value string.
+7. Every group left in place because it mixes items with and without `href`. Name file and line.
+8. Every set of steps built in a loop, left in place, with the note that the steps and panels must be rebuilt as children by hand. Name file and line.
+9. Every `options` prop, left in place, with the note that the steps and panels must be rebuilt as children by hand. Name file and line.
+10. Every item without `value`, left in place. Name file and line.
+11. Every left-in-place call to `select()`, `getOptionByValue()`, `getOptions()` or `setActive()`.
+12. Every left-in-place `balNavigate` listener.
+13. Every left-in-place `BalStepOption` reference.
+14. Every ambient type reference `BalProps.BalStepsColor`, `BalEvents.BalSteps*`, `HTMLBalStepsElement` and `HTMLBalStepItemElement`. The scan cannot see them. Grep for them and rename by hand. The scan does list `Components.BalSteps`, because it matches the bare `BalSteps` symbol. Treat it as a type reference too.
+15. Every legacy `bal-steps__*` class, the `bal-step-item` class and `data-testid="bal-steps-option"` selector. They no longer match, because `ds-steps` uses shadow DOM.
+16. One-time note: in navigation mode, `ds-steps` takes an accessible `label` for its `<nav>` landmark. Nothing was added. Suggest the consumer adds one that fits the page.
 
-Also report what the scan cannot see:
+Coverage only, written to the file:
 
-- Ambient type references `BalProps.BalStepsColor`, `BalEvents.BalSteps*`, `HTMLBalStepsElement` and `HTMLBalStepItemElement`. Grep for them and rename by hand. The scan does list `Components.BalSteps`, because it matches the bare `BalSteps` symbol. Treat it as a type reference too.
-- Legacy `bal-steps__*` classes, the `bal-step-item` class and `data-testid="bal-steps-option"` selectors no longer match, because `ds-steps` uses shadow DOM.
-- In navigation mode, `ds-steps` takes an accessible `label` for its `<nav>` landmark. Nothing was added. Suggest the consumer adds one that fits the page.
-- Keyboard and roles. In panels mode, arrow keys, Home and End move the step, and the roles stay `tablist` and `tab`. Navigation mode renders an `<ol>` of links.
+17. Every `bal-step-item` split into a step and panel.
+18. Every deleted `debounce`.
+19. Every `active` moved to `value`.
+20. Every import that changed.
+21. One-time note: keyboard and roles. In panels mode, arrow keys, Home and End move the step, and the roles stay `tablist` and `tab`. Navigation mode renders an `<ol>` of links.
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 
-Done when the summary is printed and the working tree is still unstaged.
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

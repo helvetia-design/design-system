@@ -18,7 +18,7 @@ Unlike the modal work ([#2119](https://github.com/helvetia-design/system/issues/
 - **`create()` resolves the id** (`Promise<string | undefined>`), matching the core controller 1:1, rather than resolving the element — the core API is already async/id-based, not something this ticket should re-shape.
 - **`dismiss(id)` / `dismissAll()`** naming (not `remove`/`removeAll`) so both read as the same verb, even though they forward to core's differently-named `remove`/`removeAll`.
 - **`Alert` type used directly**, no `DsToastOptions`/`DsSnackbarOptions` aliases — core already unified the shape for both.
-- No explicit `defineCustomElement()` calls in the services — `packages/angular/src/index.ts` re-exporting `generated/proxies.ts` already registers `ds-toast`/`ds-snackbar`/`ds-alert-container` as a side effect of `ProxyCmp()`.
+- ~~No explicit `defineCustomElement()` calls in the services.~~ Superseded by #116: `ProxyCmp()` registers an element only when its proxy survives tree-shaking, so production builds of imperative-only apps registered nothing. The services now call `defineCustomElement()` themselves.
 
 ## Work items
 

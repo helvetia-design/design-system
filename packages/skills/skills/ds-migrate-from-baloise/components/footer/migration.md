@@ -59,21 +59,26 @@ Children of `bal-footer` are default-slot content in both components. Leave them
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `disableDefaultSocialLinks` that was added, every `showSocialMedia` that was dropped or negated, every `hideLinks` that was renamed to `disableDefaultLinks`, every dropped `logoBrand`, and every `logoHref`, `logoSvg`, and `overrideLinks` that needs manual rework.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Report these logic changes the scan cannot see, so the consumer can check them:
+Needs your attention when found:
 
-- **Language switch**: the legacy footer changed the app language itself when the user picked one. `ds-app-footer` only updates its own select and emits `dsLanguageChange` with `{ language }`. Every footer that is not hidden by `hideLanguageSelection` needs a `dsLanguageChange` handler (`(dsLanguageChange)` in Angular, `onDsLanguageChange` in React, `addEventListener('dsLanguageChange'` in HTML) that switches the app language. Do not write that handler yourself. List each footer file.
-- **Logo**: the logo follows the global config brand. A footer that set `logoBrand` may show a different logo.
+1. Every `logoHref` or `logoSvg` that needs manual rework. A custom logo is now markup in the `logo` slot.
+2. Every `overrideLinks` that needs manual rework. Custom links are now `<a>` children in the `links` slot.
+3. Every footer file not hidden by `hideLanguageSelection`. The legacy footer changed the app language itself when the user picked one. `ds-app-footer` only updates its own select and emits `dsLanguageChange` with `{ language }`. Each of these footers needs a `dsLanguageChange` handler that switches the app language: `(dsLanguageChange)` in Angular, `onDsLanguageChange` in React, `addEventListener('dsLanguageChange'` in HTML. Do not write that handler yourself.
+4. One-time note: the logo follows the global config brand. A footer that set `logoBrand` may show a different logo.
+5. One-time note: `ds-app-footer` renders a legal text below the divider, taken from config by region and language, which `bal-footer` did not have. The consumer sets `legalText` if it needs to change. Do not add attributes to compensate.
+6. One-time note: legal and social links come from the DS config, not from the legacy web-app-utils loader, so the link set and the regions it applies to can differ.
+7. One-time note: `ds-app-footer` uses shadow DOM.
+8. Every selector that targets the legacy elements and that the scan cannot see. The legacy component set the classes `bal-footer`, `bal-footer__inner`, `bal-footer__slot`, and the other `bal-footer__*` parts, and the test id `bal-footer-language` on the language select. Tests and styles that query them break, and the new select uses `app-footer-language-select`. Do not rewrite those selectors yourself. Report them.
 
-Also report the rendering differences, so the consumer can check them. Do not add attributes to compensate:
+Coverage only, written to the file:
 
-- `ds-app-footer` renders a legal text below the divider, taken from config by region and language, which `bal-footer` did not have. Set `legalText` yourself if it needs to change.
-- Legal and social links come from the DS config, not from the legacy web-app-utils loader, so the link set and the regions it applies to can differ.
-- `ds-app-footer` uses shadow DOM.
+9. Every `disableDefaultSocialLinks` that was added.
+10. Every `showSocialMedia` that was dropped or negated.
+11. Every `hideLinks` that was renamed to `disableDefaultLinks`.
+12. Every dropped `logoBrand`.
 
-Also list every selector that targeted the legacy elements and that the scan cannot see. The legacy component set the classes `bal-footer`, `bal-footer__inner`, `bal-footer__slot`, and the other `bal-footer__*` parts, and the test id `bal-footer-language` on the language select. Tests and styles that query them break, and the new select uses `app-footer-language-select`. Do not rewrite those selectors yourself. Report them.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
-
-Done when the summary is printed and the working tree is still unstaged.
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.
