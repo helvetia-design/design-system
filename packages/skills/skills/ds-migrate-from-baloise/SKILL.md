@@ -54,16 +54,21 @@ If `status` is `ready`, show the detected framework, package manager, version, a
      ```
 
    - `font`, `structure`, `core`: leave these three lines unchanged and keep them. Immediately above the first of the three (or, if `normalize` was on the line directly above, immediately below the two new imports), insert one comment noting they must be removed manually once the migration is verified, e.g. `/* TODO: remove these legacy Baloise imports once the Helvetia migration is verified */`. Insert that comment once, not once per line.
-   - Baloise **utilities** line (`css/utilities/all`, any of the nine category files, or `css/utilities/<name>`): do not duplicate this line. Replace it in place with the `@helvetia-design/styles/css/utilities` equivalent, using the matching at-rule or the equivalent local form for the project's `framework`. This avoids both utility stylesheets being loaded and clashing.
-   - Bundled `css/all`: this one file already contains normalize + font + structure + core + utilities together, so — unlike `font`/`structure`/`core` — it cannot be left in place: that would duplicate the utility classes too. Treat it like `normalize`: comment out the original line in place, and immediately below it insert all three, using the matching at-rule:
+   - Baloise **utilities** line (`css/utilities/all`, any of the nine category files, or `css/utilities/<name>`): leave the line unchanged and keep it. The app markup still uses the legacy utility classes, and many of them have no Helvetia equivalent. Insert the `@helvetia-design/styles/css/utilities` equivalent once, immediately below the last Baloise utilities line, using the matching at-rule or the equivalent local form for the project's `framework`. The Helvetia line must load after the Baloise one, so Helvetia wins where both define the same class. Immediately above the first Baloise utilities line, insert one comment noting it must be removed manually once the migration is verified, e.g. `/* TODO: remove the legacy Baloise utilities once no legacy utility class is left */`.
+   - Bundled `css/all`: this one file contains normalize + font + structure + core + utilities together. Its normalize clashes with the Helvetia design system, so comment out the original line in place. Immediately below it, insert the Helvetia base imports, then the legacy parts without normalize, then the Helvetia utilities, using the matching at-rule:
 
      ```scss
      @import '@helvetia-design/tokens/css/base';
      @import '@helvetia-design/styles/css/design-system';
+     /* TODO: remove these legacy Baloise imports once the Helvetia migration is verified */
+     @import '@baloise/ds-styles/css/font';
+     @import '@baloise/ds-styles/css/structure';
+     @import '@baloise/ds-styles/css/core';
+     @import '@baloise/ds-styles/css/utilities/all';
      @import '@helvetia-design/styles/css/utilities';
      ```
 
-     The commented-out `css/all` line carried the `@font-face` rules, and `@helvetia-design/styles/css/design-system` has none, so the app renders Arial until **Assets** runs. Do not insert `design-system.local` here. **Assets** sets up the self-hosted fonts.
+     The inserted `css/font` line keeps the `@font-face` rules of `css/all`, which load the fonts from www.baloise.ch. Do not insert `design-system.local` here. **Assets** replaces that line with self-hosted fonts.
 
    - For every other `imports` entry with `kind` `bootstrap`, add the `@helvetia-design` equivalent immediately below that line. Leave the original line unchanged.
    - When the line is HTML, CSS, or a side-effect import, duplicate the line. In the duplicate only, apply this package map: `@baloise/ds-core` → `@helvetia-design/core`, `@baloise/ds-react` → `@helvetia-design/react`, `@baloise/ds-angular` → `@helvetia-design/angular`, and `@baloise/ds-styles` → `@helvetia-design/styles`.
@@ -87,7 +92,7 @@ If `status` is `ready`, show the detected framework, package manager, version, a
 
    - Local form when the target file is `.scss`/`.sass` instead (regardless of `framework`): use `@import '@helvetia-design/styles/css/design-system';`, or `@use` if that is the at-rule already used by Baloise lines in that same file.
 
-4. Write the Init section of `ds-migration-report.md` as `shared/report.md` describes. Create the file when it is missing, so this section is its first entry. Under `### Setup`, list the resolved `version`, the aliases written, and the install command. Under `### Files changed`, list every file touched. Every existing `@helvetia-design/*` value that step 1 left unchanged goes under **Needs your attention**, with both values. So does every `css/all` line that step 3 commented out, with file and line and the note that it carried `@font-face` and the app renders Arial until **Assets** runs. In chat, show the whole section (attention lines, Setup, and Files changed) and end with the line `Report written to ds-migration-report.md.`
+4. Write the Init section of `ds-migration-report.md` as `shared/report.md` describes. Create the file when it is missing, so this section is its first entry. Under `### Setup`, list the resolved `version`, the aliases written, and the install command. Under `### Files changed`, list every file touched. Every existing `@helvetia-design/*` value that step 1 left unchanged goes under **Needs your attention**, with both values. So does every `css/all` line that step 3 commented out, with file and line and the note that the inserted `css/font` line loads the fonts from www.baloise.ch until **Assets** runs. In chat, show the whole section (attention lines, Setup, and Files changed) and end with the line `Report written to ds-migration-report.md.`
 5. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.
 
 ### Components
