@@ -38,7 +38,7 @@ Each run appends one section. Take the date from `date +%F`.
 - `src/pages/x.tsx`: 3 `bal-select` and 5 `bal-select-option` tags rewritten
 ```
 
-The section title names the step: `<date> init`, `<date> components: <name>` or `<date> assets`.
+The section title names the step: `<date> init`, `<date> components: <name>`, `<date> batch: <name>, <name>, ...` or `<date> assets`. A batch writes one coverage checklist per migration, as `shared/batch.md` describes.
 
 **Needs your attention** lists every line that needs a decision or an action from the consumer, each with file and line. When there is none, write `None.`
 
