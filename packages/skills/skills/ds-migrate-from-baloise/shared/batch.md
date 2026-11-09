@@ -39,6 +39,7 @@ Show, in this order:
 2. The migration list in rewrite order (see Order below), each with its `total`.
 3. `notYet` with each `total`. These stay `bal-*`.
 4. The shared files, each with its importers.
+5. The legacy config calls to delete, when the batch will leave no `bal-*` component. Run the Scan section of `shared/legacy-config.md`. Its `scan-migratable.mjs` call runs without path arguments. A component in the migration list does not count as left when its `total` there equals its `total` in the batch scan, because then every usage lies in the file set. Every other component counts as left.
 
 When the migration list has more than eight entries, say that the batch is large, suggest splitting the scope into smaller folders, and continue only on an explicit yes.
 
@@ -54,9 +55,11 @@ Run the migrations in this order. Structural parents first, because their `migra
 
 1. `card`, `modal`, `list`, `accordion`, `tabs`, `steps`, `navbar`, `sheet`, `popup`
 2. every other migration in the list, alphabetical
-3. `button`, `close`, `icon`, `text`, `heading`, `badge`, `tag`, `divider`
+3. `field`, `button`, `close`, `icon`, `text`, `heading`, `badge`, `tag`, `divider`
 
 Skip every name the migration list does not contain.
+
+`field` runs after every form control migration. Each control migration removes the `bal-field` around its own controls, following `shared/field.md`. The `field` migration then handles the grid and every `bal-field` that is left.
 
 ### Per migration
 
@@ -70,8 +73,9 @@ For each migration, in order:
    ```
 
 3. Apply its **Rewrite** step to those findings only. Skip its **Scan** display, its **Confirm** step and its stop.
-4. Skip the icon import and Registration rules from `shared/icons.md`. Step 6 runs them once for the whole batch. Keep applying the icon name rule to icon props that the migration file copies.
-5. Note the items its **Report** step lists, per file, before moving to the next migration.
+4. For a form control migration, apply `shared/field.md` in the same pass, as `SKILL.md` describes.
+5. Skip the icon import and Registration rules from `shared/icons.md` and every rule from `shared/legacy-config.md`. Steps 6 and 7 run them once for the whole batch. Keep applying the icon name rule to icon props that the migration file copies.
+6. Note the outcome of every numbered item of its **Report** step, then of every `F` item of `shared/field.md` when step 4 applied, with file and line. Do this before moving to the next migration.
 
 A rule in a `migration.md` that names a sibling or child by its `bal-*` tag also matches the `ds-*` tag an earlier migration in this batch already wrote. The card rule "wrap the `bal-close` next to the title in `ds-card-header`" also wraps a `ds-close`.
 
@@ -92,34 +96,40 @@ Follow `shared/icons.md` once for the union of every file the batch touched:
 - Run its **Scan** with those files as arguments.
 - Run its `scan-migratable.mjs` call without path arguments, so it covers the whole project. The batch rewrite has already happened, so ignore no component.
 - Apply every rule, including Registration. The legacy registration usually sits in a startup file outside the file set. Edit it there.
-- Note the items from its **Report** section.
+- Note the outcome of every `I` item from its **Report** section.
 
-Skip this step when the icon scan reports `total` 0.
+When the icon scan reports `total` 0, write each `I` item as `none found`.
 
 Done when every icon rule has been applied to the touched files.
 
-## 7. Legacy component check
+## 7. Legacy config
 
-Run the migratable scan without path arguments:
+Follow `shared/legacy-config.md` once for the whole project. The batch rewrite has already happened, so run its `scan-migratable.mjs` call again without path arguments, and count every component it lists as left. Then apply its **Decide** section and note the outcome of every `L` item.
 
-```bash
-node <this-skill-directory>/scripts/scan-migratable.mjs <project-root>
-```
+When a `bal-*` component is left, name the remaining components with their `total` under L5.
 
-When `suggested` or `notYet` is not empty, `bal-*` components remain in the project. The legacy config call and every `@baloise/*` package stay. Name the remaining components with their `total` in the report.
-
-Done when the report has the answer.
+Done when every legacy config call is deleted or reported as staying.
 
 ## 8. Report
 
-Print, per file, the Report items of every migration in the order they ran, then the icon items. Then three blocks:
+Append one section to `ds-migration-report.md` as `shared/report.md` describes. Its title is `<date> batch: <name>, <name>, ...`, with the migrations that ran, in order.
 
-1. `notYet` components left in the file set, with the files that use them. A `notYet` child inside a migrated parent is listed here by name, because the parent may now style or query it by its `ds-*` tag.
+**Needs your attention** lists every attention line of every migration, of `shared/field.md`, `shared/icons.md` and `shared/legacy-config.md`, then three batch lines. Each batch line is written as `None.` when it has nothing:
+
+1. `notYet` components left in the file set, with their files. A `notYet` child inside a migrated parent belongs here, because the parent may now style or query it by its `ds-*` tag.
 2. The shared files, with their importers outside the set.
 3. The migrations that did not run, when the batch stopped early.
 
-End with the result of step 7.
+Write one coverage checklist per source, each under its own heading:
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+- `### Coverage checklist: <name>` for every migration that ran, in order. It holds that migration's numbered items, then its `F` items when `shared/field.md` applied.
+- `### Coverage checklist: icons` with the `I` items.
+- `### Coverage checklist: legacy config` with the `L` items.
 
-Done when the report is printed and the working tree is still unstaged.
+Follow the checklist rules in `shared/report.md` for every line. **Files changed** has one line per file, naming every migration that changed it.
+
+In chat, show the **Needs your attention** lines and the pointer line from `shared/report.md`, counted over every checklist in the section.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every checklist has a line for each of its items, the chat shows only the attention lines and the pointer line, and the working tree is still unstaged.

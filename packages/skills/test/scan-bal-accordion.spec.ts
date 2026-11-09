@@ -470,7 +470,7 @@ describe('accordion migration.md', () => {
     expect(cardRow).toBeDefined()
     expect(cardRow).not.toContain('ds-card-content')
     expect(cardRow).toContain('Do not add a wrapper element')
-    expect(cardRow).toContain('Mention each dropped `card` in the summary')
+    expect(cardRow).toContain('Mention each dropped `card` in the report')
     expect(migration).toContain('the consumer may add `ds-card` themselves if a real card was intended')
   })
 })

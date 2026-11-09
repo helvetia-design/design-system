@@ -251,7 +251,7 @@ describe('shared/icons.md', () => {
       'BrandIcon<Name>',
       'initializeDesignSystem',
       'DsRootProvider',
-      'scan-migratable.mjs',
+      'shared/legacy-config.md',
     ]) {
       expect(rules, phrase).toContain(phrase)
     }
