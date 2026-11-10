@@ -49,9 +49,10 @@ flowchart TD
     R6{"Classify each finding"}:::code
     R6 -->|global / alias / device,<br/>used raw| V["VIOLATION —<br/>needs own Component token"]:::code
     R6 -->|component-foreign<br/>(another component's own token)| G["REVIEW —<br/>confirm intentional reuse"]:::code
+    R6 -->|component-shared<br/>(forms family using --ds-form-*)| OK["Treated as own —<br/>no finding"]:::code
     R6 -->|hardcoded literal,<br/>or missing/typo token| P["GAP —<br/>blocks a clean Figma bind"]:::code
     R6 -->|existing Component token,<br/>anatomy rule failed| N["NAMING —<br/>wrong segment order, casing,<br/>typo, abbreviation, font- prefix"]:::code
-    R6 -->|transition/animation property,<br/>or brand-invariant constant<br/>already marked in source| E["EXEMPT —<br/>not a token candidate,<br/>informational only"]:::code
+    R6 -->|transition/animation property,<br/>focus-ring alias token,<br/>or brand-invariant constant<br/>already marked in source| E["EXEMPT —<br/>not a token candidate,<br/>informational only"]:::code
 
     V --> L["For each VIOLATION/GAP:<br/>reverse-lookup the value against<br/>Base.tokens.json's Alias layer"]:::code
     L -->|match found| M1["Propose that Alias as the<br/>new Component token's resolution"]:::code
@@ -81,6 +82,20 @@ exists anywhere in this skill.
 - NEVER use an Alias or Device token directly in a component's own SCSS/TSX — Alias and
   Device values are legitimate _resolution targets_ for a Component token, but the
   component's code must reference `--ds-<component>-*`, not the Alias/Device var itself.
+  - **Exception: focus-ring interaction tokens.** `--ds-alias-interaction-focus-*`
+    (`focus-color-base`, `focus-color-inverted`, `focus-size-*`, etc.) is a cross-cutting,
+    universal design value — every component's focus ring resolves to the exact same
+    Alias value, there is no per-component variation to capture, and no Component-layer
+    key exists for it today (unlike background/icon/text colors, which do vary per
+    component and therefore do need their own `--ds-<component>-*` wrapper). Referencing
+    `--ds-alias-interaction-focus-color-base` / `-inverted` directly from a component's
+    SCSS is `EXEMPT`, not `VIOLATION` — do not propose a new `--ds-<component>-color-focus`
+    token for this. This mirrors how several existing components already do it
+    (`--ds-hint-color-focus`, `--ds-select-color-focus-ring`, `--ds-checkbox-focus-color`,
+    etc. all ultimately just alias the same base/inverted value) — those existing
+    Component-layer focus tokens aren't wrong, but a component that skips that wrapper
+    and references the Alias token directly isn't wrong either; don't flag either
+    pattern as a violation.
 - NEVER treat prevalence as correctness — e.g. Device tokens are used raw in 14+
   components today; that is the drift this skill exists to surface, not a precedent to
   defer to.
@@ -94,6 +109,18 @@ exists anywhere in this skill.
   real component) as a VIOLATION — it is informational (`REVIEW`) only, since it is
   often deliberate reuse (e.g. `card-header` mirroring `button`'s small-size scale), and
   it is not itself a Figma gap (it already resolves to a real token).
+- NEVER flag a **form control** family (anything under `components/forms/`) for using
+  the shared `Form` tokens (`--ds-form-*`) — not even as `REVIEW`. Every form control
+  (input, textarea, select, datepicker, number-input, phone-input, …) deliberately
+  styles its field box, label, description and control through `Form` via
+  `form.mixin.scss` / `input.mixin.scss`; this is confirmed design, not drift. `scan.js`
+  classifies these usages as `component-shared` (see `SHARED_OWNERS_BY_CATEGORY`) and
+  treats `Form` as one of the family's `componentKeys`. Borrowing from any _other_
+  component (e.g. a form control using `--ds-button-*`) is still `REVIEW` as usual.
+  - `Form`'s naming violations show up in every form family's run. Report them once
+    in the `form` family's own report; other form families mention them in one line
+    ("N naming findings on shared `Form` key — see form report"), not as per-family
+    findings.
 - NEVER derive which `🧩 Component` JSON key a sub-component's tokens live under by
   guessing `PascalCase(folder name)` — some sub-components (e.g. `tab`) have no own
   top-level key at all; their tokens nest inside the family owner's key (`Tabs`).
@@ -256,8 +283,23 @@ node .claude/skills/ds-token-check/scan.js tab    # resolves up to the tabs fami
 
 Output is JSON: the classified usage list, the derived `componentKeys`, the `naming`
 violations per key, the parsed `propEnums` (the family's `@Prop()` variant dimensions),
-the `figmaChecklist` matrix (found/missing per category×variant×state), and
-`hardcodedDeclarations` (literal values with no token at all). The agent reads this,
+the `figmaChecklist` matrix (found/missing per category×variant×state),
+`hardcodedDeclarations` (literal values with no token at all), and for families that
+share a namespace (`sharedOwners`, e.g. `form` for `components/forms/`) a
+`sharedOwnerInventory`: every `--ds-<owner>-*` token bucketed into the 9 checklist
+categories, each flagged `referencedInFamilySource`.
+
+For a shared-owner family, `figmaChecklist` mostly comes back `notFoundAnywhere`: it
+probes `--ds-<family>-*`, and the shared namespace has its own anatomy
+(`--ds-form-<state>-<part>-<suffix>`, with `default` where the prop says `primary`).
+Fill those rows from `sharedOwnerInventory` instead, mapping tokens to variant × state
+by hand. `referencedInFamilySource: false` does **not** mean unused: tokens applied
+through the owner's mixins (e.g. `form.mixin.scss` container/label/description) never
+appear in the family's own files. Check the mixin before calling a token unwired. A
+token that is defined but applied nowhere (neither family source nor owner mixin) is a
+`GAP`, because Figma would bind a value the code doesn't render.
+
+The agent reads this,
 then reads the same family's files directly to sanity-check the checklist (especially
 the disabled/loading limitation above) and add anything the mechanical passes can't see,
 before assembling and writing the report.

@@ -1530,6 +1530,15 @@
         }
       }
     },
+    "📏 Size": {
+      "Control": {
+        "Base": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Space.48}",
+          "$description": "Minimum height of a standard form control box (48px at 16px root)."
+        }
+      }
+    },
     "🔵 Radius": {
       "None": {
         "$type": "dimension",
@@ -11635,6 +11644,12 @@
       }
     },
     "Form": {
+      "Field": {
+        "Gap": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.2XS}"
+        }
+      },
       "Container": {
         "Radius": {
           "$type": "dimension",
@@ -11645,6 +11660,18 @@
             ],
             "com.figma.variableId": "VariableID:137:1498"
           }
+        },
+        "Gap": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.2XS}"
+        },
+        "PaddingX": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Padding.XS}"
+        },
+        "MinHeight": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.📏 Size.Control.Base}"
         }
       },
       "Default": {
@@ -11906,135 +11933,9 @@
                 "style": "VariableID:137:1533"
               }
             }
-          },
-          "Background": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🎨 Surface.SuccessLighter}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:1534"
-            }
-          }
-        },
-        "Label": {
-          "Typo": {
-            "$type": "typography",
-            "$value": {
-              "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
-              "fontSize": "{📱 Device.🔤 Text.Size.SM}",
-              "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
-              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
-              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
-              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
-            },
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": {
-                "fontFamily": "VariableID:2826:10082",
-                "fontSize": "VariableID:2826:10083",
-                "fontWeight": "VariableID:2826:10084",
-                "lineHeight": "VariableID:2826:10085",
-                "letterSpacing": "VariableID:2826:10086",
-                "textDecoration": "VariableID:2826:10087",
-                "textTransform": "VariableID:2826:10088"
-              }
-            }
-          },
-          "Color": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🔤 Text.Color.Success}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:1539"
-            }
-          }
-        },
-        "Control": {
-          "Typo": {
-            "$type": "typography",
-            "$value": {
-              "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
-              "fontSize": "{📱 Device.🔤 Text.Size.Base}",
-              "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
-              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
-              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
-              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
-            },
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": {
-                "fontFamily": "VariableID:2826:10089",
-                "fontSize": "VariableID:2826:10090",
-                "fontWeight": "VariableID:2826:10091",
-                "lineHeight": "VariableID:2826:10092",
-                "letterSpacing": "VariableID:2826:10093",
-                "textDecoration": "VariableID:2826:10094",
-                "textTransform": "VariableID:2826:10095"
-              }
-            }
-          },
-          "Value": {
-            "Color": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🔤 Text.Color.Success}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1544"
-              }
-            }
-          },
-          "Placeholder": {
-            "Color": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🔤 Text.Color.Placeholder}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1545"
-              }
-            }
           }
         },
         "Description": {
-          "Typo": {
-            "$type": "typography",
-            "$value": {
-              "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
-              "fontSize": "{📱 Device.🔤 Text.Size.XS}",
-              "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
-              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
-              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
-              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
-            },
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": {
-                "fontFamily": "VariableID:2826:10096",
-                "fontSize": "VariableID:2826:10097",
-                "fontWeight": "VariableID:2826:10098",
-                "lineHeight": "VariableID:2826:10099",
-                "letterSpacing": "VariableID:2826:10100",
-                "textDecoration": "VariableID:2826:10101",
-                "textTransform": "VariableID:2826:10102"
-              }
-            }
-          },
           "Color": {
             "$type": "color",
             "$value": "{🔗 Alias.🔤 Text.Color.Success}",
@@ -12066,135 +11967,9 @@
                 "style": "VariableID:137:1553"
               }
             }
-          },
-          "Background": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🎨 Surface.WarningLighter}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:1554"
-            }
-          }
-        },
-        "Label": {
-          "Typo": {
-            "$type": "typography",
-            "$value": {
-              "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
-              "fontSize": "{📱 Device.🔤 Text.Size.SM}",
-              "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
-              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
-              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
-              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
-            },
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": {
-                "fontFamily": "VariableID:2826:10103",
-                "fontSize": "VariableID:2826:10104",
-                "fontWeight": "VariableID:2826:10105",
-                "lineHeight": "VariableID:2826:10106",
-                "letterSpacing": "VariableID:2826:10107",
-                "textDecoration": "VariableID:2826:10108",
-                "textTransform": "VariableID:2826:10109"
-              }
-            }
-          },
-          "Color": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🔤 Text.Color.Warning}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:1559"
-            }
-          }
-        },
-        "Control": {
-          "Typo": {
-            "$type": "typography",
-            "$value": {
-              "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
-              "fontSize": "{📱 Device.🔤 Text.Size.Base}",
-              "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
-              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
-              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
-              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
-            },
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": {
-                "fontFamily": "VariableID:2826:10110",
-                "fontSize": "VariableID:2826:10111",
-                "fontWeight": "VariableID:2826:10112",
-                "lineHeight": "VariableID:2826:10113",
-                "letterSpacing": "VariableID:2826:10114",
-                "textDecoration": "VariableID:2826:10115",
-                "textTransform": "VariableID:2826:10116"
-              }
-            }
-          },
-          "Value": {
-            "Color": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🔤 Text.Color.Warning}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1564"
-              }
-            }
-          },
-          "Placeholder": {
-            "Color": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🔤 Text.Color.Placeholder}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1565"
-              }
-            }
           }
         },
         "Description": {
-          "Typo": {
-            "$type": "typography",
-            "$value": {
-              "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
-              "fontSize": "{📱 Device.🔤 Text.Size.XS}",
-              "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
-              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
-              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
-              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
-            },
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": {
-                "fontFamily": "VariableID:2826:10117",
-                "fontSize": "VariableID:2826:10118",
-                "fontWeight": "VariableID:2826:10119",
-                "lineHeight": "VariableID:2826:10120",
-                "letterSpacing": "VariableID:2826:10121",
-                "textDecoration": "VariableID:2826:10122",
-                "textTransform": "VariableID:2826:10123"
-              }
-            }
-          },
           "Color": {
             "$type": "color",
             "$value": "{🔗 Alias.🔤 Text.Color.Warning}",
@@ -12226,135 +12001,9 @@
                 "style": "VariableID:137:1573"
               }
             }
-          },
-          "Background": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🎨 Surface.DangerLighter}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:1574"
-            }
-          }
-        },
-        "Label": {
-          "Typo": {
-            "$type": "typography",
-            "$value": {
-              "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
-              "fontSize": "{📱 Device.🔤 Text.Size.SM}",
-              "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
-              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
-              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
-              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
-            },
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": {
-                "fontFamily": "VariableID:2826:10124",
-                "fontSize": "VariableID:2826:10125",
-                "fontWeight": "VariableID:2826:10126",
-                "lineHeight": "VariableID:2826:10127",
-                "letterSpacing": "VariableID:2826:10128",
-                "textDecoration": "VariableID:2826:10129",
-                "textTransform": "VariableID:2826:10130"
-              }
-            }
-          },
-          "Color": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🔤 Text.Color.Danger}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:1579"
-            }
-          }
-        },
-        "Control": {
-          "Typo": {
-            "$type": "typography",
-            "$value": {
-              "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
-              "fontSize": "{📱 Device.🔤 Text.Size.Base}",
-              "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
-              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
-              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
-              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
-            },
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": {
-                "fontFamily": "VariableID:2826:10131",
-                "fontSize": "VariableID:2826:10132",
-                "fontWeight": "VariableID:2826:10133",
-                "lineHeight": "VariableID:2826:10134",
-                "letterSpacing": "VariableID:2826:10135",
-                "textDecoration": "VariableID:2826:10136",
-                "textTransform": "VariableID:2826:10137"
-              }
-            }
-          },
-          "Value": {
-            "Color": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🔤 Text.Color.Danger}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1584"
-              }
-            }
-          },
-          "Placeholder": {
-            "Color": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🔤 Text.Color.Placeholder}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1585"
-              }
-            }
           }
         },
         "Description": {
-          "Typo": {
-            "$type": "typography",
-            "$value": {
-              "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
-              "fontSize": "{📱 Device.🔤 Text.Size.XS}",
-              "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
-              "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
-              "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
-              "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
-            },
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": {
-                "fontFamily": "VariableID:2826:10138",
-                "fontSize": "VariableID:2826:10139",
-                "fontWeight": "VariableID:2826:10140",
-                "lineHeight": "VariableID:2826:10141",
-                "letterSpacing": "VariableID:2826:10142",
-                "textDecoration": "VariableID:2826:10143",
-                "textTransform": "VariableID:2826:10144"
-              }
-            }
-          },
           "Color": {
             "$type": "color",
             "$value": "{🔗 Alias.🔤 Text.Color.Danger}",

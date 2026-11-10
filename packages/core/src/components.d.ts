@@ -343,6 +343,7 @@ export namespace Components {
     }
     /**
      * Button provides a clickable element for triggering actions, submitting forms, or navigating — supporting text, icons, or both.
+     * @attachment ds-badge top-right - Optional badge in the default slot, pinned just outside the button's top-right corner.
      */
     interface DsButton {
         /**
@@ -500,6 +501,10 @@ export namespace Components {
     }
     /**
      * Card groups related content together in a contained, visually distinct container with optional header and footer.
+     * @attachment ds-badge top-right - Optional badge as the first child of the default slot, centered on the card's top-right corner.
+     * @attachment ds-tag top-left position=left - Optional tag as the first child of the default slot, centered on the card's top edge, aligned left.
+     * @attachment ds-tag top-center position=center - Optional tag as the first child of the default slot, centered on the card's top edge.
+     * @attachment ds-tag top-right position=right - Optional tag as the first child of the default slot, centered on the card's top edge, aligned right.
      */
     interface DsCard {
         /**
@@ -1251,6 +1256,7 @@ export namespace Components {
      * Drawer displays a panel that slides up from the bottom of the screen.
      * Uses the native dialog element for accessible top-layer rendering, built-in focus management,
      * and Escape-key handling.
+     * @attachment ds-close top-right - Close button rendered when `closable` is true, inset 1rem from the container's top-right corner.
      */
     interface DsDrawer {
         /**
@@ -1895,6 +1901,7 @@ export namespace Components {
     }
     /**
      * Modal displays content in a dialog overlay using the native dialog element.
+     * @attachment ds-close top-right - Close button rendered when `closable` is true, inset by the modal padding from the top-right corner.
      */
     interface DsModal {
         /**
@@ -3267,6 +3274,7 @@ export namespace Components {
     }
     /**
      * Tab renders a single tab button inside a ds-tabs group, supporting both the panels and navigation variants.
+     * @attachment ds-badge top-right size=sm - Optional small badge in the default slot, centered vertically on the top-right of the label. Only `size="sm"` is positioned.
      */
     interface DsTab {
         /**
@@ -4015,6 +4023,7 @@ declare global {
     }
     /**
      * Button provides a clickable element for triggering actions, submitting forms, or navigating — supporting text, icons, or both.
+     * @attachment ds-badge top-right - Optional badge in the default slot, pinned just outside the button's top-right corner.
      */
     interface HTMLDsButtonElement extends Components.DsButton, HTMLStencilElement {
         addEventListener<K extends keyof HTMLDsButtonElementEventMap>(type: K, listener: (this: HTMLDsButtonElement, ev: DsButtonCustomEvent<HTMLDsButtonElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -4041,6 +4050,10 @@ declare global {
     };
     /**
      * Card groups related content together in a contained, visually distinct container with optional header and footer.
+     * @attachment ds-badge top-right - Optional badge as the first child of the default slot, centered on the card's top-right corner.
+     * @attachment ds-tag top-left position=left - Optional tag as the first child of the default slot, centered on the card's top edge, aligned left.
+     * @attachment ds-tag top-center position=center - Optional tag as the first child of the default slot, centered on the card's top edge.
+     * @attachment ds-tag top-right position=right - Optional tag as the first child of the default slot, centered on the card's top edge, aligned right.
      */
     interface HTMLDsCardElement extends Components.DsCard, HTMLStencilElement {
     }
@@ -4304,6 +4317,7 @@ declare global {
      * Drawer displays a panel that slides up from the bottom of the screen.
      * Uses the native dialog element for accessible top-layer rendering, built-in focus management,
      * and Escape-key handling.
+     * @attachment ds-close top-right - Close button rendered when `closable` is true, inset 1rem from the container's top-right corner.
      */
     interface HTMLDsDrawerElement extends Components.DsDrawer, HTMLStencilElement {
         addEventListener<K extends keyof HTMLDsDrawerElementEventMap>(type: K, listener: (this: HTMLDsDrawerElement, ev: DsDrawerCustomEvent<HTMLDsDrawerElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -4479,6 +4493,7 @@ declare global {
     }
     /**
      * Modal displays content in a dialog overlay using the native dialog element.
+     * @attachment ds-close top-right - Close button rendered when `closable` is true, inset by the modal padding from the top-right corner.
      */
     interface HTMLDsModalElement extends Components.DsModal, HTMLStencilElement {
         addEventListener<K extends keyof HTMLDsModalElementEventMap>(type: K, listener: (this: HTMLDsModalElement, ev: DsModalCustomEvent<HTMLDsModalElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -4943,6 +4958,7 @@ declare global {
     }
     /**
      * Tab renders a single tab button inside a ds-tabs group, supporting both the panels and navigation variants.
+     * @attachment ds-badge top-right size=sm - Optional small badge in the default slot, centered vertically on the top-right of the label. Only `size="sm"` is positioned.
      */
     interface HTMLDsTabElement extends Components.DsTab, HTMLStencilElement {
         addEventListener<K extends keyof HTMLDsTabElementEventMap>(type: K, listener: (this: HTMLDsTabElement, ev: DsTabCustomEvent<HTMLDsTabElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -5443,6 +5459,7 @@ declare namespace LocalJSX {
     }
     /**
      * Button provides a clickable element for triggering actions, submitting forms, or navigating — supporting text, icons, or both.
+     * @attachment ds-badge top-right - Optional badge in the default slot, pinned just outside the button's top-right corner.
      */
     interface DsButton {
         /**
@@ -5624,6 +5641,10 @@ declare namespace LocalJSX {
     }
     /**
      * Card groups related content together in a contained, visually distinct container with optional header and footer.
+     * @attachment ds-badge top-right - Optional badge as the first child of the default slot, centered on the card's top-right corner.
+     * @attachment ds-tag top-left position=left - Optional tag as the first child of the default slot, centered on the card's top edge, aligned left.
+     * @attachment ds-tag top-center position=center - Optional tag as the first child of the default slot, centered on the card's top edge.
+     * @attachment ds-tag top-right position=right - Optional tag as the first child of the default slot, centered on the card's top edge, aligned right.
      */
     interface DsCard {
         /**
@@ -6445,6 +6466,7 @@ declare namespace LocalJSX {
      * Drawer displays a panel that slides up from the bottom of the screen.
      * Uses the native dialog element for accessible top-layer rendering, built-in focus management,
      * and Escape-key handling.
+     * @attachment ds-close top-right - Close button rendered when `closable` is true, inset 1rem from the container's top-right corner.
      */
     interface DsDrawer {
         /**
@@ -7130,6 +7152,7 @@ declare namespace LocalJSX {
     }
     /**
      * Modal displays content in a dialog overlay using the native dialog element.
+     * @attachment ds-close top-right - Close button rendered when `closable` is true, inset by the modal padding from the top-right corner.
      */
     interface DsModal {
         /**
@@ -8650,6 +8673,7 @@ declare namespace LocalJSX {
     }
     /**
      * Tab renders a single tab button inside a ds-tabs group, supporting both the panels and navigation variants.
+     * @attachment ds-badge top-right size=sm - Optional small badge in the default slot, centered vertically on the top-right of the label. Only `size="sm"` is positioned.
      */
     interface DsTab {
         /**
@@ -10051,6 +10075,7 @@ declare module "@stencil/core" {
             "ds-brand-icon": LocalJSX.IntrinsicElements["ds-brand-icon"] & JSXBase.HTMLAttributes<HTMLDsBrandIconElement>;
             /**
              * Button provides a clickable element for triggering actions, submitting forms, or navigating — supporting text, icons, or both.
+             * @attachment ds-badge top-right - Optional badge in the default slot, pinned just outside the button's top-right corner.
              */
             "ds-button": LocalJSX.IntrinsicElements["ds-button"] & JSXBase.HTMLAttributes<HTMLDsButtonElement>;
             /**
@@ -10059,6 +10084,10 @@ declare module "@stencil/core" {
             "ds-button-group": LocalJSX.IntrinsicElements["ds-button-group"] & JSXBase.HTMLAttributes<HTMLDsButtonGroupElement>;
             /**
              * Card groups related content together in a contained, visually distinct container with optional header and footer.
+             * @attachment ds-badge top-right - Optional badge as the first child of the default slot, centered on the card's top-right corner.
+             * @attachment ds-tag top-left position=left - Optional tag as the first child of the default slot, centered on the card's top edge, aligned left.
+             * @attachment ds-tag top-center position=center - Optional tag as the first child of the default slot, centered on the card's top edge.
+             * @attachment ds-tag top-right position=right - Optional tag as the first child of the default slot, centered on the card's top edge, aligned right.
              */
             "ds-card": LocalJSX.IntrinsicElements["ds-card"] & JSXBase.HTMLAttributes<HTMLDsCardElement>;
             /**
@@ -10141,6 +10170,7 @@ declare module "@stencil/core" {
              * Drawer displays a panel that slides up from the bottom of the screen.
              * Uses the native dialog element for accessible top-layer rendering, built-in focus management,
              * and Escape-key handling.
+             * @attachment ds-close top-right - Close button rendered when `closable` is true, inset 1rem from the container's top-right corner.
              */
             "ds-drawer": LocalJSX.IntrinsicElements["ds-drawer"] & JSXBase.HTMLAttributes<HTMLDsDrawerElement>;
             /**
@@ -10195,6 +10225,7 @@ declare module "@stencil/core" {
             "ds-logo": LocalJSX.IntrinsicElements["ds-logo"] & JSXBase.HTMLAttributes<HTMLDsLogoElement>;
             /**
              * Modal displays content in a dialog overlay using the native dialog element.
+             * @attachment ds-close top-right - Close button rendered when `closable` is true, inset by the modal padding from the top-right corner.
              */
             "ds-modal": LocalJSX.IntrinsicElements["ds-modal"] & JSXBase.HTMLAttributes<HTMLDsModalElement>;
             /**
@@ -10315,6 +10346,7 @@ declare module "@stencil/core" {
             "ds-steps": LocalJSX.IntrinsicElements["ds-steps"] & JSXBase.HTMLAttributes<HTMLDsStepsElement>;
             /**
              * Tab renders a single tab button inside a ds-tabs group, supporting both the panels and navigation variants.
+             * @attachment ds-badge top-right size=sm - Optional small badge in the default slot, centered vertically on the top-right of the label. Only `size="sm"` is positioned.
              */
             "ds-tab": LocalJSX.IntrinsicElements["ds-tab"] & JSXBase.HTMLAttributes<HTMLDsTabElement>;
             /**

@@ -16,6 +16,18 @@ const TOKENS_CSS_PATH = 'packages/tokens/dist/css/base.tokens.css'
 const TOKENS_JSON_PATH = 'packages/tokens/tokens/Base.tokens.json'
 const COMPONENT_TOKENS_KEY = '🧩 Component'
 
+// Component-layer namespaces a whole category deliberately shares instead of each
+// family owning its own key. Every form control (input, textarea, select, datepicker,
+// number-input, …) styles its field box/label/description/control through the shared
+// `Form` tokens (`--ds-form-*`) via form.mixin.scss / input.mixin.scss — confirmed
+// intentional design. For a family in one of these categories, usages of the shared
+// namespace classify as `component-shared` (treated like `component-own`: no REVIEW
+// finding, its 🧩 key is naming-checked, and it gets a token inventory for the Figma
+// checklist) instead of `component-foreign`.
+const SHARED_OWNERS_BY_CATEGORY = {
+  forms: ['form'],
+}
+
 function findDSRoot() {
   let current = process.cwd()
   while (current !== '/') {
@@ -141,7 +153,7 @@ function extractUsages(file, dsRoot) {
   return usages
 }
 
-function classify(token, familyKebab, siblingNames, allComponentNames, definedTokens) {
+function classify(token, familyKebab, siblingNames, allComponentNames, definedTokens, sharedOwners = []) {
   if (!definedTokens.has(token)) return 'missing'
   if (token.startsWith('--ds-global-')) return 'global'
   if (token.startsWith('--ds-alias-')) return 'alias'
@@ -150,6 +162,9 @@ function classify(token, familyKebab, siblingNames, allComponentNames, definedTo
   const rest = token.slice('--ds-'.length)
   for (const name of [familyKebab, ...siblingNames]) {
     if (rest === name || rest.startsWith(`${name}-`)) return 'component-own'
+  }
+  for (const name of sharedOwners) {
+    if (rest === name || rest.startsWith(`${name}-`)) return 'component-shared'
   }
   for (const name of allComponentNames) {
     if (rest === name || rest.startsWith(`${name}-`)) return 'component-foreign'
@@ -174,7 +189,7 @@ function deriveComponentKeys(usages, componentLayer) {
   const found = new Map() // key -> kebab
 
   for (const usage of usages) {
-    if (usage.layer !== 'component-own') continue
+    if (usage.layer !== 'component-own' && usage.layer !== 'component-shared') continue
     const rest = usage.token.slice('--ds-'.length)
 
     let best = null
@@ -446,6 +461,36 @@ function buildFigmaChecklist(familyKebab, propEnums, definedTokens) {
   return rows
 }
 
+// Inventory of a shared owner's tokens (e.g. every `--ds-form-*`), bucketed into the 9
+// checklist categories by longest matching suffix. buildFigmaChecklist can't cross these
+// against the family's @Prop() enums: the shared namespace has its own anatomy
+// (`--ds-form-<state>-<part>-<suffix>`, e.g. `--ds-form-danger-container-border`, with
+// `default` where the family prop says `primary`), so the agent maps them to variant ×
+// state by hand. `referencedInFamilySource` is a literal match against the family's own
+// files only — tokens applied indirectly through the owner's mixins (e.g.
+// form.mixin.scss's container/label/description) show `false` while still rendering.
+function buildSharedOwnerInventory(sharedOwners, definedTokens, usages) {
+  const referenced = new Set(usages.map(u => u.token))
+  const suffixEntries = Object.entries(CATEGORY_SUFFIXES)
+    .flatMap(([category, suffixes]) => suffixes.map(suffix => ({ category, suffix })))
+    .sort((a, b) => b.suffix.length - a.suffix.length)
+
+  return sharedOwners.map(owner => {
+    const byCategory = Object.fromEntries(Object.keys(CATEGORY_SUFFIXES).map(c => [c, []]))
+    const uncategorized = []
+    for (const token of definedTokens) {
+      if (!token.startsWith(`--ds-${owner}-`)) continue
+      // letter-spacing / text-decoration / text-transform are EXEMPT by default (SKILL.md Rules)
+      if (/-(letter-spacing|text-decoration|text-transform)$/.test(token)) continue
+      const match = suffixEntries.find(({ suffix }) => token.endsWith(`-${suffix}`))
+      const entry = { token, referencedInFamilySource: referenced.has(token) }
+      if (match) byCategory[match.category].push(entry)
+      else uncategorized.push(entry)
+    }
+    return { owner, byCategory, uncategorized }
+  })
+}
+
 // Value strings that are never a token candidate regardless of property —
 // generic CSS keywords/resets, not design values.
 const HARDCODED_SKIP_VALUES = new Set(['none', 'inherit', 'initial', 'unset', 'auto', '0', 'normal'])
@@ -506,6 +551,9 @@ function scan(componentName) {
   const allComponentNames = listAllComponentDirNames(dsRoot)
   const definedTokens = loadDefinedTokens(dsRoot)
   const files = collectSourceFiles(familyDir)
+  const sharedOwners = (SHARED_OWNERS_BY_CATEGORY[category] || []).filter(
+    owner => owner !== familyKebab && !siblingNames.includes(owner),
+  )
 
   const usages = []
   for (const file of files) {
@@ -513,7 +561,7 @@ function scan(componentName) {
   }
 
   for (const usage of usages) {
-    usage.layer = classify(usage.token, familyKebab, siblingNames, allComponentNames, definedTokens)
+    usage.layer = classify(usage.token, familyKebab, siblingNames, allComponentNames, definedTokens, sharedOwners)
   }
 
   const componentLayer = loadComponentLayer(dsRoot)
@@ -526,6 +574,7 @@ function scan(componentName) {
 
   const propEnums = parseFamilyProps(familyDir)
   const figmaChecklist = buildFigmaChecklist(familyKebab, propEnums, definedTokens)
+  const sharedOwnerInventory = buildSharedOwnerInventory(sharedOwners, definedTokens, usages)
   const scssFiles = files.filter(f => f.endsWith('.scss'))
   const hardcodedDeclarations = findHardcodedDeclarations(scssFiles, dsRoot)
 
@@ -535,12 +584,14 @@ function scan(componentName) {
     familyKebab,
     familyDir: path.relative(dsRoot, familyDir),
     siblingNames,
+    sharedOwners,
     files: files.map(f => path.relative(dsRoot, f)),
     usages,
     componentKeys: [...componentKeys.keys()],
     naming,
     propEnums,
     figmaChecklist,
+    sharedOwnerInventory,
     hardcodedDeclarations,
   }
 }

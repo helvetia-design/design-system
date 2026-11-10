@@ -50,8 +50,6 @@
     font-size: var(--_#{$prefix}-size);
     line-height: var(--_#{$prefix}-line-height);
 
-    border-radius: var(--_#{$prefix}-container-radius);
-
     @include placeholder {
       color: var(--_#{$prefix}-placeholder);
     }

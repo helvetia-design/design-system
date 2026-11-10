@@ -7,7 +7,7 @@
  */
 
 @mixin vars-field() {
-  @include vars.local(form-field-gap, 0.25rem);
+  @include vars.local(form-field-gap, var(--ds-form-field-gap));
 }
 
 @mixin field() {
@@ -50,11 +50,11 @@
     display: flex;
     width: 100%;
     align-items: center;
-    min-height: 3rem;
-    gap: 0.25rem;
+    min-height: var(--ds-form-container-min-height);
+    gap: var(--ds-form-container-gap);
 
     @if $bordered {
-      padding-inline: 0.5rem;
+      padding-inline: var(--ds-form-container-padding-x);
 
       background: var(--_form-container-background);
       border: var(--_form-container-border);

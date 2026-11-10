@@ -35,7 +35,7 @@
 | ⬜     | Spinner      | Indicators | -                                     | ✅  | ⬜    |
 | ⬜     | Progress Bar | Indicators | -                                     | ✅  | ⬜    |
 | ⬜     | Label        | Forms      | -                                     | ✅  | ⬜    |
-| ⬜     | Input        | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Input        | Forms      | -                                     | ✅  | ⬜    |
 | ⬜     | Textarea     | Forms      | -                                     | ⬜  | ⬜    |
 | ⬜     | Toggle       | Forms      | -                                     | ⬜  | ⬜    |
 | ⬜     | Radio        | Forms      | -                                     | ⬜  | ⬜    |
@@ -64,7 +64,7 @@
 | ⬜     | Tabs         | Navigation | Icon                                  | ⬜  | ⬜    |
 | ⬜     | Accordion    | Structure  | Icon                                  | ⬜  | ⬜    |
 | ⬜     | App Footer   | Structure  | Divider, Icon, Logo                   | ⬜  | ⬜    |
-| ⬜     | Close        | Actions    | Button                                | ⬜  | ⬜    |
+| ⬜     | Close        | Actions    | Button                                | ✅  | ⬜    |
 | ⬜     | Counter      | Forms      | Button                                | ⬜  | ⬜    |
 | ⬜     | File Upload  | Forms      | Button, Content, Icon, Spinner, Stack | ⬜  | ⬜    |
 | ⬜     | Pagination   | Navigation | Icon, Button                          | ⬜  | ⬜    |
