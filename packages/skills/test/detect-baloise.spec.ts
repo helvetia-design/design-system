@@ -186,6 +186,7 @@ describe('detectBaloise', () => {
       version: '20.0.0',
       aliases: {
         '@helvetia-design/react': '20.0.0',
+        '@helvetia-design/assets': '20.0.0',
         '@helvetia-design/core': '20.0.0',
         '@helvetia-design/styles': '20.0.0',
         '@helvetia-design/tokens': '20.0.0',
@@ -521,15 +522,54 @@ describe('aliasesFor declares every package the migration makes the consumer imp
     ])
   })
 
-  it.each(['@baloise/ds-icons', '@baloise/ds-brand-icons'])(
-    'declares assets when %s is a direct dependency',
-    async name => {
-      expect(await aliasesForDeps({ '@baloise/ds-core': '19.0.0', [name]: '19.0.0' })).toEqual([
-        '@helvetia-design/assets',
-        '@helvetia-design/core',
-        '@helvetia-design/styles',
-        '@helvetia-design/tokens',
-      ])
-    },
-  )
+  it.each([
+    '@baloise/ds-icons',
+    '@baloise/ds-brand-icons',
+    '@baloise/ds-styles',
+    '@baloise/ds-fonts',
+    '@baloise/ds-favicons',
+  ])('declares assets when %s is a direct dependency', async name => {
+    expect(await aliasesForDeps({ '@baloise/ds-core': '19.0.0', [name]: '19.0.0' })).toEqual([
+      '@helvetia-design/assets',
+      '@helvetia-design/core',
+      '@helvetia-design/styles',
+      '@helvetia-design/tokens',
+    ])
+  })
+
+  it('lists @baloise/ds-fonts and @baloise/ds-favicons in dependencies and declares assets', async () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'package.json',
+      JSON.stringify({
+        dependencies: {
+          'react': '19.0.0',
+          '@baloise/ds-react': '19.0.0',
+          '@baloise/ds-fonts': '19.0.0',
+          '@baloise/ds-favicons': '19.0.0',
+        },
+      }),
+    )
+    write(root, 'src/entry.ts', "import '@baloise/ds-styles/css/normalize.css'\n")
+
+    const result = (await detectBaloise(root, { readDistTags: distTags('20.0.0') })) as {
+      dependencies: string[]
+      aliases: Record<string, string>
+    }
+
+    expect(result.dependencies).toEqual(['@baloise/ds-favicons', '@baloise/ds-fonts', '@baloise/ds-react'])
+    expect(result.aliases['@helvetia-design/assets']).toBe('20.0.0')
+  })
+
+  it('does not pick a manifest that declares only @baloise/ds-fonts', async () => {
+    const root = createScratchDir()
+    write(root, 'package.json', JSON.stringify({ dependencies: { '@baloise/ds-fonts': '19.0.0' } }))
+    write(root, 'src/entry.ts', "import '@baloise/ds-styles/css/normalize.css'\n")
+
+    expect(await detectBaloise(root, { readDistTags: distTags('20.0.0') })).toEqual({
+      status: 'nothing-to-migrate',
+      message: NOTHING,
+    })
+  })
 })

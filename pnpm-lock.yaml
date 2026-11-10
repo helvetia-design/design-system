@@ -808,6 +808,9 @@ importers:
       '@helvetia-design/assets':
         specifier: workspace:*
         version: link:../assets
+      '@helvetia-design/styles':
+        specifier: workspace:*
+        version: link:../styles
       eslint:
         specifier: 'catalog:'
         version: 10.12.0(jiti@2.7.0)(supports-color@8.1.1)
@@ -14536,8 +14539,8 @@ snapshots:
       less: 4.9.1(supports-color@8.1.1)
       ora: 9.4.1
       postcss: 8.5.29
-      rolldown: 1.2.13
-      rolldown-plugin-dts: 0.28.6(oxc-resolver@11.21.2)(rolldown@1.2.13)(typescript@6.0.3)
+      rolldown: 1.2.16
+      rolldown-plugin-dts: 0.28.6(oxc-resolver@11.21.2)(rolldown@1.2.16)(typescript@6.0.3)
       rxjs: 7.8.2
       sass: 1.105.1
       sass-embedded: 1.105.1
@@ -15302,12 +15305,12 @@ snapshots:
       glob: 13.0.6
       package-json-from-dist: 1.0.1
 
-  rolldown-plugin-dts@0.28.6(oxc-resolver@11.21.2)(rolldown@1.2.13)(typescript@6.0.3):
+  rolldown-plugin-dts@0.28.6(oxc-resolver@11.21.2)(rolldown@1.2.16)(typescript@6.0.3):
     dependencies:
       dts-resolver: 3.0.0(oxc-resolver@11.21.2)
       get-tsconfig: 5.0.0-beta.6
       obug: 3.0.0
-      rolldown: 1.2.13
+      rolldown: 1.2.16
       yuku-ast: 0.10.2
       yuku-codegen: 0.10.2
       yuku-parser: 0.10.2

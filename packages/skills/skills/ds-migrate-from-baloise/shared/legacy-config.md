@@ -45,7 +45,7 @@ Check the answer again after the Rewrite step. When the Rewrite left a usage of 
 
 ## Report
 
-These items come last, after the `I` items of `shared/icons.md`. Each one gets its own line in `ds-migration-report.md`, as `shared/report.md` describes. The `icons` value stays or goes with the call.
+These items come last, after the `I` items of `shared/icons.md` and, in the **Assets** step, after the `A` items of `shared/fonts-favicons.md`. Each one gets its own line in `ds-migration-report.md`, as `shared/report.md` describes. The `icons` value stays or goes with the call.
 
 Needs your attention when found:
 

@@ -579,6 +579,61 @@ describe('scanMigratable', () => {
       notYet: [],
     })
   })
+
+  it('limits the scan to the given paths and breaks the counts down per file', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/page/page.component.html',
+      '<bal-card><bal-card-title>T</bal-card-title><bal-fictional></bal-fictional><bal-button>Go</bal-button></bal-card>\n',
+    )
+    write(root, 'src/page/page.component.ts', "import { BalCard } from '@baloise/ds-angular'\n")
+    write(root, 'src/page/empty.ts', 'export const nothing = 1\n')
+    write(root, 'src/other/other.html', '<bal-tag></bal-tag>\n')
+
+    expect(scanMigratable(root, ['src/page', 'src/missing.html'])).toEqual({
+      suggested: [
+        { name: 'button', total: 2 },
+        { name: 'card', total: 5 },
+      ],
+      notYet: [{ name: 'fictional', total: 2 }],
+      files: [
+        {
+          file: 'src/page/page.component.html',
+          components: [
+            { name: 'button', total: 2 },
+            { name: 'card', total: 4 },
+            { name: 'fictional', total: 2 },
+          ],
+        },
+        { file: 'src/page/page.component.ts', components: [{ name: 'card', total: 1 }] },
+      ],
+      unmatched: ['src/missing.html'],
+    })
+  })
+
+  it('prints the per-file breakdown without unmatched when every path matches', () => {
+    const root = createScratchDir()
+    write(root, 'src/a.html', '<bal-tag></bal-tag>\n')
+    let text = ''
+
+    expect(
+      run(
+        root,
+        {
+          write(chunk: string) {
+            text += chunk
+          },
+        },
+        ['src/a.html'],
+      ),
+    ).toBe(0)
+    expect(JSON.parse(text)).toEqual({
+      suggested: [{ name: 'tag', total: 2 }],
+      notYet: [],
+      files: [{ file: 'src/a.html', components: [{ name: 'tag', total: 2 }] }],
+    })
+  })
 })
 
 describe('componentNameToSlug', () => {

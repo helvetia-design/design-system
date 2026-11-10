@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { realpathSync } from 'node:fs'
-import { relative, resolve, sep } from 'node:path'
+import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
@@ -13,33 +13,13 @@ const NAMESPACE_RE = /\bimport\s*\*\s*as\s+([A-Za-z_$][\w$]*)\s+from\s*['"]@balo
 const IMPORT_KEYWORD_RE = /\b(?:from|import|require)\b/
 
 export function scanIconImports(rootDir, files = []) {
-  const root = realpathSync(resolve(rootDir))
-  const only = files.length > 0 ? new Set(files.map(file => toRootRelative(root, file))) : undefined
-  const scanned = new Set()
   const found = []
-  scanSourceFiles(
-    root,
-    ({ file, masked, text }) => {
-      if (only && !only.has(file)) return
-      scanned.add(file)
-      collect(file, text, masked, found)
-    },
-    EXTENSIONS,
-  )
+  const unmatched = scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found), {
+    extensions: EXTENSIONS,
+    paths: files,
+  })
   const result = group(found)
-  const unmatched = only ? [...only].filter(file => !scanned.has(file)).sort() : []
   return unmatched.length > 0 ? { ...result, unmatched } : result
-}
-
-function toRootRelative(root, file) {
-  const absolute = resolve(root, file)
-  let real = absolute
-  try {
-    real = realpathSync(absolute)
-  } catch {
-    // A missing file keeps its resolved path and ends up in `unmatched`.
-  }
-  return relative(root, real).split(sep).join('/')
 }
 
 export function run(rootDir, stdout, files = []) {
