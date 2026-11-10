@@ -14516,7 +14516,7 @@
             }
           }
         },
-        "MD": {
+        "SM": {
           "$type": "typography",
           "$value": {
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
@@ -16511,6 +16511,18 @@
     },
     "Spinner": {
       "Circle": {
+        "Border": {
+          "Style": {
+            "$type": "string",
+            "$value": "{🔗 Alias.▭ Border.Style.Solid}",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ],
+              "com.figma.variableId": "PENDING-FIGMA-SYNC"
+            }
+          }
+        },
         "Primary": {
           "Background": {
             "$type": "color",
@@ -16600,6 +16612,90 @@
           }
         }
       },
+      "Label": {
+        "Gap": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.XS}",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ],
+            "com.figma.variableId": "PENDING-FIGMA-SYNC"
+          }
+        },
+        "GapBottom": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.2XS}",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ],
+            "com.figma.variableId": "PENDING-FIGMA-SYNC"
+          }
+        },
+        "FontFamily": {
+          "$type": "fontFamily",
+          "$value": "{🔗 Alias.🔤 Text.Family.Text}",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ],
+            "com.figma.variableId": "PENDING-FIGMA-SYNC"
+          }
+        },
+        "LineHeight": {
+          "$type": "number",
+          "$value": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ],
+            "com.figma.variableId": "PENDING-FIGMA-SYNC"
+          }
+        },
+        "FontSize": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.🔤 Text.Size.Base}",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ],
+            "com.figma.variableId": "PENDING-FIGMA-SYNC"
+          }
+        },
+        "FontWeight": {
+          "$type": "fontWeight",
+          "$value": "{🔗 Alias.🔤 Text.Weight.Regular}",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ],
+            "com.figma.variableId": "PENDING-FIGMA-SYNC"
+          }
+        },
+        "Color": {
+          "Primary": {
+            "$type": "color",
+            "$value": "{🔗 Alias.🔤 Text.Color.Primary}",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ],
+              "com.figma.variableId": "PENDING-FIGMA-SYNC"
+            }
+          },
+          "Inverted": {
+            "$type": "color",
+            "$value": "{🔗 Alias.🔤 Text.Color.InvertedPrimary}",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ],
+              "com.figma.variableId": "PENDING-FIGMA-SYNC"
+            }
+          }
+        }
+      },
       "Logo": {
         "Size": {
           "MD": {
@@ -16623,8 +16719,8 @@
             }
           }
         },
-        "Inverted": {
-          "Color": {
+        "Color": {
+          "Inverted": {
             "$type": "color",
             "$value": "{🔗 Alias.🔤 Text.Color.InvertedPrimary}",
             "$extensions": {
@@ -16633,10 +16729,8 @@
               ],
               "com.figma.variableId": "VariableID:137:2103"
             }
-          }
-        },
-        "Primary": {
-          "Color": {
+          },
+          "Primary": {
             "$type": "color",
             "$value": "{🔗 Alias.🔤 Text.Color.Primary}",
             "$extensions": {
@@ -19128,172 +19222,222 @@
     },
     "ProgressBar": {
       "Primary": {
-        "Background": {
-          "Dark": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🎨 Surface.GreyLight}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:2329"
+        "Light": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.White}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2330"
+              }
             }
-          },
-          "Light": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🎨 Surface.White}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:2330"
+          }
+        },
+        "Dark": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.GreyLight}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2329"
+              }
             }
           }
         },
         "Line": {
-          "$type": "color",
-          "$value": "{🔗 Alias.🎨 Surface.Primary}",
-          "$extensions": {
-            "com.figma.scopes": [
-              "ALL_SCOPES"
-            ],
-            "com.figma.variableId": "VariableID:137:2328"
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.Primary}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2328"
+              }
+            }
           }
         }
       },
       "Yellow": {
-        "Background": {
-          "Light": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🎨 Surface.White}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:2332"
+        "Light": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.White}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2332"
+              }
             }
-          },
-          "Dark": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🎨 Surface.YellowLight}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:2333"
+          }
+        },
+        "Dark": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.YellowLight}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2333"
+              }
             }
           }
         },
         "Line": {
-          "$type": "color",
-          "$value": "{🔗 Alias.🎨 Surface.YellowDark}",
-          "$extensions": {
-            "com.figma.scopes": [
-              "ALL_SCOPES"
-            ],
-            "com.figma.variableId": "VariableID:137:2331"
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.YellowDark}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2331"
+              }
+            }
           }
         }
       },
       "Purple": {
-        "Background": {
-          "Light": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🎨 Surface.White}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:2335"
+        "Light": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.White}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2335"
+              }
             }
-          },
-          "Dark": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🎨 Surface.PurpleLight}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:2336"
+          }
+        },
+        "Dark": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.PurpleLight}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2336"
+              }
             }
           }
         },
         "Line": {
-          "$type": "color",
-          "$value": "{🔗 Alias.🎨 Surface.PurpleDark}",
-          "$extensions": {
-            "com.figma.scopes": [
-              "ALL_SCOPES"
-            ],
-            "com.figma.variableId": "VariableID:137:2334"
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.PurpleDark}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2334"
+              }
+            }
           }
         }
       },
       "Red": {
-        "Background": {
-          "Light": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🎨 Surface.White}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:2338"
+        "Light": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.White}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2338"
+              }
             }
-          },
-          "Dark": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🎨 Surface.RedLight}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:2339"
+          }
+        },
+        "Dark": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.RedLight}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2339"
+              }
             }
           }
         },
         "Line": {
-          "$type": "color",
-          "$value": "{🔗 Alias.🎨 Surface.RedDark}",
-          "$extensions": {
-            "com.figma.scopes": [
-              "ALL_SCOPES"
-            ],
-            "com.figma.variableId": "VariableID:137:2337"
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.RedDark}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2337"
+              }
+            }
           }
         }
       },
       "Green": {
-        "Background": {
-          "Light": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🎨 Surface.White}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:2341"
+        "Light": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.White}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2341"
+              }
             }
-          },
-          "Dark": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🎨 Surface.GreenLight}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:2342"
+          }
+        },
+        "Dark": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.GreenLight}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2342"
+              }
             }
           }
         },
         "Line": {
-          "$type": "color",
-          "$value": "{🔗 Alias.🎨 Surface.GreenDark}",
-          "$extensions": {
-            "com.figma.scopes": [
-              "ALL_SCOPES"
-            ],
-            "com.figma.variableId": "VariableID:137:2340"
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.GreenDark}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2340"
+              }
+            }
           }
         }
       },

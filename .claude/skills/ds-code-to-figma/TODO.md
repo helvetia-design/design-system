@@ -30,11 +30,11 @@
 | ------ | ------------ | ---------- | ------------------------------------- | --- | ----- |
 | ⬜     | Icon         | Media      | -                                     | ✅  | ⬜    |
 | ⬜     | Brand Icon   | Media      | -                                     | ✅  | ⬜    |
-| ⬜     | Logo         | Media      | -                                     | ⬜  | ⬜    |
-| ⬜     | Shape        | Media      | -                                     | ⬜  | ⬜    |
-| ⬜     | Spinner      | Indicators | -                                     | ⬜  | ⬜    |
-| ⬜     | Progress Bar | Indicators | -                                     | ⬜  | ⬜    |
-| ⬜     | Label        | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Logo         | Media      | -                                     | ✅  | ⬜    |
+| ⛔     | Shape        | Media      | -                                     | ⛔  | ⛔    |
+| ⬜     | Spinner      | Indicators | -                                     | ✅  | ⬜    |
+| ⬜     | Progress Bar | Indicators | -                                     | ✅  | ⬜    |
+| ⬜     | Label        | Forms      | -                                     | ✅  | ⬜    |
 | ⬜     | Input        | Forms      | -                                     | ⬜  | ⬜    |
 | ⬜     | Textarea     | Forms      | -                                     | ⬜  | ⬜    |
 | ⬜     | Toggle       | Forms      | -                                     | ⬜  | ⬜    |
@@ -57,7 +57,7 @@
 | ⬜     | Root         | Structure  | -                                     | ⬜  | ⬜    |
 | ⬜     | Card         | Structure  | -                                     | ⬜  | ⬜    |
 | ⬜     | Button       | Actions    | Brand Icon, Icon, Spinner             | ⬜  | ⬜    |
-| ⬜     | Badge        | Indicators | Icon                                  | ⬜  | ⬜    |
+| ⬜     | Badge        | Indicators | Icon                                  | ✅  | ⬜    |
 | ⬜     | Segment      | Forms      | Icon                                  | ⬜  | ⬜    |
 | ⬜     | Datepicker   | Forms      | Icon                                  | ⬜  | ⬜    |
 | ⬜     | App Navbar   | Navigation | Icon                                  | ⬜  | ⬜    |

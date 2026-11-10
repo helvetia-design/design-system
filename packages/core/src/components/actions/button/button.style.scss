@@ -559,7 +559,7 @@ $inverted-colors: ('secondary', 'tertiary', 'ghost', 'text', 'link');
     }
 
     & > ds-spinner {
-      --spinner-color: var(--ds-button-color-disabled-base-text);
+      --spinner-logo-color: var(--ds-button-color-disabled-base-text);
     }
 
     & > ds-spinner.is-circle {

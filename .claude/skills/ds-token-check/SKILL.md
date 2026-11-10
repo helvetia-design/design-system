@@ -113,6 +113,23 @@ exists anywhere in this skill.
   skill — there is no Alias/Device motion-token layer in `Base.tokens.json` today, and
   proposing one is a design-system-wide decision, not a per-component fix. Report these
   as `EXEMPT` (informational) if mentioned at all, never as a blocker.
+- NEVER flag `letter-spacing`, `text-decoration`, or `text-transform` Component tokens
+  that exist in `Base.tokens.json` but aren't referenced in a component's SCSS/TSX as
+  VIOLATION or GAP by default — check the Alias layer first. As of this writing,
+  `Alias.Text.LetterSpacing` only has `Text`/`Heading` options and both resolve to the
+  same `0` Global value, and `Alias.Text.TextDecoration`/`TextTransform` each only have
+  a single `None` option — there is currently no way for _any_ component to express a
+  non-default value for these three properties through the token system at all, so an
+  unwired token here is a design-system-wide characteristic, not a per-component code
+  bug worth flagging. Report as `EXEMPT` (informational) if mentioned at all, with a
+  one-line note of the actual resolved value(s) so the exemption is visibly justified,
+  not just asserted.
+  - This is conditional, not permanent: before exempting, resolve the specific family's
+    tokens down to their actual values. If the Alias layer ever grows a second real
+    option (e.g. an `Uppercase` `TextTransform`, or a `LetterSpacing` option that isn't
+    `0`) and the family under review actually resolves to that non-default value, it's a
+    real GAP like any other unapplied token — wiring it up would change rendering, so
+    it isn't exempt just because the property name matches this rule.
 - NEVER flag a hardcoded literal as GAP if it represents a **brand-invariant constant**
   — a value that is identical across every brand/theme by construction and will never
   come from a design token (e.g. a fixed rotation angle for a "turn" modifier, a
@@ -141,6 +158,13 @@ it while reading the file":
 
 **Border · Background · Radius · Typography (font-family, font-weight, font-size,
 line-height) · Text-Color · Opacity · Padding · Gap · Margin**
+
+`letter-spacing`, `text-decoration`, and `text-transform` are deliberately **not** among
+the 4 tracked Typography suffixes, even though every typography Component token in
+`Base.tokens.json` carries all seven fields (including these three). See the Rules
+section above — today the Alias layer has no real variation for any of the three
+(`LetterSpacing` is always `0`, `TextDecoration`/`TextTransform` are always `None`), so
+there's nothing for the Typography row to meaningfully check for them yet.
 
 - Each category is crossed only against the `@Prop()` variant dimension(s) that
   actually gate it for this component (e.g. button's Border/Background/Text-Color vary
@@ -268,6 +292,10 @@ Before writing the report, confirm:
   ToC `Issue` text is a short title, not a restatement of the full recommendation.
 - No `transition`/`animation` property was reported as `VIOLATION` or `GAP` — motion
   timing is always `EXEMPT` or omitted entirely, per the rule above.
+- Every unwired `letter-spacing`/`text-decoration`/`text-transform` Component token was
+  actually resolved down to its value before being marked `EXEMPT` — don't apply the
+  exemption on property-name alone if the family's specific tokens turn out to resolve
+  to a non-default value in the current `Base.tokens.json`.
 - Every hardcoded literal judged brand-invariant (and therefore `EXEMPT` or a
   "mark as intentional" `GAP`) is one the agent can actually justify as never differing
   per brand/theme — don't wave through a real theming gap (e.g. a color, a spacing
