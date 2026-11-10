@@ -298,8 +298,7 @@ describe('icon migration.md', () => {
     for (const phrase of [
       'scan-bal-icon.mjs',
       'one yes/no',
-      'alert-triangle',
-      'info-circle',
+      'shared/icons.md',
       'size="sm"',
       'size="md"',
       'size="lg"',

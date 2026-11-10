@@ -6,6 +6,8 @@ The legacy folder has one consumer child tag, `bal-input-date`. It is a text fie
 
 Other legacy tags that start with `bal-input` are different components and are not part of this migration: `bal-input-group`, `bal-input-slider` (see `components/input-slider/migration.md`), `bal-input-stepper` (see `components/input-stepper/migration.md`). `bal-number-input` is a separate component too. The scan does not list them.
 
+A surrounding `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrapper is handled by `shared/field.md` in the Rewrite step, in the same pass. `components/field/migration.md` migrates `bal-form-grid` and `bal-form-col`.
+
 ## 1. Scan
 
 `<project-root>` is the consumer project root that contains the app lockfile. When the skill is invoked from that root, use the current directory.
@@ -88,20 +90,29 @@ Angular splits a component across `x.component.html` and `x.component.ts`, and t
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `required` that was set to false, every dropped `allowInvalidValue`, every event handler that was renamed, and every handler, method call, and unsupported prop (`textAlign`, `clickable`, `hasIconRight`) that needs manual rework.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Report these logic changes the scan cannot see, so the consumer can check them:
+Needs your attention when found:
 
-- **Empty value**: a cleared field now yields `null` where legacy yielded `undefined`. Code that checks `=== undefined` needs review. List each handler or form binding that reads the value.
-- **`INVALID_VALUE`**: search the consumer code for the string. Every place that compares against it, and every file where `allowInvalidValue` was dropped, needs manual review.
+1. Every dropped `allowInvalidValue`.
+2. Every event handler that needs manual rework.
+3. Every method call that needs manual rework, listed as "method no longer available, needs manual rework".
+4. Every unsupported `textAlign` left in place. It has no effect now.
+5. Every unsupported `clickable` left in place. The new `dsClick` event reports the click, so the consumer can replace the pattern.
+6. Every unsupported `hasIconRight` left in place. It has no effect now.
+7. Every use of a `BalEvents.BalInput*Detail` or `BalEvents.BalInputDate*Detail` type, listed as "type needs manual rework".
+8. Every handler or form binding that reads the value. A cleared field now yields `null` where legacy yielded `undefined`, so code that checks `=== undefined` needs review.
+9. Every place that compares against the string `INVALID_VALUE`. Search the consumer code for it.
+10. Every file where `allowInvalidValue` was dropped, reviewed for logic that relies on `INVALID_VALUE`.
+11. Every `bal-input-date` rewritten to `ds-datepicker`. `bal-input-date` was a plain text field with a date mask, and `ds-datepicker` adds a calendar popup opened from a button. Do not add attributes to compensate.
+12. One-time note: `ds-input` and `ds-datepicker` have `label`, `description`, and `color`. Fields may need a `label` now. Do not add one yourself.
+13. Every selector that targets the legacy elements and that the scan cannot see, such as classes starting with `bal-input` and the `bal-input-date` internals. Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.
 
-Also report the rendering differences, so the consumer can check them. Do not add attributes to compensate:
+Coverage only, written to the file:
 
-- `bal-input-date` was a plain text field with a date mask. `ds-datepicker` adds a calendar popup opened from a button.
-- `ds-input` and `ds-datepicker` have `label`, `description`, and `color`. Fields may need a `label` now. Do not add one yourself.
+14. Every `required` that was set to false.
+15. Every event handler that was renamed.
 
-Also list every selector that targeted the legacy elements and that the scan cannot see (classes starting with `bal-input` and the `bal-input-date` internals). Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
-
-Done when the summary is printed and the working tree is still unstaged.
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

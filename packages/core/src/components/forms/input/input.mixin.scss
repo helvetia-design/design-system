@@ -43,6 +43,7 @@
     background: inherit;
 
     flex: 1;
+    min-width: 0;
 
     color: var(--_#{$prefix}-color);
     font-family: var(--_#{$prefix}-family);

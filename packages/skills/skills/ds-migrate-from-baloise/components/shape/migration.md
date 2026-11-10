@@ -36,15 +36,15 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-shape`)                                                                                      | new (`ds-shape`)  | handling                                                                                                                                                                                                                                           |
-| ------------------------------------------------------------------------------------------------------ | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `variation="1"` / `"2"` / `"3"`                                                                        | same              | Copy as-is.                                                                                                                                                                                                                                        |
-| `rotation="0"` / `"90"` / `"180"` / `"270"`                                                            | same              | Copy as-is.                                                                                                                                                                                                                                        |
-| `color="green"`, `green-light`, `red`, `red-light`, `purple`, `purple-light`, `yellow`, `yellow-light` | same              | Copy as-is. Also keep the single-quoted and `{"…"}` / `{'…'}` forms.                                                                                                                                                                               |
-| _(no `color`)_                                                                                         | `color="green"`   | The default changed. `bal-shape` rendered green, `ds-shape` renders purple. Add `color="green"` to every static usage without a `color` attribute, so the shape looks the same. Record each file and line for the summary. React: `color="green"`. |
-| `color` with any other static value (including `""`)                                                   | _(no equivalent)_ | Do not rewrite. Leave it in place and record the file, line, and old value for the summary. `bal-shape` rendered every unknown value in grey, `ds-shape` renders it in the default alias green instead, and `@OneOf` logs a warning.               |
-| `[color]="x"`, `[attr.color]="x"`, `color={x}`                                                         | `color`           | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line for manual review. A shape that previously had no value bound now renders purple, and the valid values are the eight listed above.                 |
-| `[variation]="x"`, `[rotation]="x"`, `variation={x}`, `rotation={x}`                                   | same              | Copy as-is. The accepted values are unchanged.                                                                                                                                                                                                     |
+| old (`bal-shape`)                                                                                      | new (`ds-shape`)  | handling                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------------------------------------------------ | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variation="1"` / `"2"` / `"3"`                                                                        | same              | Copy as-is.                                                                                                                                                                                                                                       |
+| `rotation="0"` / `"90"` / `"180"` / `"270"`                                                            | same              | Copy as-is.                                                                                                                                                                                                                                       |
+| `color="green"`, `green-light`, `red`, `red-light`, `purple`, `purple-light`, `yellow`, `yellow-light` | same              | Copy as-is. Also keep the single-quoted and `{"…"}` / `{'…'}` forms.                                                                                                                                                                              |
+| _(no `color`)_                                                                                         | `color="green"`   | The default changed. `bal-shape` rendered green, `ds-shape` renders purple. Add `color="green"` to every static usage without a `color` attribute, so the shape looks the same. Record each file and line for the report. React: `color="green"`. |
+| `color` with any other static value (including `""`)                                                   | _(no equivalent)_ | Do not rewrite. Leave it in place and record the file, line, and old value for the report. `bal-shape` rendered every unknown value in grey, `ds-shape` renders it in the default alias green instead, and `@OneOf` logs a warning.               |
+| `[color]="x"`, `[attr.color]="x"`, `color={x}`                                                         | `color`           | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line for manual review. A shape that previously had no value bound now renders purple, and the valid values are the eight listed above.                |
+| `[variation]="x"`, `[rotation]="x"`, `variation={x}`, `rotation={x}`                                   | same              | Copy as-is. The accepted values are unchanged.                                                                                                                                                                                                    |
 
 ### Tags and imports
 
@@ -62,15 +62,20 @@ Neither component has a public method a consumer calls. There is no sibling-file
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `color="green"` that was added, every dynamic `color` binding left for manual review, and every static `color` value left in place.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Also list each loss:
+Needs your attention when found:
 
-- every static `color` value with no `ds-shape` equivalent, with its file, line, and old value, which `bal-shape` rendered in grey
-- every type reference such as `BalProps.BalShapeColor` that the scan cannot see
+1. Every dynamic `color` binding left for manual review.
+2. Every static `color` value left in place.
+3. Every static `color` value with no `ds-shape` equivalent, which `bal-shape` rendered in grey. Name file, line and old value.
+4. Every type reference that the scan cannot see, such as `BalProps.BalShapeColor`.
+5. One-time note, when at least one shape was migrated, one line and not one per usage: `ds-shape` no longer rounds its corners below the desktop breakpoint, where `bal-shape` used a normal border radius.
 
-When at least one shape was migrated, add one line, not one per usage: `ds-shape` no longer rounds its corners below the desktop breakpoint, where `bal-shape` used a normal border radius.
+Coverage only, written to the file:
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+6. Every `color="green"` that was added.
 
-Done when the summary is printed and the working tree is still unstaged.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

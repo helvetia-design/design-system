@@ -7,10 +7,17 @@ import { promisify } from 'node:util'
 
 const LEGACY_SCOPE = '@baloise'
 const TARGET_SCOPE = '@helvetia-design'
-const SHORT_NAMES = ['angular', 'core', 'react', 'styles']
+const STYLES_NAME = 'styles'
+const INSTALL_NAMES = ['angular', 'core', 'react', STYLES_NAME]
+const ICON_NAMES = ['icons', 'brand-icons']
+const FONT_FAVICON_NAMES = ['fonts', 'favicons']
+const SHORT_NAMES = [...INSTALL_NAMES, ...ICON_NAMES]
+const DEPENDENCY_NAMES = [...SHORT_NAMES, ...FONT_FAVICON_NAMES]
+const ASSET_NAMES = [...ICON_NAMES, STYLES_NAME, ...FONT_FAVICON_NAMES]
+const ASSET_PACKAGES = new Set(ASSET_NAMES.map(short => `${LEGACY_SCOPE}/ds-${short}`))
 const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', 'out', '.next', '.angular', '.git', '.claude', 'coverage'])
-const LOCKFILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'npm-shrinkwrap.json'])
-const IMPORT_EXTENSIONS = new Set([
+export const LOCKFILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'npm-shrinkwrap.json'])
+export const IMPORT_EXTENSIONS = new Set([
   '.html',
   '.htm',
   '.ts',
@@ -25,7 +32,8 @@ const IMPORT_EXTENSIONS = new Set([
   '.vue',
   '.json',
 ])
-const DEPENDENCY_FIELDS = ['dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies']
+export const SOURCE_EXTENSIONS = new Set([...IMPORT_EXTENSIONS, '.mts', '.cts'])
+export const DEPENDENCY_FIELDS = ['dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies']
 const NOTHING = 'no Baloise Design System installation detected, nothing to migrate'
 
 function targetPackageName(short) {
@@ -36,6 +44,8 @@ const MISSING_LATEST = `npm view ${targetPackageName('core')} dist-tags did not 
 
 const execFileAsync = promisify(execFile)
 const PACKAGE_RE = new RegExp(`${LEGACY_SCOPE}/ds-(?:${SHORT_NAMES.join('|')})\\b`)
+const INSTALL_RE = new RegExp(`^${LEGACY_SCOPE}/ds-(?:${INSTALL_NAMES.join('|')})$`)
+const DEPENDENCY_RE = new RegExp(`${LEGACY_SCOPE}/ds-(?:${DEPENDENCY_NAMES.join('|')})\\b`)
 
 export async function readNpmDistTags(execImpl = execFileAsync) {
   const { stdout } = await execImpl('npm', ['view', targetPackageName('core'), 'dist-tags', '--json'], {
@@ -69,7 +79,7 @@ export async function detectBaloise(rootDir, options = {}) {
     dependencies: found.dependencies,
     imports: found.imports,
     version,
-    aliases: aliasesFor(framework, version),
+    aliases: aliasesFor(framework, version, found.dependencies),
   }
 }
 
@@ -79,46 +89,60 @@ export async function run(rootDir, stdout, options = {}) {
   return result.status === 'error' ? 1 : 0
 }
 
-function installCommand(packageManager) {
+export function installCommand(packageManager) {
   if (packageManager === 'pnpm') return 'pnpm install'
   if (packageManager === 'yarn') return 'yarn install'
   return 'npm install'
 }
 
-function detectPackageManager(rootDir) {
+export function detectPackageManager(rootDir) {
   if (existsSync(join(rootDir, 'pnpm-lock.yaml'))) return 'pnpm'
   if (existsSync(join(rootDir, 'yarn.lock'))) return 'yarn'
   if (existsSync(join(rootDir, 'package-lock.json'))) return 'npm'
   return 'npm'
 }
 
-function detectFramework(manifest) {
+export function detectFramework(manifest) {
   const names = new Set(dependencyNames(manifest))
   if (names.has('@angular/core')) return 'angular'
   if (names.has('react') || names.has('react-dom')) return 'react'
   return 'html'
 }
 
-function aliasesFor(framework, version) {
-  if (framework === 'react') {
-    return {
-      [targetPackageName('react')]: version,
-      [targetPackageName('styles')]: version,
-    }
-  }
-  if (framework === 'angular') {
-    return {
-      [targetPackageName('angular')]: version,
-      [targetPackageName('styles')]: version,
-    }
-  }
-  return {
+/**
+ * Every framework gets `tokens` and `core` on top of its own binding package, because the
+ * migration makes the consumer import both directly:
+ *
+ * - `tokens` — Init writes an `@helvetia-design/tokens/css/base` import into the consumer's own
+ *   entry file (the `normalize` and bundled `css/all` rules in SKILL.md).
+ * - `core` — the controller and option types live there and are not re-exported by the binding
+ *   packages, so `AlertController`, `Alert`, `ModalController` and `ModalOptions` are imported
+ *   from `@helvetia-design/core` even in a React or Angular app.
+ *
+ * Both currently resolve anyway, as transitive dependencies, but only because npm and Yarn
+ * flatten `node_modules`. Under pnpm's default layout, where only declared dependencies are
+ * linked, those imports fail to resolve. Declaring what the skill tells the consumer to import
+ * is the fix.
+ *
+ * `assets` is added when the app declared `@baloise/ds-icons` or `@baloise/ds-brand-icons`
+ * directly, because then it imports icon symbols itself. It is also added for `@baloise/ds-styles`,
+ * `@baloise/ds-fonts` and `@baloise/ds-favicons`, because the Assets step copies the self-hosted
+ * fonts and favicons from `node_modules/@helvetia-design/assets`, which pnpm only links when the
+ * app declares it.
+ */
+function aliasesFor(framework, version, dependencies) {
+  const shared = {
     [targetPackageName('core')]: version,
     [targetPackageName('styles')]: version,
+    [targetPackageName('tokens')]: version,
   }
+  if (dependencies.some(name => ASSET_PACKAGES.has(name))) shared[targetPackageName('assets')] = version
+  if (framework === 'react') return { [targetPackageName('react')]: version, ...shared }
+  if (framework === 'angular') return { [targetPackageName('angular')]: version, ...shared }
+  return shared
 }
 
-function dependencyNames(manifest) {
+export function dependencyNames(manifest) {
   const names = []
   for (const field of DEPENDENCY_FIELDS) {
     const block = manifest?.[field]
@@ -127,8 +151,8 @@ function dependencyNames(manifest) {
   return names
 }
 
-function baloiseDependencies(manifest) {
-  return [...new Set(dependencyNames(manifest).filter(name => PACKAGE_RE.test(name)))].sort()
+export function baloiseDependencies(manifest) {
+  return [...new Set(dependencyNames(manifest).filter(name => DEPENDENCY_RE.test(name)))].sort()
 }
 
 function scan(rootDir) {
@@ -171,7 +195,8 @@ function walk(rootDir, dir, packages, imports) {
     if (entry.name === 'package.json') {
       const manifest = readJson(filePath)
       const dependencies = manifest ? baloiseDependencies(manifest) : []
-      if (dependencies.length > 0) {
+      // An icon-only manifest, such as a workspace root, must not win over the app manifest.
+      if (dependencies.some(name => INSTALL_RE.test(name))) {
         packages.push({ manifest, packageJsonPath: toPosix(rootDir, filePath), dependencies })
       }
       continue
@@ -215,7 +240,7 @@ function isIgnorableLine(line) {
   return trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*') || trimmed.startsWith('<!--')
 }
 
-function readJson(filePath) {
+export function readJson(filePath) {
   try {
     return JSON.parse(readFileSync(filePath, 'utf8'))
   } catch {

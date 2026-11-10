@@ -110,9 +110,10 @@
 
 /**
  * Prevent VoiceOver from ignoring list semantics in Safari (opinionated).
+ * Skips light-DOM lists of unmigrated Baloise components so they keep their layout (issue #117).
  */
 
-:where(nav li)::before {
+:where(nav li:not(bal-nav li, bal-pagination li, bal-tabs li))::before {
   content: '\200B';
   float: left;
 }
