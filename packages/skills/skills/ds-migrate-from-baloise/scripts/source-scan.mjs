@@ -129,7 +129,7 @@ function readSource(rootDir, filePath, collect) {
 }
 
 function commentKind(extension) {
-  if (extension === '.html' || extension === '.vue') return 'markup'
+  if (extension === '.html' || extension === '.htm' || extension === '.vue') return 'markup'
   if (extension === '.css') return 'css'
   if (extension === '.scss' || extension === '.sass' || extension === '.less') return 'scss'
   return 'script'
