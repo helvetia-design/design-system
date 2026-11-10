@@ -4,7 +4,7 @@ This document captures domain language, architectural patterns, and key concepts
 
 ## Overview
 
-**packages/skills** (`@helvetia-design/skills`) ships Claude Code skills that consuming applications install into their own repo. It is not a design-system runtime package — there are no web components, tokens, or styles here. Consumers run `npx @helvetia-design/skills add`, which copies a skill folder into `<cwd>/.claude/skills/`.
+**packages/skills** (`@helvetia-design/skills`) ships Claude Code skills that consuming applications install into their own repo. It is not a design-system runtime package — there are no web components, tokens, or styles here. Consumers run `npx @helvetia-design/skills add`, which copies a skill folder into `<project root>/.claude/skills/`. The project root is the nearest directory above `cwd` (or `cwd` itself) that has a `package.json` and a lockfile (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock` or `npm-shrinkwrap.json`). It falls back to `cwd` when none is found.
 
 The first (and currently only) skill is **ds-migrate-from-baloise**: a menu-driven helper for migrating an app from the Baloise Design System (`bal-*`, `@baloise/ds-*`) to the Helvetia Design System (`ds-*`, `@helvetia-design/*`). The menu itself lives in the copied `SKILL.md`; this file documents package conventions, not the menu copy.
 
@@ -14,7 +14,7 @@ The first (and currently only) skill is **ds-migrate-from-baloise**: a menu-driv
 
 The package has two parts that must not be confused:
 
-- **Compiled CLI** — `src/cli.ts`, swc-compiled to `dist/cli.js`, exposed as `bin.skills`. Its only job is the `add` subcommand: copy the skill payload into the consumer's `.claude/skills/` directory (creating parents, overwriting on re-run). Re-running `add` is how a consumer updates the skill. The CLI has no other subcommands until a second skill exists.
+- **Compiled CLI** — `src/cli.ts`, swc-compiled to `dist/cli.js`, exposed as `bin.skills`. Its only job is the `add` subcommand: copy the skill payload into the consumer's `.claude/skills/` directory (creating parents). It copies into a temp folder in `.claude/`, swaps it in with two renames (restoring the old folder if the second fails) and writes `.installed.json` (package version and a SHA-256 per file). A re-run first compares the installed files to that marker and exits 1 listing local changes unless `--force` is passed. Hashing ignores CRLF versus LF. An install without a valid `.installed.json` (missing or invalid) is compared to the new payload once, and the list cannot tell local edits from upstream changes. A leftover `.claude/.ds-migrate-from-baloise.tmp` is deleted at the start, and a leftover `.bak` is restored when no destination exists or deleted when it does. A failed second rename restores the old folder, and if that also fails the CLI throws an `AggregateError` naming the kept backup. Re-running `add` is how a consumer updates the skill. The CLI has no other subcommands until a second skill exists.
 - **Self-contained payload** — `skills/ds-migrate-from-baloise/`, plain uncompiled Markdown and dependency-free Node scripts. Copied verbatim. After copy, the skill must run inside the consumer's repo with **zero runtime dependency** back on `@helvetia-design/skills` or this monorepo — no script imports from `node_modules/@helvetia-design/*`.
 
 The compiled CLI is a delivery mechanism. The payload is the product.
@@ -161,9 +161,9 @@ The copied skill edits the consumer's files and leaves everything unstaged, incl
 
 ## Key Constraints
 
-- **CLI surface is `add` only** — no arguments, no `list`, no per-skill selection.
+- **CLI surface is `add [--force]` only** — no other arguments, no `list`, no per-skill selection.
 - **Payload stays uncompiled** — Markdown and dependency-free JS only. Do not import from this package's `dist/` or from other workspace packages.
-- **Overwrite is the update path** — `add` replaces the destination folder; do not add a separate `update` command.
+- **Overwrite is the update path** — `add` replaces the destination folder, but local edits block it unless `--force` is passed; do not add a separate `update` command.
 - **No menu item is "coming soon" any more** — Init, Components, CSS utils, Assets and Cleanup are all implemented. A future placeholder item reports "coming soon" and stops; it shows eventual scope, not an error.
 
 ## Testing
@@ -201,8 +201,8 @@ Done when:
 
 1. stdout is `Copied ds-migrate-from-baloise to <scratch>/.claude/skills/ds-migrate-from-baloise`
 2. that folder contains `SKILL.md` with the 5-item menu (Init / Components / CSS utils / Assets / Cleanup), `shared/css-utils.md`, `shared/css-utils-map.json` and `scripts/scan-css-utils.mjs`, and the line that the skill never runs `git add` or `git commit`
-3. `node …/dist/cli.js` with no args, or with `list`, prints `Usage: skills add` and exits 1
-4. after writing a stale `SKILL.md` and `stale.txt` into the destination, a second `add` restores `SKILL.md` and removes `stale.txt`
+3. `node …/dist/cli.js` with no args, or with `list`, prints `Usage: skills add [--force]` and exits 1
+4. after the first `add` (which writes `.installed.json`) and writing a stale `SKILL.md` and `stale.txt` into the destination, a second `add` exits 1 and lists `changed: SKILL.md` and `added: stale.txt`, and `add --force` restores `SKILL.md` and removes `stale.txt`
 
 ### Menu (Claude)
 
