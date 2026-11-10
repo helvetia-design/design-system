@@ -18,18 +18,55 @@
 
 # Components to test
 
-- spinner
-- close
-- logo (responsive)
-- button (variants + nested)
-- pagination (top layer split)
-- input
-- card
-
-Still open
-
-Run the sync in dry-run first. Use TOKENS_DIR_OVERRIDE against a sandbox file. Two paths are only tested with fixtures: the partial-id completion on existing typography tokens, and Pass 0 from the line-height work.
-Text-decoration and text-transform primitives in Toky are plain text cells, validated against the allowed keywords rather than dropdowns. A Select would be a small follow-up.
-Not done: Storybook pages that list typography properties, and component SCSS adoption (deliberately out of scope).
-Pulling a letter-spacing change from Figma is reported as unsupported, not written, because a percentage can't be mapped back to a reference without guessing.
-Two files I didn't touch showed up in the working tree: packages/tokens/docs/adr/0006-figma-breakpoint-display-order.md (untracked) and packages/tokens/docs/figma-token-sync-plugin-plan.md (modified). They look like they come from another session, so check them before committing.
+| Status | Component    | Category   | Nested                                | Gap | Figma |
+| ------ | ------------ | ---------- | ------------------------------------- | --- | ----- |
+| ⬜     | Icon         | Media      | -                                     | ✅  | ⬜    |
+| ⬜     | Brand Icon   | Media      | -                                     | ⬜  | ⬜    |
+| ⬜     | Logo         | Media      | -                                     | ⬜  | ⬜    |
+| ⬜     | Shape        | Media      | -                                     | ⬜  | ⬜    |
+| ⬜     | Spinner      | Indicators | -                                     | ⬜  | ⬜    |
+| ⬜     | Progress Bar | Indicators | -                                     | ⬜  | ⬜    |
+| ⬜     | Label        | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Input        | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Textarea     | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Toggle       | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Radio        | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Checkbox     | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Slider       | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Select       | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Number Input | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Phone Input  | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Steps        | Navigation | -                                     | ⬜  | ⬜    |
+| ⬜     | Tooltip      | Overlays   | -                                     | ⬜  | ⬜    |
+| ⬜     | Sheet        | Overlays   | -                                     | ⬜  | ⬜    |
+| ⬜     | Divider      | Structure  | -                                     | ⬜  | ⬜    |
+| ⬜     | Text         | Structure  | -                                     | ⬜  | ⬜    |
+| ⬜     | Heading      | Structure  | -                                     | ⬜  | ⬜    |
+| ⬜     | Stack        | Structure  | -                                     | ⬜  | ⬜    |
+| ⬜     | Content      | Structure  | -                                     | ⬜  | ⬜    |
+| ⬜     | Data         | Structure  | -                                     | ⬜  | ⬜    |
+| ⬜     | List         | Structure  | -                                     | ⬜  | ⬜    |
+| ⬜     | Root         | Structure  | -                                     | ⬜  | ⬜    |
+| ⬜     | Card         | Structure  | -                                     | ⬜  | ⬜    |
+| ⬜     | Button       | Actions    | Brand Icon, Icon, Spinner             | ⬜  | ⬜    |
+| ⬜     | Badge        | Indicators | Icon                                  | ⬜  | ⬜    |
+| ⬜     | Segment      | Forms      | Icon                                  | ⬜  | ⬜    |
+| ⬜     | Datepicker   | Forms      | Icon                                  | ⬜  | ⬜    |
+| ⬜     | App Navbar   | Navigation | Icon                                  | ⬜  | ⬜    |
+| ⬜     | Tabs         | Navigation | Icon                                  | ⬜  | ⬜    |
+| ⬜     | Accordion    | Structure  | Icon                                  | ⬜  | ⬜    |
+| ⬜     | App Footer   | Structure  | Divider, Icon, Logo                   | ⬜  | ⬜    |
+| ⬜     | Close        | Actions    | Button                                | ⬜  | ⬜    |
+| ⬜     | Counter      | Forms      | Button                                | ⬜  | ⬜    |
+| ⬜     | File Upload  | Forms      | Button, Content, Icon, Spinner, Stack | ⬜  | ⬜    |
+| ⬜     | Pagination   | Navigation | Icon, Button                          | ⬜  | ⬜    |
+| ⬜     | Modal        | Overlays   | Close                                 | ⬜  | ⬜    |
+| ⬜     | Drawer       | Overlays   | Close                                 | ⬜  | ⬜    |
+| ⬜     | Popup        | Overlays   | Close                                 | ⬜  | ⬜    |
+| ⬜     | Notification | Overlays   | Close                                 | ⬜  | ⬜    |
+| ⬜     | Tag          | Indicators | Close                                 | ⬜  | ⬜    |
+| ⬜     | Toast        | Overlays   | Button, Close, Icon                   | ⬜  | ⬜    |
+| ⬜     | Snackbar     | Overlays   | Brand Icon, Button, Close, Icon       | ⬜  | ⬜    |
+| ⬜     | Carousel     | Structure  | Icon, Pagination                      | ⬜  | ⬜    |
+| ⬜     | Hint         | Indicators | Icon, Button, Close, Drawer, Popup    | ⬜  | ⬜    |
+| ⬜     | Alert        | Overlays   | Snackbar, Toast                       | ⬜  | ⬜    |
