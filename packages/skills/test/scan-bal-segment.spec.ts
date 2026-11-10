@@ -312,8 +312,9 @@ describe('Detect', () => {
     // bal-segment-item has no migration of its own; the segment migration covers it,
     // so it counts towards segment rather than showing up as notYet.
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'segment', total: 4 }],
+      suggested: [{ name: 'segment', total: 2 }],
       notYet: [],
+      types: [],
     })
   })
 })

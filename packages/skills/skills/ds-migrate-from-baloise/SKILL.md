@@ -166,9 +166,11 @@ If that list is empty, report that no component migrations are available yet, th
 node <this-skill-directory>/scripts/scan-migratable.mjs <project-root>
 ```
 
-The script prints one JSON object. `suggested` contains used `bal-*` components that have a migration, with their usage total. `notYet` contains used components for which this skill has no migration.
+The script prints one JSON object. `suggested` contains used `bal-*` components that have a migration, with their usage total. `notYet` contains used components for which this skill has no migration. A total counts usages: opening tags, JSX elements and `Bal*` symbols, not closing tags. A component scanner's `total` also counts closing tags, so it is usually higher than the Detect total for the same component. Do not compare the two. `types` contains legacy type namespaces such as `BalEvents`, `BalProps` and `BalLanguage`. A member such as `BalEvents.BalSegmentCustomEvent` also counts for its component when that component has a migration. They are not components, are never offered, and do not count as left.
 
 Show `notYet`, if it is not empty, as used components that cannot be migrated by this version of the skill. Do not offer them as choices.
+
+If `types` is not empty, show it as a note: these legacy types stay until their code is rewritten by hand.
 
 If `suggested` is empty, report that none of the used components has an available migration, then stop.
 
@@ -230,7 +232,7 @@ Migrate every legacy icon left in the project, following `shared/icons.md`. Comp
 Delete what Init kept for the transition, once the migration is complete, following `shared/cleanup.md`. Run this step last, after **Components**, **CSS utils** and **Assets**.
 
 1. Run `scan-cleanup.mjs` from the Scan section of `shared/cleanup.md`. It runs `scan-migratable.mjs` first.
-   - When `status` is `incomplete`, do not edit files. List every entry in `outstanding.suggested` with its `total` and say to migrate it with **Components** first. List every entry in `outstanding.notYet` with its `total` as a component that this version of the skill cannot migrate, which the consumer must replace by hand. List every line in `outstanding.hidden` (path, line, snippet) as a `bal-*` tag that the scan cannot attribute to a component, which the consumer must migrate by hand. Stop.
+   - When `status` is `incomplete`, do not edit files. List every entry in `outstanding.suggested` with its `total` and say to migrate it with **Components** first. List every entry in `outstanding.notYet` with its `total` as a component that this version of the skill cannot migrate, which the consumer must replace by hand. List every entry in `outstanding.types` with its `total` as legacy types that the consumer must replace by hand, because removing the `@baloise/ds-*` dependency breaks every file that still imports them. List every line in `outstanding.hidden` (path, line, snippet) as a `bal-*` tag that the scan cannot attribute to a component, which the consumer must migrate by hand. Stop.
    - When `status` is `nothing-to-clean-up`, do not edit files. Say there is nothing to clean up. List every line in `keep.lines`, every entry in `keep.dependencies` and every file in `unreadable` as in step 2. Stop.
 2. When `status` is `ready`, show what the step deletes: every line in `remove.lines` (path, line, snippet) and every entry in `remove.dependencies` (manifest, field, name). Then show what stays: every line in `keep.lines` and every entry in `keep.dependencies` with the pointer that the Scan section of `shared/cleanup.md` gives for its `reason`, and every file in `unreadable`. Say that the scan skips build output such as `dist` and `build`, and ask the consumer to check build tooling outside the scanned files for legacy references. Ask one yes/no: delete every listed line and dependency? On no, stop with the files unchanged.
 3. Apply the Lines section of `shared/cleanup.md`.

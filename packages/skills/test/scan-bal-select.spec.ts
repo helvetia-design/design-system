@@ -315,8 +315,9 @@ describe('Detect', () => {
     // bal-select-option has no migration of its own; the select migration covers it,
     // so it counts towards select rather than showing up as notYet.
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'select', total: 4 }],
+      suggested: [{ name: 'select', total: 2 }],
       notYet: [],
+      types: [],
     })
   })
 })

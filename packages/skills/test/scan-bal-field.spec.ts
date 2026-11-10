@@ -268,7 +268,7 @@ describe('Detect', () => {
 
     const { suggested, notYet } = scanMigratable(root)
 
-    expect(suggested).toEqual([{ name: 'field', total: 10 }])
+    expect(suggested).toEqual([{ name: 'field', total: 5 }])
     expect(notYet).toEqual([])
   })
 
@@ -276,7 +276,7 @@ describe('Detect', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-form-grid></bal-form-grid>\n')
 
-    expect(scanMigratable(root).suggested).toEqual([{ name: 'field', total: 2 }])
+    expect(scanMigratable(root).suggested).toEqual([{ name: 'field', total: 1 }])
   })
 })
 

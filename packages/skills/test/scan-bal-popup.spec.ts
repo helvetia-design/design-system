@@ -292,17 +292,17 @@ describe('Detect', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-popup id="p1"></bal-popup>\n')
 
-    expect(scanMigratable(root).suggested).toEqual([{ name: 'popup', total: 2 }])
+    expect(scanMigratable(root).suggested).toEqual([{ name: 'popup', total: 1 }])
   })
 
-  it('does not suggest popup from a trigger attribute alone', () => {
+  it('suggests popup from a trigger attribute alone', () => {
     const root = createScratchDir()
     write(root, 'trigger.html', '<bal-button bal-popup="p1"></bal-button>\n')
 
-    const result = scanMigratable(root)
-
-    expect(JSON.stringify(result)).not.toContain('popup')
-    expect(result.suggested).toEqual([{ name: 'button', total: 2 }])
+    expect(scanMigratable(root).suggested).toEqual([
+      { name: 'button', total: 1 },
+      { name: 'popup', total: 1 },
+    ])
   })
 })
 
