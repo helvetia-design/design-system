@@ -55,6 +55,73 @@ export async function readNpmDistTags(execImpl = execFileAsync) {
   return typeof parsed === 'string' ? JSON.parse(parsed) : parsed
 }
 
+export async function readNpmAngularPeers(version, execImpl = execFileAsync) {
+  const { stdout } = await execImpl(
+    'npm',
+    ['view', `${targetPackageName('angular')}@${version}`, 'peerDependencies', '--json'],
+    { encoding: 'utf8' },
+  )
+  if (!stdout.trim()) return {}
+  const parsed = JSON.parse(stdout)
+  return typeof parsed === 'string' ? JSON.parse(parsed) : parsed
+}
+
+const VERSION_PART = String.raw`v?(\d+)(?:\.(?:\d+|[xX*]))?(?:\.(?:\d+|[xX*]))?(?:[-+][0-9A-Za-z.+-]+)?`
+const LOWER_BOUND_RE = new RegExp(`^(?:\\^|~|>=|=)?${VERSION_PART}$`)
+const UPPER_BOUND_RE = new RegExp(`^<=?${VERSION_PART}$`)
+
+export function lowestMajor(spec) {
+  if (typeof spec !== 'string') return null
+  const [lower, ...upper] = spec
+    .trim()
+    .replace(/(>=|<=|<|=|\^|~)\s+/g, '$1')
+    .split(/\s+/)
+  const match = LOWER_BOUND_RE.exec(lower)
+  if (!match || !upper.every(part => UPPER_BOUND_RE.test(part))) return null
+  return Number(match[1])
+}
+
+function angularCoreSpec(manifest) {
+  for (const field of DEPENDENCY_FIELDS) {
+    const spec = manifest?.[field]?.['@angular/core']
+    if (typeof spec === 'string') return spec
+  }
+  return undefined
+}
+
+async function checkAngular(manifest, packageJsonPath, version, readAngularPeers) {
+  const peerPackage = `${targetPackageName('angular')}@${version}`
+  const installed = angularCoreSpec(manifest)
+  let required
+  try {
+    const peers = await readAngularPeers(version)
+    required = peers?.['@angular/core']
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error)
+    return { error: `Could not read the peer dependencies of ${peerPackage}: ${reason}` }
+  }
+  if (typeof required !== 'string') {
+    return { error: `${peerPackage} declares no @angular/core peer range, so the Angular version cannot be checked` }
+  }
+  const installedMajor = lowestMajor(installed)
+  if (installedMajor === null) {
+    return {
+      error: `Cannot read the major of @angular/core "${installed}" in ${packageJsonPath}. Use a plain version such as ^19.2.0 and run the migration again.`,
+    }
+  }
+  const requiredMajor = lowestMajor(required)
+  if (requiredMajor === null) {
+    return { error: `Cannot read the major of the @angular/core peer range "${required}" of ${peerPackage}` }
+  }
+  const compatible = installedMajor >= requiredMajor
+  const angular = { installed, required, compatible }
+  if (compatible) return { angular }
+  return {
+    angular,
+    error: `${packageJsonPath} declares @angular/core ${installed}, but ${peerPackage} requires @angular/core ${required}. Upgrade the app to Angular ${requiredMajor} or later before running the migration; Angular ${installedMajor} is not supported.`,
+  }
+}
+
 export async function detectBaloise(rootDir, options = {}) {
   const found = scan(rootDir)
   if (!found) {
@@ -69,6 +136,22 @@ export async function detectBaloise(rootDir, options = {}) {
   }
 
   const framework = detectFramework(found.manifest)
+  let angular
+  if (framework === 'angular') {
+    const check = await checkAngular(
+      found.manifest,
+      found.packageJsonPath,
+      version,
+      options.readAngularPeers ?? readNpmAngularPeers,
+    )
+    if (check.error) {
+      return check.angular
+        ? { status: 'error', message: check.error, angular: check.angular }
+        : { status: 'error', message: check.error }
+    }
+    angular = check.angular
+  }
+
   const packageManager = detectPackageManager(rootDir)
   return {
     status: 'ready',
@@ -80,6 +163,7 @@ export async function detectBaloise(rootDir, options = {}) {
     imports: found.imports,
     version,
     aliases: aliasesFor(framework, version, found.dependencies),
+    ...(angular && { angular }),
   }
 }
 
