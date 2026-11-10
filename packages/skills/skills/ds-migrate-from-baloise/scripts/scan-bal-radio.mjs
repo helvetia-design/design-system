@@ -2,14 +2,22 @@
 import { realpathSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
+import { lineAt, lineText, readTag, scanSourceFilesWithSetValue, toSnippet } from './source-scan.mjs'
 
 const USAGE_RE =
   /<\/?bal-radio(?:-group|-icon)?(?![\w-])|<\/?BalRadio(?:Group|Icon)?\b|\bBalRadio(?:Group|Icon)?\b|\bnewBalRadioOption\b/g
 
 export function scanBalRadio(rootDir, paths = []) {
   const found = []
-  const unmatched = scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found), { paths })
+  const unmatched = scanSourceFilesWithSetValue(
+    rootDir,
+    ({ file, masked, text }) => collect(file, text, masked, found),
+    {
+      paths,
+      elementType: 'HTMLBalRadioGroupElement',
+      found,
+    },
+  )
   const result = group(found)
   return unmatched.length > 0 ? { ...result, unmatched } : result
 }
@@ -31,7 +39,7 @@ function group(found) {
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([file, findings]) => ({
       file,
-      findings: findings.sort((a, b) => a.index - b.index).map(({ line, snippet }) => ({ line, snippet })),
+      findings: findings.sort((a, b) => a.index - b.index).map(({ file: _file, index: _index, ...finding }) => finding),
     }))
 
   return {

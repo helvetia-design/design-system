@@ -37,7 +37,7 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'button': { attention: 11, coverage: 4 },
   'card': { attention: 9, coverage: 3 },
   'carousel': { attention: 21, coverage: 6 },
-  'checkbox': { attention: 10, coverage: 2 },
+  'checkbox': { attention: 15, coverage: 2 },
   'close': { attention: 2, coverage: 1 },
   'content': { attention: 4, coverage: 2 },
   'data': { attention: 6, coverage: 1 },
@@ -62,7 +62,7 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'pagination': { attention: 6, coverage: 4 },
   'popup': { attention: 17, coverage: 4 },
   'progress-bar': { attention: 6, coverage: 3 },
-  'radio': { attention: 11, coverage: 2 },
+  'radio': { attention: 12, coverage: 2 },
   'segment': { attention: 8, coverage: 0 },
   'select': { attention: 13, coverage: 0 },
   'shape': { attention: 5, coverage: 1 },
@@ -269,10 +269,30 @@ describe('shared/report.md', () => {
 describe('SKILL.md', () => {
   const skill = read('SKILL.md')
 
-  it('writes the Init, CSS utils and Assets reports through shared/report.md', () => {
+  it('writes the Init, CSS utils, Assets and Cleanup reports through shared/report.md', () => {
     expect(section(skill, '### Init')).toContain('`shared/report.md`')
     expect(section(skill, '### CSS utils')).toContain('`shared/report.md`')
     expect(section(skill, '### Assets')).toContain('`shared/report.md`')
+    expect(section(skill, '### Cleanup')).toContain('`shared/report.md`')
+  })
+
+  it('lists Cleanup as the fifth menu item', () => {
+    expect(section(skill, '## Menu')).toMatch(/^5\. \*\*Cleanup\*\* /m)
+  })
+
+  it('gates the Cleanup step on scan-cleanup.mjs and shared/cleanup.md, with C items', () => {
+    const cleanup = section(skill, '### Cleanup')
+
+    expect(read('shared/cleanup.md')).toContain('scripts/scan-cleanup.mjs')
+    expect(cleanup).toContain('`scan-cleanup.mjs`')
+    expect(cleanup).toContain('`shared/cleanup.md`')
+    expect(cleanup).toContain('`incomplete`')
+    expect(cleanup).toContain('`outstanding.suggested`')
+    expect(cleanup).toContain('`outstanding.notYet`')
+    expect(cleanup).toContain('`outstanding.hidden`')
+    expect(cleanup).toContain('`nothing-to-clean-up`')
+    expect(cleanup).toContain('one yes/no')
+    expect(cleanup).toContain('`C1.`')
   })
 
   it('runs scan-assets.mjs and shared/fonts-favicons.md in the Assets step', () => {
@@ -369,6 +389,18 @@ describe('shared/css-utils.md Report', () => {
   it('lists the CSS utils items as a continuous U-numbered checklist', () => {
     const report = section(read('shared/css-utils.md'), '## Report')
     const numbers = [...report.matchAll(/^- U(\d+)\. /gm)].map(([, number]) => Number(number))
+
+    expect(report).toContain('`shared/report.md`')
+    expect(report).not.toContain('summary')
+    expect(numbers.length).toBeGreaterThan(0)
+    expect(numbers).toEqual(numbers.map((_, index) => index + 1))
+  })
+})
+
+describe('shared/cleanup.md Report', () => {
+  it('lists the cleanup items as a continuous C-numbered checklist', () => {
+    const report = section(read('shared/cleanup.md'), '## Report')
+    const numbers = [...report.matchAll(/^- C(\d+)\. /gm)].map(([, number]) => Number(number))
 
     expect(report).toContain('`shared/report.md`')
     expect(report).not.toContain('summary')

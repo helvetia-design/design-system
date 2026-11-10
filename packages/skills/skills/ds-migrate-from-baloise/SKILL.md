@@ -1,6 +1,6 @@
 ---
 name: ds-migrate-from-baloise
-description: Migrate a consuming app from the Baloise Design System (bal-*) to the Helvetia Design System (ds-*). Use when bootstrapping Helvetia packages alongside Baloise, or when migrating components, CSS utilities, or assets.
+description: Migrate a consuming app from the Baloise Design System (bal-*) to the Helvetia Design System (ds-*). Use when bootstrapping Helvetia packages alongside Baloise, when migrating components, CSS utilities, or assets, or when removing the legacy Baloise imports and dependencies once the migration is complete.
 ---
 
 # ds-migrate-from-baloise
@@ -15,6 +15,7 @@ On invocation, present this menu and wait for one choice:
 2. **Components** — migrate a specific `bal-*` component to `ds-*`
 3. **CSS utils** — rewrite legacy Baloise utility classes and delete the Baloise utilities line once none is left
 4. **Assets** — migrate legacy icons in files that no component migration touches, move fonts and favicons to `@helvetia-design/assets`, and delete the legacy config call once no `bal-*` component is left
+5. **Cleanup** — once every `bal-*` component is migrated, delete the legacy `structure` and `core` imports and the legacy `@baloise/ds-*` dependencies
 
 Then follow only the matching section below. Stop when that section says to stop.
 
@@ -196,3 +197,16 @@ Migrate every legacy icon left in the project, following `shared/icons.md`. Comp
 5. Apply the Decide section of `shared/legacy-config.md`.
 6. Append an `assets` section to `ds-migration-report.md` as `shared/report.md` describes. Its checklist holds the `I1.`, `I2.`, ... items from the Report section of `shared/icons.md`, then the `A1.`, `A2.`, ... items from the Report section of `shared/fonts-favicons.md`, then the `L1.`, `L2.`, ... items from the Report section of `shared/legacy-config.md`. Skip the final whole-project scan of `shared/icons.md`, which this step already is.
 7. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.
+
+### Cleanup
+
+Delete what Init kept for the transition, once the migration is complete, following `shared/cleanup.md`. Run this step last, after **Components**, **CSS utils** and **Assets**.
+
+1. Run `scan-cleanup.mjs` from the Scan section of `shared/cleanup.md`. It runs `scan-migratable.mjs` first.
+   - When `status` is `incomplete`, do not edit files. List every entry in `outstanding.suggested` with its `total` and say to migrate it with **Components** first. List every entry in `outstanding.notYet` with its `total` as a component that this version of the skill cannot migrate, which the consumer must replace by hand. List every line in `outstanding.hidden` (path, line, snippet) as a `bal-*` tag that the scan cannot attribute to a component, which the consumer must migrate by hand. Stop.
+   - When `status` is `nothing-to-clean-up`, do not edit files. Say there is nothing to clean up. List every line in `keep.lines`, every entry in `keep.dependencies` and every file in `unreadable` as in step 2. Stop.
+2. When `status` is `ready`, show what the step deletes: every line in `remove.lines` (path, line, snippet) and every entry in `remove.dependencies` (manifest, field, name). Then show what stays: every line in `keep.lines` and every entry in `keep.dependencies` with the pointer that the Scan section of `shared/cleanup.md` gives for its `reason`, and every file in `unreadable`. Say that the scan skips build output such as `dist` and `build`, and ask the consumer to check build tooling outside the scanned files for legacy references. Ask one yes/no: delete every listed line and dependency? On no, stop with the files unchanged.
+3. Apply the Lines section of `shared/cleanup.md`.
+4. Apply the Dependencies section of `shared/cleanup.md`. It runs `installCommand` only when it deleted a dependency.
+5. Append a `cleanup` section to `ds-migration-report.md` as `shared/report.md` describes. Its checklist holds the `C1.`, `C2.`, ... items from the Report section of `shared/cleanup.md`. Under `### Files changed`, list every file this step edited.
+6. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.
