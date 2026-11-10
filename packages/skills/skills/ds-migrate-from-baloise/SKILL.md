@@ -125,6 +125,8 @@ Every component migration also decides about the legacy config call. Follow `sha
 
 Inside a batch (see `shared/batch.md`), a `migration.md` runs only its Rewrite step, on the batch file list. It skips its Scan display, its Confirm step and its stop. It still applies `shared/field.md`. It skips the icon import and Registration rules and `shared/legacy-config.md`, which the batch runs once at the end. It hands the outcome of its Report items back to the batch instead of writing its own report section.
 
+Vue is not a supported target. The scanners read `.vue` files only so that `shared/legacy-config.md` and **Cleanup** see every `bal-*` tag that is left. A component migration or a batch never rewrites a `.vue` file. Show its findings with the others, marked as not migrated, and leave the file unchanged. In the Report step, list each such file under "Needs your attention" as a Vue file that this skill does not migrate, with its findings. The legacy config call and the legacy imports stay until the consumer migrates those files by hand.
+
 #### Manual
 
 List every file matching `components/*.md` or `components/*/migration.md` in this skill folder. Build a picker from each file's title (the first Markdown heading). Wait for one choice, then ask the cascade question below.
