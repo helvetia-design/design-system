@@ -129,7 +129,7 @@ function readSource(rootDir, filePath, collect) {
 }
 
 function commentKind(extension) {
-  if (extension === '.html' || extension === '.vue') return 'markup'
+  if (extension === '.html' || extension === '.htm' || extension === '.vue') return 'markup'
   if (extension === '.css') return 'css'
   if (extension === '.scss' || extension === '.sass' || extension === '.less') return 'scss'
   return 'script'
@@ -347,6 +347,14 @@ function closeAt(text, token, from) {
 }
 
 export function readTag(text, start) {
+  return text.slice(start, tagEnd(text, start))
+}
+
+/**
+ * Returns the index after the `>` that closes the tag opening at `start`, or `text.length`. It skips quoted values
+ * and balanced JSX `{…}` expressions, so the `>` of an arrow function inside a handler does not end the tag.
+ */
+export function tagEnd(text, start) {
   let i = start + 1
   let quote = ''
   while (i < text.length) {
@@ -365,10 +373,17 @@ export function readTag(text, start) {
       i++
       continue
     }
-    if (ch === '>') return text.slice(start, i + 1)
+    if (ch === '{') {
+      const close = closingIndex(text, i, '{', '}')
+      if (close < text.length) {
+        i = close + 1
+        continue
+      }
+    }
+    if (ch === '>') return i + 1
     i++
   }
-  return text.slice(start)
+  return text.length
 }
 
 export function lineText(text, index) {
@@ -385,4 +400,105 @@ export function lineAt(text, index) {
 
 export function toSnippet(raw) {
   return raw.replace(/\s+/g, ' ').replace(/ >/g, '>').trim().slice(0, 240)
+}
+
+/** Returns the `.ts` file beside an Angular `.html` template, or `undefined` for any other file. */
+export function siblingScript(file) {
+  return file.endsWith('.html') ? `${file.slice(0, -'.html'.length)}.ts` : undefined
+}
+
+const SCRIPT_RE = /\.[jt]sx?$/
+
+/**
+ * Runs `scanSourceFiles` and then pushes a `setValue: true` finding into `found` for every `.setValue(` call on a ref
+ * typed `elementType`, in each scanned script and in the `.ts` beside each scanned `.html`. Returns the unmatched paths.
+ */
+export function scanSourceFilesWithSetValue(rootDir, collect, { paths = [], elementType, found }) {
+  const pushSetValue = ({ file, masked, text }) => {
+    for (const index of typedSetValueCalls(masked, elementType)) {
+      found.push({ file, index, line: lineAt(text, index), snippet: toSnippet(lineText(text, index)), setValue: true })
+    }
+  }
+  const scanned = new Set()
+  const unmatched = scanSourceFiles(
+    rootDir,
+    source => {
+      scanned.add(source.file)
+      collect(source)
+      if (SCRIPT_RE.test(source.file)) pushSetValue(source)
+    },
+    { paths },
+  )
+  for (const file of scanned) {
+    const sibling = siblingScript(file)
+    if (sibling && !scanned.has(sibling)) scanSourceFiles(rootDir, pushSetValue, { paths: [sibling] })
+  }
+  return unmatched
+}
+
+const IDENT = '([A-Za-z_$][\\w$]*)'
+const CHAIN = '(?:[A-Za-z_$][\\w$]*(?:\\(\\))?\\s*[?!]?\\s*\\.\\s*)*[A-Za-z_$][\\w$]*(?:\\(\\))?[?!]?'
+const RECEIVER_RE = new RegExp(`(${CHAIN})\\s*$`)
+const ALIAS_RE = new RegExp(`\\b(?:const|let|var)\\s+${IDENT}\\s*=\\s*(${CHAIN})\\s*(?:;|$)`, 'gm')
+const CONTINUATION_RE = /^\s*[?!]?\s*\./
+const declarationCache = new Map()
+
+function declarationsFor(type) {
+  let cached = declarationCache.get(type)
+  if (!cached) {
+    cached = {
+      declarations: [
+        [`${IDENT}\\s*[!?]?\\s*:\\s*ElementRef\\s*<\\s*${type}\\s*>`, 'nativeElement'],
+        [`${IDENT}\\s*=\\s*viewChild(?:\\.required)?\\s*<\\s*ElementRef\\s*<\\s*${type}\\s*>`, 'nativeElement'],
+        [`${IDENT}\\s*=\\s*useRef\\s*<\\s*${type}\\b`, 'current'],
+        [`${IDENT}\\s*[!?]?\\s*:\\s*${type}\\b`, ''],
+        [`${IDENT}\\s*=[^;\\n]*?(?:\\bas\\s+${type}\\b|<\\s*${type}\\s*>\\s*\\()`, ''],
+      ].map(([source, wrapper]) => [new RegExp(source, 'g'), wrapper]),
+      inlineCast: new RegExp(`\\bas\\s+${type}\\s*\\)\\s*$`),
+    }
+    declarationCache.set(type, cached)
+  }
+  return cached
+}
+
+function chainParts(receiver) {
+  return receiver.replace(/\(\)|[?!\s]/g, '').split('.')
+}
+
+function isTypedRef(refs, parts) {
+  return refs.some(({ name, wrapper }) =>
+    wrapper ? parts.at(-1) === wrapper && parts.at(-2) === name : parts.at(-1) === name,
+  )
+}
+
+/**
+ * Returns the index of every `.setValue(` call in `masked` whose receiver is a reference typed as `elementType`,
+ * so a `FormControl.setValue` call on the same line shape is never returned.
+ */
+export function typedSetValueCalls(masked, elementType) {
+  if (!masked.includes(elementType)) return []
+  const { declarations, inlineCast } = declarationsFor(elementType)
+  const refs = []
+  for (const [re, wrapper] of declarations) {
+    for (const match of masked.matchAll(re)) refs.push({ name: match[1], wrapper })
+  }
+  for (const match of masked.matchAll(ALIAS_RE)) {
+    if (isTypedRef(refs, chainParts(match[2]))) refs.push({ name: match[1], wrapper: '' })
+  }
+
+  const calls = []
+  for (const match of masked.matchAll(/\.\s*setValue\s*\(/g)) {
+    let start = masked.lastIndexOf('\n', match.index - 1) + 1
+    while (start > 0 && CONTINUATION_RE.test(masked.slice(start, match.index + 1))) {
+      start = masked.lastIndexOf('\n', start - 2) + 1
+    }
+    const prefix = masked.slice(start, match.index)
+    if (inlineCast.test(prefix)) {
+      calls.push(match.index)
+      continue
+    }
+    const receiver = RECEIVER_RE.exec(prefix)?.[1]
+    if (receiver && isTypedRef(refs, chainParts(receiver))) calls.push(match.index)
+  }
+  return calls
 }

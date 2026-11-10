@@ -22,6 +22,7 @@ const CHILD_SLUGS = new Map([
   ['card-title', 'card'],
   ['button-group', 'button'],
   ['carousel-item', 'carousel'],
+  ['check', 'checkbox'],
   ['checkbox-group', 'checkbox'],
   ['data-item', 'data'],
   ['data-label', 'data'],
@@ -56,6 +57,7 @@ const CHILD_SLUGS = new Map([
   ['select-option', 'select'],
   ['step-item', 'steps'],
   ['step-option', 'steps'],
+  ['switch', 'checkbox'],
   ['tag-group', 'tag'],
   ['tab-item', 'tabs'],
   ['tab-option', 'tabs'],
@@ -75,7 +77,7 @@ function isBundle(slug) {
   return slug.endsWith('-bundle')
 }
 
-export function scanMigratable(rootDir, paths = []) {
+export function scanMigratable(rootDir, paths = [], { extensions } = {}) {
   const available = availableMigrations()
   const totals = new Map()
   const perFile = new Map()
@@ -95,7 +97,7 @@ export function scanMigratable(rootDir, paths = []) {
       }
       if (fileTotals.size > 0) perFile.set(file, fileTotals)
     },
-    { paths },
+    extensions ? { paths, extensions } : { paths },
   )
 
   const used = toComponents(totals)
