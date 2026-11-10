@@ -20,11 +20,11 @@ user _approving_ it — never auto-appended.
 - [`conventions/component-set-rendering.md`](conventions/component-set-rendering.md) — Component
   Set axis labeling, sizing/grid mechanics, screenshot reliability for this section (Phase 3).
 - [`conventions/document-sections.md`](conventions/document-sections.md) — `Section` / `Preview` /
-  `Title` mechanics for the Copy me, Anatomy and Specs sections (Phases 6–8).
-- [`conventions/specs.md`](conventions/specs.md) — which sizes Specs shows (groups, triage rules)
+  `Title` mechanics for the Copy me, Anatomy and Measurements sections (Phases 6–8).
+- [`conventions/measurements.md`](conventions/measurements.md) — which sizes Measurements shows (groups, triage rules)
   and how each one is drawn (kinds, line styles, section layout) (Phases 1 and 8).
 - [`conventions/families.md`](conventions/families.md) — documentation owner and sub-components:
-  family resolution, lockstep phases, parent-set props, slots, anatomy and specs (every phase).
+  family resolution, lockstep phases, parent-set props, slots, anatomy and measurements (every phase).
 - [`conventions/build-mechanics.md`](conventions/build-mechanics.md) — general Figma Plugin API
   gotchas that apply across any phase: platform limits, variant-set mechanics, auto-layout
   sizing, vector import, color/paint, focus states.

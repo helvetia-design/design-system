@@ -15,7 +15,7 @@ phase or section. See `../CONVENTIONS.md` for the index.
   slot itself.
 - **Figma hard-rejects moving a subtree that itself contains `SLOT` instances into _another_
   slot's contents** — `Cannot move node. Node is not allowed SLOT node`. A documentation frame is
-  already 2 slot-levels deep internally (Anatomy/Specs each nest a `Preview` inside a `Preview`)
+  already 2 slot-levels deep internally (Anatomy/Measurements each nest a `Preview` inside a `Preview`)
   before it ever reaches a category-level slot. This rules out wrapping a whole page (or even a
   row of documentation frames) in one more slotted master — only shallow content (plain
   shapes/text, or at most one level of nested `Preview`) can go into a slot.
@@ -112,7 +112,7 @@ imported.width)`, then move **all** `imported.children` (via `findAll`, not `fin
 - **Every skill-authored label/annotation text on the documentation page — never the component's
   own content — binds its fill to `🔗 Alias/🔤 Text/Color/Primary` (`VariableID:137:288`), never a
   hardcoded literal color**, even when the literal happens to match the token's resolved value
-  exactly. Covers things this skill builds as chrome around the real component (Specs card titles, Component Set sub-labels). Does not cover text that's part of the real
+  exactly. Covers things this skill builds as chrome around the real component (Measurements card titles, Component Set sub-labels). Does not cover text that's part of the real
   component/master being documented. When in doubt which color a piece of skill-authored text
   should use, default to `Alias/Text/Color/Primary` rather than guessing a hex value.
 

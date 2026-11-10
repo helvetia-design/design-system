@@ -69,7 +69,7 @@ props:
   color: follows inverted
   device: # omit entirely if Phase 1 step 5a found no breakpoint-driven token differences.
   # One entry per responsive binding — the single place that owns the mechanism detail (which
-  # routing variable, its per-mode aliases, why this component needed it). tokens:/specs: entries
+  # routing variable, its per-mode aliases, why this component needed it). tokens:/measurements: entries
   # for the same binding just reference the routing variable by name, no restating the breakdown.
   responsiveBindings:
   - cssVar: [--ds-logo-size-base-mobile, --ds-logo-size-base-desktop] # every real --ds-* token
@@ -102,24 +102,31 @@ props:
   figmaVariableId: null # the routing/Device variable is hand-created by Phase 3, not resolved by
   # css-token-lookup.mjs — see device: above and PHASE-3-BUILD.md step 3
   resolved: true
-  specs: # confirmed specs triage (PHASE-1-ANALYZE.md step 6), rendered by Phase 8. Rules:
-  # conventions/specs.md
+  measurements: # confirmed measurements triage (PHASE-1-ANALYZE.md step 6), rendered by Phase 8. Rules:
+  # conventions/measurements.md
   drawnOption: base # the Variants-axis option shown on the drawn card
-  options: [base, sm, lg] # table columns, canonical order; [] when there is no Variants axis
+  drawnColor: secondary # the color option every drawn instance uses — the default, unless its
+  # border = fill (conventions/measurements.md → "Border visibility"); omit when there is no color axis
+  drawnColorReason: "primary draws the border in the fill color — confirmed by the user" # required
+  # when drawnColor isn't the default color option
+  drawnState: hover # optional: the state the main instance is drawn in when the default state
+  # can't show the shape (transparent background, no border — conventions/measurements.md →
+  # "Shape visibility"); omit for default. Needs drawnStateReason, like drawnColor
+  options: [base, sm, lg] # table columns, code default first (like the component set); [] when there is no Variants axis
   behavior: # triage rows proposed as `behavior` land here, not in rows:. Omit when the size
   # never changes with content/container (icon, spinner)
   width: hug # hug | fill — from the behavior probe
   overflow: truncate # truncate | wrap | overflow (flag overflow in the triage)
   rows: # numbered in this order on the drawn card and in the table: size → spacing → shape → type
-  - property: Min height # Width | Height | Size (w = h) | Min/Max width/height | Padding X/Y/L/R | Gap | Radius | Border width | Focus ring | Type (<part>)
+  - property: Min height # Width | Height | Size (w = h) | Min/Max width/height | Padding X/Y/L/R | Gap | Radius | Border width | Focus ring | Text (<part>)
     kind: size # size | spacing | shape | type
     group: limit # fixed | inner spacing | limit | behavior | derived | outer margin | hit area | context-dependent | typography
     show: drawn # drawn (marker + table row) | table (table row only, rare) | skip
-    instance: main # drawn rows only: main | min-content | focus | … — see conventions/specs.md → "Section layout"
+    instance: main # drawn rows only: main | min-content | focus | … — see conventions/measurements.md → "Section layout"
     source: button.host.scss:42 # the SCSS declaration that sets it
     values: # one per option; measured px + its token (exact Figma variable name)
-    sm: { px: 32, token: 🧩 Component/Button/Size/SM/MinHeight }
     base: { px: 48, token: 🧩 Component/Button/Size/Base/MinHeight }
+    sm: { px: 32, token: 🧩 Component/Button/Size/SM/MinHeight }
     lg: { px: 56, token: 🧩 Component/Button/Size/LG/MinHeight }
   - property: Padding X
     kind: spacing
@@ -128,7 +135,7 @@ props:
     source: logo.host.scss:12
     values:
     base: { px: { mobile: 16, tablet: 16, desktop: 24 }, token: 🧩 Component/Logo/Padding/Device } # routing variable — see device: above
-  - property: Type (label)
+  - property: Text (label)
     kind: type
     group: typography
     show: drawn
@@ -142,6 +149,13 @@ props:
     reason: "padding + line-height; min height already covers it" # required when show is skip, or when the user changed the default proposal
     values:
     base: { px: 48 }
+  - property: Min width
+    kind: size
+    group: limit
+    show: skip
+    reason: "never binds — border + padding alone are 52px > 48px" # a limit no content reaches
+    values:
+    base: { px: 48, token: 🧩 Component/Button/Size/Base/MinWidth }
   - property: Margin
     kind: spacing
     group: outer margin
@@ -193,7 +207,7 @@ anatomy: # merged list for the whole family
     part: Tab (ds-tab)
     description: 'Tab renders a single tab button inside a ds-tabs group.'
   # a sub-component with more than one @part adds B1, B2, … ; a single @part collapses into its entry
-specs:
+measurements:
   rows:
     - property: Padding X
       set: Tab # every row names its set; sub-component rows live here, not in their own file
@@ -201,7 +215,7 @@ specs:
 ```
 
 **Sub-component** (`tabs/tab/tab.figma.md`) — the schema above, plus `owner:`, minus `anatomy:` and
-`specs:`:
+`measurements:`:
 
 ```yaml
 owner: ../tabs/tabs.figma.md # documentation owner; its frame is this file's figmaDocFrameNodeId

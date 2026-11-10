@@ -165,13 +165,13 @@ what's listed below.
 **Layer-name contract.** This skill addresses the template by these layer names only. If any is
 missing, **hard stop** and report which — never fall back to hand-building.
 
-| Where               | Layer names touched                                                                                                                                                                   |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Page                | `Category Frame` › `Category Header` (`component`, `lead`) › `Documentation Frames`                                                                                                   |
-| Documentation frame | `Component A Documentation` › `Header`, `body` › `Documentation` › 3 `Section` placeholders (`Title` `kind` = `copy-me`, `anatomy`, `specs`), `body` › `Component Sets` › `Sets`      |
-| Sets stack          | `Sets` › `Primary` (`sub-label`, `Labeled Set` › `Row Labels` › `lane-<axis>` › `bracket-<n>`, `Column + Box` › `Column Labels`, set, `Grid` › `divider-row-<n>` / `divider-col-<n>`) |
-| `Header`            | `kicker`, `title` › `component`, `review-status`, `body` › `lead`, `meta` › `row` (`label`/`value`)                                                                                   |
-| `Header` links      | `links` › `link-row-storybook` / `link-row-toky` / `link-row-github` › `link-storybook`, `link-toky`, `link-github`                                                                   |
+| Where               | Layer names touched                                                                                                                                                                     |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page                | `Category Frame` › `Category Header` (`component`, `lead`) › `Documentation Frames`                                                                                                     |
+| Documentation frame | `Component A Documentation` › `Header`, `body` › `Documentation` › 3 `Section` placeholders (`Title` `kind` = `copy-me`, `anatomy`, `measurements`), `body` › `Component Sets` › `Sets` |
+| Sets stack          | `Sets` › `Primary` (`sub-label`, `Labeled Set` › `Row Labels` › `lane-<axis>` › `bracket-<n>`, `Column + Box` › `Column Labels`, set, `Grid` › `divider-row-<n>` / `divider-col-<n>`)   |
+| `Header`            | `kicker`, `title` › `component`, `review-status`, `body` › `lead`, `meta` › `row` (`label`/`value`)                                                                                     |
+| `Header` links      | `links` › `link-row-storybook` / `link-row-toky` / `link-row-github` › `link-storybook`, `link-toky`, `link-github`                                                                     |
 
 ### Labeled component set
 

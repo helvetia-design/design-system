@@ -1,18 +1,18 @@
-# Conventions — Specs: what to show and how (Phases 1 and 8)
+# Conventions — Measurements: what to show and how (Phases 1 and 8)
 
-Which sizes go into the "📐 Specs" section, and how each one is drawn. Phase 1 step 6 uses the
-first half (measure, classify, triage) to write `<name>.figma.md`'s `specs:`; Phase 8 uses the
+Which sizes go into the "📏 Measurements" section, and how each one is drawn. Phase 1 step 6 uses the
+first half (measure, classify, triage) to write `<name>.figma.md`'s `measurements:`; Phase 8 uses the
 second half (visual vocabulary, layout) to render it. See `../CONVENTIONS.md` for the index.
 
 ## Principle
 
-**Specs document what the code decides, not what the layout produces.** A value is worth showing
+**Measurements document what the code decides, not what the layout produces.** A value is worth showing
 when a designer has to respect it while building a screen: a fixed size, an inner spacing, a limit,
 a behavior. A value that falls out of other values (a height that is just padding + line-height)
 is noise, and goes stale the moment one of its inputs changes.
 
 Code and Figma variables already give developers every exact value in Dev Mode. The main reader of
-Specs is a designer, so behavior and limits matter more than exhaustive numbers.
+Measurements is a designer, so behavior and limits matter more than exhaustive numbers.
 
 **Numbers come from the browser, groups come from the SCSS.** Phase 1 measures every value on the
 rendered component (computed styles and box model), so derived and inherited values are exact. It
@@ -40,11 +40,29 @@ Rules that apply on top of the groups:
 
 - **No radius on a circle or pill.** Skip the radius row when the radius is at least half of the
   component's height (and width, if smaller), e.g. `9999` or `50%`. The shape says it all.
-- **States don't get specs.** Hover/active/disabled change color, not geometry. The one exception
+- **States don't get measurements.** Hover/active/disabled change color, not geometry. The one exception
   is the focus ring: show its width once, on an extra `focus` instance, as a `shape` row.
 - **Every shown row is drawn.** `show: table` is only for a value that has no place on any instance
   (rare — say why in `reason`). A table row without a marker confuses more than it helps.
 - **Only the default set.** An `inverted` split changes colors, never geometry.
+- **A limit is shown only when it binds.** Before proposing a `min-*`/`max-*` row as `drawn`,
+  check that some realistic content hits it: compare the limit with what the box needs anyway
+  (border + padding + the smallest realistic content; the behavior probe's `0px` width). A limit
+  that never binds is **skip** with the arithmetic as `reason` (`ds-button` min width: border +
+  padding are 52px > 48px) and is reported as a finding — it can't be drawn honestly, because no
+  instance shows it.
+- **Border visibility.** A border drawn in the same color as the fill is invisible, but still
+  takes up space. The `drawnColor` is the default color option, unless its border = fill: then
+  propose the first color option (component set order) whose border ≠ fill (`ds-button`:
+  `secondary`; `primary` and the status colors have border = fill). **A `drawnColor` other than
+  the default is always a 🟡 ask**: name the default, the proposed option and the reason (which
+  marker the default would hide), and wait for the user to confirm — never switch silently. When
+  no option shows the border, flag the border row as "invisible, reserves N px" and ask the user
+  (🟡) whether to draw it, fold it into the padding note, or skip it.
+- **Shape visibility.** The same applies to the default _state_: when its background is
+  transparent and no border draws the shape (`ds-close`), the box a size line measures can't be
+  seen. Propose a `drawnState` whose background shows the shape (`hover`) — always a 🟡 ask
+  with the reason, like `drawnColor`. The focus instance stays `state=focus`.
 - **Symmetric padding is one row.** `Padding X` when left = right; `Padding L` / `Padding R` as two
   rows when they differ. Never mix an axis label with a side label on one component.
 - **Measured ≠ token is a finding, not a value.** When the measured px doesn't match the resolved
@@ -65,50 +83,109 @@ has several rows of it):
 | `shape`   | radius, border width, focus ring              | blue    |
 | `type`    | font size/weight/line-height                  | purple  |
 
-**What → marker** (component names in `../PHASE-8-DOCUMENT-SPECS.md` step 0):
+**What → marker** (component names in `../PHASE-8-DOCUMENT-MEASUREMENTS.md` step 0):
 
 | What                     | Marker                                                                                                   |
 | ------------------------ | -------------------------------------------------------------------------------------------------------- |
 | width / height           | dimension line with end ticks, outside the component — solid for a fixed value, dashed for `Min` / `Max` |
 | padding                  | 20% tint on every side the token applies to **plus** a `spacing` dimension line below each tinted side   |
 | gap                      | hatched overlay between the two children **plus** a `spacing` dimension line below each gap              |
-| icon / glyph size        | overlay box exactly on the nested part, plus a width line above the component                            |
+| icon / glyph size        | text-free overlay (25% fill + 1px outline) on the nested part, plus a width line above the component     |
 | radius                   | circle with the radius's own size, sitting in the corner; leader diagonally outward                      |
-| border width, focus ring | leader: dot on the edge or ring, line outward, pill with the value                                       |
-| typography               | leader: dot on the text, line outward, pill with size / weight / line-height                             |
+| border width, focus ring | leader: 3px dot (no outline) centered on the edge or ring, line outward, pill with the value             |
+| typography               | dashed outline on the text's line box, leader from its edge, pill with size / weight / line-height       |
 | hit area                 | dashed orange outline around the hit area (its own color, not a kind)                                    |
 | behavior                 | no line — text label (`Hug ↔`, `Fill ↔`, `Truncates`, `Wraps`)                                           |
 
-**Labels**: every marker label is the **value** (`48px`, `min 48px`, `4px`) followed by a number
-bubble in the kind color. The bubble's number is the row's number in the Sizes table — never put
-the number into the value text.
+**Labels**: every marker label is the same soft **pill** — a light tint of the kind color, a 1px
+outline in the kind color, a solid number bubble first (it matches the Sizes table, where every
+row starts with its bubble), then the **value** in a dark shade of the kind color (`48px`,
+`min 48px`, `4px`). The dark shade keeps the value text at WCAG AA contrast; white on the base
+green or magenta doesn't reach it. The bubble's number is the row's number in the Sizes table —
+never put the number into the value text. Leader and corner-radius pills stay attached to the
+end of their line — there the line is the connection.
+
+| Kind      | Base (lines, bubble, outline) | Dark (value text) | Tint (pill fill) |
+| --------- | ----------------------------- | ----------------- | ---------------- |
+| `size`    | `#1C9454`                     | `#0F5C33`         | `#E3F2EA`        |
+| `spacing` | `#D92E9E`                     | `#8A1663`         | `#FBE6F3`        |
+| `shape`   | `#3366F2`                     | `#1F45B0`         | `#E6EDFE`        |
+| `type`    | `#8257DB`                     | `#5530A0`         | `#EEE8FA`        |
+
+**Gaps are measured from the tick ends**, not from the line: the end ticks stick out 3px on both
+sides of a dimension line, so a gap measured from the line disappears. 4px between the ticks and
+the component, 4px between the ticks and the pill.
+
+**Dimension pill placement**, tried in this order until the pill touches nothing:
+
+1. **Centered** under (or above, beside) its own line — `label=center`.
+2. **Shifted outward**, away from the component's center, until its inner edge lines up with
+   the inner end of its line — `label=end` on the left half, `label=start` on the right half
+   (`ds-button` padding).
+3. **Straight callout** one pill row further out: the line stays next to the component and a
+   vertical leader carries the pill out — `label=callout`, shifted outward as in 2 with
+   `callout-end` / `callout-start` when centered still collides (`ds-button` gaps). Resize the
+   instance's height to set the leader length.
+4. **Angled leader** — only as a last resort; diagonals pull the pill away from what it measures.
+
+Callouts stay the exception, never the default: a callout adds a line that measures nothing, so
+it should also signal "this dimension is too small for its own pill".
+
+**Units**: drawing pills carry the unit (`24px`) — a pill is read on its own. Table cells don't
+(`Base/PaddingX · 24`); the footnote says `Values in px.` once.
+
+**Fills**: only spacing gets a fill (padding tint, gap hatch) and an icon overlay its light box.
+Shape markers stay outlines — the radius circle gets no fill, because half of it lies outside the
+component and a fill would blur the edge it shows.
+
+**Min / max** keep their kind color: the dashed line and the `min` / `max` prefix mark them. Never
+give them a color of their own — color says the kind, and a limit is still a `size`.
 
 **Leaders point away from the center.** A marker starts at the measured spot and its line runs
 outward, away from the component's center: corner markers diagonally out of their corner, leaders
-horizontally to the side the target is on (or to the side with free space when the target is
-centered). A leader never crosses the component towards its center.
+straight out to their side. A leader never crosses the component towards its center.
 
-**Placement**: dimension lines sit **outside** the component — widths on top, heights on the left,
-padding and gap below. Radius goes on the top-right corner (the left side carries the height line),
-leaders to the right. Never draw on top of content except the padding tint, the gap hatch and the
-icon overlay. When two markers on the same side collide, offset the second by its own height + 4px.
+**Placement**: dimension lines sit **outside** the component, as close as the tick-end gap
+allows, all lines of one side on one row:
+
+| Marker                                    | Side                                                                      |
+| ----------------------------------------- | ------------------------------------------------------------------------- |
+| width                                     | top                                                                       |
+| height                                    | left                                                                      |
+| horizontal padding (left/right), row gap  | bottom                                                                    |
+| vertical padding (top/bottom), column gap | right (`side=right`)                                                      |
+| radius                                    | a free corner — top-right preferred                                       |
+| leaders (type, border, focus ring, …)     | right preferred; any side with space, outside that side's dimension lines |
+
+Never draw on top of content except the padding tint, the gap hatch and the icon overlay.
+When pills collide, follow "Dimension pill placement" above — move the pill, never the line.
+
+**Overlaps**: markers should not overlap each other — pills, lines, ticks, dots and rings all
+count, not just pills. To resolve an overlap, try in order:
+
+1. Shift the pill ("Dimension pill placement" above).
+2. Move the marker to another side or corner (a pill-shaped radius ring covers a whole end, so
+   put it on the end no leader leaves from).
+3. Lengthen the leader or enlarge the stage.
+
+If an overlap remains, keep it minimal: a line may cross another line, but nothing may cover a
+pill or its number. Mention the remaining overlap to the user when confirming the section.
 
 ## 3. Section layout
 
-The Specs `Section` (`Flat`) holds up to three nested `Default` `Preview`s, in this order:
+The Measurements `Section` (`Flat`) holds up to three nested `Default` `Preview`s, in this order:
 
-1. **Drawn spec** — **every numbered table row is drawn here exactly once.** One **main** instance
+1. **Drawing** — **every numbered table row is drawn here exactly once.** One **main** instance
    of the default Variants-axis option (`base`, or the implicit default), default state, every
-   optional part on. Add an **extra** instance only for a row that can't be drawn on the main one
-   — a limit that only binds with other content (`min width` on a short label), or a value that
-   only exists in a state (the focus ring on `focus`). An extra instance may also take a marker
-   that doesn't fit on the main instance (`ds-button`: the border width on the short-label
-   instance). Extra instances sit in a row below the main one, each with a one-word caption
-   (`Min content`, `Focus`) and only its own markers. Never one instance per Variants-axis option —
+   optional part on, in the `drawnColor` (see "Border visibility"). Add an **extra** instance only
+   for a row that can't be drawn on the main one — a value that only exists in a state (the focus
+   ring on `focus`), or a limit that only binds with other content (a `min width` that a short
+   label actually hits). Extra instances sit in a row below the main one, each with a one-word
+   caption (`Focus`, `Min content`) and only its own markers. Never one instance per Variants-axis option —
    the table compares options; the only exception is an option that changes the structure (other
    parts or layout), not just values.
-2. **Sizes table** — rows = properties, columns = the Variants-axis options in canonical order
-   (`base · sm · md · lg`). Each cell shows the token's short name and px (`Gap/XS · 8`). A row whose
+2. **Sizes table** — rows = properties, columns = the Variants-axis options with the code default
+   first, like the component set (`base · sm · md · lg`). Each cell shows the token's short name and px (`Gap/XS · 8`). A row whose
    value is the same for every option shows it once, spanning the columns. Rows are grouped by kind
    in the order `size → spacing → shape → type`, each row starting with its number bubble. Numbers
    run 1, 2, 3, … top to bottom. Context-dependent cells list one value per mode
@@ -116,7 +193,7 @@ The Specs `Section` (`Flat`) holds up to three nested `Default` `Preview`s, in t
 3. **Behavior** — only when the component has a `behavior` row: one **stretched** instance (long
    content, fixed width below its content width) labelled with its behavior (`Hug ↔` / `Fill ↔`,
    `Wraps` / `Truncates`; a prop that switches it goes in brackets: `Hug ↔ (wide: Fill)`). The
-   min-content case lives in the drawn spec. Skip this card for components whose size never changes
+   min-content case lives in the drawing. Skip this card for components whose size never changes
    with content or container (icon, spinner, close).
 
 A component with no Variants axis has one column in the table, headed with its name.
@@ -132,5 +209,5 @@ Run on a clone of the default instance in a test wrapper, so the page under test
    wrapper → `scrollWidth > clientWidth` on the text part with `text-overflow: ellipsis` means
    **truncates**; a taller box means **wraps**; neither means it **overflows** (flag it).
 
-Only the outcome goes into `specs:` (`width: hug`, `overflow: truncate`); the probe's raw numbers
+Only the outcome goes into `measurements:` (`width: hug`, `overflow: truncate`); the probe's raw numbers
 don't.

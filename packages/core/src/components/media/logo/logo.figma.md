@@ -93,7 +93,7 @@ tokens:
     figmaVariableId: null
     resolved: true
 
-specs:
+measurements:
   base:
     - kind: size
       label: Height
@@ -159,7 +159,7 @@ true    primary   [cell]    [cell]    [cell]
   someone comparing Figma to the live default.
 - **Width is calculated, not a token**: each brand SVG's width is derived from height via a fixed
   aspect ratio in code (`(1084/204) * height` for Helvetia, `(158/32) * height` for Baloise) — this
-  is calculated inner content, left out of `specs:` per `PHASE-6-DOCUMENT-SPECS.md`.
+  is calculated inner content, left out of `measurements:` per `PHASE-8-DOCUMENT-MEASUREMENTS.md`.
 - **Animation (Lottie) is out of v1 scope**: `animated=true` is still represented as a boolean
   variant (per `logo.tsx`'s own prop), but the Figma component will show the animated container's
   static/idle visual, not a Lottie-driven animation.
@@ -167,6 +167,6 @@ true    primary   [cell]    [cell]    [cell]
   inline `fill="#000D6E"` on their path, but `logo.host.scss`'s `svg { @include fillSvg(var(--_logo-color)); }`
   overrides it — the real rendered color comes from `--ds-logo-color-primary`/`-inverted`, already
   resolved above. No hardcoded-value gap.
-- `specs:` height px values are the real resolved token values, confirmed against
+- `measurements:` height px values are the real resolved token values, confirmed against
   `packages/tokens/tokens/Base.tokens.json` directly (sm: 24/24/24 mobile/tablet/desktop constant;
   base: 24/24/32; lg: 32/32/48) — not placeholders.

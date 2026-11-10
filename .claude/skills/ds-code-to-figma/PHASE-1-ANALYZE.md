@@ -4,7 +4,7 @@
 
 Read the code of every family member and produce the draft mapping files that Phase 2 proposes a
 grouping against. Steps 1–5 run **per member**; the anatomy review, the token-gap batch (5b) and
-the specs triage (6) are presented **once for the whole family** (`conventions/families.md` §2).
+the measurements triage (6) are presented **once for the whole family** (`conventions/families.md` §2).
 
 ## Inputs
 
@@ -23,8 +23,8 @@ the specs triage (6) are presented **once for the whole family** (`conventions/f
 - `docs/adr/0017-direct-commit-variableid-backfill.md` — why variable ids already live in
   `Base.tokens.json`
 - `packages/styles/src/scss/mixins/breakpoint.mixin.scss` — full breakpoint mixin set, for detecting responsive bindings
-- `conventions/specs.md` — groups and rules for the specs triage (step 6)
-- `conventions/families.md` — family resolution (step 0), merged anatomy, family specs triage
+- `conventions/measurements.md` — groups and rules for the measurements triage (step 6)
+- `conventions/families.md` — family resolution (step 0), merged anatomy, family measurements triage
 
 ## Instructions
 
@@ -187,8 +187,8 @@ Tokens` collection has exactly those three. Any other mixin (`desktop-lg`, `desk
      its `device:` binding rather than a single static token. Surface every gap now, as a batch,
      using the same hard-stop flow as step 5, rather than discovering missing tokens one at a time
      mid-build.
-6. **Specs triage** — decide which sizes Phase 8's "📐 Specs" section shows. Rules:
-   `conventions/specs.md`. Numbers come from the browser, groups come from the SCSS.
+6. **Measurements triage** — decide which sizes Phase 8's "📏 Measurements" section shows. Rules:
+   `conventions/measurements.md`. Numbers come from the browser, groups come from the SCSS.
    - 6a. **Measure.** Start the dev server from the repo root (`pnpm start`) if it isn't
      running, and open the component's `test/*.visual.html`. For every option of the Variants axis (one element each; default
      values for every other prop), read the host and every `[part]` in its `shadowRoot`:
@@ -215,29 +215,41 @@ Tokens` collection has exactly those three. Any other mixin (`desktop-lg`, `desk
            cs.borderBottomLeftRadius,
          ],
          font: { size: cs.fontSize, weight: cs.fontWeight, lineHeight: cs.lineHeight, family: cs.fontFamily },
+         colors: { background: cs.backgroundColor, border: cs.borderTopColor },
        }
      }
      const host = document.querySelector('ds-<name>[size="sm"]') // one per option
      const parts = [...host.shadowRoot.querySelectorAll('[part]')]
      ;({ host: measure(host), parts: Object.fromEntries(parts.map(p => [p.getAttribute('part'), measure(p)])) })
      ```
-     Then run the behavior probe (`conventions/specs.md` → "Behavior probe") once, on the
+     Then run the behavior probe (`conventions/measurements.md` → "Behavior probe") once, on the
      default option. An option missing from `*.visual.html` is not measured: its values come from
      the tokens resolved in step 5, and the triage marks it `unmeasured`. Stop the dev server when
      done if this step started it.
-   - 6b. **Classify.** Put every measured value into one group from `conventions/specs.md` →
+   - 6b. **Classify.** Put every measured value into one group from `conventions/measurements.md` →
      "Groups", using the SCSS declaration (file:line) that sets it, and match it to its token from
      step 5. Values nobody declares (`0` paddings, `auto` sizes, `normal` gaps) are dropped, not
-     listed — except a box size, which becomes `derived`.
+     listed — except a box size, which becomes `derived`. Then run the two checks from
+     `conventions/measurements.md`: **does each limit bind?** (a `min-*`/`max-*` that no realistic
+     content reaches → `skip`, reported as a finding) and **border visibility** (measure every
+     Variants color option's `background` vs `border` color; the default option stays the
+     `drawnColor` unless its border = fill, then the first option where they differ is proposed;
+     none → ask), and **shape visibility** (default state with a transparent background and no
+     border → propose a `drawnState`, e.g. `hover`).
    - 6c. **🟡 Present the triage** in the conversation as one table, one row per property:
 
      ```
-     # | property | kind | group | sm | base | lg | token | source | proposal | instance | reason
+     # | property | kind | group | base | sm | lg | token | source | proposal | instance | reason
      ```
 
      `proposal` is `drawn` (marker + table row), `table` (table row only, rare), `behavior` or
      `skip`. `instance` says where a drawn row goes: `main`, or an extra instance (`min-content`,
-     `focus`, …) per `conventions/specs.md` → "Section layout".
+     `focus`, …) per `conventions/measurements.md` → "Section layout". Option columns follow the
+     code default first (`base | sm | lg`). When the proposed `drawnColor` isn't the default
+     color option, list it with the rows that need a decision: the default, the proposed option
+     and why (e.g. "`primary` draws the border in the fill color, so the 2px border and the
+     padding inside it can't be seen — recommend `secondary`"). The user confirms or keeps the
+     default.
      **Family:** measure every member (sub-components inside the owner's visual test where
      they're contained), add a `set` column and group the rows by set — still one table, one
      checkpoint. Rows of a wrapping sub-component are `table` only (`conventions/families.md` §6).
@@ -246,11 +258,11 @@ Tokens` collection has exactly those three. Any other mixin (`desktop-lg`, `desk
      margins) separately, each with a one-line recommendation. Wait for the user to confirm or
      change it.
 7. Write all of the above into `<name>.figma.md` (create it if it doesn't exist) as a draft, per
-   the schema in `examples/mapping-file-format.md`, including the confirmed `specs:` from step 6.
+   the schema in `examples/mapping-file-format.md`, including the confirmed `measurements:` from step 6.
    One file per family member, next to its `.tsx`. The owner's file holds `anatomy:` and every
-   `specs:` row (each with `set:`); each sub-component's file holds `owner:` and no
-   `anatomy:`/`specs:`.
-   Skipped rows stay in `specs:` with `show: skip` and their reason, so a re-run doesn't ask again.
+   `measurements:` row (each with `set:`); each sub-component's file holds `owner:` and no
+   `anatomy:`/`measurements:`.
+   Skipped rows stay in `measurements:` with `show: skip` and their reason, so a re-run doesn't ask again.
 
 ## Output
 
@@ -263,7 +275,7 @@ A draft mapping file `<name>.figma.md`, written per
 - Resolved token/variable id for every CSS-var binding, including responsive `device:` bindings
 - Nested DS component references (their Figma component keys)
 - The completeness checklist
-- The confirmed `specs:` triage (measured values, group, token, proposal per property)
+- The confirmed `measurements:` triage (measured values, group, token, proposal per property)
 
 ## Completion Criteria
 
@@ -276,10 +288,10 @@ A draft mapping file `<name>.figma.md`, written per
   stop and resolved with the user — none left as a guess or silent default.
 - Responsive (device-mode) bindings are identified and recorded under `device:`.
 - The completeness checklist has no unresolved gaps.
-- Every measured size is in the specs triage with a group and a proposal, and the user confirmed
+- Every measured size is in the measurements triage with a group and a proposal, and the user confirmed
   it; every measured ≠ token mismatch was decided with the user.
 
 ## Next Phase
 
 Proceed to [`PHASE-2-PROPOSE.md`](PHASE-2-PROPOSE.md) only once the draft `<name>.figma.md`
-(props, anatomy, states, resolved tokens, completeness checklist, confirmed specs triage) exists.
+(props, anatomy, states, resolved tokens, completeness checklist, confirmed measurements triage) exists.
