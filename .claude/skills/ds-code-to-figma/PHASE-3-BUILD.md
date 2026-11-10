@@ -277,6 +277,29 @@ to its set name per `PHASE-2-PROPOSE.md` → "Naming" · fixed uniform cell grid
 **and** inner dashed grid lines — per set `(cols − 1) + (rows − 1)` dividers, styled like the prototypes, `Grid` above the set · outside labels naming every axis and option · variant layers in
 grid reading order · no Figma default layer names · no styling literal written by this skill.
 
+### Interactions
+
+When the set has a `state` axis, wire the interaction states as prototype reactions on the
+variants (`setReactionsAsync`), so an instance reacts like the code in prototypes. Per row (every
+other axis fixed, every component state `false`):
+
+| From variant    | Trigger                     | To             |
+| --------------- | --------------------------- | -------------- |
+| `state=default` | `ON_HOVER` (while hovering) | `state=hover`  |
+| `state=default` | `ON_PRESS` (while pressing) | `state=active` |
+| `state=hover`   | `ON_PRESS` (while pressing) | `state=active` |
+
+- Action: `{ type: 'NODE', destinationId: <target variant id>, navigation: 'CHANGE_TO',
+transition: null }` (instant). Both triggers revert by themselves on mouse-leave / release — no
+  return reactions.
+- Only the options the component has: no `hover` → no hover reaction; no `active` → no press
+  reaction.
+- **No reactions** on `state=focus` (Figma has no keyboard-focus trigger, and a click must not show
+  the `:focus-visible` ring), on `state=active`, and on every variant with a component state `true`
+  (`disabled`, `loading`, `invalid` don't react in code).
+- A CSS `transition` in code is not copied into Figma — note it in the mapping file.
+- Set reactions after the grid is final (variants recreated later lose them).
+
 ### Documentation frame header
 
 Override text on the cloned `Header` instance by finding each node by name and setting

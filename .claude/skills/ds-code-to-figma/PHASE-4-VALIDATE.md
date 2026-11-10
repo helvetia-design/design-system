@@ -86,6 +86,10 @@ worst of all reports (`fail` > `blocked` > `pass`) and decides [Next Phase](#nex
    component's bindings. Create and remove them in the same script, off-canvas, and return
    "created N, removed N"; never change the main component (e.g. the boolean's default) instead.
    Layers that are hidden without a boolean (Badge `sm`) are never shown: skip them.
+   e. **Interactions** (`PHASE-3-BUILD.md` → "Interactions"): every `state=default` / `state=hover`
+   variant with all component states `false` has exactly the listed reactions (trigger type,
+   `CHANGE_TO`, instant), each pointing at the variant with the same other axes and the target
+   `state`; every other variant has none. Report found vs. expected counts per set.
 5. **Check the component set's layout against the template** (`🗂️ Template / Category` →
    `Labeled component set` in `PHASE-3-BUILD.md`):
    a. **Outer stroke and grid dividers**, per set. Find the set's own `Grid` through its parent

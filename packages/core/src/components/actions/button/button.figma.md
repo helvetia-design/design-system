@@ -81,14 +81,14 @@ props:
       name: disabled,
       type: boolean,
       default: false,
-      figmaProperty: state,
-      figmaPropertyType: 'variant (state=disabled)',
+      figmaProperty: disabled,
+      figmaPropertyType: 'variant false/true (component state; true only with state=default)',
     }
   - name: loading
     type: boolean
     default: false
-    figmaProperty: state
-    figmaPropertyType: 'variant (state=loading)'
+    figmaProperty: loading
+    figmaPropertyType: 'variant false/true (component state; true only with state=default)'
     note: 'Disabled colors plus a visible ds-spinner (size sm); icons hidden.'
   # non-variant component properties (no variant cost)
   - name: label
@@ -151,7 +151,7 @@ props:
 
 states:
   figmaProperty: state
-  options: [default, hover, focus, active, disabled, loading]
+  options: [default, hover, focus, active] # interaction states; disabled / loading are own variants (10.11.2026)
   sources:
     hover: ':hover / .is-hovered (button.style.scss) → *-hover-* tokens'
     focus: ':focus-visible / .is-focused → focus ring (--ds-alias-interaction-focus-color-base; inverted set: -inverted)'
@@ -166,13 +166,13 @@ figmaSets:
   # Pagination uses the new set.
   button:
     name: Button
-    axes: 'size 3 × color 13 (rows) × state 6 (columns)'
+    axes: 'size 3 × color 13 (rows) × state 4 + disabled + loading (6 columns)'
     variants: 234
     nodeId: '4594:1327'
     key: '8956ebb803a4c6fe3749f84119915335d0d43ade'
   buttonInverted:
     name: ButtonInverted
-    axes: 'size 3 × color 5 (rows) × state 6 (columns)'
+    axes: 'size 3 × color 5 (rows) × state 4 + disabled + loading (6 columns)'
     variants: 90
     nodeId: '4600:2108' # recreated 10.11.2026 (option order); first build 4594:1328
     key: '227d31d011d34dc7e4fc8505061be74339b77af9'
@@ -1888,6 +1888,19 @@ set name.
     `icon right` (INSTANCE_SWAP, 79 preferred glyphs). `loading` icons hidden, no boolean.
   - The frame's `body` widened 1854 → 2044 so `Component Sets` (1280) fits the 1200px stack.
   - Frame approved by the user 10.11.2026.
+- **Component states + interactions (10.11.2026)**, per the new skill rules:
+  - Both sets migrated in place (node ids and keys unchanged): `state` = `default · hover · focus ·
+active`; `state=disabled` → `state=default, disabled=true, loading=false`, `state=loading` →
+    `state=default, disabled=false, loading=true`. Option orders `false, true`. All 64 instances of
+    `Button` (Pagination, Copy me, Anatomy, Measurements) kept their variant; Pagination's 20
+    disabled buttons now read `disabled=true`.
+  - Column label `state` centred on the four interaction-state columns; `disabled` / `loading`
+    label their own columns.
+  - Prototype reactions: `default` → while hovering → `hover`, `default` / `hover` → while pressing →
+    `active`, `CHANGE_TO`, instant. 117 reactions on `Button`, 45 on `ButtonInverted`; none on
+    `focus`, `active`, `disabled=true`, `loading=true`.
+  - Code transition not copied: `button.style.scss:82–84` (`color, background-color, border-color,
+box-shadow, text-shadow`, 0.2s, `cubic-bezier(0, 0, 0.2, 1)`, literals, no token).
 
 ## Phase 4–5 — document sections
 

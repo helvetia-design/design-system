@@ -69,3 +69,16 @@ re-baseline). Accepted by the user 10.11.2026 ("let's continue"); go on to Phase
     set.
   - 5c: pass.
   - 6b: screenshot of `4590:1064`, every line visible.
+
+## Re-check: component states + interactions (10.11.2026)
+
+Read-only after migrating both sets in place (`Button` `4594:1327`, `ButtonInverted` `4600:2108`).
+
+| #   | Check                          | Result | Evidence                                                                                                                                                                                                           |
+| --- | ------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 3a  | Interaction / component states | pass   | Both sets: `state` = default · hover · focus · active; `disabled` and `loading` = false · true. 0 variants with a component state `true` outside `state=default`, 0 with both `true`. Counts unchanged (234 / 90). |
+| 4e  | Interactions                   | pass   | 234 / 234 and 90 / 90 variants match the expected reactions (117 and 45 reactions: `ON_HOVER` → hover, `ON_PRESS` → active, `CHANGE_TO`, transition `null`, same size and color); every other variant has none.    |
+| 5b  | Column labels                  | pass   | `state` centre x 350.5 = centre of columns 1–4 (175px cells); `disabled` / `loading` centred on columns 5 / 6 (787.5 / 962.5).                                                                                     |
+| 5c  | Ordering                       | pass   | First layer and top-left cell `size=base, color=primary, state=default, disabled=false, loading=false`; option orders as above.                                                                                    |
+| 6b  | Screenshot                     | pass   | `4590:1064`: labels, columns and dividers as expected.                                                                                                                                                             |
+| —   | Instances                      | pass   | 64 / 64 instances of `Button` keep their main component; 20 former `state=disabled` (Pagination) read `disabled=true`.                                                                                             |
