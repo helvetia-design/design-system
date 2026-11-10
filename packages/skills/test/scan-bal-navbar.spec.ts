@@ -369,7 +369,7 @@ describe('Detect', () => {
 
     const { suggested } = scanMigratable(root)
 
-    expect(suggested).toEqual(expect.arrayContaining([{ name: 'navbar', total: 2 }]))
+    expect(suggested).toEqual(expect.arrayContaining([{ name: 'navbar', total: 1 }]))
   })
 
   it('folds the child tags into navbar instead of listing them as unmigratable', () => {
@@ -389,7 +389,7 @@ describe('Detect', () => {
     const result = scanMigratable(root)
 
     expect(JSON.stringify(result)).not.toContain('navbar-')
-    expect(result.suggested).toEqual(expect.arrayContaining([{ name: 'navbar', total: 8 }]))
+    expect(result.suggested).toEqual(expect.arrayContaining([{ name: 'navbar', total: 4 }]))
   })
 })
 

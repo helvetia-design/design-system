@@ -364,8 +364,9 @@ describe('Detect', () => {
     // bal-radio-group and bal-radio-icon have no migration of their own; the radio
     // migration covers them, so they count towards radio rather than showing up as notYet.
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'radio', total: 6 }],
+      suggested: [{ name: 'radio', total: 3 }],
       notYet: [],
+      types: [],
     })
   })
 })

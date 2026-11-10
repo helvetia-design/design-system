@@ -362,7 +362,7 @@ describe('Detect', () => {
       ].join('\n'),
     )
 
-    expect(scanMigratable(root).suggested).toEqual([{ name: 'list', total: 16 }])
+    expect(scanMigratable(root).suggested).toEqual([{ name: 'list', total: 8 }])
   })
 
   it('does not list BalListBundle as its own unmigratable component', () => {

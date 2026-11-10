@@ -257,7 +257,7 @@ describe('Detect', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-pagination></bal-pagination>\n')
 
-    expect(scanMigratable(root).suggested).toEqual([{ name: 'pagination', total: 2 }])
+    expect(scanMigratable(root).suggested).toEqual([{ name: 'pagination', total: 1 }])
   })
 })
 
