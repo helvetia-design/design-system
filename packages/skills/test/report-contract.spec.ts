@@ -276,6 +276,14 @@ describe('SKILL.md', () => {
     expect(section(skill, '### Cleanup')).toContain('`shared/report.md`')
   })
 
+  it('reports .vue findings in a component migration instead of rewriting them', () => {
+    const components = section(skill, '### Components')
+
+    expect(components).toContain('Vue is not a supported target.')
+    expect(components).toContain('never rewrites a `.vue` file')
+    expect(components).toContain('"Needs your attention"')
+  })
+
   it('lists Cleanup as the fifth menu item', () => {
     expect(section(skill, '## Menu')).toMatch(/^5\. \*\*Cleanup\*\* /m)
   })

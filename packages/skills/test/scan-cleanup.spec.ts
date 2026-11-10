@@ -759,7 +759,7 @@ describe('scanCleanup', () => {
     ])
   })
 
-  it('refuses while a bal-* tag hides behind an apostrophe or a glob in markup text', () => {
+  it('refuses while a bal-* tag hides behind an apostrophe, and counts a Vue tag after a glob as suggested', () => {
     const root = createScratchDir()
     writeManifest(root, { dependencies: { '@baloise/ds-styles': '19.0.0' } })
     write(root, 'src/styles.scss', "@import '@baloise/ds-styles/css/core';\n")
@@ -773,13 +773,10 @@ describe('scanCleanup', () => {
     expect(scanCleanup(root)).toEqual({
       status: 'incomplete',
       outstanding: {
-        suggested: [],
+        suggested: [{ name: 'button', total: 1 }],
         notYet: [],
         types: [],
-        hidden: [
-          { file: 'src/App.vue', line: 3, snippet: '<bal-button>Go</bal-button>' },
-          { file: 'src/index.html', line: 1, snippet: "<p>Ab CHF 1'000 <bal-tag>Neu</bal-tag></p>" },
-        ],
+        hidden: [{ file: 'src/index.html', line: 1, snippet: "<p>Ab CHF 1'000 <bal-tag>Neu</bal-tag></p>" }],
       },
     })
   })

@@ -150,12 +150,13 @@ describe('scanIconImports', () => {
 
   it('scans plain JavaScript and Vue files', () => {
     const root = createScratchDir()
-    for (const file of ['main.js', 'icons.mjs', 'legacy.cjs', 'config.mts', 'App.vue']) {
+    for (const file of ['main.js', 'icons.mjs', 'legacy.cjs', 'config.mts', 'config.cts', 'App.vue']) {
       write(root, `src/${file}`, "import { balIconPlus } from '@baloise/ds-icons'\n")
     }
 
     expect(scanIconImports(root).files.map(entry => entry.file)).toEqual([
       'src/App.vue',
+      'src/config.cts',
       'src/config.mts',
       'src/icons.mjs',
       'src/legacy.cjs',

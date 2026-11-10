@@ -585,6 +585,29 @@ describe('scanMigratable', () => {
     })
   })
 
+  it('suggests button for a React app whose JSX lives only in .js files', () => {
+    const root = createScratchDir()
+    write(root, 'src/App.js', 'export const App = () => <bal-button>Hi</bal-button>\n')
+
+    expect(scanMigratable(root)).toEqual({ suggested: [{ name: 'button', total: 1 }], notYet: [], types: [] })
+  })
+
+  it('suggests button for a Vue template and finds .js and .vue paths', () => {
+    const root = createScratchDir()
+    write(root, 'src/App.js', 'export const App = () => <bal-button>Hi</bal-button>\n')
+    write(root, 'src/g.vue', '<template>\n  <bal-button>Go</bal-button>\n</template>\n')
+
+    expect(scanMigratable(root, ['src/App.js', 'src/g.vue'])).toEqual({
+      suggested: [{ name: 'button', total: 2 }],
+      notYet: [],
+      types: [],
+      files: [
+        { file: 'src/App.js', components: [{ name: 'button', total: 1 }] },
+        { file: 'src/g.vue', components: [{ name: 'button', total: 1 }] },
+      ],
+    })
+  })
+
   it('returns no suggestions when only unsupported components are used', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-fictional></bal-fictional>\n')

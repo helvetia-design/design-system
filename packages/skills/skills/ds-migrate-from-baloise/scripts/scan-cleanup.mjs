@@ -7,14 +7,14 @@ import {
   DEPENDENCY_FIELDS,
   dependencyNames,
   detectPackageManager,
+  IMPORT_EXTENSIONS,
   installCommand,
   LOCKFILES,
-  SOURCE_EXTENSIONS,
 } from './detect-baloise.mjs'
 import { scanMigratable } from './scan-migratable.mjs'
 import { scanSourceFiles, toSnippet } from './source-scan.mjs'
 
-const GATE_EXTENSIONS = new Set([...SOURCE_EXTENSIONS, '.less'])
+const GATE_EXTENSIONS = new Set([...IMPORT_EXTENSIONS, '.less'])
 const TAG_EXTENSIONS = new Set([...GATE_EXTENSIONS].filter(ext => ext !== '.json'))
 const YAML_EXTENSIONS = new Set(['.yml', '.yaml'])
 const EXTENSIONS = new Set([...GATE_EXTENSIONS, ...YAML_EXTENSIONS])

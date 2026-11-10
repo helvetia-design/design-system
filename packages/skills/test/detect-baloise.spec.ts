@@ -102,10 +102,12 @@ describe('detectBaloise', () => {
       '<script type="module" src="node_modules/@baloise/ds-core/dist/design-system/design-system.esm.js"></script>\n',
     )
     write(root, 'coverage/app.js', "import '@baloise/ds-core'\n")
+    write(root, 'storybook-static/main.js', "import '@baloise/ds-core'\n")
+    write(root, '.nx/cache/app.js', "import '@baloise/ds-core'\n")
 
     const result = await detectBaloise(root, {
       readDistTags: async () => {
-        throw new Error('imports under dist and coverage are not an install')
+        throw new Error('imports under dist, coverage, storybook-static and .nx are not an install')
       },
     })
 
@@ -147,6 +149,19 @@ describe('detectBaloise', () => {
     })
 
     expect(result).toEqual({ status: 'nothing-to-migrate', message: NOTHING })
+  })
+
+  it('detects an import in a .mts file', async () => {
+    const root = createScratchDir()
+    write(root, 'package.json', JSON.stringify({ dependencies: { '@baloise/ds-core': '19.10.2' } }))
+    write(root, 'src/setup.mts', "import '@baloise/ds-core'\n")
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.0') })
+
+    expect(result).toMatchObject({
+      status: 'ready',
+      imports: [{ file: 'src/setup.mts', line: 1, snippet: "import '@baloise/ds-core'" }],
+    })
   })
 
   it('detects a React app, pnpm, and aliases for the resolved latest version', async () => {

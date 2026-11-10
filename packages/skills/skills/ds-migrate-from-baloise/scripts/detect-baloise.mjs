@@ -4,6 +4,7 @@ import { existsSync, readdirSync, readFileSync, realpathSync } from 'node:fs'
 import { extname, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
+import { SKIPPED_DIRS, SOURCE_EXTENSIONS } from './source-scan.mjs'
 
 const LEGACY_SCOPE = '@baloise'
 const TARGET_SCOPE = '@helvetia-design'
@@ -15,24 +16,8 @@ const SHORT_NAMES = [...INSTALL_NAMES, ...ICON_NAMES]
 const DEPENDENCY_NAMES = [...SHORT_NAMES, ...FONT_FAVICON_NAMES]
 const ASSET_NAMES = [...ICON_NAMES, STYLES_NAME, ...FONT_FAVICON_NAMES]
 const ASSET_PACKAGES = new Set(ASSET_NAMES.map(short => `${LEGACY_SCOPE}/ds-${short}`))
-const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', 'out', '.next', '.angular', '.git', '.claude', 'coverage'])
 export const LOCKFILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'npm-shrinkwrap.json'])
-export const IMPORT_EXTENSIONS = new Set([
-  '.html',
-  '.htm',
-  '.ts',
-  '.tsx',
-  '.js',
-  '.jsx',
-  '.mjs',
-  '.cjs',
-  '.css',
-  '.scss',
-  '.sass',
-  '.vue',
-  '.json',
-])
-export const SOURCE_EXTENSIONS = new Set([...IMPORT_EXTENSIONS, '.mts', '.cts'])
+export const IMPORT_EXTENSIONS = new Set([...SOURCE_EXTENSIONS, '.css', '.scss', '.sass', '.json'])
 export const DEPENDENCY_FIELDS = ['dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies']
 const NOTHING = 'no Baloise Design System installation detected, nothing to migrate'
 
@@ -269,7 +254,7 @@ function walk(rootDir, dir, packages, imports) {
   for (const entry of entries) {
     if (entry.isSymbolicLink()) continue
     if (entry.isDirectory()) {
-      if (SKIP_DIRS.has(entry.name)) continue
+      if (SKIPPED_DIRS.has(entry.name)) continue
       walk(rootDir, join(dir, entry.name), packages, imports)
       continue
     }

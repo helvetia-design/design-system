@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { extname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 
-const SKIP_DIRS = new Set([
+export const SKIPPED_DIRS = new Set([
   'node_modules',
   'dist',
   'build',
@@ -12,14 +12,30 @@ const SKIP_DIRS = new Set([
   '.claude',
   'coverage',
   '.nx',
+  '.nuxt',
+  '.output',
   'storybook-static',
 ])
-const EXTENSIONS = new Set(['.tsx', '.jsx', '.html', '.ts'])
+export const SOURCE_EXTENSIONS = new Set([
+  '.ts',
+  '.tsx',
+  '.mts',
+  '.cts',
+  '.js',
+  '.jsx',
+  '.mjs',
+  '.cjs',
+  '.vue',
+  '.html',
+  '.htm',
+])
+export const MARKUP_EXTENSIONS = new Set(['.html', '.htm', '.vue'])
+export const STYLE_EXTENSIONS = new Set(['.css', '.scss', '.sass', '.less'])
 
 /**
  * Walks the source files under `rootDir`, or only the files and directories in `paths`, and returns the paths that match no source file.
  */
-export function scanSourceFiles(rootDir, collect, { extensions = EXTENSIONS, paths = [] } = {}) {
+export function scanSourceFiles(rootDir, collect, { extensions = SOURCE_EXTENSIONS, paths = [] } = {}) {
   const root = realpathSync(resolve(rootDir))
   if (!statSync(root).isDirectory()) throw new Error(`Scan root is not a directory: ${root}`)
   if (paths.length === 0) {
@@ -41,7 +57,7 @@ export function scanSourceFiles(rootDir, collect, { extensions = EXTENSIONS, pat
     } else if (
       !target.real ||
       isAbsolute(target.rel) ||
-      target.rel.split('/').some(part => part === '..' || SKIP_DIRS.has(part))
+      target.rel.split('/').some(part => part === '..' || SKIPPED_DIRS.has(part))
     ) {
       unmatched.add(target.rel)
     } else if (statSync(target.real).isDirectory()) {
@@ -83,7 +99,7 @@ function walk(rootDir, dir, collect, extensions) {
     const entryPath = canonicalChild(rootDir, join(dir, entry.name))
     if (!entryPath) continue
     if (entry.isDirectory()) {
-      if (SKIP_DIRS.has(entry.name)) continue
+      if (SKIPPED_DIRS.has(entry.name)) continue
       walk(rootDir, entryPath, collect, extensions)
       continue
     }
@@ -118,7 +134,7 @@ function readSource(rootDir, filePath, collect) {
     file: toPosix(relative(rootDir, filePath)),
     text,
     get masked() {
-      masked ??= maskSource(text, extension === '.html')
+      masked ??= maskSource(text, maskKind(extension))
       return masked
     },
     get comments() {
@@ -128,12 +144,19 @@ function readSource(rootDir, filePath, collect) {
   })
 }
 
+function maskKind(extension) {
+  if (extension === '.vue') return 'vue'
+  return MARKUP_EXTENSIONS.has(extension) ? 'markup' : 'script'
+}
+
 function commentKind(extension) {
-  if (extension === '.html' || extension === '.htm' || extension === '.vue') return 'markup'
+  if (MARKUP_EXTENSIONS.has(extension)) return 'markup'
   if (extension === '.css') return 'css'
   if (extension === '.scss' || extension === '.sass' || extension === '.less') return 'scss'
   return 'script'
 }
+
+const SCSS_LANG_RE = /\blang\s*=\s*["']?(?:scss|sass|less)\b/i
 
 /**
  * Blanks comments only and keeps every string. `kind` is `script`, `css`, `scss` (with `//` line comments) or
@@ -149,7 +172,7 @@ export function maskComments(text, kind) {
       if (tag) {
         if (tag[1]) region = 'markup'
         else if (tag[2].toLowerCase() === 'script') region = 'script'
-        else region = /\blang\s*=\s*["']?(?:scss|sass|less)\b/i.test(readTag(text, i)) ? 'scss' : 'css'
+        else region = SCSS_LANG_RE.test(readTag(text, i)) ? 'scss' : 'css'
         i = tag[1] ? i + tag[0].length : closeAt(text, '>', i)
         continue
       }
@@ -221,27 +244,46 @@ function endOfRegex(text, start) {
   return -1
 }
 
-function maskSource(text, html) {
+const VUE_BLOCK_RE = /^<(\/?)(script|style)(?=[\s>/])/i
+
+function maskSource(text, kind) {
   const mask = Array.from(text)
+  let region = kind === 'script' ? 'script' : 'markup'
   let i = 0
   while (i < text.length) {
+    if (kind === 'vue' && text[i] === '<') {
+      const tag = VUE_BLOCK_RE.exec(text.slice(i, i + 9))
+      if (tag) {
+        if (tag[1]) region = 'markup'
+        else if (tag[2].toLowerCase() === 'script') region = 'script'
+        else region = SCSS_LANG_RE.test(readTag(text, i)) ? 'scss' : 'css'
+        i += tag[1] ? tag[0].length : readTag(text, i).length
+        continue
+      }
+    }
     if (text.startsWith('<!--', i)) {
       i = blank(mask, i, closeAt(text, '-->', i + 4))
       continue
     }
-    if (!html && text.startsWith('//', i)) {
+    if (
+      text.startsWith('//', i) &&
+      (region === 'script' || (region === 'scss' && text[i - 1] !== ':' && text[i - 1] !== '('))
+    ) {
       const end = text.indexOf('\n', i)
       i = blank(mask, i, end === -1 ? text.length : end)
       continue
     }
-    if (text.startsWith('/*', i)) {
+    if (text.startsWith('/*', i) && (kind !== 'vue' || region !== 'markup')) {
       i = blank(mask, i, closeAt(text, '*/', i + 2))
       continue
     }
 
     const quote = text[i]
     if (quote === '"' || quote === "'" || quote === '`') {
-      i = !html && isTemplatePropertyString(text, i) ? keepTemplate(text, mask, i, true) : blankString(text, mask, i)
+      i =
+        region === 'script' && isTemplatePropertyString(text, i)
+          ? keepTemplate(text, mask, i, true)
+          : blankString(text, mask, i)
       continue
     }
     i++
@@ -407,7 +449,7 @@ export function siblingScript(file) {
   return file.endsWith('.html') ? `${file.slice(0, -'.html'.length)}.ts` : undefined
 }
 
-const SCRIPT_RE = /\.[jt]sx?$/
+const SCRIPT_RE = /\.(?:[cm]?[jt]s|[jt]sx|vue)$/
 
 /**
  * Runs `scanSourceFiles` and then pushes a `setValue: true` finding into `found` for every `.setValue(` call on a ref

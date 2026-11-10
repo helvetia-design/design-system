@@ -14,7 +14,7 @@ The script prints one JSON object and does not edit files. It first runs `scan-m
 
 Otherwise `status` is `ready`, or `nothing-to-clean-up` when both `remove` lists are empty. `packageManager` and `installCommand` come from the lockfile at `<project-root>`, as in Init.
 
-The script reads every source and stylesheet file (including `.less`, `.mts` and `.cts`), every `.json` file and every `.yml` or `.yaml` file. It skips lockfiles and the folders `node_modules`, `dist`, `build`, `out`, `.next`, `.angular`, `.git`, `.claude`, `coverage`, `.nx` and `storybook-static`. Build tooling outside these files can still name a legacy package, so the consumer checks it before confirming.
+The script reads the source files listed in the Init section of `SKILL.md`, every stylesheet (`.css`, `.scss`, `.sass`, `.less`), every `.json` file and every `.yml` or `.yaml` file. It skips lockfiles and the folders that Init lists. Build tooling outside these files can still name a legacy package, so the consumer checks it before confirming.
 
 The script sorts every line that names an `@baloise/ds-*` package into one list:
 

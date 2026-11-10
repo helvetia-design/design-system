@@ -32,7 +32,7 @@ node <this-skill-directory>/scripts/scan-css-utils.mjs <project-root> [<file> ..
 
 The script prints one JSON object, `{ total, files: [{ file, findings: [{ line, snippet, classes: [{ from, to, group }] }] }], dynamic }`, and does not edit files. `files` has one entry per file, and its `findings` list every line with a class move. `total` counts those lines. `dynamic` lists the places the scan found but cannot rewrite, each with `file`, `line`, `snippet` and `reason`. Pass paths relative to `<project-root>`. When the JSON has an `unmatched` list, those arguments are not source files under `<project-root>`. Fix the paths and run the scan again before you continue.
 
-The scan reads source files (`.ts`, `.tsx`, `.js`, `.jsx`, `.vue`, `.html` and the other script extensions) and stylesheets (`.css`, `.scss`, `.sass`, `.less`). In source files it reads these class contexts:
+The scan reads source files (`.ts`, `.tsx`, `.mts`, `.cts`, `.js`, `.jsx`, `.mjs`, `.cjs`, `.vue`, `.html`, `.htm`) and stylesheets (`.css`, `.scss`, `.sass`, `.less`). In source files it reads these class contexts:
 
 - `class="…"`, `class='…'` and unquoted `class=…` in HTML, Vue and Angular templates, also inside an Angular inline `template:`
 - static `ngClass="…"`, Angular `routerLinkActive="…"` and Vue `active-class="…"` and `exact-active-class="…"`
@@ -42,7 +42,7 @@ The scan reads source files (`.ts`, `.tsx`, `.js`, `.jsx`, `.vue`, `.html` and t
 - `classList.add`, `remove`, `toggle` and `contains` with string arguments
 - Angular `host: { class: '…' }` and `'[class.<name>]'` host keys
 
-Comments are skipped. In `.html` and `.vue`, only `<!--` is a comment outside `<script>` and `<style>`.
+Comments are skipped. In `.html`, `.htm` and `.vue`, only `<!--` is a comment outside `<script>` and `<style>`.
 
 Show the findings grouped by file, with path, line, snippet and each `from` to `to`. End with the total per group, then the `dynamic` list.
 
