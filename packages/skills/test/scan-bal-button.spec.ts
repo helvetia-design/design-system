@@ -210,6 +210,15 @@ describe('scanBalButton', () => {
     expect(scanBalButton(root, ['src/App.js', 'src/g.vue'])).toEqual(expected)
   })
 
+  it('lists tags in .htm, .mjs and .cjs files', () => {
+    const root = createScratchDir()
+    write(root, 'a.htm', '<bal-button>a</bal-button>\n')
+    write(root, 'b.mjs', 'export const b = () => <bal-button>b</bal-button>\n')
+    write(root, 'c.cjs', 'module.exports = () => <bal-button>c</bal-button>\n')
+
+    expect(scanBalButton(root).files.map((entry: { file: string }) => entry.file)).toEqual(['a.htm', 'b.mjs', 'c.cjs'])
+  })
+
   it('lists every tag of a button group and the buttons inside it, each on its own line', () => {
     const root = createScratchDir()
     write(

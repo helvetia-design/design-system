@@ -36,6 +36,8 @@ const SKIP_DIRS = new Set([
   '.claude',
   'coverage',
   '.nx',
+  '.nuxt',
+  '.output',
   'storybook-static',
 ])
 const SKIP_FILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock'])

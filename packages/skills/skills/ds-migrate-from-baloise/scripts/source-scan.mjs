@@ -12,6 +12,8 @@ export const SKIPPED_DIRS = new Set([
   '.claude',
   'coverage',
   '.nx',
+  '.nuxt',
+  '.output',
   'storybook-static',
 ])
 export const SOURCE_EXTENSIONS = new Set([
@@ -27,6 +29,8 @@ export const SOURCE_EXTENSIONS = new Set([
   '.html',
   '.htm',
 ])
+export const MARKUP_EXTENSIONS = new Set(['.html', '.htm', '.vue'])
+export const STYLE_EXTENSIONS = new Set(['.css', '.scss', '.sass', '.less'])
 
 /**
  * Walks the source files under `rootDir`, or only the files and directories in `paths`, and returns the paths that match no source file.
@@ -142,16 +146,17 @@ function readSource(rootDir, filePath, collect) {
 
 function maskKind(extension) {
   if (extension === '.vue') return 'vue'
-  if (extension === '.html' || extension === '.htm') return 'markup'
-  return 'script'
+  return MARKUP_EXTENSIONS.has(extension) ? 'markup' : 'script'
 }
 
 function commentKind(extension) {
-  if (extension === '.html' || extension === '.htm' || extension === '.vue') return 'markup'
+  if (MARKUP_EXTENSIONS.has(extension)) return 'markup'
   if (extension === '.css') return 'css'
   if (extension === '.scss' || extension === '.sass' || extension === '.less') return 'scss'
   return 'script'
 }
+
+const SCSS_LANG_RE = /\blang\s*=\s*["']?(?:scss|sass|less)\b/i
 
 /**
  * Blanks comments only and keeps every string. `kind` is `script`, `css`, `scss` (with `//` line comments) or
@@ -167,7 +172,7 @@ export function maskComments(text, kind) {
       if (tag) {
         if (tag[1]) region = 'markup'
         else if (tag[2].toLowerCase() === 'script') region = 'script'
-        else region = /\blang\s*=\s*["']?(?:scss|sass|less)\b/i.test(readTag(text, i)) ? 'scss' : 'css'
+        else region = SCSS_LANG_RE.test(readTag(text, i)) ? 'scss' : 'css'
         i = tag[1] ? i + tag[0].length : closeAt(text, '>', i)
         continue
       }
@@ -239,15 +244,19 @@ function endOfRegex(text, start) {
   return -1
 }
 
+const VUE_BLOCK_RE = /^<(\/?)(script|style)(?=[\s>/])/i
+
 function maskSource(text, kind) {
   const mask = Array.from(text)
-  let html = kind !== 'script'
+  let region = kind === 'script' ? 'script' : 'markup'
   let i = 0
   while (i < text.length) {
     if (kind === 'vue' && text[i] === '<') {
-      const tag = /^<(\/?)script\b/i.exec(text.slice(i, i + 10))
+      const tag = VUE_BLOCK_RE.exec(text.slice(i, i + 9))
       if (tag) {
-        html = Boolean(tag[1])
+        if (tag[1]) region = 'markup'
+        else if (tag[2].toLowerCase() === 'script') region = 'script'
+        else region = SCSS_LANG_RE.test(readTag(text, i)) ? 'scss' : 'css'
         i += tag[1] ? tag[0].length : readTag(text, i).length
         continue
       }
@@ -256,19 +265,25 @@ function maskSource(text, kind) {
       i = blank(mask, i, closeAt(text, '-->', i + 4))
       continue
     }
-    if (!html && text.startsWith('//', i)) {
+    if (
+      text.startsWith('//', i) &&
+      (region === 'script' || (region === 'scss' && text[i - 1] !== ':' && text[i - 1] !== '('))
+    ) {
       const end = text.indexOf('\n', i)
       i = blank(mask, i, end === -1 ? text.length : end)
       continue
     }
-    if (text.startsWith('/*', i)) {
+    if (text.startsWith('/*', i) && (kind !== 'vue' || region !== 'markup')) {
       i = blank(mask, i, closeAt(text, '*/', i + 2))
       continue
     }
 
     const quote = text[i]
     if (quote === '"' || quote === "'" || quote === '`') {
-      i = !html && isTemplatePropertyString(text, i) ? keepTemplate(text, mask, i, true) : blankString(text, mask, i)
+      i =
+        region === 'script' && isTemplatePropertyString(text, i)
+          ? keepTemplate(text, mask, i, true)
+          : blankString(text, mask, i)
       continue
     }
     i++
@@ -434,7 +449,7 @@ export function siblingScript(file) {
   return file.endsWith('.html') ? `${file.slice(0, -'.html'.length)}.ts` : undefined
 }
 
-const SCRIPT_RE = /\.[jt]sx?$/
+const SCRIPT_RE = /\.(?:[cm]?[jt]s|[jt]sx|vue)$/
 
 /**
  * Runs `scanSourceFiles` and then pushes a `setValue: true` finding into `found` for every `.setValue(` call on a ref

@@ -99,6 +99,39 @@ describe('scanSourceFiles masked text', () => {
     )
   })
 
+  it('masks a Vue template that follows a <script> block as markup', () => {
+    const root = createScratchDir()
+    const template = '<template>\n  <p>a // b</p><bal-button>Go</bal-button><!-- x -->\n</template>\n'
+    write(root, 'g.vue', `<script setup>\n// x\n</script>\n${template}<script>\n// y\n</script>\n`)
+
+    expect(maskedFiles(root)['g.vue']).toBe(
+      `<script setup>\n    \n</script>\n${template.replace('<!-- x -->', ' '.repeat(10))}<script>\n    \n</script>\n`,
+    )
+  })
+
+  it('keeps a Vue template tag after text such as image/*', () => {
+    const root = createScratchDir()
+    const text = '<template>\n  <p>Accepted: image/*</p>\n  <bal-button>x</bal-button>\n</template>\n'
+    write(root, 'g.vue', text)
+
+    expect(maskedFiles(root)['g.vue']).toBe(text)
+  })
+
+  it('masks // comments in a Vue <style lang="scss"> block and keeps the url', () => {
+    const root = createScratchDir()
+    write(root, 'g.vue', '<style lang="scss">\n// <bal-button>\na { b: url(//x) }\n</style>\n')
+
+    expect(maskedFiles(root)['g.vue']).toBe(`<style lang="scss">\n${' '.repeat(15)}\na { b: url(//x) }\n</style>\n`)
+  })
+
+  it('does not treat a Vue element named script-loader as a script block', () => {
+    const root = createScratchDir()
+    const text = '<template><script-loader>a // b</script-loader></template>\n'
+    write(root, 'g.vue', text)
+
+    expect(maskedFiles(root)['g.vue']).toBe(text)
+  })
+
   it('masks a .htm file like a .html file', () => {
     const root = createScratchDir()
     const text = '<p>a // <bal-button>b</bal-button></p><!-- <bal-tag> -->\n'

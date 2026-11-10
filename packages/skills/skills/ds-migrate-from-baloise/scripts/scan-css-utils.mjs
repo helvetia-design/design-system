@@ -7,15 +7,15 @@ import {
   endOfString,
   endOfSubstitution,
   lineText,
+  MARKUP_EXTENSIONS,
   readTag,
   scanSourceFiles,
   SOURCE_EXTENSIONS,
+  STYLE_EXTENSIONS,
   toSnippet,
 } from './source-scan.mjs'
 
-const EXTENSIONS = new Set([...SOURCE_EXTENSIONS, '.css', '.scss', '.sass', '.less'])
-const MARKUP_EXTENSIONS = new Set(['.html', '.htm', '.vue'])
-const STYLE_EXTENSIONS = new Set(['.css', '.scss', '.sass', '.less'])
+const EXTENSIONS = new Set([...SOURCE_EXTENSIONS, ...STYLE_EXTENSIONS])
 const JSX_EXTENSIONS = new Set(['.tsx', '.jsx', '.js'])
 const CLASS_ATTRIBUTES = new Set(['ngClass', 'active-class', 'exact-active-class'])
 const GROUP_STRENGTH = ['variant', 'structure', 'renamed', 'approximated', 'lost']

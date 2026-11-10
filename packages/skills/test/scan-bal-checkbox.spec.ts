@@ -613,6 +613,21 @@ describe('scanBalCheckbox', () => {
     })
   })
 
+  it('flags setValue() on a typed group ref in .mts and Vue script files', () => {
+    const root = createScratchDir()
+    const reset = 'export function reset(group: HTMLBalCheckboxGroupElement) {\n  group.setValue([])\n}\n'
+    write(root, 'reset.mts', reset)
+    write(root, 'g.vue', `<script setup lang="ts">\n${reset}</script>\n`)
+
+    expect(scanBalCheckbox(root)).toEqual({
+      total: 2,
+      files: [
+        { file: 'g.vue', findings: [{ line: 3, snippet: 'group.setValue([])', setValue: true }] },
+        { file: 'reset.mts', findings: [{ line: 2, snippet: 'group.setValue([])', setValue: true }] },
+      ],
+    })
+  })
+
   it('reads JSX arrow handlers inside a tag when it computes the flags', () => {
     const root = createScratchDir()
     write(
