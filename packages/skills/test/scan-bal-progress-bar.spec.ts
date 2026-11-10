@@ -222,7 +222,7 @@ describe('Detect', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-progress-bar value="50"></bal-progress-bar>\n')
 
-    expect(scanMigratable(root).suggested).toEqual([{ name: 'progress-bar', total: 2 }])
+    expect(scanMigratable(root).suggested).toEqual([{ name: 'progress-bar', total: 1 }])
   })
 })
 

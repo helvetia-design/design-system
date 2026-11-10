@@ -39,8 +39,28 @@ describe('scanCleanup', () => {
     expect(scanCleanup(root)).toEqual({
       status: 'incomplete',
       outstanding: {
-        suggested: [{ name: 'button', total: 2 }],
+        suggested: [{ name: 'button', total: 1 }],
         notYet: [{ name: 'unknown-widget', total: 1 }],
+        types: [],
+        hidden: [],
+      },
+    })
+  })
+
+  it('refuses while a legacy type namespace is still imported', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { '@baloise/ds-angular': '19.0.0' } })
+    write(root, 'src/app.component.ts', "import { BalEvents, BalLanguage } from '@baloise/ds-angular'\n")
+
+    expect(scanCleanup(root)).toEqual({
+      status: 'incomplete',
+      outstanding: {
+        suggested: [],
+        notYet: [],
+        types: [
+          { name: 'events', total: 1 },
+          { name: 'language', total: 1 },
+        ],
         hidden: [],
       },
     })
@@ -544,10 +564,11 @@ describe('scanCleanup', () => {
       status: 'incomplete',
       outstanding: {
         suggested: [
-          { name: 'button', total: 2 },
+          { name: 'button', total: 1 },
           { name: 'tag', total: 1 },
         ],
         notYet: [],
+        types: [],
         hidden: [],
       },
     })
@@ -752,8 +773,9 @@ describe('scanCleanup', () => {
     expect(scanCleanup(root)).toEqual({
       status: 'incomplete',
       outstanding: {
-        suggested: [{ name: 'button', total: 2 }],
+        suggested: [{ name: 'button', total: 1 }],
         notYet: [],
+        types: [],
         hidden: [{ file: 'src/index.html', line: 1, snippet: "<p>Ab CHF 1'000 <bal-tag>Neu</bal-tag></p>" }],
       },
     })

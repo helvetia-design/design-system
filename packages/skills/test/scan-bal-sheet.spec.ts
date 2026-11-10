@@ -207,8 +207,9 @@ describe('Detect', () => {
     write(root, 'index.html', '<bal-sheet></bal-sheet>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'sheet', total: 2 }],
+      suggested: [{ name: 'sheet', total: 1 }],
       notYet: [],
+      types: [],
     })
   })
 })

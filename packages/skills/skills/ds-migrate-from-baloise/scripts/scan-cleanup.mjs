@@ -43,7 +43,7 @@ const UTILITIES_RE = /@baloise\/ds-styles\/(?:dist\/)?css\/utilities\//
 
 export function scanCleanup(rootDir) {
   const root = realpathSync(resolve(rootDir))
-  const { suggested, notYet } = scanMigratable(root, [], { extensions: GATE_EXTENSIONS })
+  const { suggested, notYet, types } = scanMigratable(root, [], { extensions: GATE_EXTENSIONS })
 
   const hidden = []
   const lines = []
@@ -71,8 +71,8 @@ export function scanCleanup(rootDir) {
     { extensions: EXTENSIONS },
   )
 
-  if (suggested.length > 0 || notYet.length > 0 || hidden.length > 0) {
-    return { status: 'incomplete', outstanding: { suggested, notYet, hidden: hidden.sort(byPosition) } }
+  if (suggested.length > 0 || notYet.length > 0 || types.length > 0 || hidden.length > 0) {
+    return { status: 'incomplete', outstanding: { suggested, notYet, types, hidden: hidden.sort(byPosition) } }
   }
 
   const removeLines = lines

@@ -315,7 +315,7 @@ describe('data migration.md', () => {
       'editable',
       'multiline',
       'balClick',
-      'no longer emitted',
+      'Apply Unmapped props and handlers',
       'bal-data-value-button',
       'per-file summary',
       'git commit',

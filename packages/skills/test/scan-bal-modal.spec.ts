@@ -341,7 +341,7 @@ describe('Detect', () => {
 
     const { suggested } = scanMigratable(root)
 
-    expect(suggested).toEqual(expect.arrayContaining([{ name: 'modal', total: 2 }]))
+    expect(suggested).toEqual(expect.arrayContaining([{ name: 'modal', total: 1 }]))
   })
 
   it('folds the header and body children into modal instead of listing them as unmigratable', () => {
@@ -352,7 +352,7 @@ describe('Detect', () => {
 
     expect(JSON.stringify(result)).not.toContain('modal-header')
     expect(JSON.stringify(result)).not.toContain('modal-body')
-    expect(result.suggested).toEqual(expect.arrayContaining([{ name: 'modal', total: 4 }]))
+    expect(result.suggested).toEqual(expect.arrayContaining([{ name: 'modal', total: 2 }]))
   })
 })
 
