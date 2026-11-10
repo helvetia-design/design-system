@@ -84,6 +84,10 @@ A batch exists because parents style or query their children by tag across famil
 
 When you add a migration, place it in the order list in `shared/batch.md` when it restructures children or is a leaf that other migrations wrap. Otherwise the alphabetical middle group covers it.
 
+### Angular peer check in Init
+
+`detect-baloise.mjs` stops Init before any edit when the app's `@angular/core` major is below the lower bound of the `@angular/core` peer range of `@helvetia-design/angular@<version>`. It reads that range with `npm view` through the injectable `readAngularPeers`. It also stops when it cannot decide, for example when `npm view` fails or a spec has no readable major. `lowestMajor` reads one lower bound (`^`, `~`, `>=`, `=` or a bare version), optionally followed by `<` or `<=` upper bounds, so `>=22.0.0 <24.0.0` gives 22. A `||` range, a hyphen range, `*`, a dist-tag or a protocol such as `workspace:` gives `null`, and Init stops. It compares majors only, uses no semver dependency and does not parse lockfiles. The check runs for npm, pnpm and Yarn.
+
 ### Legacy config call stays until the last `bal-*` component
 
 The legacy config call (`initializeBaloiseDesignSystem`, `useBaloiseDesignSystem`, `provideBaloiseDesignSystem`) fills the only config that `bal-*` components read, so no migration deletes it while one `bal-*` component is left. The `app` migration copies its values onto `ds-root` and leaves the call unchanged. `shared/legacy-config.md` is the one place that deletes it: `SKILL.md` runs it at the end of every component migration and in **Assets**, and it deletes the call only when `scan-migratable.mjs` reports no other `bal-*` component.
