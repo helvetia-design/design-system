@@ -105,7 +105,7 @@ The scan does not list a file that only listens and never uses `bal-radio`/`bal-
 
 `setFocus()` exists on both `bal-radio` and `ds-radio` and keeps its signature. There is nothing to rewrite.
 
-`getInputElement()` and `getOption()` do not exist on `ds-radio`. Flag every call site for manual review; there is no replacement.
+`getInputElement()` and `getOption()` do not exist on `ds-radio`. Apply Unmapped props and handlers (`SKILL.md`).
 
 `getOptionByValue()` does not exist on `ds-radio-group`. It is tied to the dropped `options` array — flag every call site alongside the `options` occurrence it belongs to.
 
@@ -124,7 +124,7 @@ Needs your attention when found:
 5. Every dropped `verticalOnMobile`.
 6. Every dropped `expanded`.
 7. Every dropped `options` or `newBalRadioOption`, flagged for manual conversion to slotted children, together with any `getOptionByValue()` call site tied to it.
-8. Every `getInputElement()` or `getOption()` call, flagged as having no replacement.
+8. Every `getInputElement()` or `getOption()` call, with its Unmapped props and handlers outcome.
 9. Every `bal-radio-icon` or `BalRadioIcon` left in place because it has no `ds-*` equivalent. Name file and line for each.
 10. Every type reference that the scan cannot see, such as `HTMLBalRadioElement`, `BalProps.BalRadioInterface` or `BalEvents.BalRadioChange`. These resolve from the ambient namespaces and stop compiling once `@baloise/ds-core` is removed.
 11. One-time note: files which only listen or only call a method, and have no scanned `.html` of the same name beside them, were not scanned.

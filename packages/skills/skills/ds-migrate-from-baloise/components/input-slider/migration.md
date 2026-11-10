@@ -43,7 +43,7 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 | `step` with a numeric literal                                                                  | `step` as a string                                           | `step` is a string on `ds-slider`. `step="5"` stays. Angular `[step]="5"` becomes `step="5"`, React `step={5}` becomes `step="5"`, otherwise strictly typed templates no longer compile.                                                                  |
 | `step` bound to an expression                                                                  | `step`                                                       | Leave the binding and flag it for manual review: the value must now be a string, or `"any"`.                                                                                                                                                              |
 | `balTabindex`                                                                                  | `tabindex`                                                   | `ds-slider` takes a native `tabindex` from the host. HTML `balTabindex="1"` becomes `tabindex="1"`, Angular `[balTabindex]="x"` becomes `[attr.tabindex]="x"`, React `balTabindex={1}` becomes `tabIndex={1}`.                                            |
-| `hasTicks`                                                                                     | _(no equivalent prop)_                                       | Leave the attribute in place, do not drop it. It has no effect after the migration, and in strictly typed React or Angular templates it may not compile. Flag every occurrence for manual review.                                                         |
+| `hasTicks`                                                                                     | _(no equivalent prop)_                                       | Apply Unmapped props and handlers (`SKILL.md`). It has no effect after the migration.                                                                                                                                                                     |
 | _(none)_                                                                                       | `label`, `description`, `color`, `brandColor`, `invalidText` | New props. Nothing to migrate from. Leave them unset.                                                                                                                                                                                                     |
 
 ### Tags and imports
@@ -60,7 +60,7 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 | `balInput`    | `dsInput`  | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms.                                                                   |
 | `balBlur`     | `dsBlur`   | Same shapes.                                                                                                                                                        |
 | `balFocus`    | `dsFocus`  | Same shapes.                                                                                                                                                        |
-| `balKeyPress` | _(none)_   | No equivalent. Leave the handler in place and report it as "event no longer fires, needs manual rework".                                                            |
+| `balKeyPress` | _(none)_   | No equivalent. Apply Unmapped props and handlers (`SKILL.md`).                                                                                                      |
 
 `ds-slider` adds `dsClick`. There is nothing to migrate from.
 
@@ -72,7 +72,7 @@ When the value in `balChange` or `balInput` is read, note that it was `string | 
 
 ### Methods
 
-`setFocus()` keeps its name. `getInputElement()` keeps its name too, but it now resolves the noUiSlider handle (`HTMLElement`) instead of an `HTMLInputElement`. Do not rewrite calls to it. List each call by file and line as "return type changed, check the caller". `setAriaForm()` does not exist on `ds-slider`. Do not remove calls to it and do not invent a replacement. List each call by file and line as "method no longer available, needs manual rework".
+`setFocus()` keeps its name. `getInputElement()` keeps its name too, but it now resolves the noUiSlider handle (`HTMLElement`) instead of an `HTMLInputElement`. Do not rewrite calls to it. List each call by file and line as "return type changed, check the caller". `setAriaForm()` does not exist on `ds-slider`. Apply Unmapped props and handlers (`SKILL.md`).
 
 Angular splits a component across `x.component.html` and `x.component.ts`, and the class file often calls these methods through `@ViewChild` or `viewChild` without naming the tag, so the scan cannot see it. For every `.html` finding, open the same-basename `.ts` file beside it and check it for `getInputElement` and `setAriaForm` calls and for `balChange`, `balInput`, and `balKeyPress`. React and plain HTML callers hold the element in a ref or a query result, so look for calls on that variable in the same file.
 
@@ -82,11 +82,11 @@ Write the report as `shared/report.md` describes, with the per-file summary unde
 
 Needs your attention when found:
 
-1. Every unsupported `hasTicks` left in place. It has no effect now.
-2. Every `balKeyPress` handler, listed as "event no longer fires, needs manual rework".
+1. Every unsupported `hasTicks`, with its Unmapped props and handlers outcome.
+2. Every `balKeyPress` handler, with its Unmapped props and handlers outcome.
 3. Every dynamic `step` binding. The value must now be a string, or `"any"`.
 4. Every `getInputElement()` call, listed as "return type changed, check the caller".
-5. Every `setAriaForm()` call, listed as "method no longer available, needs manual rework".
+5. Every `setAriaForm()` call, with its Unmapped props and handlers outcome.
 6. Every detail-type use, listed as "type needs manual rework".
 7. Every static or bound value that can be empty. A slider can never be empty, so a legacy `value=""`, `null` or `undefined` now resolves to `min`.
 8. One-time note: handlers and form controls now receive a `number`, never a string or `null`.

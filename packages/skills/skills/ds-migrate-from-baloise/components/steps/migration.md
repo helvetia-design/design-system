@@ -119,8 +119,8 @@ The `label` is kept on the `ds-step` and its text is also the text of the `<a>`.
 | `active`                      | `value` on `ds-steps`           | When `bal-steps` has no `value`, set `value` to this item's `name` and delete `active`. (Without any `value`, `ds-steps` selects the first step that is not hidden or disabled, so only add one when `active` was on a different item.) When it has one, the old code let `value` win, so keep it, delete `active`, and report the conflict. A dynamic `active` stays in place and is reported. |
 | `href`, `rel`, `target`       | on the slotted `<a>`            | See Navigation mode.                                                                                                                                                                                                                                                                                                                                                                            |
 | `prevent`                     | _(no equivalent)_               | Delete the attribute. Mention each one. The slotted `<a>` is left to the consumer's router.                                                                                                                                                                                                                                                                                                     |
-| `balNavigate`                 | _(no equivalent)_               | Leave the listener in place and report it. Say that the router or a click handler on the `<a>` replaces it.                                                                                                                                                                                                                                                                                     |
-| `getOptions()`, `setActive()` | _(no equivalent)_               | Leave the call in place and report it.                                                                                                                                                                                                                                                                                                                                                          |
+| `balNavigate`                 | _(no equivalent)_               | Apply Unmapped props and handlers (`SKILL.md`). In the report, say that the router or a click handler on the `<a>` replaces it.                                                                                                                                                                                                                                                                 |
+| `getOptions()`, `setActive()` | _(no equivalent)_               | Apply Unmapped props and handlers (`SKILL.md`).                                                                                                                                                                                                                                                                                                                                                 |
 
 ### Tags and imports
 
@@ -131,13 +131,13 @@ The `label` is kept on the `ds-step` and its text is also the text of the `<a>`.
 
 ### Events and methods
 
-| old                       | new               | handling                                                                                                                                                                                                |
-| ------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balChange`               | `dsChange`        | Rewrite `addEventListener('balChange'` to `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`.                                        |
-| event `detail`            | see handling      | Legacy `detail` was the step `value` string. `dsChange` `detail` is `{ value }`. Leave each handler body as it is and mention every listener that reads `detail`. `dsChange` fires in panels mode only. |
-| `select(step)`            | _(no equivalent)_ | Leave the call in place and report it. Set `value` on `ds-steps` to change the step.                                                                                                                    |
-| `getOptionByValue(value)` | _(no equivalent)_ | Leave the call in place and report it.                                                                                                                                                                  |
-| _(none)_                  | `dsStepSelect`    | Internal event from `ds-step`. Nothing to migrate from. Leave it unset.                                                                                                                                 |
+| old                       | new               | handling                                                                                                                                                                                                                                                                                                    |
+| ------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `balChange`               | `dsChange`        | Rewrite `addEventListener('balChange'` to `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`.                                                                                                                                            |
+| event `detail`            | see handling      | Legacy `detail` was the step `value` string. `dsChange` `detail` is `{ value }`. Leave each handler body as it is and mention every listener that reads `detail`. `dsChange` fires in panels mode only.                                                                                                     |
+| `select(step)`            | `value`           | Set `value` on `ds-steps` to the step's `value`. React: `ref.current.value = step.value`, or set the state variable that feeds `value` when the element is controlled. Angular: set the property bound to `[value]`, or `el.value = ...`. HTML: `el.value = ...`. Setting `value` does not emit `dsChange`. |
+| `getOptionByValue(value)` | _(no equivalent)_ | Apply Unmapped props and handlers (`SKILL.md`).                                                                                                                                                                                                                                                             |
+| _(none)_                  | `dsStepSelect`    | Internal event from `ds-step`. Nothing to migrate from. Leave it unset.                                                                                                                                                                                                                                     |
 
 Rewrite `balChange` listeners only on a migrated element. `balChange` is emitted by many other legacy components, so never rewrite a listener on an element you did not migrate. The scan does not list a file that only listens and never uses `bal-steps`, `bal-step-item`, `BalSteps`, `BalStepItem`, `BalStepsBundle` or `BalStepOption`.
 
@@ -157,8 +157,8 @@ Needs your attention when found:
 8. Every set of steps built in a loop, left in place, with the note that the steps and panels must be rebuilt as children by hand. Name file and line.
 9. Every `options` prop, left in place, with the note that the steps and panels must be rebuilt as children by hand. Name file and line.
 10. Every item without `value`, left in place. Name file and line.
-11. Every left-in-place call to `select()`, `getOptionByValue()`, `getOptions()` or `setActive()`.
-12. Every left-in-place `balNavigate` listener.
+11. Every call to `getOptionByValue()`, `getOptions()` or `setActive()`, with its Unmapped props and handlers outcome.
+12. Every `balNavigate` listener, with its Unmapped props and handlers outcome.
 13. Every left-in-place `BalStepOption` reference.
 14. Every ambient type reference `BalProps.BalStepsColor`, `BalEvents.BalSteps*`, `HTMLBalStepsElement` and `HTMLBalStepItemElement`. The scan cannot see them. Grep for them and rename by hand. The scan does list `Components.BalSteps`, because it matches the bare `BalSteps` symbol. Treat it as a type reference too.
 15. Every legacy `bal-steps__*` class, the `bal-step-item` class and `data-testid="bal-steps-option"` selector. They no longer match, because `ds-steps` uses shadow DOM.
@@ -171,6 +171,7 @@ Coverage only, written to the file:
 19. Every `active` moved to `value`.
 20. Every import that changed.
 21. One-time note: keyboard and roles. In panels mode, arrow keys, Home and End move the step, and the roles stay `tablist` and `tab`. Navigation mode renders an `<ol>` of links.
+22. Every `select(step)` call rewritten to set `value`.
 
 Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 

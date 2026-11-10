@@ -68,7 +68,7 @@ Do not edit handler bodies. Report these detail changes so the consumer can chec
 
 ### Methods
 
-`getInputElement()` keeps its name, but it now resolves the increase button (the decrease button when increase is disabled) instead of an `HTMLInputElement`. Do not rewrite calls to it. List each call by file and line as "return type changed, check the caller". `setAriaForm()` does not exist on `ds-counter`. Do not remove calls to it and do not invent a replacement. List each call by file and line as "method no longer available, needs manual rework". `ds-counter` adds `setFocus()`. There is nothing to migrate from.
+`getInputElement()` keeps its name, but it now resolves the increase button (the decrease button when increase is disabled) instead of an `HTMLInputElement`. Do not rewrite calls to it. List each call by file and line as "return type changed, check the caller". `setAriaForm()` does not exist on `ds-counter`. Apply Unmapped props and handlers (`SKILL.md`). `ds-counter` adds `setFocus()`. There is nothing to migrate from.
 
 Angular splits a component across `x.component.html` and `x.component.ts`, and the class file often calls these methods through `@ViewChild` or `viewChild` without naming the tag, so the scan cannot see it. For every `.html` finding, open the same-basename `.ts` file beside it and check it for `getInputElement` and `setAriaForm` calls and for `balChange`, `balInput`, `balIncrease`, `balDecrease`, `balFocus`, and `balBlur`. React and plain HTML callers hold the element in a ref or a query result, so look for calls on that variable in the same file.
 
@@ -80,7 +80,7 @@ Needs your attention when found:
 
 1. Every `ev.detail` read on `dsFocus` or `dsBlur`, listed as "event detail removed, needs manual rework".
 2. Every `getInputElement()` call, listed as "return type changed, check the caller".
-3. Every `setAriaForm()` call, listed as "method no longer available, needs manual rework".
+3. Every `setAriaForm()` call, with its Unmapped props and handlers outcome.
 4. Every detail-type use, listed as "type needs manual rework".
 5. Every static or bound value that can be empty or out of range. Every write is resolved onto `[min, max]`, and an empty value (`null`, `undefined`, `NaN`) becomes `min`. No `dsChange` fires for that, so a bound value outside the range stays unchanged on the framework side while the element shows the clamped one.
 6. Every file where the rendered label changed. `shared/field.md` moves the label of a surrounding `bal-field` onto `ds-counter` and decides `required` from the wrapper. `ds-counter` defaults `required` to `true`, which only shows once a `label` is set. A counter without any `required` on the wrapper gets `required="false"` and now shows the "(optional)" suffix, which the legacy label did not.
