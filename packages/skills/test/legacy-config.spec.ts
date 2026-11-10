@@ -70,12 +70,12 @@ describe('SKILL.md', () => {
 
     expect(components).toContain('shared/legacy-config.md')
     expect(skill).toContain(
-      '**Assets** — migrate legacy icons in files that no component migration touches, and delete the legacy config call once no `bal-*` component is left',
+      '**Assets** — migrate legacy icons in files that no component migration touches, move fonts and favicons to `@helvetia-design/assets`, and delete the legacy config call once no `bal-*` component is left',
     )
     for (const phrase of [
       'Then run the Scan section of `shared/legacy-config.md`',
-      'List each call it marks for deletion after the icon findings',
-      'When step 1 listed icon findings, ask one yes/no: rewrite every listed usage and delete every listed call?',
+      'List each call it marks for deletion after the icon and asset findings',
+      'When step 1 listed icon or asset findings, ask one yes/no: rewrite every listed usage and delete every listed call?',
       'When it listed only calls to delete, ask one yes/no: delete every listed call?',
       'Apply the Decide section of `shared/legacy-config.md`',
     ]) {
