@@ -31,13 +31,15 @@ node <this-skill-directory>/scripts/detect-baloise.mjs <project-root>
 
 The script prints one JSON object. It resolves the current `latest` dist-tag with `npm view @helvetia-design/core dist-tags`. Use `version` and `aliases` from that JSON. Do not hardcode a version.
 
+For an Angular project the script also runs `npm view @helvetia-design/angular@<version> peerDependencies --json` with the resolved `version`. It compares the lowest major that the app's `@angular/core` spec allows with the lower bound of the `@angular/core` peer range. It adds `angular: { installed, required, compatible }`, where `installed` and `required` are the raw spec and range. It returns `status: error` when `compatible` is false. It also returns `status: error` when it cannot decide. That happens when the lookup fails, when the peer data has no `@angular/core` range, or when a value such as `*`, `latest`, a `||` range, `workspace:*` or `catalog:` has no readable major. The check runs for every package manager.
+
 The walk skips `node_modules`, `dist`, `build`, `out`, `.next`, `.angular`, `.git`, `.claude`, and `coverage` at any depth.
 
 If `status` is `nothing-to-migrate`, tell the user: no Baloise Design System installation detected, nothing to migrate. Stop. Do not edit files and do not install.
 
-If `status` is `error`, tell the user `message` and stop. Do not edit files and do not install.
+If `status` is `error`, tell the user `message` and stop. Do not edit files and do not install. For an Angular app below the required major, `message` says to upgrade Angular first. Never work around it with `--legacy-peer-deps` or `--force`.
 
-If `status` is `ready`, show the detected framework, package manager, version, aliases, and bootstrap files, then ask for one yes/no. On no, stop without editing. On yes:
+If `status` is `ready`, show the detected framework, package manager, version, aliases, the `angular` field for an Angular app, and bootstrap files, then ask for one yes/no. On no, stop without editing. On yes:
 
 1. Add each entry in `aliases` to the `dependencies` object of `packageJsonPath` (relative to `<project-root>`). Create `dependencies` if it is missing. Do not change or remove existing keys. If an `@helvetia-design/*` key is already present, leave its value unchanged and report both the existing value and the value from the JSON.
 2. From `<project-root>`, run `installCommand` exactly (`pnpm install`, `yarn install`, or `npm install`). Do not add extra package arguments.
