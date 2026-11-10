@@ -62,8 +62,8 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 | `balBlur`                         | `dsBlur`              | Same shapes.                                                                                                                                                        |
 | `balFocus`                        | `dsFocus`             | Same shapes.                                                                                                                                                        |
 | `balInputClick`                   | `dsClick`             | Same shapes: `(balInputClick)` becomes `(dsClick)` and `onBalInputClick` becomes `onDsClick`.                                                                       |
-| `balIconClick`                    | _(no equivalent)_     | Do not rewrite or remove the handler. List each one by file and line as "event no longer emitted, needs manual rework".                                             |
-| `balWillAnimate`, `balDidAnimate` | _(no equivalent)_     | Same: leave the handler and list it.                                                                                                                                |
+| `balIconClick`                    | _(no equivalent)_     | Apply Unmapped props and handlers (`SKILL.md`).                                                                                                                     |
+| `balWillAnimate`, `balDidAnimate` | _(no equivalent)_     | Apply Unmapped props and handlers (`SKILL.md`).                                                                                                                     |
 
 Rewrite only handlers that are attached to the `bal-date` element being migrated. `balChange`, `balInput`, `balBlur`, and `balFocus` are emitted by many other legacy components, so never rewrite a handler on another element, and never rename them by search and replace across the file.
 
@@ -71,7 +71,7 @@ When the value in `balChange` or `balInput` is read, note that it is `string | u
 
 ### Methods
 
-`setFocus()`, `setBlur()`, and `getInputElement()` keep their names. `open()`, `close()`, `toggle()`, `select()`, and `setAriaForm()` do not exist on `ds-datepicker`. Do not rewrite or remove calls to them and do not invent a replacement. List each call by file and line as "method no longer available, needs manual rework". `select(date)` can often be replaced by setting `value`, say so in the report, but do not change the code.
+`setFocus()`, `setBlur()`, and `getInputElement()` keep their names. `open()`, `close()`, `toggle()`, `select()`, and `setAriaForm()` do not exist on `ds-datepicker`. Apply Unmapped props and handlers (`SKILL.md`). `select(date)` can often be replaced by setting `value`, say so in the report, but do not write that replacement.
 
 Angular splits a component across `x.component.html` and `x.component.ts`, and the class file often calls these methods through `@ViewChild` or `viewChild` without naming the tag, so the scan cannot see it. For every `.html` finding, open the same-basename `.ts` file beside it and check it for those calls and for `balChange`, `balInput`, `balIconClick`, and `INVALID_VALUE`. React and plain HTML callers hold the element in a ref or a query result, so look for calls on that variable in the same file.
 
@@ -82,8 +82,8 @@ Write the report as `shared/report.md` describes, with the per-file summary unde
 Needs your attention when found:
 
 1. Every dropped `allowInvalidValue`.
-2. Every event handler that needs manual rework.
-3. Every method call that needs manual rework. Say that `select(date)` can often be replaced by setting `value`.
+2. Every `balIconClick`, `balWillAnimate` and `balDidAnimate` handler, with its Unmapped props and handlers outcome.
+3. Every `open()`, `close()`, `toggle()`, `select()` and `setAriaForm()` call, with its Unmapped props and handlers outcome. Say that `select(date)` can often be replaced by setting `value`.
 4. Every place that compares against the string `INVALID_VALUE`. Search the consumer code for it, because `ds-datepicker` never emits it.
 5. Every file where `allowInvalidValue` was dropped, reviewed for logic that relies on `INVALID_VALUE`.
 6. Every handler or form binding that reads the value. A cleared field now yields `null` where `bal-date` yielded `undefined`, so code that checks `=== undefined` needs review.

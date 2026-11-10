@@ -130,8 +130,8 @@ An accordion item keeps its head content under the normal icon and content rules
 | `clickable` together with `href`                  | `variant="link"`       | `href` wins, as it did in the legacy render. Report each dropped `clickable`.                                                                                                                                                                                                          |
 | `disabled`                                        | `disabled`             | Copy as-is, in every form. Unlike `bal-list` `disabled`, this one means the same thing on both sides.                                                                                                                                                                                  |
 | `accordion`                                       | `variant="accordion"`  | See Shape.                                                                                                                                                                                                                                                                             |
-| `selected`                                        | _(no equivalent prop)_ | Leave the attribute in place, do not drop it. `ds-item` has no selected state, so it has no effect after the migration, and in strictly typed React or Angular templates it may not compile. Flag every occurrence for manual review.                                                  |
-| `subAccordionItem` / `sub-accordion-item`         | _(no equivalent prop)_ | Leave the attribute in place, do not drop it. Nesting is now a `ds-list` inside `slot="accordion-content"`, so it has no effect after the migration, and in strictly typed React or Angular templates it may not compile. Flag every occurrence for manual review.                     |
+| `selected`                                        | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). `ds-item` has no selected state.                                                                                                                                                                                                       |
+| `subAccordionItem` / `sub-accordion-item`         | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). Nesting is now a `ds-list` inside `slot="accordion-content"`.                                                                                                                                                                          |
 | `[href]`, `[disabled]`, `[clickable]`, `href={x}` | leave the binding      | Dynamic value. Do not guess the mapping. A bound `clickable` or `href` cannot be resolved to a static `variant` at scan time. Leave the binding unchanged and list the file and line in the report for manual review: the new values are `default`, `link`, `button`, and `accordion`. |
 | _(none)_                                          | `inverted`             | New per-item prop. `ds-list` `inverted` already cascades to its items, so leave it unset.                                                                                                                                                                                              |
 
@@ -209,16 +209,16 @@ Never invent a group name. The group is page-global, so two unrelated lists give
 
 Rewrite only handlers that are attached to the `bal-list` or `bal-list-item` element being migrated. Never rewrite a handler on another element, and never rename these by search and replace across the file.
 
-| old                                 | new                                      | handling                                                                                                                                                                                                                  |
-| ----------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balNavigate` on a `clickable` item | `dsClick`                                | Rewrite `addEventListener('balNavigate'` to `addEventListener('dsClick'`. Angular: `(balNavigate)` becomes `(dsClick)`. React: `onBalNavigate` becomes `onDsClick`. Both details are a `MouseEvent`.                      |
-| `balNavigate` on an `href` item     | _(no equivalent)_                        | `ds-item` wires `dsClick` only for `variant="button"`, so the handler would never fire on a link. Do not rewrite or remove the handler. List each one by file and line as "event no longer emitted, needs manual rework". |
-| `balAccordionChange`                | `dsAccordionToggle`                      | Same shapes, and move the listener from the head onto the `ds-item`.                                                                                                                                                      |
-| event `detail`                      | object                                   | Legacy sent the new open state as a boolean. `ds-item` sends `{ group, id, open }`. Every handler that used the value directly must read `.detail.open`. Report each handler.                                             |
-| `balGroupStateChanged`              | _(no equivalent)_                        | Removed. Do not rewrite or remove the handler. List each one by file and line as "event no longer emitted, needs manual rework".                                                                                          |
-| `balWillAnimate`                    | _(no equivalent)_                        | Removed. `ds-item` emits nothing before the transition. Drop the binding and report it.                                                                                                                                   |
-| `balDidAnimate`                     | _(no equivalent)_                        | Removed. `ds-item` emits nothing after the transition. Drop the binding and report it.                                                                                                                                    |
-| _(none)_                            | `dsAccordionOpened`, `dsAccordionClosed` | New events. Nothing to migrate from.                                                                                                                                                                                      |
+| old                                 | new                                      | handling                                                                                                                                                                                             |
+| ----------------------------------- | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `balNavigate` on a `clickable` item | `dsClick`                                | Rewrite `addEventListener('balNavigate'` to `addEventListener('dsClick'`. Angular: `(balNavigate)` becomes `(dsClick)`. React: `onBalNavigate` becomes `onDsClick`. Both details are a `MouseEvent`. |
+| `balNavigate` on an `href` item     | _(no equivalent)_                        | `ds-item` wires `dsClick` only for `variant="button"`, so the handler would never fire on a link. Apply Unmapped props and handlers (`SKILL.md`).                                                    |
+| `balAccordionChange`                | `dsAccordionToggle`                      | Same shapes, and move the listener from the head onto the `ds-item`.                                                                                                                                 |
+| event `detail`                      | object                                   | Legacy sent the new open state as a boolean. `ds-item` sends `{ group, id, open }`. Every handler that used the value directly must read `.detail.open`. Report each handler.                        |
+| `balGroupStateChanged`              | _(no equivalent)_                        | Removed. Apply Unmapped props and handlers (`SKILL.md`).                                                                                                                                             |
+| `balWillAnimate`                    | _(no equivalent)_                        | Removed. `ds-item` emits nothing before the transition. Drop the binding and report it.                                                                                                              |
+| `balDidAnimate`                     | _(no equivalent)_                        | Removed. `ds-item` emits nothing after the transition. Drop the binding and report it.                                                                                                               |
+| _(none)_                            | `dsAccordionOpened`, `dsAccordionClosed` | New events. Nothing to migrate from.                                                                                                                                                                 |
 
 ### Methods
 
@@ -232,7 +232,7 @@ Rewrite only handlers that are attached to the `bal-list` or `bal-list-item` ele
 
 Unlike the legacy methods, assigning `accordionOpen` emits no event. When the surrounding code relied on `balAccordionChange` firing afterwards, call the handler directly and report it.
 
-`dismiss(true)` and `dismiss(false)` lose the `ignoreNested` argument: nested items keep their own state. `configChanged()` was `@internal` and is not a consumer API. For both, list each call by file and line as "method no longer available, needs manual rework".
+`dismiss(true)` and `dismiss(false)` have no counterpart. `ds-item` has no `dismiss()` method, and `accordionOpen` has no `ignoreNested` equivalent: nested items keep their own state. `configChanged()` was `@internal` and has no counterpart either. For both, apply Unmapped props and handlers (`SKILL.md`).
 
 ### Files to edit beyond the scan
 
@@ -255,13 +255,13 @@ Needs your attention when found:
 5. Every dropped `border`.
 6. Every dropped `disabled`. The legacy prop only suppressed hover on the rows.
 7. Every dropped `contentAlignment`.
-8. Every flagged `selected`.
-9. Every flagged `subAccordionItem`.
+8. Every `selected`, with its Unmapped props and handlers outcome.
+9. Every `subAccordionItem`, with its Unmapped props and handlers outcome.
 10. Every dynamic binding left for the caller.
 11. Every renamed event handler. A `balAccordionChange` handler that used the detail directly must now read `.detail.open`.
-12. Every orphaned event handler, listed as "event no longer emitted, needs manual rework".
+12. Every orphaned `balNavigate` or `balGroupStateChanged` handler, with its Unmapped props and handlers outcome.
 13. Every rewritten `present()`, `dismiss()` or `toggle()` call. Assigning `accordionOpen` emits no event.
-14. Every `dismiss(true)`, `dismiss(false)` or `configChanged()` call, listed as "method no longer available, needs manual rework".
+14. Every `dismiss(true)`, `dismiss(false)` or `configChanged()` call, with its Unmapped props and handlers outcome.
 15. Every dropped `background="color"`, with its file, line, and old value.
 16. Every dropped `size="small"`, with its file, line, and old value.
 17. Every unmappable `visualLevel` token, with its file, line, and old value.

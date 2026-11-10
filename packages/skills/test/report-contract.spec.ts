@@ -62,16 +62,16 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'pagination': { attention: 6, coverage: 4 },
   'popup': { attention: 17, coverage: 4 },
   'progress-bar': { attention: 6, coverage: 3 },
-  'radio': { attention: 12, coverage: 2 },
+  'radio': { attention: 13, coverage: 2 },
   'segment': { attention: 8, coverage: 0 },
   'select': { attention: 12, coverage: 1 },
-  'shape': { attention: 5, coverage: 1 },
-  'sheet': { attention: 7, coverage: 0 },
+  'shape': { attention: 4, coverage: 1 },
+  'sheet': { attention: 6, coverage: 0 },
   'snackbar': { attention: 20, coverage: 6 },
   'spinner': { attention: 0, coverage: 1 },
   'stack': { attention: 4, coverage: 1 },
-  'steps': { attention: 19, coverage: 8 },
-  'tabs': { attention: 28, coverage: 7 },
+  'steps': { attention: 19, coverage: 9 },
+  'tabs': { attention: 28, coverage: 8 },
   'tag': { attention: 5, coverage: 6 },
   'text': { attention: 5, coverage: 1 },
   'textarea': { attention: 7, coverage: 2 },
@@ -316,6 +316,160 @@ describe('SKILL.md', () => {
   it('keeps the report file unstaged', () => {
     expect(skill).toContain('leaves every change unstaged, including the report file `ds-migration-report.md`')
     expect(skill).toContain('never runs `git add` or `git commit`')
+  })
+})
+
+describe('Unmapped props and handlers', () => {
+  const instruction = /\b[Aa]pply Unmapped props and handlers\b/
+
+  const unmappedComponents = [
+    'data',
+    'date',
+    'file-upload',
+    'hint',
+    'input',
+    'input-slider',
+    'input-stepper',
+    'label',
+    'list',
+    'modal',
+    'navbar',
+    'notification',
+    'number-input',
+    'popup',
+    'radio',
+    'segment',
+    'select',
+    'shape',
+    'sheet',
+    'steps',
+    'tabs',
+    'textarea',
+  ]
+
+  // Rows marked "no equivalent" that are structural, so the unmapped rule does not cover them.
+  const notUnmapped: Record<string, string> = {
+    'steps: `options`': 'the steps are rebuilt as `ds-step` children by hand (issue #174)',
+    'tabs: `accordion`, `options`': 'the whole group stays in place, see Groups left in place (issue #174)',
+    'tabs: `handleAsTabList`': 'with `href` items the whole group stays in place',
+    'tabs: `disabled`, `invisible`': 'a static `true` or a dynamic value keeps the whole group in place',
+  }
+
+  function cells(line: string) {
+    return line
+      .split('|')
+      .slice(1, -1)
+      .map(cell => cell.trim())
+  }
+
+  function row(name: string, cell: string) {
+    const line = read(`components/${name}/migration.md`)
+      .split('\n')
+      .find(candidate => candidate.startsWith(`| ${cell} `))
+    if (!line) throw new Error(`components/${name}/migration.md has no table row for ${cell}`)
+    return cells(line)
+  }
+
+  function instructionLines(markdown: string) {
+    return markdown.split('\n').filter(line => instruction.test(line) && !/^\d+\. /.test(line))
+  }
+
+  const skill = read('SKILL.md')
+  const rule = section(skill, '#### Unmapped props and handlers')
+
+  it('defines the rule in SKILL.md under Components, before Manual', () => {
+    const componentsSection = section(skill, '### Components')
+
+    expect(componentsSection).toContain('#### Unmapped props and handlers\n')
+    expect(componentsSection.indexOf('#### Unmapped props and handlers')).toBeLessThan(
+      componentsSection.indexOf('#### Manual'),
+    )
+    expect(rule).toContain('TODO(ds-migrate)')
+  })
+
+  it.each([
+    '- HTML: leave',
+    '- React and Angular, prop or attribute: remove',
+    '- React and Angular, event handler: remove',
+    'standalone statement',
+    'Report every item this rule handles under Needs your attention.',
+    '"will not compile, needs manual rework"',
+  ])('SKILL.md rule states %s', phrase => {
+    expect(rule).toContain(phrase)
+  })
+
+  it.each(unmappedComponents)('components/%s/migration.md applies the rule on a row or instruction line', name => {
+    expect(instructionLines(read(`components/${name}/migration.md`))).not.toHaveLength(0)
+  })
+
+  it.each(components)('components/%s/migration.md handles every no-equivalent row', name => {
+    const unhandled = read(`components/${name}/migration.md`)
+      .split('\n')
+      .filter(line => line.startsWith('|') && line.includes('_(no equivalent'))
+      .map(cells)
+      .filter(([old]) => !notUnmapped[`${name}: ${old}`])
+      .filter(rowCells => {
+        const handling = rowCells.at(-1) ?? ''
+        return !instruction.test(handling) && !/\b(drop|delete)\b|\bRemoved\b|Do not carry it over/i.test(handling)
+      })
+      .map(([old]) => old)
+
+    expect(unhandled).toEqual([])
+  })
+
+  it('lists only rows that exist in notUnmapped', () => {
+    for (const key of Object.keys(notUnmapped)) {
+      const [name, old] = key.split(': ')
+      expect(row(name, old)[1], key).toMatch(/_\(no equivalent/)
+    }
+  })
+
+  const wordingFiles = [
+    ...components.map(name => `components/${name}/migration.md`),
+    'SKILL.md',
+    ...readdirSync(`${skillDir}shared`)
+      .filter(file => file.endsWith('.md'))
+      .map(file => `shared/${file}`),
+  ]
+
+  it.each(wordingFiles)('%s has no vague compile wording', file => {
+    expect(read(file)).not.toMatch(/(may|might|does|do) not compile|fails? to compile/i)
+  })
+
+  it.each(components)('components/%s/migration.md drops the leave-in-place wording', name => {
+    const migration = read(`components/${name}/migration.md`)
+
+    expect(migration).not.toMatch(/Leave the (attribute|handler|listener|call) in place/)
+    expect(migration).not.toMatch(/Do not rewrite (these|handlers)\b/)
+    for (const phrase of ['In strictly typed React', 'Do not rewrite or remove the handler']) {
+      expect(migration, phrase).not.toContain(phrase)
+    }
+  })
+
+  it('popup splits balChange into dsDidPresent and dsDidDismiss', () => {
+    const [, target, handling] = row('popup', '`balChange`')
+
+    expect(target).toContain('`dsDidPresent`')
+    expect(target).toContain('`dsDidDismiss`')
+    expect(handling).toContain('TS17001')
+  })
+
+  it.each([
+    ['tabs', '`select(tab)`'],
+    ['steps', '`select(step)`'],
+  ])('%s rewrites %s to value without emitting dsChange', (name, old) => {
+    const rowCells = row(name, old)
+
+    expect(rowCells[1]).toBe('`value`')
+    expect(rowCells.join(' | ')).not.toMatch(/no equivalent/i)
+    expect(rowCells.at(-1)).toContain('Setting `value` does not emit `dsChange`.')
+  })
+
+  it('notification maps light with info or primary to outline-default as an approximation', () => {
+    const rowCells = row('notification', '`light` with `color="info"` / `"primary"`')
+
+    expect(rowCells[1]).toBe('`color="outline-default"`')
+    expect(rowCells.at(-1)).toMatch(/approximation/)
   })
 })
 

@@ -72,7 +72,7 @@ Do not edit handler bodies. `dsBlur`, `dsFocus` and `dsKeyPress` keep their `Foc
 
 ### Methods
 
-`getInputElement()` keeps its name and still resolves an `HTMLInputElement`, but that input now lives in the shadow DOM. Do not rewrite calls to it. List each call by file and line as "input is now in the shadow DOM, check the caller". `setAriaForm()` does not exist on `ds-number-input`. Do not remove calls to it and do not invent a replacement. List each call by file and line as "method no longer available, needs manual rework". `setFocus()` is unchanged.
+`getInputElement()` keeps its name and still resolves an `HTMLInputElement`, but that input now lives in the shadow DOM. Do not rewrite calls to it. List each call by file and line as "input is now in the shadow DOM, check the caller". `setAriaForm()` does not exist on `ds-number-input`. Apply Unmapped props and handlers (`SKILL.md`). `setFocus()` is unchanged.
 
 Angular splits a component across `x.component.html` and `x.component.ts`, and the class file often calls these methods through `@ViewChild` or `viewChild` without naming the tag, so the scan cannot see it. For every `.html` finding, open the same-basename `.ts` file beside it and check it for `getInputElement` and `setAriaForm` calls and for `balChange`, `balInput`, `balBlur`, `balFocus`, and `balKeyPress`. React and plain HTML callers hold the element in a ref or a query result, so look for calls on that variable in the same file.
 
@@ -83,7 +83,7 @@ Write the report as `shared/report.md` describes, with the per-file summary unde
 Needs your attention when found:
 
 1. Every file where `shared/field.md` moved the label and message of a surrounding `bal-field` onto the `label`, `description` and `invalidText` props, and every `bal-field` left in place. The legacy input was linked to that label and message through `setAriaForm()` (`aria-labelledby`, `aria-describedby`). A `bal-field` left in place keeps a label that is no longer linked, which is a WCAG regression the scan cannot see.
-2. Every method call that needs manual rework.
+2. Every `getInputElement()` call that needs a check, and every `setAriaForm()` call with its Unmapped props and handlers outcome.
 3. Every handler that needs manual rework.
 4. Every detail-type use that needs manual rework.
 5. Every bound `value` that is a string or that can be `undefined`. `value` is now `number | null`. The legacy type was `number | string | undefined`.
