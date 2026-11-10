@@ -54,10 +54,12 @@ props:
   figmaPropertyType: instance-text-override
   states:
   figmaProperty: state
-  options: [default, hover, focus, active, disabled]
+  options: [default, hover, focus, active] # interaction states only
   sources:
   hover: ":hover (spinner.host.scss)"
-  disabled: "disabled prop"
+  componentStates: # component-state props → own false/true variants, true only with state=default (PHASE-2-PROPOSE.md)
+  disabled: { figmaProperty: disabled, options: [false, true], source: "disabled prop" }
+  loading: { figmaProperty: loading, options: [false, true], source: "loading prop" }
   nested:
 - childTag: ds-icon
   childMappingFile: ../icon/icon.figma.md
@@ -66,7 +68,14 @@ props:
   codeProp: icon # → INSTANCE_SWAP property `icon`
   acceptsBrandIcon: true # brandIcon replaces icon in part="icon" → brand-icon library in preferredValues
   size: follows parent size # icon right: fixed sm
-  color: follows inverted
+  colorSource: # Phase 1 fills it, Phase 3 binds from it, Phase 4 checks against it.
+  # Key = state, or a component state for its `true` variant (`disabled`, `loading`); `default` covers every
+  # state not listed. Value = the variable the vector fill
+  # binds to, and where code takes it from. Use `<color>` for a per-variant token.
+  default: "Button/Color/<color>/Base/Text (--icon-color)"
+  hover: "Button/Color/<color>/Hover/Text (--icon-color)"
+  active: "Button/Color/<color>/Active/Text (--icon-color)"
+  disabled: "Button/Color/Disabled/Base/Text (--icon-color)"
   device: # omit entirely if Phase 1 step 5a found no breakpoint-driven token differences.
   # One entry per responsive binding — the single place that owns the mechanism detail (which
   # routing variable, its per-mode aliases, why this component needed it). tokens:/measurements: entries

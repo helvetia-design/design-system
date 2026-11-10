@@ -26,7 +26,8 @@ Verify the built Figma component set against the confirmed mapping file `<name>.
 `<name>.figma-validation.md` each; step 2 (header) only for the owner. The family verdict is the
 worst of all reports (`fail` > `blocked` > `pass`) and decides [Next Phase](#next-phase).
 
-1. Load `figma-use` (mandatory before any `use_figma` call; all calls in this phase are read-only)
+1. Load `figma-use` (mandatory before any `use_figma` call; all calls in this phase are read-only,
+   except the temporary instances in step 4c)
    and create a session against `figma.config.json`'s `componentLibraryFileKey`. **Locate the
    nodes** by the mapping-file fields Phase 3 wrote (`sets:` → each `figmaMasterNodeId`,
    `figmaDocFrameNodeId`, `figmaPage`). If a node is missing, mark every check on it
@@ -44,7 +45,9 @@ worst of all reports (`fail` > `blocked` > `pass`) and decides [Next Phase](#nex
    value is lowercase with spaces, every set name is flat PascalCase with the default set bare,
    and every `sub-label` equals its set name, per `PHASE-2-PROPOSE.md` → "Naming"
    (list each wrong name). Same layers/different token → a variant property on the
-   `COMPONENT_SET`, never a shared "style" variant.
+   `COMPONENT_SET`, never a shared "style" variant. `state` holds interaction states only; every
+   component-state prop (`disabled`, `loading`, `invalid`, …) is its own `false` / `true` variant, with `true`
+   only on `state=default` variants — a `disabled` / `loading` option inside `state` is a `fail`.
    b. **Top-level splits** — walk `PHASE-2-PROPOSE.md` → "Top-level splits" in order, per prop:
    1. Different layers/structure per option → one `COMPONENT_SET` per option, not a variant
       property.
@@ -62,7 +65,7 @@ worst of all reports (`fail` > `blocked` > `pass`) and decides [Next Phase](#nex
    paint's stored colour and opacity equal the variable's resolved value for that node**
    (`variable.resolveForConsumer(node).value`, alpha included); a mismatch is a `fail` even when
    the binding itself is correct (see `conventions/build-mechanics.md` → "Color and paint").
-   b. Every nested instance's main component key matches the Phase 1 key for that DS component —
+   b. Every nested instance except icon slots (see c) has a main component key matching the Phase 1 key for that DS component —
    no detached instance, no local copy. Sub-component instances match the key the
    sub-component's own mapping file recorded in Phase 3 (the `…Inverted` set inside an
    `…Inverted` owner set).
@@ -70,10 +73,19 @@ worst of all reports (`fail` > `blocked` > `pass`) and decides [Next Phase](#nex
    preferred instances and the confirmed default fill (count, non-default props, text); every
    `drivenBy` prop on every sub-component instance matches the owner variant it sits in (e.g.
    every `Tab` inside `Tabs vertical=true` has `vertical=true`).
-   c. Every icon slot from the mapping file has its `INSTANCE_SWAP` property (lowercase name,
+   c. Every icon slot and fixed icon (`conventions/content-selection-and-mitigations.md` → "Fixed icons": same checks, minus the swap property and preferred values) from the mapping file is a directly nested glyph library instance (no Icon wrapper); every icon slot has its `INSTANCE_SWAP` property (lowercase name,
    bound on every variant), the right `preferredValues` (icon library, plus brand-icon library
-   where applicable), and no exposed nested instance properties; nested icon `size`/color match
-   code per variant.
+   where applicable), and no exposed nested instance properties. The glyph's size and vector fill
+   match code on **every variant and state**: the fill's bound variable id equals the slot's
+   `colorSource` entry for that state. An unbound fill is a `fail` even when it looks right — the
+   glyphs default to navy, which matches navy parents by accident.
+   **Hidden icons:** a layer hidden in the main component (a `show` boolean that defaults to
+   false) returns no children, so read it on a temporary instance instead: per variant,
+   `createInstance()`, `setProperties` with every `show` boolean of an icon slot set to `true`,
+   read the glyph, `remove()`. A fresh instance has no overrides, so it shows the main
+   component's bindings. Create and remove them in the same script, off-canvas, and return
+   "created N, removed N"; never change the main component (e.g. the boolean's default) instead.
+   Layers that are hidden without a boolean (Badge `sm`) are never shown: skip them.
 5. **Check the component set's layout against the template** (`🗂️ Template / Category` →
    `Labeled component set` in `PHASE-3-BUILD.md`):
    a. **Outer stroke and grid dividers**, per set. Find the set's own `Grid` through its parent
@@ -87,9 +99,11 @@ worst of all reports (`fail` > `blocked` > `pass`) and decides [Next Phase](#nex
      (`divider-col`) or width (`divider-row`).
    - **Layer order:** `Grid`'s index in `Column + Box` is greater than the set's (`Column
 Labels`, set, `Grid`). Below the set, the set's fill covers every divider.
-   - **Renders:** each is `visible`, opacity > 0, with a non-empty `absoluteRenderBounds` — a
-     rotated `LINE` can report correct values and still not render (see
-     `conventions/component-set-rendering.md`).
+   - **Renders:** each is `visible` with opacity > 0. `divider-row` (`LINE`) also has a non-empty
+     `absoluteRenderBounds` — a rotated `LINE` can report correct values and still not render (see
+     `conventions/component-set-rendering.md`). `divider-col` (a 0.01-wide `RECTANGLE` drawn by its
+     left stroke) reports `null` even when it renders, the template's own prototype included: its
+     render is checked on the screenshot in step 6b instead.
    - **Styling:** type, width/height on the thin axis, fills, strokes, stroke weights
      (incl. `strokeLeftWeight`) and `dashPattern` identical to the template prototype — quote
      both values.

@@ -41,8 +41,14 @@ names, fonts and colors come from that clone; this skill writes no fill, stroke,
 value here. **Hard stop** if the `kind=anatomy` placeholder, `diagram-area`, `marker-A`, `legend` or
 the `Anatomy/Legend item` component is missing.
 
-1. **Component.** Swap the template instance in `diagram-area` to the real component's default
-   variant (`swapComponent`) and centre it horizontally in `diagram-area`.
+1. **Component — whatever shows the parts best.** Every part in `anatomy:` must be visible on an
+   instance. Start from the default variant (`swapComponent` on the template instance); turn on
+   `show <name>` booleans, pick another variant or state, or set props as needed so the parts show.
+   When no single instance can show every part (mutually exclusive parts, e.g. `ds-button`'s
+   `loading` spinner hides both icons), use more than one instance — as few as possible, side by
+   side with 48px between them, together centred horizontally in `diagram-area`, all on the
+   cloned `y`. Name each instance after what it shows (`Button`, `Button (loading)`) and say which
+   instance carries which markers when you ask for confirmation.
 2. **Markers — one per `anatomy:` entry.** Clone `marker-A` for each part, delete the unused ones,
    rename each to `marker-<letter>` and keep the groups in letter order. Set each `letter` text.
    - Dots at `y = 16`; the component keeps its cloned `y`.
@@ -76,7 +82,7 @@ nothing is appended or moved. Iterate on it with the user in Figma before moving
 
 ## Completion Criteria
 
-- `diagram-area` holds an instance of the real component and exactly one `marker-<letter>` per
+- `diagram-area` holds the fewest instances of the real component that show every part, and exactly one `marker-<letter>` per
   `anatomy:` entry, in letter order, positioned per the rules above.
 - `legend` holds exactly one `Anatomy/Legend item` instance per part, in letter order, with only
   its text properties set.

@@ -121,6 +121,9 @@ nested:
   - childTag: ds-icon
     childMappingFile: ../../media/icon/icon.figma.md
     figmaComponentKey: '2056:8249'
+    # 10.11.2026: no Icon wrapper instance any more — the caret glyph sits directly in the new
+    # `Button` set's icon slot, set via its `icon` INSTANCE_SWAP property (caret-left 2053:34 /
+    # caret-right 2053:37); glyph fill bound to the button's label text color variable.
     iconSlot:
       codeProp: '(fixed — not a public prop; hardcoded name="caret-left"/"caret-right" per button)'
       acceptsBrandIcon: false
@@ -130,14 +133,17 @@ nested:
     usedFor: [previous, next]
   - childTag: '(style-forward reuse, not a literal <ds-button> instance)'
     childMappingFile: ../../actions/button/button.figma.md
-    figmaComponentKey: 'c2100dbfe5316a49d985bb57ff23d93595bbc1b3 (Button/Primary set, nodeId 3048:2541)'
+    figmaComponentKey: '8956ebb803a4c6fe3749f84119915335d0d43ade (Button set, nodeId 4594:1327)'
+    # 10.11.2026: moved from the deprecated `_Button/Primary` set (3048:2541, key
+    # c2100dbfe5316a49d985bb57ff23d93595bbc1b3) to the new `Button` set. Variant order is now
+    # `size, color, state`; props `label` / `show icon` / `show icon right` / `icon` / `icon right`.
     usedFor: [previous, next, page]
     note: >
       pagination.host.scss does `@forward '../../actions/button/button.style.scss'` and the
       previous/next/page <button>s apply `.ds-button.is-square` classes directly — no <ds-button>
       custom element is ever instantiated. For the Figma build this should still be realized as
-      INSTANCEs of the existing Button/Primary set (color=ghost|primary, square=true, size=sm,
-      state=default|disabled) rather than redrawn from scratch, per the "reuse existing resources"
+      INSTANCEs of the existing Button set (size=base|sm, color=ghost|primary,
+      state=default|disabled, square via padding-x/gap → 0) rather than redrawn from scratch, per the "reuse existing resources"
       rule. color=ghost for inactive pages and previous/next; color=primary for the active page.
 
 tokens:
@@ -272,7 +278,7 @@ completenessChecklist:
   navigation (frame):
     layout: flex row, centered, gap → device: n/a, Pagination/Size/<tier>/Gap (items: inner spacing row)
   previous / next / page (ds-button instances):
-    all geometry/color owned by ds-button's own Button/Primary set — see nested: above
+    all geometry/color owned by ds-button's own Button set — see nested: above
   list (frame):
     gap: Pagination/Size/<tier>/Gap
   ellipsis (text):
@@ -477,6 +483,12 @@ specs:
   existing `caret-left` (`2053:34`) / `caret-right` (`2053:37`) swap-library members). Min
   width/height (48 base / 32 sm) came for free from the Button component's own square-size
   defaults — no override needed.
+- **10.11.2026 — moved to the new `Button` set** (`4594:1327`): all 52 button instances in
+  `Pagination/Default`, `Pagination/Dots`, `Pagination/DotsRow` and `Bubu` swapped in place
+  (`swapComponent`), with label text, name, padding-x/gap 0 and sizing re-applied. Carets are now
+  glyphs set via the `icon` swap property (no Icon wrapper); their fill was re-bound to the
+  label's text color variable after the swap. The base-tier caret is now 16px (the Button set's
+  base icon size) instead of the old `size=md` wrapper; code uses `size="sm"` in both tiers.
 - **Representative content**: `Pagination` = `value=5, totalPages=10, pageRange=1` (previous · 1 ·
   … · 4 · 5(active) · 6 · … · 10 · next). `PaginationDots` = `value=10, totalPages=20` (forces the
   counter-badge sub-case per the Phase 2 recommendation; the ≤5-page dot-row sub-case stays

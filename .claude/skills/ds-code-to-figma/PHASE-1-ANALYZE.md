@@ -59,10 +59,12 @@ the measurements triage (6) are presented **once for the whole family** (`conven
      only for a sub-component with more than one `@part` (`conventions/families.md` §5).
      Sub-component mapping files have no `anatomy:`. The owner's list is skipped only when it has
      no `@part`s and no contained sub-components.
-3. Read the component's `<name>.host.scss` and scan for **pseudo-class states** —
-   `:hover`, `:focus`, `:active`, `:disabled`, and any loading-related
-   class/attribute selector. These don't show up as props but still need a Figma
-   representation (see `PHASE-2-PROPOSE.md` → mapping table, `state` row).
+3. Read the component's `<name>.host.scss` and scan for **states** (CSS pseudo-classes and state classes) —
+   `:hover`, `:focus`, `:active`, `:disabled`, and any loading- or invalid-related
+   class/attribute selector. Interaction states (`:hover`, `:focus`, `:active`) become the `state`
+   variant; component-state props (`disabled`, `loading`, `invalid`, …) become their own `false` /
+   `true` variants (see `PHASE-2-PROPOSE.md` → mapping table, interaction-state and component-state
+   rows).
    - Also scan **every text-bearing part for every attribute a Figma text node needs**: font
      family, font size, font weight, line-height, letter-spacing, color, text-decoration. A
      component's own SCSS commonly sets only some of these explicitly (e.g. a `::part(label)`
@@ -91,7 +93,8 @@ the measurements triage (6) are presented **once for the whole family** (`conven
    sub-component instances under `slots:` (default fill proposed in Phase 2;
    `conventions/families.md` §4). Mark every nested `ds-icon` /
    `ds-brand-icon` as an **icon slot** (see `conventions/content-selection-and-mitigations.md` →
-   "Icon slots in a parent component"): record the code prop driving it, whether `ds-brand-icon`
+   "Icon slots in a parent component"): record the code prop driving it, its color source per variant and state (as `colorSource`,
+   `examples/mapping-file-format.md`), whether `ds-brand-icon`
    can fill the same slot, and how code sets its `size` and color.
 5. For every value the component's SCSS binds to a CSS custom property (`var(--ds-...)`),
    resolve it to the matching Figma variable **id** — resolve this entirely locally, no Figma
@@ -271,7 +274,7 @@ A draft mapping file `<name>.figma.md`, written per
 
 - Extracted public props (type, default)
 - Lettered anatomy (`@part` tags cross-checked against `render()`)
-- Pseudo-class states from `<name>.host.scss`
+- Interaction and component states from `<name>.host.scss`
 - Resolved token/variable id for every CSS-var binding, including responsive `device:` bindings
 - Nested DS component references (their Figma component keys)
 - The completeness checklist

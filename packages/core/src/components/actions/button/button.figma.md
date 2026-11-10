@@ -1,12 +1,12 @@
 # button → Figma mapping
 
-> **Status: Phases 3–6 done (04.11.2026); Phase 7 review reported; spinner size fixed, `padding-block` finding open (see below). `brandIcon` deferred — `ds-brand-icon` has no Figma mapping yet; see Notes.**
+> **Status: re-run with the current skill done 10.11.2026 — all phases confirmed (frame `4590:981`). Old frame `3044:458` and `Button/Inverted` `3049:1550` deleted; old `Button/Primary` `3048:2541` kept, renamed `_Button/Primary (deprecated, used by Pagination)` and moved below the category frame, until Pagination is moved to the new `Button` set. `ds-badge` attachment and `brandIcon` not built — see Notes.**
 
 ```yaml
 figmaComponentKey: null # two top-level sets, see figmaSets below
 figmaPage: Core / Actions # page node 3022:2
 figmaMasterNodeId: null # see figmaSets
-figmaDocFrameNodeId: '3044:458' # "Button Documentation"
+figmaDocFrameNodeId: '4590:981' # "Button Documentation" (re-run 10.11.2026; old frame 3044:458)
 
 anatomy:
   - letter: A
@@ -71,7 +71,7 @@ props:
     default: '(unset — implicit `base`)'
     figmaProperty: size
     figmaPropertyType: variant
-    figmaOptions: [sm, base, lg]
+    figmaOptions: [base, sm, lg]
   - name: inverted
     type: boolean
     default: false
@@ -93,19 +93,19 @@ props:
   # non-variant component properties (no variant cost)
   - name: label
     type: slot
-    figmaProperty: Label
-    figmaPropertyType: instance-text-override
+    figmaProperty: label
+    figmaPropertyType: text
     placeholder: Button
   - name: icon
     type: string
     default: "''"
-    figmaProperty: 'Show icon (BOOLEAN, default false) + Icon (INSTANCE_SWAP)'
+    figmaProperty: 'show icon (BOOLEAN, default false) + icon (INSTANCE_SWAP)'
     figmaPropertyType: boolean + instance-swap
-    note: 'render() guards on hasValue(icon), so the paired Show boolean is required.'
+    note: 'render() guards on hasValue(icon), so the paired show boolean is required.'
   - name: iconRight
     type: string
     default: "''"
-    figmaProperty: 'Show icon right (BOOLEAN, default false) + Icon right (INSTANCE_SWAP)'
+    figmaProperty: 'show icon right (BOOLEAN, default false) + icon right (INSTANCE_SWAP)'
     figmaPropertyType: boolean + instance-swap
   # instance-level overrides — 500-variant mitigation, approved 04.11.2026
   - name: square
@@ -132,13 +132,6 @@ props:
   - { name: brandIcon, type: string, default: "''", figmaPropertyType: DEFERRED (no ds-brand-icon Figma mapping) }
   - { name: brandSize, type: enum, options: [sm, lg], figmaPropertyType: DEFERRED (with brandIcon) }
   # excluded — no static visual difference in a Figma frame (approved 04.11.2026)
-  - {
-      name: outlined,
-      type: boolean,
-      default: false,
-      figmaPropertyType: EXCLUDED,
-      note: 'No styles in button.style.scss.',
-    }
   - { name: elementType, type: enum, options: [button, reset, submit], default: button, figmaPropertyType: EXCLUDED }
   - { name: href, type: string, figmaPropertyType: EXCLUDED }
   - { name: target, type: enum, options: [_blank, _parent, _self, _top], default: _self, figmaPropertyType: EXCLUDED }
@@ -167,21 +160,22 @@ states:
     loading: 'loading prop → disabled colors + ds-spinner (sm)'
 
 figmaSets:
-  # Phase 2 grouping, approved 04.11.2026. Total 324 variants (≤500).
+  # Phase 2 grouping, approved 10.11.2026 (re-run). Total 324 variants (≤500). Built and approved
+  # 10.11.2026. Old 04.11 sets: Button/Inverted 3049:1550 deleted with the old frame; Button/Primary
+  # 3048:2541 kept as `_Button/Primary (deprecated, used by Pagination)` (unpublished) until
+  # Pagination uses the new set.
   button:
-    {
-      name: Button/Primary,
-      axes: 'color 13 × size 3 × state 6',
-      variants: 234,
-      nodeId: '3048:2541',
-      key: 'c2100dbfe5316a49d985bb57ff23d93595bbc1b3',
-    }
+    name: Button
+    axes: 'size 3 × color 13 (rows) × state 6 (columns)'
+    variants: 234
+    nodeId: '4594:1327'
+    key: '8956ebb803a4c6fe3749f84119915335d0d43ade'
   buttonInverted:
-    name: Button/Inverted
-    axes: 'color 5 × size 3 × state 6'
+    name: ButtonInverted
+    axes: 'size 3 × color 5 (rows) × state 6 (columns)'
     variants: 90
-    nodeId: '3049:1550'
-    key: 'f9ac1db7260726a3b69ba26216fc88fde552dd48'
+    nodeId: '4600:2108' # recreated 10.11.2026 (option order); first build 4594:1328
+    key: '227d31d011d34dc7e4fc8505061be74339b77af9'
     note: 'In code, primary, brand-*, info, success, warning and danger all use the shared `inverted` tokens, so they look identical when inverted. The `primary` option stands for all of them; secondary/tertiary/ghost/link use their own inverted-* tokens.'
 
 nested:
@@ -189,7 +183,23 @@ nested:
     childMappingFile: ../../media/icon/icon.figma.md
     figmaComponentKey: '2056:8249'
     usedFor: [icon, iconRight]
-    sizing: 'icon size follows button size (sm / base / lg); iconRight is always sm; square (non-sm) forces 1.5rem → Icon size=md'
+    iconSlot: # glyph library component nested directly, no Icon wrapper
+      - codeProp: icon # → `show icon` + INSTANCE_SWAP `icon`
+        acceptsBrandIcon: true # brandIcon fills part="icon" — not built until ds-brand-icon is in Figma
+        size: 'follows button size: sm 14 (Icon/Size/SM), base 16 (Icon/Size/Base), lg 32 (Icon/Size/LG)'
+      - codeProp: iconRight # → `show icon right` + INSTANCE_SWAP `icon right`
+        acceptsBrandIcon: false
+        size: 'always 14 (Icon/Size/SM)'
+    colorSource:
+      # both slots; button.style.scss:109/127/136/558 set --icon-color = the label text token.
+      # ds-icon's `inverted` prop (button.tsx:487) has no visible effect: public --icon-color wins over --mod-icon-color.
+      default: 'Button/Color/<color>/Base/Text (--icon-color)'
+      hover: 'Button/Color/<color>/Hover/Text (--icon-color)'
+      focus: 'Button/Color/<color>/Base/Text (--icon-color)'
+      active: 'Button/Color/<color>/Active/Text (--icon-color)'
+      disabled: 'Button/Color/Disabled/Base/Text (--icon-color)'
+      loading: 'none — both icons are hidden (no boolean), skipped'
+      inverted: 'ButtonInverted uses Button/Color/Inverted[-<color>]/<state>/Text the same way'
   - childTag: ds-spinner
     childMappingFile: ../../indicators/spinner/spinner.figma.md
     figmaComponentKey: null # four top-level sets, see spinner.figma.md figmaSets
@@ -1425,6 +1435,20 @@ tokens:
       figmaVariableId: 'VariableID:137:248',
       resolved: true,
     }
+  - {
+      cssVar: --ds-alias-interaction-focus-color-border,
+      figmaVariable: 🔗 Alias/✨ Interaction/Focus/Color/Border,
+      figmaVariableId: 'VariableID:137:253',
+      resolved: true,
+      note: 'focus-shadow mixin (general.mixin.scss:40), inner ring → focus-ring-inner stroke. Added by Phase 5 (10.11.2026); bound since 04.11.',
+    }
+  - {
+      cssVar: null,
+      figmaVariable: 🔗 Alias/✨ Interaction/Focus/Size/Inner,
+      figmaVariableId: 'VariableID:137:243',
+      resolved: true,
+      resolution: 'mixin literal 2px (general.mixin.scss:40) = Focus/Size/Inner, approved 04.11.2026 → focus-ring-inner stroke weights. Added by Phase 5 (10.11.2026).',
+    }
   # shadow prop
   - {
       cssVar: --ds-alias-shadow-box-base,
@@ -1722,70 +1746,85 @@ measurements: # measurements triage confirmed 05.11.2026 (PHASE-1-ANALYZE.md ste
   `device:` section for the padding.
 - `button.style.scss` styles a `text` color (and `inverted-text`), but `text` is not in
   `BUTTON_COLORS`, so it isn't a prop option and is left out.
-- `outlined` is a public prop with no styles in `button.style.scss` — no visual effect today.
+- **`ds-badge` attachment not built (10.11.2026).** `button.tsx` declares `@attachment ds-badge
+top-right`; the skill has no attachment support yet (`docs/plans/figma-attachments-plan.md`,
+  steps 3–5 open) and the offset is a literal `-0.5rem`. Add it once the plan lands.
+- **`--icon-size` without `--icon-inner-size` (code finding).** `square` sets `--icon-size: 1.5rem`
+  (`button.style.scss:437`, `:450`) but not `--icon-inner-size`, so the glyph box stays at the
+  `size` prop's value. Open in `TODO.md`; Figma follows what code renders.
+- **Left and right icon sizes differ (open question for code, 10.11.2026).** `icon` follows the
+  button size (`button.tsx:485`, `size={size}`: sm 14 / base 16 / lg 32px), `iconRight` is always
+  `size={'sm'}` (`button.tsx:501`, 14px). At `lg` that is 32 vs 14px. No comment in code says
+  whether this is intended; the `icon` visual test only renders `base`. Check with Gery. Figma
+  follows what code renders.
 - Font family, weight and line-height are identical across sm / base / lg (BaloiseCreateHeadline,
   700, 1.3); only font size differs (14 / 16 / 18px).
 - Code-side drift (follow-up, not fixed here): the square sizes, spinner logo size and flat
   min-height are rem literals in SCSS rather than tokens.
 
-## Phase 2 — variant grouping (approved 04.11.2026)
+## Phase 2 — variant grouping (proposed 10.11.2026, re-run)
 
-Full cross of every visual prop was 3,744 variants (color 13 × size 3 × state 6 × inverted 2 ×
-flat 2 × square 2 × shadow 2). Approved mitigation, 324 variants in total:
+Full cross of every visual prop is 3,744 variants (color 13 × size 3 × state 6 × inverted 2 ×
+flat 2 × square 2 × shadow 2). Mitigation kept from the 04.11.2026 approval, 324 variants in
+total:
 
-- `inverted` → top-level split into `Button/Primary` and `Button/Inverted`; the inverted set only has the
-  5 colors that look different when inverted.
+- `inverted` → top-level split (rule 2) into `Button` and `ButtonInverted`. The inverted set only
+  has the 5 colors that look different when inverted.
 - `square`, `flat`, `shadow`, `iconTurn` → instance-level overrides (steps in `props:` → `howTo`).
-- `color` stays a variant dropdown (same layers, different tokens), not a top-level split per
-  color — chosen over the Phase 2 table's "button type" example, which conflicts with its own
-  deciding test for this component.
+- `color` stays one variant property (same layers, different tokens).
 
-Nested matrix (3 axes): `size` on columns, rows nested by ascending option count — `state` (6)
-outermost, `color` (13) inside.
+Component properties (no variant cost): `label` (text, placeholder `Button`), `show icon` +
+`icon` (swap), `show icon right` + `icon right` (swap). Icon swaps: glyph library nested directly,
+79 preferred glyphs, color per `colorSource`. Not built: `ds-badge` attachment, `brandIcon`.
 
-**`Button/Primary`** — 13 × 3 × 6 = 234
+Changes against the 04.11 build (current skill rules):
 
-```
-                          sm      base    lg
-default   primary        [cell]  [cell]  [cell]
-          secondary      [cell]  [cell]  [cell]
-          tertiary       [cell]  [cell]  [cell]
-          ghost          [cell]  [cell]  [cell]
-          brand-purple   [cell]  [cell]  [cell]
-          brand-red      [cell]  [cell]  [cell]
-          brand-yellow   [cell]  [cell]  [cell]
-          brand-green    [cell]  [cell]  [cell]
-          info           [cell]  [cell]  [cell]
-          success        [cell]  [cell]  [cell]
-          warning        [cell]  [cell]  [cell]
-          danger         [cell]  [cell]  [cell]
-          link           [cell]  [cell]  [cell]
-hover     primary        [cell]  [cell]  [cell]
-          …              …       …       …
-focus     …
-active    …
-disabled  …
-loading   …
-```
+- Set names `Button` / `ButtonInverted` (was `Button/Primary` / `Button/Inverted`).
+- `state` on the columns (hard rule); `size` and `color` on rows, nested by option count:
+  `size` (3) outermost, `color` (13) inside.
+- `size` order `base · sm · lg` (code default first; was `sm · base · lg`).
+- Property names lowercase.
 
-**`Button/Inverted`** — 5 × 3 × 6 = 90
+**`Button`** — 13 × 3 × 6 = 234
 
 ```
-                       sm      base    lg
-default   primary     [cell]  [cell]  [cell]
-          secondary   [cell]  [cell]  [cell]
-          tertiary    [cell]  [cell]  [cell]
-          ghost       [cell]  [cell]  [cell]
-          link        [cell]  [cell]  [cell]
-hover     …
-focus     …
-active    …
-disabled  …
-loading   …
+                     default  hover   focus   active  disabled loading
+base   primary       [cell]   [cell]  [cell]  [cell]  [cell]   [cell]
+       secondary     [cell]   [cell]  [cell]  [cell]  [cell]   [cell]
+       tertiary      …
+       ghost         …
+       brand-purple  …
+       brand-red     …
+       brand-yellow  …
+       brand-green   …
+       info          …
+       success       …
+       warning       …
+       danger        …
+       link          …
+sm     primary       …
+       …
+lg     primary       …
+       …
 ```
 
-Ordering checked: `size` sm · base · lg (scale), `state` default / hover / focus / active /
-disabled / loading (rule 2), `color` in `BUTTON_COLORS` source order (rule 4).
+**`ButtonInverted`** — 5 × 3 × 6 = 90
+
+```
+                  default  hover   focus   active  disabled loading
+base   primary    [cell]   [cell]  [cell]  [cell]  [cell]   [cell]
+       secondary  …
+       tertiary   …
+       ghost      …
+       link       …
+sm     …
+lg     …
+```
+
+Pre-flight checked: top-left cell of each set is the code default (`base`, `primary`,
+`default`); `size` base · sm · lg, `state` default · hover · focus · active · disabled · loading,
+`color` in `BUTTON_COLORS` source order; all names lowercase, sets flat PascalCase, `sub-label` =
+set name.
 
 ## Phase 3 — build log
 
@@ -1833,9 +1872,29 @@ disabled / loading (rule 2), `color` in `BUTTON_COLORS` source order (rule 4).
     placeholder colour rendered black until refreshed).
   - `Button/Inverted` variants were cloned from `Button/Primary` and lost the set-level `Label` /
     `Show icon` / `Show icon right` properties; they were re-added on the inverted set and re-wired.
+- **Re-run (10.11.2026)**, current skill. New frame `4590:981` appended last in `Core / Actions`,
+  header filled (`status=review`, v0.0.6, 10.11.2026, three links).
+  - First variant `size=base, color=primary, state=default` (`4590:1407`), cloned from `3044:825`,
+    confirmed by the user.
+  - Fan-out: the 323 other variants cloned from the 04.11 sets (all bindings, focus ring, spinner,
+    link underline kept). Icon wrappers replaced by the `check` glyph (`2053:46`) nested directly:
+    width/height bound as before (`icon` per size, `icon-right` `Icon/Size/SM`), padding `icon`
+    sm 0.875 / base 1 / lg 2, `icon-right` 0.875 (`ds-icon size="sm"`), vector fill bound to the
+    label's text fill variable (= `colorSource`).
+  - `Button` (`4594:1327`, 234) and `ButtonInverted` (`4594:1328`, 90; recreated as `4600:2108` in Phase 5 for the `size` option order) combined into the template
+    stacks; cell 175 × 88 (widest 143 + 32), 6 `state` columns, rows `size` (outer, brackets) ×
+    `color`; dividers 5 + 38 / 5 + 14. `sub-label` = set name (two stacks).
+  - Properties: `label` (text), `show icon` / `show icon right` (boolean, false), `icon` /
+    `icon right` (INSTANCE_SWAP, 79 preferred glyphs). `loading` icons hidden, no boolean.
+  - The frame's `body` widened 1854 → 2044 so `Component Sets` (1280) fits the 1200px stack.
+  - Frame approved by the user 10.11.2026.
 
 ## Phase 4–5 — document sections
 
+- **Copy me, re-run (10.11.2026)**: one `Button` default instance (`base` / `primary` / `default`, no overrides, icons off) in the `copy-me` `Section` (`4590:985`) of the new frame, replacing the template example. Confirmed by the user.
+
+- **Anatomy, re-run (10.11.2026)**: same two-instance layout as the approved 04.11 deviation — `primary` / `base` / `loading` (A native, B spinner) and `primary` / `base` / `default` with `show icon` + `show icon right` on (C icon, D label, E icon-right); markers at y 16, leaders end 4px above each part's visible top. Legend: five `Anatomy/Legend item` instances with the `@part` descriptions verbatim — the backticks stay as literal text (the skill forbids restyling legend instances; no monospace token exists).
+- **Measurements, re-run (10.11.2026)**: the three approved 05.11 cards (drawing, sizes table, behavior) cloned from the old section `3044:464` into the new `kind=measurements` `Section` (`4590:987`); their three Button instances swapped to the new `Button` set (`secondary` / `base` / `default` with both icons, `focus`, behavior `default`), props re-applied. Triage unchanged ("Keep it"). Geometry re-checked against the new glyphs: icon overlays 16 × 16 / 14 × 14, text box 53 × 21, insets, gaps all on their parts (0px off).
 - **Copy me** (`Section` 3044:462): one `Button/Primary` instance (`primary` / `base` / `default`, node 3051:482) with both `Show icon` toggles on, per the Phase 4 rule. Kept as is; see the skill TODO about using the plain default instead.
 - **Anatomy** (`Section` 3044:463), approved deviation (04.11.2026): **two instances** instead of the template's one, because no single state shows all five parts (`loading` shows the spinner and hides both icons). Left: `primary` / `base` / `loading` (markers A and B; A sits on the container's top edge just left of B, so the markers read A–E left to right). Right: `primary` / `base` / `default` with both icons on (markers C, D, E). Markers sit above the instances in the layer order.
 - **Measurements** (`Section` 3044:464), rebuilt 05.11.2026 (markers v3, v4: soft pills, padding pills `end`/`start`, gap pills on callouts; text box on the label, `Text (label)`, content-sized table columns): drawing on `secondary` (the border is invisible on primary) with two instances — main `base` with icons (markers 1–7, 9) and `Focus` (8 focus ring); pill labels; padding tints inside the border; sizes table rows 1–9, `base` first; min width skipped (never binds); behavior card with one wrapping long label (`Hug ↔ (wide: Fill) · Wraps (no-wrap: Truncates)`). The left icon at `lg` is 32px (ds-icon `size` follows the button size) — documented as the code does it. The focus ring (2px + 3px) has no token.

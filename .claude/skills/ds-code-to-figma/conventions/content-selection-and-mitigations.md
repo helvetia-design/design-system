@@ -45,21 +45,46 @@ A nested `ds-icon` or `ds-brand-icon` inside the component being built (e.g. `ds
 `icon` / `iconRight`) is an **icon slot**. Icon slots always use instance swap — never a variant
 property, never an exposed nested instance, never a separate set per icon.
 
+- **Nest the glyph directly — always, without asking.** The icon layer is an instance of a glyph
+  library component (the 79 single `COMPONENT`s on the Icon page), a direct child of the parent
+  variant — never the Icon wrapper set. The Plugin API can't bind a parent `INSTANCE_SWAP` two
+  levels down (parent → wrapper instance → glyph): property references can't be set on a layer
+  inside an instance.
 - **One `INSTANCE_SWAP` component property per icon slot** on the parent set, named after the code
-  prop per `../PHASE-2-PROPOSE.md` → "Naming" (`icon`, `icon right`), bound to the nested glyph
+  prop per `../PHASE-2-PROPOSE.md` → "Naming" (`icon`, `icon right`), bound to the glyph
   instance via `componentPropertyReferences = { mainComponent: propKey }` on every variant.
 - **Preferred values** (`preferredValues`): the icon swap library; plus the brand-icon library when
   code lets `ds-brand-icon` fill the same slot (in `ds-button`, `brandIcon` replaces `icon` in
   `part="icon"`).
-- **Never expose the nested icon's own properties** (`isExposedInstance = false`). Its `size` and
-  `color` are set per parent variant, matching code — e.g. `ds-button`'s left icon follows the
-  button `size`, `icon right` is always `sm`, color follows `inverted`.
+- **Never expose the glyph instance** (`isExposedInstance = false`). Its size and color are set
+  per parent variant, matching code: bind the glyph's `width` / `height` and its vector's fill to
+  the variables the code uses for that variant (`ds-badge`: `Size/*/Icon` and the badge's text
+  color).
 - **Conditionally rendered slot** (`hasValue(this.icon) && …`) → also a `show <name>` boolean per
   the Phase 2 mapping table.
 - Every other nested DS component (e.g. `ds-spinner`) stays a plain nested instance.
-- **Untested:** binding a parent `INSTANCE_SWAP` to a glyph two levels down (parent → icon wrapper
-  instance → glyph). If the Plugin API refuses it, hard stop and ask the user before falling back
-  to nesting the glyph library component directly (no wrapper). Record the outcome here.
+- **Color source per variant and state:** the glyphs are unbound navy, so a missed binding still
+  looks right on navy parents. Phase 1 records, per variant and state, where the code takes the
+  icon color from: the parent's `--icon-color` (usually its text token), `ds-icon`'s `color` /
+  `inverted` / `disabled` props, or nothing (Icon primary), as the slot's `colorSource`. Phase 3
+  binds the vector fill to exactly that on every variant; Phase 4 compares variable ids against it.
+- **Build order:** read the glyph and its vector **before** binding `visible` to a `show` boolean
+  that defaults to false: the hidden layer's children can't be read afterwards.
+
+### Fixed icons
+
+A nested `ds-icon` whose `name` is hardcoded in code (not driven by a prop, e.g. `ds-input`'s
+`<ds-icon name="alert">` in `field.util.tsx`) is a **fixed icon**. It follows every icon-slot rule
+above except the swap:
+
+- **Nest the glyph directly** (that exact glyph from the Icon page), never the Icon wrapper set.
+- **No `INSTANCE_SWAP` property** and no preferred values — code offers no choice. Not exposed.
+- **Size, padding and color bound per variant like a slot:** `width` / `height` to the size the code
+  renders (the `size` prop, or `ds-icon`'s default `base` when none is set; a parent
+  `--icon-size` wins), padding per `ds-icon`'s size, and the vector fill per the icon's
+  `colorSource` (recorded in Phase 1, checked in Phase 4 step 4c).
+- **Conditionally rendered** (`invalid && invalidText && <ds-icon>`) → visible only on the variants
+  where code renders it, or a `show <name>` boolean when a text/prop guard decides it.
 
 ## The 500-variant threshold
 

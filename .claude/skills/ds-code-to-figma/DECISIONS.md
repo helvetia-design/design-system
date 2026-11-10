@@ -82,9 +82,6 @@ batch and grouping sign-off happen once for the whole family; Phases 6–8 run f
   variant and wait for their confirmation in Figma before fanning out the rest of the component set — catches a structural
   mistake once, before it's replicated across every variant. For a family: once per set, in build
   order (contained sub-components → owner → wrapping sub-components).
-- 🛑 **Icon-slot binding refused**: the Plugin API won't bind the parent `INSTANCE_SWAP` to the
-  glyph inside the icon wrapper — ask before falling back to nesting the glyph library directly
-  (`conventions/content-selection-and-mitigations.md` → "Icon slots in a parent component").
 
 ## Phase 4 — Validate
 

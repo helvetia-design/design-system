@@ -113,7 +113,9 @@ table, prefix each sub-component row's property with its set name (`Tab · Paddi
      its ticks 4px right of the instance (`x = right + 4`). The padding starts inside the border
      (CSS `border-box`), so inset the tint by the border width on every side it touches
      (`ds-button`: 2px border → `x = 2`, `y = 2`, `height − 4`), and round its outer corners to
-     `radius − border` (`4 − 2 = 2`) so it follows the component's inner edge without gaps.
+     `radius − border` (`4 − 2 = 2`) so it follows the component's inner edge without gaps. When
+     the radius is wider than the tint (a pill), rounding can't follow the edge: put the tints in a
+     frame the size of the instance, `clipsContent` on, radius bound to the component's radius.
    - **gap** → `Spec/Gap` over each gap the token applies to, plus a `Spec/Dimension`
      (`kind=spacing`) per gap, on the same row as the padding lines of that side: a row gap gets
      `side=bottom` under it, a column gap (vertical layout) `side=right` beside it. Inset

@@ -54,9 +54,10 @@ runs once, for the whole frame; step 7 writes back into every member's mapping f
      black). See `conventions/build-mechanics.md` → "Color and paint".
    - Every nested component as an **instance of the existing Figma component** resolved in
      Phase 1, step 4 — never redrawn from scratch. **Icon slots** (nested `ds-icon` /
-     `ds-brand-icon`) get an `INSTANCE_SWAP` property with preferred values and an unexposed nested
-     instance, per `conventions/content-selection-and-mitigations.md` → "Icon slots in a parent
-     component".
+     `ds-brand-icon`) get an `INSTANCE_SWAP` property with preferred values and the glyph library
+     component nested directly (no Icon wrapper, no question to the user), per `conventions/content-selection-and-mitigations.md` → "Icon slots in a parent
+     component". Bind the glyph's vector fill on every variant to the slot's `colorSource` entry
+     for that variant's state.
    - **No Figma default layer names** (`Frame 1`, `Line`, `Ellipse`, `Vector`, `Group 1`). Name
      built layers after their part (`icon`, `label`, `track`); cloned layers keep their template
      name.
@@ -201,12 +202,18 @@ values**; clone a prototype and change only text and positions.
    Source every inverted stack from the template's `Inverted` stack and every other stack from its
    `Primary` stack. Delete template stacks that aren't needed.
 
-2. **Combine** the stack's variants into a `COMPONENT_SET` with `combineAsVariants()`. Clone the
+2. **Combine** the stack's variants into a `COMPONENT_SET` with `combineAsVariants()`. **First put
+   the variants in grid reading order as layers in one parent** (`insertChild`), default variant
+   first: Figma sets each property's option order once, at combine time, from the first layer that
+   uses each value, and ignores the order of the array passed in. Reordering layers or renaming
+   afterwards doesn't change it, and the Plugin API has no setter. Check
+   `componentPropertyDefinitions[axis].variantOptions` right after combining. Clone the
    template set's fill, stroke (dashed, purple, variable-bound) and corner radius onto it by
    copying them from the template set — never recreate them. Put the new set **in the template
    set's place** in `Column + Box` (between `Column Labels` and `Grid`), never after `Grid`.
 3. **Axes → grid.** Per `PHASE-2-PROPOSE.md` step 2: `state` is the column axis (`size` only when
-   there is no `state` axis); every other axis is a row, nested outer→inner by ascending option count (ties: prop declaration order).
+   there is no `state` axis), followed by one column per component-state variant (`disabled`, `loading`, …,
+   `PHASE-2-PROPOSE.md` → "Component-state columns"); every other axis is a row, nested outer→inner by ascending option count (ties: prop declaration order).
    Order the options within each axis per `conventions/component-set-rendering.md` → "Option and
    axis ordering" — code default first (top-left cell = default variant), then smallest left/top,
    largest right/bottom.
@@ -215,7 +222,9 @@ values**; clone a prototype and change only text and positions.
    uniform cell size. Centre each variant in its cell by computed x/y, then resize the set to
    cols × rows cells. Order the variant layers in grid reading order — rows top→bottom, then
    columns left→right (`insertChild`) — because Figma's variant picker lists options in layer
-   order.
+   order. **Lay out the grid after the component properties are added and bound** (`show <name>`
+   booleans, swaps): binding a layer's `visible` changes the variant's width, so variants placed
+   before stay off-centre.
 5. **Every set is labeled — no axis count is exempt, not even a single-axis set.** With no row axis
    (e.g. a lone `size` axis) there are just `Column Labels` and no `Row Labels`.
 6. **Labels and grid lines, cloned from template prototypes** — a `Column Labels` text, a
@@ -223,7 +232,9 @@ values**; clone a prototype and change only text and positions.
    column/row axis and option outside the set. Label text repeats the property value exactly
    (`base`, `sm`, `none`, `leading`) — never title-cased, abbreviated or reworded.
    - **`Column Labels`:** keep the cloned strip as is. Centre the axis name on the set and each
-     value text on its column; `Column Labels` width = set width.
+     value text on its column; `Column Labels` width = set width. With component-state columns,
+     centre `state` on the interaction-state columns only, and label each component-state column with its prop name
+     (`disabled`, `loading`) on the value line.
    - **`Row Labels`: one lane (`lane-<axis>`) per row axis**, outer→inner, left→right. Lane width =
      longest text in the lane, axis name included. Labels are left-aligned in their lane and
      vertically centred on the rows they cover; the axis name sits at the lane's left edge, on the
@@ -246,7 +257,8 @@ values**; clone a prototype and change only text and positions.
      3. Read back from **this `Grid` node's `children`** — never a name search across the page:
         every documentation frame (and the template) has nodes named `divider-col-1` etc. Confirm
         the count, that each divider's styling matches the prototype, a non-empty
-        `absoluteRenderBounds`, and the **layer order**: `Grid` comes after the set in
+        `absoluteRenderBounds` on every `divider-row` (`divider-col` reports `null` even when it
+        renders — check it on a screenshot), and the **layer order**: `Grid` comes after the set in
         `Column + Box` (`Column Labels`, set, `Grid`), so it draws on top. A `Grid` below the set is
         covered by the set's fill and every divider disappears.
 

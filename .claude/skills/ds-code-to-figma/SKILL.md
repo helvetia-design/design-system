@@ -85,7 +85,6 @@ flowchart TD
         direction LR
         P3a["Clone category page / frame<br/>from template + fill header"]:::figma -->|template layer, category copy<br/>or story ID missing| P3h(["Hard stop: ask user"]):::human
         P3a --> P3b["Build the<br/>default variant"]:::figma
-        P3b -->|icon-slot binding<br/>refused| P3h
         P3b --> P3c{{"User confirms default variant<br/>in Figma"}}:::human
         P3c -->|approved| P3d["Fan out + build labeled<br/>component set(s)"]:::figma
         P3d --> P3f{{"User approves header +<br/>component set in Figma"}}:::human
