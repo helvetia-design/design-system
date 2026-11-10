@@ -29,7 +29,7 @@
 | Status | Component    | Category   | Nested                                | Gap | Figma |
 | ------ | ------------ | ---------- | ------------------------------------- | --- | ----- |
 | ⬜     | Icon         | Media      | -                                     | ✅  | ⬜    |
-| ⬜     | Brand Icon   | Media      | -                                     | ⬜  | ⬜    |
+| ⬜     | Brand Icon   | Media      | -                                     | ✅  | ⬜    |
 | ⬜     | Logo         | Media      | -                                     | ⬜  | ⬜    |
 | ⬜     | Shape        | Media      | -                                     | ⬜  | ⬜    |
 | ⬜     | Spinner      | Indicators | -                                     | ⬜  | ⬜    |
