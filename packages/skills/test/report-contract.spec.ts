@@ -67,7 +67,7 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'select': { attention: 13, coverage: 0 },
   'shape': { attention: 5, coverage: 1 },
   'sheet': { attention: 7, coverage: 0 },
-  'snackbar': { attention: 14, coverage: 5 },
+  'snackbar': { attention: 20, coverage: 6 },
   'spinner': { attention: 0, coverage: 1 },
   'stack': { attention: 4, coverage: 1 },
   'steps': { attention: 16, coverage: 5 },
@@ -75,7 +75,7 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'tag': { attention: 5, coverage: 6 },
   'text': { attention: 5, coverage: 1 },
   'textarea': { attention: 7, coverage: 2 },
-  'toast': { attention: 8, coverage: 5 },
+  'toast': { attention: 15, coverage: 7 },
   'tooltip': { attention: 5, coverage: 2 },
 }
 
@@ -177,6 +177,59 @@ describe('Report items the issue requires by name', () => {
         phrase,
       ).toHaveLength(1)
     }
+  })
+
+  describe.each(['toast', 'snackbar'])('%s notice controller rules', name => {
+    const migration = () => read(`components/${name}/migration.md`)
+    const sharedBalClose =
+      '`balClose` is emitted only by `bal-toast` and `bal-snackbar`, and `balAction` only by `bal-snackbar`.'
+
+    it.each(['`useEffect` cleanup', `more than one ${name} through one hook`, 'its target is unknown'])(
+      'has exactly one attention item about %s',
+      phrase => {
+        const { attention, coverage } = bucketsOf(name)
+
+        expect(
+          attention.filter(item => item.text.includes(phrase)),
+          phrase,
+        ).toHaveLength(1)
+        expect(
+          coverage.filter(item => item.text.includes(phrase)),
+          phrase,
+        ).toHaveLength(0)
+      },
+    )
+
+    it('shares the balClose emitter sentence and drops the wrong justification', () => {
+      expect(migration()).toContain(sharedBalClose)
+      expect(migration()).not.toContain('Both names are emitted by other legacy components')
+    })
+
+    it('no longer maps remove(id) to the dismiss hook function', () => {
+      const dismiss = name === 'toast' ? 'dismissToast' : 'dismissSnackbar'
+
+      expect(migration()).not.toContain(`\`${dismiss}()\` where it used \`remove(id)\``)
+      expect(migration()).toContain(`\`${dismiss}()\` takes no id`)
+    })
+
+    it('uses the hook inside components and the controller with defineCustomElement outside', () => {
+      const hook = name === 'toast' ? 'useToast' : 'useSnackbar'
+      const controller = name === 'toast' ? 'dsToastController' : 'dsSnackbarController'
+
+      expect(migration()).toContain(`\`${hook}\` from \`@helvetia-design/react\``)
+      expect(migration()).toContain(`import \`${controller}\` from \`@helvetia-design/core\``)
+      expect(migration()).toContain('`@helvetia-design/core/components/ds-alert-container.js`')
+      expect(migration()).toContain(`\`@helvetia-design/core/components/ds-${name}.js\``)
+    })
+  })
+
+  it('toast has an attention item for Angular and React heading=""', () => {
+    const { attention, coverage } = bucketsOf('toast')
+    const items = attention.filter(item => item.text.includes('`heading=""`'))
+
+    expect(items).toHaveLength(1)
+    expect(items[0].text).toContain('Angular and React')
+    expect(coverage.filter(item => item.text.includes('`heading=""`'))).toHaveLength(0)
   })
 })
 
