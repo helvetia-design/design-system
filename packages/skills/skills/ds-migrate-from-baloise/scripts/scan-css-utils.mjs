@@ -9,26 +9,12 @@ import {
   lineText,
   readTag,
   scanSourceFiles,
+  SOURCE_EXTENSIONS,
   toSnippet,
 } from './source-scan.mjs'
 
-const EXTENSIONS = new Set([
-  '.ts',
-  '.tsx',
-  '.mts',
-  '.cts',
-  '.js',
-  '.jsx',
-  '.mjs',
-  '.cjs',
-  '.vue',
-  '.html',
-  '.css',
-  '.scss',
-  '.sass',
-  '.less',
-])
-const MARKUP_EXTENSIONS = new Set(['.html', '.vue'])
+const EXTENSIONS = new Set([...SOURCE_EXTENSIONS, '.css', '.scss', '.sass', '.less'])
+const MARKUP_EXTENSIONS = new Set(['.html', '.htm', '.vue'])
 const STYLE_EXTENSIONS = new Set(['.css', '.scss', '.sass', '.less'])
 const JSX_EXTENSIONS = new Set(['.tsx', '.jsx', '.js'])
 const CLASS_ATTRIBUTES = new Set(['ngClass', 'active-class', 'exact-active-class'])

@@ -358,6 +358,19 @@ describe('markup, bindings and comments', () => {
     ])
   })
 
+  it('reads .mts, .cts and .htm files and skips comments in .htm markup', () => {
+    const root = createScratchDir()
+    write(root, 'src/a.mts', "document.body.classList.add('radius-large')\n")
+    write(root, 'src/b.cts', "document.body.classList.add('radius-large')\n")
+    write(root, 'page.htm', '<!-- <div class="col"></div> -->\n<div class="grid">x</div>\n')
+
+    expect(moves(scanCssUtils(root))).toEqual([
+      { file: 'page.htm', line: 2, from: 'grid', to: 'ds-grid', group: 'structure' },
+      { file: 'src/a.mts', line: 1, from: 'radius-large', to: 'radius-lg', group: 'renamed' },
+      { file: 'src/b.cts', line: 1, from: 'radius-large', to: 'radius-lg', group: 'renamed' },
+    ])
+  })
+
   it('ignores Object.prototype names in class strings', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<div class="toString constructor __proto__ hasOwnProperty"></div>\n')

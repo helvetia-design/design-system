@@ -182,6 +182,34 @@ describe('scanBalButton', () => {
     })
   })
 
+  it('lists tags in a React .js file and a Vue template, also when both are passed as paths', () => {
+    const root = createScratchDir()
+    write(root, 'src/App.js', 'export const App = () => <bal-button>Hi</bal-button>\n')
+    write(root, 'src/g.vue', '<template>\n  <bal-button>Go</bal-button>\n</template>\n')
+    const expected = {
+      total: 4,
+      files: [
+        {
+          file: 'src/App.js',
+          findings: [
+            { line: 1, snippet: '<bal-button>' },
+            { line: 1, snippet: '</bal-button>' },
+          ],
+        },
+        {
+          file: 'src/g.vue',
+          findings: [
+            { line: 2, snippet: '<bal-button>' },
+            { line: 2, snippet: '</bal-button>' },
+          ],
+        },
+      ],
+    }
+
+    expect(scanBalButton(root)).toEqual(expected)
+    expect(scanBalButton(root, ['src/App.js', 'src/g.vue'])).toEqual(expected)
+  })
+
   it('lists every tag of a button group and the buttons inside it, each on its own line', () => {
     const root = createScratchDir()
     write(

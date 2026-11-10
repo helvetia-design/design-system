@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { extname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 
-const SKIP_DIRS = new Set([
+export const SKIPPED_DIRS = new Set([
   'node_modules',
   'dist',
   'build',
@@ -14,12 +14,24 @@ const SKIP_DIRS = new Set([
   '.nx',
   'storybook-static',
 ])
-const EXTENSIONS = new Set(['.tsx', '.jsx', '.html', '.ts'])
+export const SOURCE_EXTENSIONS = new Set([
+  '.ts',
+  '.tsx',
+  '.mts',
+  '.cts',
+  '.js',
+  '.jsx',
+  '.mjs',
+  '.cjs',
+  '.vue',
+  '.html',
+  '.htm',
+])
 
 /**
  * Walks the source files under `rootDir`, or only the files and directories in `paths`, and returns the paths that match no source file.
  */
-export function scanSourceFiles(rootDir, collect, { extensions = EXTENSIONS, paths = [] } = {}) {
+export function scanSourceFiles(rootDir, collect, { extensions = SOURCE_EXTENSIONS, paths = [] } = {}) {
   const root = realpathSync(resolve(rootDir))
   if (!statSync(root).isDirectory()) throw new Error(`Scan root is not a directory: ${root}`)
   if (paths.length === 0) {
@@ -41,7 +53,7 @@ export function scanSourceFiles(rootDir, collect, { extensions = EXTENSIONS, pat
     } else if (
       !target.real ||
       isAbsolute(target.rel) ||
-      target.rel.split('/').some(part => part === '..' || SKIP_DIRS.has(part))
+      target.rel.split('/').some(part => part === '..' || SKIPPED_DIRS.has(part))
     ) {
       unmatched.add(target.rel)
     } else if (statSync(target.real).isDirectory()) {
@@ -83,7 +95,7 @@ function walk(rootDir, dir, collect, extensions) {
     const entryPath = canonicalChild(rootDir, join(dir, entry.name))
     if (!entryPath) continue
     if (entry.isDirectory()) {
-      if (SKIP_DIRS.has(entry.name)) continue
+      if (SKIPPED_DIRS.has(entry.name)) continue
       walk(rootDir, entryPath, collect, extensions)
       continue
     }
@@ -118,7 +130,7 @@ function readSource(rootDir, filePath, collect) {
     file: toPosix(relative(rootDir, filePath)),
     text,
     get masked() {
-      masked ??= maskSource(text, extension === '.html')
+      masked ??= maskSource(text, maskKind(extension))
       return masked
     },
     get comments() {
@@ -126,6 +138,12 @@ function readSource(rootDir, filePath, collect) {
       return comments
     },
   })
+}
+
+function maskKind(extension) {
+  if (extension === '.vue') return 'vue'
+  if (extension === '.html' || extension === '.htm') return 'markup'
+  return 'script'
 }
 
 function commentKind(extension) {
@@ -221,10 +239,19 @@ function endOfRegex(text, start) {
   return -1
 }
 
-function maskSource(text, html) {
+function maskSource(text, kind) {
   const mask = Array.from(text)
+  let html = kind !== 'script'
   let i = 0
   while (i < text.length) {
+    if (kind === 'vue' && text[i] === '<') {
+      const tag = /^<(\/?)script\b/i.exec(text.slice(i, i + 10))
+      if (tag) {
+        html = Boolean(tag[1])
+        i += tag[1] ? tag[0].length : readTag(text, i).length
+        continue
+      }
+    }
     if (text.startsWith('<!--', i)) {
       i = blank(mask, i, closeAt(text, '-->', i + 4))
       continue

@@ -31,7 +31,7 @@ node <this-skill-directory>/scripts/detect-baloise.mjs <project-root>
 
 The script prints one JSON object. It resolves the current `latest` dist-tag with `npm view @helvetia-design/core dist-tags`. Use `version` and `aliases` from that JSON. Do not hardcode a version.
 
-The walk skips `node_modules`, `dist`, `build`, `out`, `.next`, `.angular`, `.git`, `.claude`, and `coverage` at any depth.
+The walk skips `node_modules`, `dist`, `build`, `out`, `.next`, `.angular`, `.git`, `.claude`, `coverage`, `.nx` and `storybook-static` at any depth. Every scanner in this skill skips the same folders. The scanners read `.ts`, `.tsx`, `.mts`, `.cts`, `.js`, `.jsx`, `.mjs`, `.cjs`, `.vue`, `.html` and `.htm` files. A step that also needs stylesheets or JSON reads those on top.
 
 If `status` is `nothing-to-migrate`, tell the user: no Baloise Design System installation detected, nothing to migrate. Stop. Do not edit files and do not install.
 
