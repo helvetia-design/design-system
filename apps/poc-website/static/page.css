@@ -1,0 +1,210 @@
+/*
+ * Page-level styling for the demo — the part a website team would write themselves.
+ * Everything here reads design tokens (--ds-*); no colour, radius or spacing value is
+ * hard-coded. There is no hero, header or footer component in the design system, and this
+ * demo does not add one: that is the point, not a workaround (see docs/AEM-with-DS.md).
+ */
+
+/* Skip link
+   ------------------------------------------------------ */
+.demo-skip-link {
+  position: absolute;
+  left: -9999px;
+  z-index: 10;
+  padding: var(--ds-device-space-xs) var(--ds-device-space-base);
+  background: var(--ds-alias-surface-white);
+  color: var(--ds-alias-text-color-primary);
+  border-radius: var(--ds-alias-radius-base);
+}
+
+.demo-skip-link:focus-visible {
+  left: var(--ds-device-space-base);
+  top: var(--ds-device-space-base);
+}
+
+/* Header
+   ------------------------------------------------------ */
+.demo-header {
+  border-bottom: 1px solid var(--ds-alias-border-color-grey-light);
+  background: var(--ds-alias-surface-white);
+}
+
+.demo-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-device-space-sm);
+  padding-block: var(--ds-device-space-sm);
+}
+
+.demo-header__brand {
+  font-family: var(--ds-heading-level-1-font-family);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ds-alias-text-color-primary);
+  text-decoration: none;
+}
+
+.demo-header__nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-device-space-base);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.demo-header__nav a {
+  color: var(--ds-alias-text-color-primary);
+  text-decoration: none;
+}
+
+.demo-header__nav a:hover,
+.demo-header__nav a[aria-current='page'] {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+/* Sections
+   ------------------------------------------------------ */
+.demo-hero,
+.demo-section {
+  padding-block: var(--ds-device-space-2xl);
+}
+
+.demo-section--muted {
+  background: var(--ds-alias-surface-grey-lighter);
+}
+
+.demo-section__heading {
+  margin-bottom: var(--ds-device-space-lg);
+}
+
+.demo-prose {
+  max-width: 44rem;
+}
+
+.demo-prose > .ds-text,
+.demo-prose > ul {
+  margin-bottom: var(--ds-device-space-base);
+}
+
+.demo-prose > .ds-title {
+  margin-top: var(--ds-device-space-lg);
+}
+
+.demo-prose ul {
+  padding-left: 1.25rem;
+}
+
+.demo-prose li {
+  margin-bottom: var(--ds-device-space-3xs);
+}
+
+/* Hero
+   ------------------------------------------------------ */
+.demo-eyebrow {
+  margin: 0 0 var(--ds-device-space-2xs);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ds-alias-text-color-grey);
+}
+
+.demo-hero__image {
+  /* Reserve the aspect ratio before the image arrives so nothing jumps on load. */
+  aspect-ratio: 4 / 3;
+  background: var(--ds-alias-surface-grey-lighter);
+  overflow: hidden;
+}
+
+.demo-hero__image img {
+  height: 100%;
+}
+
+/* Actions
+   ------------------------------------------------------ */
+.demo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-device-space-sm);
+}
+
+/* Figures
+   ------------------------------------------------------ */
+.demo-figure {
+  margin: 0;
+  height: 100%;
+}
+
+.demo-figure picture {
+  aspect-ratio: 4 / 3;
+  background: var(--ds-alias-surface-grey-light);
+  overflow: hidden;
+}
+
+.demo-figure picture img {
+  height: 100%;
+}
+
+.demo-figure figcaption {
+  padding-top: var(--ds-device-space-sm);
+}
+
+.demo-figure .ds-title {
+  margin-bottom: var(--ds-device-space-3xs);
+}
+
+/* Call to action
+   ------------------------------------------------------ */
+.demo-cta {
+  text-align: center;
+}
+
+.demo-cta .demo-actions {
+  justify-content: center;
+}
+
+/* Footer
+   ------------------------------------------------------ */
+.demo-footer {
+  padding-block: var(--ds-device-space-2xl);
+  background: var(--ds-alias-surface-primary);
+  color: var(--ds-alias-text-color-inverted-primary);
+}
+
+.demo-footer__title {
+  margin: 0 0 var(--ds-device-space-xs);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.demo-footer ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.demo-footer li {
+  margin-bottom: var(--ds-device-space-3xs);
+}
+
+.demo-footer a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.demo-footer a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.demo-footer__legal {
+  margin: var(--ds-device-space-lg) 0 0;
+  font-size: 0.875rem;
+  opacity: 0.75;
+}

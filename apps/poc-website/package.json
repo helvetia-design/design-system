@@ -1,0 +1,34 @@
+{
+  "name": "poc-website",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "copy-assets": "copyfiles -u 5 \"node_modules/@helvetia-design/core/dist/design-system/**/*\" public/design-system && copyfiles -f node_modules/@helvetia-design/tokens/dist/css/base.tokens.css node_modules/@helvetia-design/styles/dist/css/design-system.local.min.css node_modules/@helvetia-design/styles/dist/css/utilities.min.css public && copyfiles -f \"node_modules/@helvetia-design/assets/src/fonts/*.woff2\" public/fonts",
+    "predev": "pnpm copy-assets",
+    "dev": "tsx watch server.ts",
+    "prestart": "pnpm copy-assets",
+    "start": "tsx server.ts",
+    "prebuild": "pnpm copy-assets",
+    "build": "tsc --noEmit",
+    "lint": "eslint .",
+    "play:run": "pnpm exec playwright test"
+  },
+  "dependencies": {
+    "@helvetia-design/assets": "workspace:*",
+    "@helvetia-design/core": "workspace:*",
+    "@helvetia-design/styles": "workspace:*",
+    "@helvetia-design/tokens": "workspace:*",
+    "compression": "catalog:",
+    "express": "catalog:"
+  },
+  "devDependencies": {
+    "@types/compression": "1.8.1",
+    "@types/express": "5.0.6",
+    "@types/node": "24.19.2",
+    "copyfiles": "2.4.1",
+    "eslint": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:"
+  }
+}

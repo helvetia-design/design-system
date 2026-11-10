@@ -22,6 +22,7 @@
     "app:angular": "turbo run build --filter=@helvetia-design/core --filter=@helvetia-design/angular --filter=@helvetia-design/styles && pnpm --filter integration-angular start",
     "app:next": "turbo run build --filter=@helvetia-design/core --filter=@helvetia-design/react --filter=@helvetia-design/styles && pnpm --filter integration-next start",
     "app:ssr": "turbo run build --filter=@helvetia-design/core --filter=@helvetia-design/styles && pnpm --filter integration-ssr start",
+    "app:poc": "turbo run build --filter=@helvetia-design/core --filter=@helvetia-design/styles && pnpm --filter poc-website start",
     "_playwright": "=============================================== Playwright =================================================",
     "play": "pnpm --filter @helvetia-design/core play",
     "play:file": "pnpm --filter @helvetia-design/core play:file",
