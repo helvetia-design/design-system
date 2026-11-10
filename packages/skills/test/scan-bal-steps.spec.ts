@@ -428,7 +428,7 @@ describe('scanBalSteps', () => {
       {
         line: 3,
         snippet:
-          "<BalSteps value={currentStep.value} color={cond ? 'green' : 'light-blue'} clickable onBalChange={event =>",
+          "<BalSteps value={currentStep.value} color={cond ? 'green' : 'light-blue'} clickable onBalChange={event => goToStep(String(event.detail ?? x))}>",
       },
       {
         line: 5,

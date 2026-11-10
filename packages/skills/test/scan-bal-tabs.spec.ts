@@ -428,7 +428,7 @@ describe('scanBalTabs', () => {
     const byFile = Object.fromEntries(result.files.map(entry => [entry.file, entry.findings]))
 
     expect(byFile['Page.tsx']).toEqual([
-      { line: 3, snippet: '<BalTabs value={tab} onBalChange={event =>' },
+      { line: 3, snippet: "<BalTabs value={tab} onBalChange={event => setParam('tab', String(event.detail ?? x))}>" },
       {
         line: 5,
         snippet: '<BalTabItem key={entry.value} value={entry.value} label={entry.label} icon={entry.icon} />',
