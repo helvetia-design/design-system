@@ -278,6 +278,10 @@ _Avoid_: parent (ambiguous — the owner may be the inner element, as `ds-button
 An independent DS component, with its own component folder, that another component uses (e.g. `ds-icon` inside `ds-button`).
 _Avoid_: child component, inner component
 
+**Attachment**:
+An optional nested component that its host positions out of flow on the host's own box, e.g. `ds-badge` on the top-right corner of `ds-button`, `ds-tab` or `ds-card`. Optional means it can be present or absent — slotted by the consumer, or rendered by the host behind a prop. The host owns the placement; the attachment owns only its own look. Declared on the host with an `@attachment` JSDoc tag. A nested component that is always present at a fixed place is not an attachment.
+_Avoid_: anchor, overlay, positioned slot, badge slot
+
 ### Usage-Category Taxonomy
 
 Every component directory lives under a lowercase-plural **category** folder:

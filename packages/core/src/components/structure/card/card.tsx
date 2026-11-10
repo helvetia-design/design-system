@@ -20,6 +20,10 @@ import { HTMLStencilElement } from '@stencil/core/internal'
  * @slot header - Content displayed in the card header.
  * @slot footer - Content displayed in the card footer.
  * @part card - The card container element.
+ * @attachment ds-badge top-right - Optional badge as the first child of the default slot, centered on the card's top-right corner.
+ * @attachment ds-tag top-left position=left - Optional tag as the first child of the default slot, centered on the card's top edge, aligned left.
+ * @attachment ds-tag top-center position=center - Optional tag as the first child of the default slot, centered on the card's top edge.
+ * @attachment ds-tag top-right position=right - Optional tag as the first child of the default slot, centered on the card's top edge, aligned right.
  */
 @Component({
   tag: 'ds-card',

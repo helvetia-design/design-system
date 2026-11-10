@@ -1,6 +1,6 @@
 ---
 name: ds-token-check
-description: Audit a component family's SCSS/TSX for design-token layer violations (raw Global/Alias/Device usage instead of a Component token), cross-component token borrows, Figma-readiness gaps (hardcoded literals, missing/typo tokens), and naming-anatomy drift in the Component-layer tokens it actually uses. Writes a single persisted Markdown report (<family>.token-check.md) for a later agent/session to fix from — never edits Base.tokens.json or any component source file itself. Use when the user asks to check/audit/review/lint a component's tokens, or before running ds-code-to-figma to make sure there's no token gap.
+description: Audit a component family's SCSS/TSX for design-token layer violations (raw Global/Alias/Device usage instead of a Component token), cross-component token borrows, Figma-readiness gaps (hardcoded literals, missing/typo tokens), naming-anatomy drift in the Component-layer tokens it actually uses, and an explicit Figma Property Checklist (Border/Background/Radius/Typography/Text-Color/Opacity/Padding/Gap/Margin, crossed per @Prop() variant×state) proving every Figma-bindable property has a Component token behind it. Writes a single persisted Markdown report (<family>.token-check.md) for a later agent/session to fix from — never edits Base.tokens.json or any component source file itself. Use when the user asks to check/audit/review/lint a component's tokens, or before running ds-code-to-figma to make sure there's no token gap.
 ---
 
 # ds-token-check
@@ -42,13 +42,16 @@ flowchart TD
 
     R4["scan.js: run the 5 ported naming rules<br/>against each derived key's subtree"]:::code --> R5
 
-    R5["Agent reads the same files directly<br/>for hardcoded literals scan.js can't see<br/>(colors, rem/px sizes, bare radii, etc.)"]:::code --> R6
+    R5["Agent reads the same files directly<br/>for hardcoded literals scan.js can't see<br/>(colors, rem/px sizes, bare radii, etc.)"]:::code --> R5b
+
+    R5b["scan.js: parse @Prop() enums (.tsx),<br/>generate the Figma Property Checklist<br/>matrix (9 categories × variant × state),<br/>and run the postcss-scss hardcoded-<br/>declaration pass"]:::code --> R6
 
     R6{"Classify each finding"}:::code
     R6 -->|global / alias / device,<br/>used raw| V["VIOLATION —<br/>needs own Component token"]:::code
     R6 -->|component-foreign<br/>(another component's own token)| G["REVIEW —<br/>confirm intentional reuse"]:::code
     R6 -->|hardcoded literal,<br/>or missing/typo token| P["GAP —<br/>blocks a clean Figma bind"]:::code
     R6 -->|existing Component token,<br/>anatomy rule failed| N["NAMING —<br/>wrong segment order, casing,<br/>typo, abbreviation, font- prefix"]:::code
+    R6 -->|transition/animation property,<br/>or brand-invariant constant<br/>already marked in source| E["EXEMPT —<br/>not a token candidate,<br/>informational only"]:::code
 
     V --> L["For each VIOLATION/GAP:<br/>reverse-lookup the value against<br/>Base.tokens.json's Alias layer"]:::code
     L -->|match found| M1["Propose that Alias as the<br/>new Component token's resolution"]:::code
@@ -59,8 +62,9 @@ flowchart TD
     G --> T
     P --> T
     N --> T
+    E --> T
 
-    T["Assemble report: a ToC table<br/>(Severity/Location/short Issue),<br/>then one detailed section per finding<br/>with a stated Fix"]:::code --> W["Write <family>.token-check.md<br/>next to the family owner's file"]:::code
+    T["Assemble report: a ToC table<br/>(Severity/Location/short Issue),<br/>a Figma Property Checklist matrix,<br/>then one detailed section per finding<br/>with a stated Fix"]:::code --> W["Write <family>.token-check.md<br/>next to the family owner's file"]:::code
 
     W --> H{{"Present summary to user"}}:::human
 
@@ -103,6 +107,85 @@ exists anywhere in this skill.
 - MUST run the naming-anatomy rules only against Component-layer keys the family's code
   actually references — not every key that happens to share a name fragment, and not a
   blind walk of the entire `🧩 Component` tree.
+- NEVER flag a `transition`/`animation` property (duration, easing/timing function,
+  `@keyframes`, delay) as VIOLATION or GAP, even when fully hardcoded (e.g.
+  `transition: transform 0.2s ease-in-out;`). Motion timing is out of scope for this
+  skill — there is no Alias/Device motion-token layer in `Base.tokens.json` today, and
+  proposing one is a design-system-wide decision, not a per-component fix. Report these
+  as `EXEMPT` (informational) if mentioned at all, never as a blocker.
+- NEVER flag a hardcoded literal as GAP if it represents a **brand-invariant constant**
+  — a value that is identical across every brand/theme by construction and will never
+  come from a design token (e.g. a fixed rotation angle for a "turn" modifier, a
+  decorative drop-shadow that isn't part of the Alias elevation scale, a structural
+  ratio that is really a layout decision, not a themeable one). The tell: ask "would
+  this value ever need to differ per brand?" — if genuinely no, it isn't a token gap.
+  - If the source already carries a marker comment of the form
+    `// ds-token-check: intentional — <reason>` on or directly above the value, treat it
+    as `EXEMPT` and don't re-report it as a gap in future runs.
+  - If no marker exists yet but the agent judges the value brand-invariant, the
+    **Fix** for that finding is to add the marker comment in the component's own file
+    (not to invent a Component/Alias token for it) — state this explicitly rather than
+    proposing a token. This still needs a human to add the comment, since the skill
+    itself never edits source files.
+  - This judgment call belongs in the report, not silence: still list the finding (as
+    `EXEMPT` once marked, or as a `GAP` with a "mark as intentional" fix before it's
+    marked) so the family's full hardcoded-literal inventory stays visible — don't just
+    drop it.
+
+## Figma Property Checklist
+
+Beyond the layer/naming findings above, every report also includes a **Figma Property
+Checklist** — an explicit, enumerated pass over the 9 property categories a Figma
+designer needs bound as variables, so nothing is left to "the agent happened to notice
+it while reading the file":
+
+**Border · Background · Radius · Typography (font-family, font-weight, font-size,
+line-height) · Text-Color · Opacity · Padding · Gap · Margin**
+
+- Each category is crossed only against the `@Prop()` variant dimension(s) that
+  actually gate it for this component (e.g. button's Border/Background/Text-Color vary
+  by `color`×state; its Typography/Radius/Gap/Padding vary by `size` only) — never a
+  blind full cross-product of every category against every prop.
+- Variant/state axes come from `@Prop()` enum options in the family's `.tsx` (via the
+  repo-wide `@OneOf(SOME_CONST)` / `@Type('boolean')` decorator convention), not from
+  guessing at SCSS selector class names.
+- Every category gets a row in every report — a found token, a `GAP` cross-referenced
+  to a numbered finding, or an explicit `N/A — <reason>` when the property genuinely
+  doesn't apply to this component. Nothing is silently omitted.
+
+`scan.js` does the mechanical half of this in two different ways, because they're
+genuinely different problems:
+
+1. **Found-token cells** (`buildFigmaChecklist`) are resolved by generating candidate
+   token names from the naming convention
+   (`--ds-<family>-<dimension>-<value>-<state>-<suffix>`) and checking each against the
+   already-compiled token set — **not** by parsing SCSS source. This matters: components
+   like `button` build their per-variant tokens via `@each $color in $colors { @include
+color($color) }` with `#{$color}` interpolation, so a string like
+   `--ds-button-color-secondary-hover-background` never appears literally anywhere in
+   the `.scss` source for a text scan to find — it only exists in the compiled CSS.
+   Generate-and-check is the only reliable way to catch a gap in that pattern (e.g. one
+   color variant missing its hover token while every other color has one).
+2. **Hardcoded-literal cells** (`findHardcodedDeclarations`) — properties with no token
+   at all, so there's no name to generate — are found by walking a real SCSS AST
+   (`postcss-scss`), not line regex. A declaration is reported only if its value
+   contains **no** `var(--...)` of any kind (including the component's own private
+   `--_<component>-*` indirection layer, which is already covered by the existing
+   `--ds-*` usage extraction one hop downstream) and isn't a generic reset keyword
+   (`none`, `auto`, `0`, …) or a `transition`/`animation` property (already `EXEMPT` per
+   the Rules above).
+
+**Known limitation — read before trusting a row's `states` list as exhaustive:** the
+generator discovers which state words a dimension uses by checking whether they're
+glued to the _value_ segment (`color-primary-hover-background`). Some components put
+`disabled`/`loading` in the **value** position instead, shared across every other
+variant value (e.g. button's `--ds-button-color-disabled-base-background`, not
+per-color). The generator won't report a false `GAP` for this — it just won't discover
+it as part of the crossed dimension either, so that state quietly doesn't appear in the
+row at all. Before writing the report, manually check whether the family has a
+shared/uncrossed disabled or loading token namespace like this and call it out
+separately — don't let its absence from the generated `states` array read as "not
+styled."
 
 ## Prerequisites
 
@@ -115,10 +198,13 @@ tokens` first if it's missing or `Base.tokens.json` changed since the last build
 
 Read only what the current step needs:
 
-- [`scan.js`](scan.js) — the mechanical extraction/classification/key-derivation script
-  (see "Inputs" below for usage). Read its top-of-file comments for exactly what it does
-  and does not cover (it does not detect hardcoded literals — that's the agent's job
-  while reading the same files).
+- [`scan.js`](scan.js) — the mechanical extraction/classification/key-derivation script,
+  plus the Figma Property Checklist generator (`buildFigmaChecklist`) and the
+  `postcss-scss`-based hardcoded-declaration pass (`findHardcodedDeclarations`) (see
+  "Inputs" below for usage). Read its top-of-file and per-function comments for exactly
+  what each pass does and does not cover — in particular the "Known limitation" note on
+  `disabled`/`loading` states living in the value position for some components (see
+  "Figma Property Checklist" above).
 - [`naming-rules.js`](naming-rules.js) — the five ported naming-anatomy rules (font-
   prefix, state-word typos, PascalCase casing, segment order, `Bg`→`Background`), each
   with a comment on why a sixth rule from the original skill (`color-variant-order`) was
@@ -144,9 +230,13 @@ node .claude/skills/ds-token-check/scan.js tabs
 node .claude/skills/ds-token-check/scan.js tab    # resolves up to the tabs family too
 ```
 
-Output is JSON: the classified usage list, the derived `componentKeys`, and the
-`naming` violations per key. The agent reads this, then reads the same family's files
-directly to add the hardcoded-literal pass, before assembling and writing the report.
+Output is JSON: the classified usage list, the derived `componentKeys`, the `naming`
+violations per key, the parsed `propEnums` (the family's `@Prop()` variant dimensions),
+the `figmaChecklist` matrix (found/missing per category×variant×state), and
+`hardcodedDeclarations` (literal values with no token at all). The agent reads this,
+then reads the same family's files directly to sanity-check the checklist (especially
+the disabled/loading limitation above) and add anything the mechanical passes can't see,
+before assembling and writing the report.
 
 ## Validation
 
@@ -176,6 +266,25 @@ Before writing the report, confirm:
   rename it.
 - Every ToC row's `#` matches the heading number of its detail section below, and the
   ToC `Issue` text is a short title, not a restatement of the full recommendation.
+- No `transition`/`animation` property was reported as `VIOLATION` or `GAP` — motion
+  timing is always `EXEMPT` or omitted entirely, per the rule above.
+- Every hardcoded literal judged brand-invariant (and therefore `EXEMPT` or a
+  "mark as intentional" `GAP`) is one the agent can actually justify as never differing
+  per brand/theme — don't wave through a real theming gap (e.g. a color, a spacing
+  value tied to density) under this exemption just because it's convenient.
+- Every one of the 9 Figma Property Checklist categories (Border, Background, Radius,
+  Typography, Text-Color, Opacity, Padding, Gap, Margin) appears as a row in the report
+  for this family — a found token, a `GAP` cross-referenced to a numbered finding, or an
+  explicit `N/A — <reason>` — never silently dropped because `scan.js` reported
+  `notFoundAnywhere`. `notFoundAnywhere` means "the generator's naming guesses didn't
+  find it," not "this component has no such property" — confirm which one it actually
+  is before writing N/A.
+- The disabled/loading value-position limitation (see "Figma Property Checklist") was
+  checked by hand for this family, not just left to whatever `figmaChecklist.states`
+  happened to discover.
+- Every `hardcodedDeclarations` finding from `scan.js` was triaged into VIOLATION/GAP/
+  EXEMPT like any other finding — not left out of the report just because it came from
+  the mechanical pass instead of a manual read.
 
 ## Completion Criteria
 
@@ -184,6 +293,8 @@ Before writing the report, confirm:
   rules.
 - Every hardcoded literal that represents a real design value (not structural CSS like
   `flex: 1` or `display: flex`) has been identified by reading the files.
+- Every one of the 9 Figma Property Checklist categories has a row for this family —
+  found token, GAP, or explicit N/A.
 - `<family>.token-check.md` has been written next to the family owner's file, left
   unstaged.
 - No other file was modified. There is no further action from this skill — fixing is a
@@ -209,6 +320,9 @@ language: say what's broken and what to do about it, skip the hedging.
 - Every detail section MUST end with a **Fix** line: the concrete change (new token
   name, its resolution, or the specific edit) — never leave a finding without a stated
   next step, even a GAP that needs design input first (state what input is needed).
+- `EXEMPT` findings get a **Fix** line too, but it's either "none — already marked
+  intentional" or "add a `// ds-token-check: intentional — …` comment at this line" —
+  never a proposed token.
 
 ```markdown
 # Token Check — tabs family
@@ -227,6 +341,26 @@ Scanned: tabs/, tab/, tab-panel/ · Component-layer keys checked: Tabs, TabPanel
 | 6   | NAMING    | Base.tokens.json   | "Unselected" flagged as a typo           |
 
 Severity counts: 2 VIOLATION · 1 REVIEW · 2 GAP · 1 NAMING
+
+## Figma Property Checklist
+
+Variant dimensions: `color` (13 options) · `size` (sm, lg) — from `tab.tsx` `@Prop()`.
+
+| Category   | Crossed by    | Status                                                                        |
+| ---------- | ------------- | ----------------------------------------------------------------------------- |
+| Border     | color × state | ✅ all 39 cells resolved                                                      |
+| Background | color × state | ⚠️ 1 missing — see finding #4                                                 |
+| Radius     | size          | ✅ all 2 cells resolved                                                       |
+| Typography | size          | ✅ all 8 cells resolved (family/weight/size/line-height)                      |
+| Text-Color | color × state | ✅ all 39 cells resolved                                                      |
+| Opacity    | —             | N/A — tab has no opacity-based state, disabled uses dedicated color tokens    |
+| Padding    | size          | ✅ all 2 cells resolved                                                       |
+| Gap        | size          | ✅ all 2 cells resolved                                                       |
+| Margin     | —             | N/A — tab sets no margin; layout is owned by the parent `tabs` flex container |
+
+`disabled`/`loading` check: tab's disabled styling uses a shared, uncrossed
+`--ds-tab-color-disabled-*` namespace (not crossed per-color) — confirmed by hand, not
+by the generator (see "Known limitation" in SKILL.md).
 
 ## Findings
 

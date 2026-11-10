@@ -40,6 +40,7 @@ import { type IconColor } from '../../media/brand-icon/brand-icon.interfaces'
  * @part icon - The leading icon wrapper (or the brand icon wrapper when `brandIcon` is set).
  * @part label - The text label wrapper (`<span>`).
  * @part icon-right - The trailing icon wrapper.
+ * @attachment ds-badge top-right - Optional badge in the default slot, pinned just outside the button's top-right corner.
  */
 @Component({
   tag: 'ds-button',

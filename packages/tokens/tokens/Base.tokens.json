@@ -11212,6 +11212,28 @@
             "com.figma.variableId": "VariableID:137:1460"
           }
         }
+      },
+      "Padding": {
+        "SM": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Size.0.875}"
+        },
+        "Base": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Size.1}"
+        },
+        "MD": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Size.1.5}"
+        },
+        "LG": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Size.2}"
+        },
+        "XL": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Size.2.5}"
+        }
       }
     },
     "BrandIcon": {
@@ -22318,6 +22340,27 @@
             "com.figma.variableId": "VariableID:137:2672"
           }
         },
+        "0.875": {
+          "$type": "dimension",
+          "$value": {
+            "value": 0.875,
+            "unit": "px"
+          }
+        },
+        "1": {
+          "$type": "dimension",
+          "$value": {
+            "value": 1,
+            "unit": "px"
+          }
+        },
+        "1.5": {
+          "$type": "dimension",
+          "$value": {
+            "value": 1.5,
+            "unit": "px"
+          }
+        },
         "2": {
           "$type": "dimension",
           "$value": {
@@ -22329,6 +22372,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": "VariableID:137:2673"
+          }
+        },
+        "2.5": {
+          "$type": "dimension",
+          "$value": {
+            "value": 2.5,
+            "unit": "px"
           }
         },
         "4": {

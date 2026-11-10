@@ -8,6 +8,7 @@
 const fs = require('fs')
 const path = require('path')
 const { globSync } = require('glob')
+const postcssScss = require('postcss-scss')
 const { checkNamingForKey, pascalToKebab } = require('./naming-rules')
 
 const COMPONENTS_ROOT = 'packages/core/src/components'
@@ -202,6 +203,297 @@ function loadDefinedTokens(dsRoot) {
   return defined
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// Figma Property Checklist
+//
+// Builds the "is every Figma-bindable property backed by a Component token"
+// matrix (border/background/radius/typography/text-color/opacity/padding/
+// gap/margin, crossed per @Prop() variant×state). Two independent passes:
+//
+//  1. buildFigmaChecklist — for the "found token" side. Doesn't parse SCSS
+//     at all: it generates CANDIDATE token names from the naming convention
+//     (--ds-<family>-<dimension>-<value>-<state>-<suffix>) and checks each
+//     against the already-compiled token set. This sidesteps a real problem
+//     with parsing SCSS source directly — components like button build their
+//     per-variant tokens via `@each $color in $colors { @include
+//     color($color) }` with `#{$color}` interpolation, so the literal
+//     `--ds-button-color-secondary-hover-background` string never appears
+//     anywhere in the .scss source text for scan.js to find; it only exists
+//     in the compiled CSS. Generating candidates and checking existence
+//     against the compiled set is the only reliable way to catch gaps in
+//     that pattern.
+//
+//  2. findHardcodedDeclarations — for the "no token at all, literal value"
+//     side, which generation+existence-checking can't find (there's no name
+//     to guess). This still needs to read the actual SCSS declarations via a
+//     real parser (postcss-scss, not line regex) so it survives SCSS nesting
+//     and mixin bodies the old line-based VAR_RE never had to deal with.
+//
+// Both passes are mechanical and produce candidates/findings for the agent
+// to interpret — same division of labor as the rest of this script: scan.js
+// extracts, the agent judges GAP vs N/A vs false positive before writing
+// the report.
+// ─────────────────────────────────────────────────────────────────────────
+
+// Which @Prop()-declared enum crosses which category's candidate tokens.
+// Suffix lists are the naming-convention guesses this generator tries —
+// tuned against what's actually in the repo today (see button.figma.md),
+// not an exhaustive spec. A category that matches zero suffixes for a given
+// component is reported as "not found anywhere" rather than silently
+// dropped — the agent still has to look and decide GAP vs N/A.
+const CATEGORY_SUFFIXES = {
+  'Border': ['border', 'border-color', 'border-width', 'border-style'],
+  'Background': ['background', 'background-color'],
+  'Radius': ['radius', 'border-radius'],
+  'Typography': ['font-family', 'font-weight', 'font-size', 'line-height'],
+  'Text-Color': ['text', 'color', 'text-color'],
+  'Opacity': ['opacity'],
+  'Padding': ['padding-x', 'padding-y', 'padding', 'padding-inline', 'padding-block'],
+  'Gap': ['gap', 'row-gap', 'column-gap'],
+  'Margin': ['margin', 'margin-inline', 'margin-block'],
+}
+
+// Closed vocabulary of interaction-state suffixes to probe for, lowercased
+// to match CSS custom property naming. Mirrors naming-rules.js's STATE_WORDS
+// (its canonical casing lives there; this is the generator's own probe list,
+// kept separate since this one drives token-NAME GENERATION, not JSON key
+// validation).
+const STATE_CANDIDATES = ['base', 'hover', 'active', 'focus', 'disabled', 'selected']
+
+// Maps a raw CSS property name (direct declaration, e.g. `border-radius:`)
+// to a checklist category. Used by findHardcodedDeclarations.
+const PROPERTY_CATEGORY_MAP = {
+  'border': 'Border',
+  'border-color': 'Border',
+  'border-width': 'Border',
+  'border-style': 'Border',
+  'border-top': 'Border',
+  'border-right': 'Border',
+  'border-bottom': 'Border',
+  'border-left': 'Border',
+  'background': 'Background',
+  'background-color': 'Background',
+  'border-radius': 'Radius',
+  'font-family': 'Typography',
+  'font-weight': 'Typography',
+  'font-size': 'Typography',
+  'line-height': 'Typography',
+  'color': 'Text-Color',
+  'opacity': 'Opacity',
+  'padding': 'Padding',
+  'padding-inline': 'Padding',
+  'padding-block': 'Padding',
+  'padding-top': 'Padding',
+  'padding-right': 'Padding',
+  'padding-bottom': 'Padding',
+  'padding-left': 'Padding',
+  'padding-inline-start': 'Padding',
+  'padding-inline-end': 'Padding',
+  'gap': 'Gap',
+  'row-gap': 'Gap',
+  'column-gap': 'Gap',
+  'margin': 'Margin',
+  'margin-inline': 'Margin',
+  'margin-block': 'Margin',
+  'margin-top': 'Margin',
+  'margin-right': 'Margin',
+  'margin-bottom': 'Margin',
+  'margin-left': 'Margin',
+}
+
+// Keyword heuristic for CUSTOM property names (--mod-button-color-text,
+// --_button-px, the vars.local() local-name position) where there's no
+// standard CSS property to look up directly. Order matters: check the more
+// specific word ("radius") before the word it's a substring neighbour of
+// ("border-radius" contains both "border" and "radius" — radius must win).
+function categorizeLocalName(name) {
+  const n = name.toLowerCase()
+  if (n.includes('radius')) return 'Radius'
+  if (n.includes('background')) return 'Background'
+  if (n.includes('border')) return 'Border'
+  if (n.includes('opacity')) return 'Opacity'
+  if (n.includes('font') || n.includes('line-height') || n.includes('lineheight')) return 'Typography'
+  if (n.includes('gap')) return 'Gap'
+  if (n.includes('margin')) return 'Margin'
+  if (/(^|[-_])(padding|px|py)([-_]|$)/.test(n)) return 'Padding'
+  if (n.includes('color')) return 'Text-Color'
+  return null
+}
+
+function camelToKebab(str) {
+  return str.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
+}
+
+const PROP_BLOCK_RE = /@Prop\([^)]*\)([\s\S]*?)readonly\s+(\w+)/g
+const ONE_OF_RE = /@OneOf\((\w+)\)/
+const TYPE_RE = /@Type\('(\w+)'\)/
+const CONST_ARRAY_RE = /export\s+const\s+([A-Z][A-Z0-9_]*)\s*=\s*\[([\s\S]*?)\]\s*as\s+const/g
+const STRING_LITERAL_RE = /['"]([^'"]+)['"]/g
+
+function parseConstArrays(content) {
+  const consts = new Map()
+  let m
+  CONST_ARRAY_RE.lastIndex = 0
+  while ((m = CONST_ARRAY_RE.exec(content))) {
+    const values = []
+    let sm
+    STRING_LITERAL_RE.lastIndex = 0
+    while ((sm = STRING_LITERAL_RE.exec(m[2]))) values.push(sm[1])
+    consts.set(m[1], values)
+  }
+  return consts
+}
+
+// Reads every @Prop() in the family's .tsx files and resolves it to its
+// variant dimension, via the repo-wide @OneOf(SOME_CONST) / @Type('boolean')
+// decorator convention (confirmed in use across 56+ components, not
+// button-specific). SOME_CONST is then resolved against the sibling
+// `export const SOME_CONST = [...] as const` arrays in *.interfaces.ts.
+// Only enum props with >=2 options and boolean props are kept — string/
+// number props (href, label, …) aren't variant dimensions.
+function parseFamilyProps(familyDir) {
+  const tsxFiles = globSync(`${familyDir}/**/*.tsx`, { ignore: `${familyDir}/test/**` })
+  const interfaceFiles = globSync(`${familyDir}/**/*.interfaces.ts`, { ignore: `${familyDir}/test/**` })
+
+  const consts = new Map()
+  for (const file of interfaceFiles) {
+    const content = fs.readFileSync(file, 'utf-8')
+    for (const [name, values] of parseConstArrays(content)) consts.set(name, values)
+  }
+
+  const propEnums = {}
+  for (const file of tsxFiles) {
+    const content = fs.readFileSync(file, 'utf-8')
+    let m
+    PROP_BLOCK_RE.lastIndex = 0
+    while ((m = PROP_BLOCK_RE.exec(content))) {
+      const [, blob, propName] = m
+      const oneOf = blob.match(ONE_OF_RE)
+      const typeMatch = blob.match(TYPE_RE)
+      if (oneOf && consts.has(oneOf[1])) {
+        const values = consts.get(oneOf[1])
+        if (values.length >= 2) propEnums[propName] = { kind: 'enum', values, source: path.basename(file) }
+      } else if (typeMatch && typeMatch[1] === 'boolean') {
+        propEnums[propName] = { kind: 'boolean', source: path.basename(file) }
+      }
+    }
+  }
+  return propEnums
+}
+
+// Generates the property×variant×state matrix by candidate-name generation
+// + existence check against the compiled token set (see file-header comment
+// for why this can't be done by parsing SCSS source for component-own
+// categories gated by an @Prop() enum (color, size, …). Each (category,
+// suffix) is probed against every enum dimension using the dimension's
+// FIRST value to discover whether that dimension gates it at all, and if
+// so, which state words it uses — then the full value×state grid is
+// generated and checked. A (category, suffix) matching no dimension falls
+// back to an "ungated" probe (a single component-level token, optionally
+// stateful, not crossed by any variant) before being reported as not found.
+function buildFigmaChecklist(familyKebab, propEnums, definedTokens) {
+  const enumDims = Object.entries(propEnums).filter(([, p]) => p.kind === 'enum')
+  const rows = []
+
+  for (const [category, suffixes] of Object.entries(CATEGORY_SUFFIXES)) {
+    for (const suffix of suffixes) {
+      let matchedAnyDimension = false
+
+      for (const [dimName, dim] of enumDims) {
+        const dimKebab = camelToKebab(dimName)
+        const probeValue = dim.values[0]
+        const statefulHits = STATE_CANDIDATES.filter(state =>
+          definedTokens.has(`--ds-${familyKebab}-${dimKebab}-${probeValue}-${state}-${suffix}`),
+        )
+        const statelessHit = definedTokens.has(`--ds-${familyKebab}-${dimKebab}-${probeValue}-${suffix}`)
+        if (statefulHits.length === 0 && !statelessHit) continue
+
+        matchedAnyDimension = true
+        const states = statefulHits.length > 0 ? statefulHits : [null]
+        const cells = []
+        for (const value of dim.values) {
+          for (const state of states) {
+            const token = state
+              ? `--ds-${familyKebab}-${dimKebab}-${value}-${state}-${suffix}`
+              : `--ds-${familyKebab}-${dimKebab}-${value}-${suffix}`
+            cells.push({ dimension: dimName, value, state, token, found: definedTokens.has(token) })
+          }
+        }
+        rows.push({ category, suffix, dimension: dimName, states, cells })
+      }
+
+      if (!matchedAnyDimension) {
+        const statefulHits = STATE_CANDIDATES.filter(state =>
+          definedTokens.has(`--ds-${familyKebab}-${state}-${suffix}`),
+        )
+        const statelessToken = `--ds-${familyKebab}-${suffix}`
+        const statelessHit = definedTokens.has(statelessToken)
+
+        if (statefulHits.length > 0 || statelessHit) {
+          const states = statefulHits.length > 0 ? statefulHits : [null]
+          const cells = states.map(state => {
+            const token = state ? `--ds-${familyKebab}-${state}-${suffix}` : statelessToken
+            return { dimension: null, value: null, state, token, found: definedTokens.has(token) }
+          })
+          rows.push({ category, suffix, dimension: null, states, cells })
+        } else {
+          rows.push({ category, suffix, dimension: null, states: [], cells: [], notFoundAnywhere: true })
+        }
+      }
+    }
+  }
+
+  return rows
+}
+
+// Value strings that are never a token candidate regardless of property —
+// generic CSS keywords/resets, not design values.
+const HARDCODED_SKIP_VALUES = new Set(['none', 'inherit', 'initial', 'unset', 'auto', '0', 'normal'])
+
+// Finds literal (non-var()) values on properties this skill cares about, by
+// walking a real SCSS AST (postcss-scss) instead of line regex — survives
+// nested rules, @mixin bodies, and @each loops the old VAR_RE never handled.
+// This is strictly the "no token at all" side; anything resolving through
+// ANY var(--...) — including the component's own private indirection layer
+// (var(--_button-color-background)), not just a direct var(--ds-*) — is
+// skipped here, because that hop is already covered by the existing
+// --ds-* usage extraction elsewhere in this script (classify()) and by
+// buildFigmaChecklist's existence check. This pass only wants declarations
+// with NO variable indirection at all.
+function findHardcodedDeclarations(scssFiles, dsRoot) {
+  const findings = []
+  for (const file of scssFiles) {
+    const content = fs.readFileSync(file, 'utf-8')
+    let root
+    try {
+      root = postcssScss.parse(content, { from: file })
+    } catch {
+      // Unparsable fragment (rare SCSS syntax) — not fatal, the agent's
+      // manual file read during the report pass is the fallback for this.
+      continue
+    }
+
+    root.walkDecls(decl => {
+      const value = decl.value.trim()
+      if (value.includes('var(--')) return
+      if (HARDCODED_SKIP_VALUES.has(value)) return
+      if (/^(transition|animation)/.test(decl.prop)) return
+
+      const category = decl.prop.startsWith('--') ? categorizeLocalName(decl.prop) : PROPERTY_CATEGORY_MAP[decl.prop]
+      if (!category) return
+
+      findings.push({
+        file: path.relative(dsRoot, file),
+        line: decl.source?.start?.line ?? null,
+        property: decl.prop,
+        value,
+        category,
+      })
+    })
+  }
+  return findings
+}
+
 function scan(componentName) {
   const dsRoot = findDSRoot()
   const found = findFamilyDir(dsRoot, componentName)
@@ -232,6 +524,11 @@ function scan(componentName) {
     naming.push({ key, kebab, violations: checkNamingForKey(kebab, componentLayer[key]) })
   }
 
+  const propEnums = parseFamilyProps(familyDir)
+  const figmaChecklist = buildFigmaChecklist(familyKebab, propEnums, definedTokens)
+  const scssFiles = files.filter(f => f.endsWith('.scss'))
+  const hardcodedDeclarations = findHardcodedDeclarations(scssFiles, dsRoot)
+
   return {
     dsRoot,
     category,
@@ -242,10 +539,22 @@ function scan(componentName) {
     usages,
     componentKeys: [...componentKeys.keys()],
     naming,
+    propEnums,
+    figmaChecklist,
+    hardcodedDeclarations,
   }
 }
 
-module.exports = { scan, findFamilyDir, findDSRoot }
+module.exports = {
+  scan,
+  findFamilyDir,
+  findDSRoot,
+  parseFamilyProps,
+  buildFigmaChecklist,
+  findHardcodedDeclarations,
+  CATEGORY_SUFFIXES,
+  PROPERTY_CATEGORY_MAP,
+}
 
 if (require.main === module) {
   const componentName = process.argv[2]

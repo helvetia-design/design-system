@@ -15,6 +15,7 @@ import { ModalPresentDetail, ModalDismissDetail } from './modal.interfaces'
  * @part title - The h2 wrapping the header slot.
  * @part body - The div wrapping the body slot.
  * @part actions - The div wrapping the actions slot.
+ * @attachment ds-close top-right - Close button rendered when `closable` is true, inset by the modal padding from the top-right corner.
  */
 @Component({
   tag: 'ds-modal',
