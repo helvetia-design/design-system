@@ -371,6 +371,96 @@ describe('scanBalTabs', () => {
     })
   })
 
+  it('lists every tab item produced by a loop together with its parent', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'Page.tsx',
+      [
+        'export function Page() {',
+        '  return (',
+        "    <BalTabs value={tab} onBalChange={event => setParam('tab', String(event.detail ?? x))}>",
+        '      {profileTabs.map(entry => (',
+        '        <BalTabItem',
+        '          key={entry.value}',
+        '          value={entry.value}',
+        '          label={entry.label}',
+        '          icon={entry.icon}',
+        '        />',
+        '      ))}',
+        '    </BalTabs>',
+        '  )',
+        '}',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'loop.component.html',
+      [
+        '<bal-tabs value="a">',
+        '  <bal-tab-item *ngFor="let entry of entries; trackBy: track" [value]="entry.value" [label]="entry.label"></bal-tab-item>',
+        '</bal-tabs>',
+        '@if (show) {',
+        '  <bal-tabs value="b">',
+        '    @for (entry of entries; track entry.value) {',
+        '      <bal-tab-item [value]="entry.value" [label]="entry.label"></bal-tab-item>',
+        '    }',
+        '  </bal-tabs>',
+        '}',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'vue-loop.html',
+      [
+        '<template>',
+        '  <bal-tabs :value="current">',
+        '    <bal-tab-item v-for="entry in entries" :key="entry.value" :value="entry.value" :label="entry.label" />',
+        '  </bal-tabs>',
+        '</template>',
+        '',
+      ].join('\n'),
+    )
+
+    const result = scanBalTabs(root)
+    const byFile = Object.fromEntries(result.files.map(entry => [entry.file, entry.findings]))
+
+    expect(byFile['Page.tsx']).toEqual([
+      { line: 3, snippet: "<BalTabs value={tab} onBalChange={event => setParam('tab', String(event.detail ?? x))}>" },
+      {
+        line: 5,
+        snippet: '<BalTabItem key={entry.value} value={entry.value} label={entry.label} icon={entry.icon} />',
+      },
+      { line: 12, snippet: '</BalTabs>' },
+    ])
+    expect(byFile['loop.component.html']).toEqual([
+      { line: 1, snippet: '<bal-tabs value="a">' },
+      {
+        line: 2,
+        snippet:
+          '<bal-tab-item *ngFor="let entry of entries; trackBy: track" [value]="entry.value" [label]="entry.label">',
+      },
+      { line: 2, snippet: '</bal-tab-item>' },
+      { line: 3, snippet: '</bal-tabs>' },
+      { line: 5, snippet: '<bal-tabs value="b">' },
+      { line: 7, snippet: '<bal-tab-item [value]="entry.value" [label]="entry.label">' },
+      { line: 7, snippet: '</bal-tab-item>' },
+      { line: 9, snippet: '</bal-tabs>' },
+    ])
+    expect(byFile['vue-loop.html']).toEqual([
+      { line: 2, snippet: '<bal-tabs :value="current">' },
+      {
+        line: 3,
+        snippet:
+          '<bal-tab-item v-for="entry in entries" :key="entry.value" :value="entry.value" :label="entry.label" />',
+      },
+      { line: 4, snippet: '</bal-tabs>' },
+    ])
+    expect(result.total).toBe(14)
+  })
+
   it('prints grouped findings as JSON and does not edit files', () => {
     const root = createScratchDir()
     const contents = '<bal-tabs value="a"></bal-tabs>\n'

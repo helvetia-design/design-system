@@ -45,16 +45,16 @@ When a file has both kinds of navbar, migrate the app ones and keep the `@balois
 
 ### Props
 
-| old (`bal-navbar`)                                 | new (`ds-app-navbar`) | handling                                                                                                                             |
-| -------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `light`                                            | `light`               | Copy as-is, in every form (`light`, `[light]="x"`, `light={x}`).                                                                     |
-| `container="fluid"` or `"compact"`                 | `container`           | Copy as-is.                                                                                                                          |
-| `container=""`                                     | _(drop)_              | The empty value was the default. Drop the attribute.                                                                                 |
-| `container="detail-page"`, `"blog-page"`, `"wide"` | _(no equivalent)_     | Drop it. `ds-app-navbar` accepts `default`, `fluid` and `compact`. List each one by file and line as "needs manual rework".          |
-| `container` with a dynamic value                   | `container`           | Copy the binding unchanged and list it by file and line, so the consumer checks that it only yields `default`, `fluid` or `compact`. |
-| `interface="app"`                                  | _(drop)_              | `ds-app-navbar` is the app navbar. Drop the attribute. For `simple`, see above.                                                      |
-| _(none)_                                           | `open`                | New. Nothing to migrate from. Leave it unset.                                                                                        |
-| _(none)_                                           | `title` slot          | New. Nothing to migrate from. Leave it empty.                                                                                        |
+| old (`bal-navbar`)                                 | new (`ds-app-navbar`) | handling                                                                                                                                                                                                                                                                                                |
+| -------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `light`                                            | `light`               | Copy as-is, in every form (`light`, `[light]="x"`, `light={x}`).                                                                                                                                                                                                                                        |
+| `container="fluid"` or `"compact"`                 | `container`           | Copy as-is.                                                                                                                                                                                                                                                                                             |
+| `container=""`                                     | _(drop)_              | The empty value was the default. Drop the attribute.                                                                                                                                                                                                                                                    |
+| `container="detail-page"`, `"blog-page"`, `"wide"` | _(no equivalent)_     | Drop it. `ds-app-navbar` accepts `default`, `fluid` and `compact`. List each one by file and line as "needs manual rework".                                                                                                                                                                             |
+| `container` with a dynamic value                   | `container`           | HTML: copy the binding unchanged and list it by file and line, so the consumer checks that it only yields `default`, `fluid` or `compact`. React and Angular: copy it when the expression's type only admits `default`, `fluid` or `compact`. Otherwise apply Unmapped props and handlers (`SKILL.md`). |
+| `interface="app"`                                  | _(drop)_              | `ds-app-navbar` is the app navbar. Drop the attribute. For `simple`, see above.                                                                                                                                                                                                                         |
+| _(none)_                                           | `open`                | New. Nothing to migrate from. Leave it unset.                                                                                                                                                                                                                                                           |
+| _(none)_                                           | `title` slot          | New. Nothing to migrate from. Leave it empty.                                                                                                                                                                                                                                                           |
 
 ### Child tags
 
@@ -79,15 +79,13 @@ Apply the "move only" and "remove" rules per file. A file that still holds a nav
 
 ### Events
 
-Do not rewrite handlers. The events are not one-to-one, so list each one by file and line, together with this mapping.
+The legacy events are emitted by `bal-navbar-brand` and reach a listener on `bal-navbar` only by bubbling. `ds-app-navbar` emits the `dsMenu*` events on its own host. Move a listener that sits on the brand to the navbar as part of the split, and say so in the report entry.
 
-The legacy events are emitted by `bal-navbar-brand` and reach a listener on `bal-navbar` only by bubbling. `ds-app-navbar` emits the `dsMenu*` events on its own host. A listener that sits on the brand must move to the navbar, so say so in the report entry.
-
-| old                                                     | new                                      | handling                                                                                                                          |
-| ------------------------------------------------------- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `balWillAnimate` (detail `boolean`, `true` = opening)   | `dsMenuOpenStart` and `dsMenuCloseStart` | One event became two, and the `boolean` detail is gone. The consumer picks the one that matches the old `true` or `false` branch. |
-| `balDidAnimate` (detail `boolean`, `true` = opening)    | `dsMenuOpenEnd` and `dsMenuCloseEnd`     | Same split.                                                                                                                       |
-| `balNavigate` (click on the brand, detail `MouseEvent`) | _(no equivalent)_                        | The brand is now a plain `<a slot="brand">`. Listen for `click` on it.                                                            |
+| old                                                     | new                                      | handling                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `balWillAnimate` (detail `boolean`, `true` = opening)   | `dsMenuOpenStart` and `dsMenuCloseStart` | Split into two bindings. In the open copy, replace every read of the event's `detail` with the literal `true`. In the close copy, use `false`. When the handler passes the event to a method that only reads `detail`, change the method to take the boolean and pass `true` or `false`. When the method reads more than `detail`, or other events share it, apply Unmapped props and handlers (`SKILL.md`). Report each split. |
+| `balDidAnimate` (detail `boolean`, `true` = opening)    | `dsMenuOpenEnd` and `dsMenuCloseEnd`     | Same split.                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `balNavigate` (click on the brand, detail `MouseEvent`) | _(no equivalent)_                        | Apply Unmapped props and handlers (`SKILL.md`). The brand is now a plain `<a slot="brand">`, so the consumer can listen for `click` on it.                                                                                                                                                                                                                                                                                      |
 
 Framework spellings: Angular `(balWillAnimate)` is `(dsMenuOpenStart)` and `(dsMenuCloseStart)`, React `onBalWillAnimate` is `onDsMenuOpenStart` and `onDsMenuCloseStart`, and `addEventListener('balWillAnimate'` is `addEventListener('dsMenuOpenStart'` and `addEventListener('dsMenuCloseStart'`. The same applies to `balDidAnimate`.
 
@@ -95,10 +93,8 @@ In each file with a finding, also look for these listeners where they are not on
 
 ### Methods
 
-Do not rewrite these. Report each call with file and line.
-
-- `toggleMenu()` on the navbar is now `toggleSidebar()`. `openSidebar()` and `closeSidebar()` are new. The legacy method toggled the brand, so it only worked while the brand existed.
-- `toggle()` on `bal-navbar-brand` has no equivalent. Call `toggleSidebar()` on `ds-app-navbar`.
+- `toggleMenu()` on the navbar becomes `toggleSidebar()`. Rename the call and report it with file and line. `openSidebar()` and `closeSidebar()` are new. The legacy method toggled the brand, so it only worked while the brand existed.
+- `toggle()` on `bal-navbar-brand` has no equivalent, because the brand is now a plain element. Apply Unmapped props and handlers (`SKILL.md`). The report names `toggleSidebar()` on `ds-app-navbar` as the replacement.
 
 ## 4. Report
 
@@ -109,13 +105,13 @@ Needs your attention when found:
 1. Every navbar that was not migrated because of `interface="simple"`, with its child tags and imports left in place. Name file and line.
 2. Every navbar that was not migrated because of a dynamic `interface`, with its child tags and imports left in place. Name file and line.
 3. Every dropped `container` value (`detail-page`, `blog-page`, `wide`).
-4. Every dynamic `container` binding.
+4. Every dynamic `container` binding, with the framework outcome (copied in HTML, copied or removed in React and Angular).
 5. Every dropped `bal-navbar-brand` prop (`logo`, `logoSize`, `logoBrand`, `logoLabel`, `logoClickable`, `simple`, `animated`), so the consumer builds the brand content in the `brand` slot.
 6. Every direct child of a migrated navbar that is still without a `slot`, because it does not render.
 7. Every `bal-navbar-brand` that had no `href` and became a `<div slot="brand">`.
-8. Every `balWillAnimate` and `balDidAnimate` listener, with the new event names.
-9. Every `balNavigate` listener, with `click` on the brand as the replacement.
-10. Every `toggleMenu()` and brand `toggle()` call, with `toggleSidebar()` as the replacement.
+8. Every `balWillAnimate` and `balDidAnimate` listener, either split into the new event pair or handled by Unmapped props and handlers, with its outcome.
+9. Every `balNavigate` listener, with its Unmapped props and handlers outcome and `click` on the brand as the replacement.
+10. Every `toggleMenu()` call renamed to `toggleSidebar()`, and every brand `toggle()` call with its Unmapped props and handlers outcome and `toggleSidebar()` as the replacement.
 11. Every `BalProps.BalNavbarInterface` and `BalEvents.BalNavbar*` type reference that needs a manual check.
 12. Every legacy selector that no longer applies, such as `.bal-navbar`, `.bal-navbar__nav`, `.bal-navbar__brand`, `.bal-navbar__menu`, `.bal-navbar--is-light` and the `is-simple` and `context-*` modifiers. `ds-app-navbar` renders in shadow DOM, so these are lost. The navbar is styleable through `part="nav"`, `part="hamburger"` and `part="sidebar"`.
 

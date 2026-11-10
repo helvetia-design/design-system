@@ -114,8 +114,15 @@ Every Report step writes to `ds-migration-report.md` as `shared/report.md` descr
 
 Every form component migration also removes the legacy field wrapper around the controls it migrates. Follow `shared/field.md` alongside the chosen file:
 
-- In the Rewrite step, apply its rules to every migrated control that sits inside `bal-field` or `bal-field-control`, or that a `bal-field-message` directly follows, in the same pass.
+- In the Rewrite step, apply its rules to every migrated control that sits inside `bal-field` or `bal-field-control`, or that a `bal-field-message` directly follows, in the same pass. Apply its Angular form binding row to every migrated Angular control bound with `formControlName`, `[formControl]` or `ngModel`, also outside a `bal-field`.
 - In the Report step, append the `F1.`, `F2.`, ... items from the Report section of `shared/field.md` to the checklist, after the component items and before the icon items.
+
+Every migrated form control whose `required` default is `true` and reaches the native control follows the required default rule. The legacy controls defaulted `required` to false, and `ds-*` forwards `required` to the native control, so native validation would apply to a control that was optional before.
+
+- **Covered controls** — `ds-input`, `ds-textarea`, `ds-datepicker`, `ds-number-input` and `ds-select`. When the legacy control omitted `required` and no `required` sits on the enclosing `bal-field` or `bal-field-label`, the migrated control gets an explicit `required="false"` (HTML), `[required]="false"` (Angular) or `required={false}` (React). A `required` that the control sets itself is copied as-is.
+- **Excluded controls** — `ds-counter`, `ds-radio-group`, `ds-checkbox-group`, `ds-segment` and `ds-slider`. Their `required` default is `true`, but it only drives the "(optional)" suffix of the component's own `label`. No native control receives it. The control migration adds no `required="false"` there, and `shared/field.md` decides `required` for them.
+- **Order** — read the enclosing field first. When `shared/field.md` unwraps a field whose level sets `required`, it decides and the control never gets the added `false`. The control rule adds `false` when neither level carries `required`, and also when `shared/field.md` leaves the `bal-field` in place, because then nothing copies the field level onto the control.
+- **Batch and report** — the rule applies inside a batch too. Each component file reports every added `false` as a coverage item.
 
 Every component migration also decides about the legacy config call. Follow `shared/legacy-config.md` after the icon rules:
 
@@ -124,6 +131,26 @@ Every component migration also decides about the legacy config call. Follow `sha
 - In the Report step, append the `L1.`, `L2.`, ... items from the Report section of `shared/legacy-config.md` to the checklist, after the icon items.
 
 Inside a batch (see `shared/batch.md`), a `migration.md` runs only its Rewrite step, on the batch file list. It skips its Scan display, its Confirm step and its stop. It still applies `shared/field.md`. It skips the icon import and Registration rules and `shared/legacy-config.md`, which the batch runs once at the end. It hands the outcome of its Report items back to the batch instead of writing its own report section.
+
+#### Unmapped props and handlers
+
+A `migration.md` row that says "Apply Unmapped props and handlers" names a prop, attribute, binding, event handler or method call with no `ds-*` counterpart. This rule covers only those rows. It does not cover structural rules, such as groups or items left in place, loops in tabs or steps, field wrappers or divider children.
+
+Decide the framework per file. A `.tsx` or `.jsx` file is React, and so is a `.ts` or `.js` file that holds JSX. An Angular template (`.component.html` or an inline `template:`) and its class file are Angular. A `.ts` or `.js` file without JSX follows the project framework, the `framework` value from `scripts/detect-baloise.mjs`: `react` or `angular` takes that branch. A `.vue` file, every other `.html` file and any other file type count as HTML.
+
+The rule depends on the framework. The React `Ds*` wrappers are typed, so an unknown prop fails `tsc` with TS2322 or TS2551. Angular with `strictTemplates` fails with NG8002. Plain HTML ignores unknown attributes.
+
+- HTML: leave the attribute, the `addEventListener` call or the method call unchanged. Report it.
+- React and Angular, prop or attribute: remove it from the element. When the value is not a literal (a binding, a variable or an expression), keep it in a comment on the line above. In React, put `// TODO(ds-migrate): <name> had no ds-* target: <expression>` between the JSX attributes, where a `//` comment is valid. In an Angular template, put `<!-- TODO(ds-migrate): <name> had no ds-* target: <expression> -->` on the line above the element. Remove a literal value (`textAlign="right"`, `scrollable`, `filter="starts-with"`) without a comment. The report still names it.
+- React and Angular, event handler: remove the binding (`onBalInput={...}`, `(balInput)="..."`). Keep the whole handler expression in the same TODO comment, so no logic is lost. Copy an inline arrow body into the comment verbatim. A multi-line body gets one `//` per line in React and one multi-line `<!-- -->` in Angular. When the handler calls a class method (`(balInput)="onInput($event)"`), keep the method in the class and name the call in the comment.
+- React, unused declarations: when the removed expression was the only use of a local function, variable or import, move that declaration into the same TODO comment and drop the import binding. This keeps `noUnusedLocals` and lint green. Angular keeps the class method, because a use in the template only does not trigger unused checks.
+- React and Angular, method call that is a standalone statement (`await ref.current?.getOptionByValue(v);`): replace the statement with `// TODO(ds-migrate): <method>() had no ds-* target: <statement>`. When the code uses the call's result (assigns, returns or passes it on), leave the call unchanged and report it as "will not compile, needs manual rework".
+
+Never invent a replacement. When the `migration.md` row gives a mapping, use it.
+
+Report every item this rule handles under Needs your attention. Name the file, the line, the name, and the removed expression or "literal `<value>`". Say whether it was left in place (HTML), removed (React, Angular), or left because its result is used. The `migration.md` checklist item that covers it gets one outcome line per occurrence.
+
+Inside a batch the rule applies the same way, because it is part of the Rewrite step.
 
 #### Manual
 

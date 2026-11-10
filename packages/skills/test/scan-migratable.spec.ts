@@ -306,6 +306,29 @@ describe('scanMigratable', () => {
     })
   })
 
+  it('folds bal-check and bal-switch into checkbox instead of listing them as notYet', () => {
+    const root = createScratchDir()
+    write(root, 'index.html', ['<bal-check checked></bal-check>', '<bal-switch></bal-switch>', ''].join('\n'))
+    write(
+      root,
+      'App.tsx',
+      ["import { BalCheck, BalSwitch } from '@baloise/ds-react'", 'export const App = () => <BalSwitch />'].join('\n'),
+    )
+
+    expect(scanMigratable(root)).toEqual({
+      suggested: [{ name: 'checkbox', total: 5 }],
+      notYet: [],
+      types: [],
+    })
+  })
+
+  it('does not fold a bal-check-list lookalike into checkbox', () => {
+    const root = createScratchDir()
+    write(root, 'index.html', '<bal-check-list></bal-check-list>\n')
+
+    expect(scanMigratable(root).suggested).toEqual([])
+  })
+
   it('suggests hint, folding the hint-title and hint-text children into it', () => {
     const root = createScratchDir()
     write(

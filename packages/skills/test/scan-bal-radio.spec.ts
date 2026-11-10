@@ -318,6 +318,71 @@ describe('scanBalRadio', () => {
     })
   })
 
+  it('flags setValue() on a legacy radio group ref in the sibling .ts, but not a FormControl.setValue', () => {
+    const root = createScratchDir()
+    write(root, 'plan.component.html', '<bal-radio-group #planGroup></bal-radio-group>\n')
+    write(
+      root,
+      'plan.component.ts',
+      [
+        'export class PlanComponent {',
+        "  @ViewChild('planGroup') planGroup!: ElementRef<HTMLBalRadioGroupElement>",
+        "  readonly plan = viewChild<ElementRef<HTMLBalRadioGroupElement>>('planGroup')",
+        "  readonly form = new FormGroup({ plan: new FormControl('basic') })",
+        '  reset() {',
+        "    this.planGroup.nativeElement.setValue('basic')",
+        "    this.plan()?.nativeElement?.setValue('basic')",
+        "    this.form.controls.plan.setValue('basic')",
+        '  }',
+        '}',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'checkbox.ts',
+      ['export function reset(group: HTMLBalCheckboxGroupElement) {', '  group.setValue([])', '}', ''].join('\n'),
+    )
+
+    expect(scanBalRadio(root, ['plan.component.html'])).toEqual({
+      total: 4,
+      files: [
+        {
+          file: 'plan.component.html',
+          findings: [
+            { line: 1, snippet: '<bal-radio-group #planGroup>' },
+            { line: 1, snippet: '</bal-radio-group>' },
+          ],
+        },
+        {
+          file: 'plan.component.ts',
+          findings: [
+            { line: 6, snippet: "this.planGroup.nativeElement.setValue('basic')", setValue: true },
+            { line: 7, snippet: "this.plan()?.nativeElement?.setValue('basic')", setValue: true },
+          ],
+        },
+      ],
+    })
+    expect(scanBalRadio(root).total).toBe(4)
+  })
+
+  it('does not flag a commented-out setValue() on a legacy radio group ref', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'plan.ts',
+      [
+        'export function reset(group: HTMLBalRadioGroupElement) {',
+        "  // group.setValue('basic')",
+        "  /* group.setValue('basic') */",
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalRadio(root)).toEqual({ total: 0, files: [] })
+  })
+
   it('prints grouped findings as JSON and does not edit files', () => {
     const root = createScratchDir()
     const html = '<bal-radio value="1"></bal-radio>\n'
@@ -400,6 +465,9 @@ describe('radio migration.md', () => {
       'dsChange',
       'balChange',
       'HTMLBalRadioElement',
+      'HTMLBalRadioGroupElement',
+      'setValue',
+      'el.value',
       'per-file summary',
       'git commit',
     ]) {
