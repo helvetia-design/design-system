@@ -75,7 +75,7 @@ function isBundle(slug) {
   return slug.endsWith('-bundle')
 }
 
-export function scanMigratable(rootDir, paths = []) {
+export function scanMigratable(rootDir, paths = [], { extensions } = {}) {
   const available = availableMigrations()
   const totals = new Map()
   const perFile = new Map()
@@ -95,7 +95,7 @@ export function scanMigratable(rootDir, paths = []) {
       }
       if (fileTotals.size > 0) perFile.set(file, fileTotals)
     },
-    { paths },
+    extensions ? { paths, extensions } : { paths },
   )
 
   const used = toComponents(totals)
