@@ -6,6 +6,7 @@ import {
   closingIndex,
   endOfString,
   endOfSubstitution,
+  JSX_EXTENSIONS,
   lineText,
   readTag,
   scanSourceFiles,
@@ -30,7 +31,6 @@ const EXTENSIONS = new Set([
 ])
 const MARKUP_EXTENSIONS = new Set(['.html', '.vue'])
 const STYLE_EXTENSIONS = new Set(['.css', '.scss', '.sass', '.less'])
-const JSX_EXTENSIONS = new Set(['.tsx', '.jsx', '.js'])
 const CLASS_ATTRIBUTES = new Set(['ngClass', 'active-class', 'exact-active-class'])
 const GROUP_STRENGTH = ['variant', 'structure', 'renamed', 'approximated', 'lost']
 const CLASS_TOKEN_RE = /^[a-z0-9][\w:./-]*$/
@@ -226,7 +226,7 @@ function collect({ file, text, comments }, index, found, dynamic) {
       continue
     }
     if (inComment(context.start)) {
-      // JSX text such as `https://x.ch` or `/tmp/*` reads as a comment, so a class context in one is reported, not dropped.
+      // JSX detection is a heuristic, so JSX text it misses can read as a comment; report the context, do not drop it.
       if (JSX_EXTENSIONS.has(extension)) {
         covered.push([context.start, context.end])
         report(context.start, 'possibly commented')

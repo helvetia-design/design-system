@@ -584,6 +584,29 @@ describe('scanMigratable', () => {
     })
   })
 
+  it('finds tags after an apostrophe, a URL or a regex literal on the same line', () => {
+    const root = createScratchDir()
+    write(root, 'a.html', "<p>Don't panic <bal-button>x</bal-button></p>\n")
+    write(root, 'b.ts', "@Component({ template: `<p>Don't forget</p> <bal-button>Save</bal-button>` })\n")
+    write(root, 'c.tsx', 'const A = () => <p>see http://x <BalButton/></p>\n')
+    write(root, 'd.tsx', 'const r = /"/; const B = () => <BalButton/>\n')
+    write(root, 'e.html', "<p>l'assurance <bal-tag>a</bal-tag> dell'anno <bal-card></bal-card></p>\n")
+
+    expect(scanMigratable(root, ['.']).files).toEqual([
+      { file: 'a.html', components: [{ name: 'button', total: 2 }] },
+      { file: 'b.ts', components: [{ name: 'button', total: 2 }] },
+      { file: 'c.tsx', components: [{ name: 'button', total: 1 }] },
+      { file: 'd.tsx', components: [{ name: 'button', total: 1 }] },
+      {
+        file: 'e.html',
+        components: [
+          { name: 'card', total: 2 },
+          { name: 'tag', total: 2 },
+        ],
+      },
+    ])
+  })
+
   it('prints the detection result as JSON', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-spinner></bal-spinner>\n')

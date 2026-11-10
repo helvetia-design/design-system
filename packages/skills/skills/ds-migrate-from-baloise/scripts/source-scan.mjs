@@ -111,95 +111,73 @@ function readSource(rootDir, filePath, collect) {
     return
   }
 
-  const extension = extname(filePath)
+  const mode = sourceMode(extname(filePath))
   let masked
   let comments
   collect({
     file: toPosix(relative(rootDir, filePath)),
     text,
     get masked() {
-      masked ??= maskSource(text, extension === '.html')
+      masked ??= maskText(text, mode, true)
       return masked
     },
     get comments() {
-      comments ??= maskComments(text, commentKind(extension))
+      comments ??= maskText(text, mode, false)
       return comments
     },
   })
 }
 
-function commentKind(extension) {
+export const JSX_EXTENSIONS = new Set(['.tsx', '.jsx', '.js'])
+
+function sourceMode(extension) {
   if (extension === '.html' || extension === '.htm' || extension === '.vue') return 'markup'
   if (extension === '.css') return 'css'
   if (extension === '.scss' || extension === '.sass' || extension === '.less') return 'scss'
+  if (JSX_EXTENSIONS.has(extension)) return 'jsx'
   return 'script'
 }
 
 /**
- * Blanks comments only and keeps every string. `kind` is `script`, `css`, `scss` (with `//` line comments) or
- * `markup`, where only `<!--` is a comment outside `<script>` and `<style>` blocks.
+ * Blanks comments only and keeps every string. `kind` is `script`, `jsx` (script that may hold JSX), `css`, `scss`
+ * (with `//` line comments) or `markup`, where only `<!--` is a comment outside `<script>` and `<style>` blocks.
  */
 export function maskComments(text, kind) {
-  const mask = text.split('')
-  let region = kind === 'markup' ? 'markup' : kind
-  let i = 0
-  while (i < text.length) {
-    if (kind === 'markup') {
-      const tag = /^<(\/?)(script|style)\b/i.exec(text.slice(i, i + 9))
-      if (tag) {
-        if (tag[1]) region = 'markup'
-        else if (tag[2].toLowerCase() === 'script') region = 'script'
-        else region = /\blang\s*=\s*["']?(?:scss|sass|less)\b/i.test(readTag(text, i)) ? 'scss' : 'css'
-        i = tag[1] ? i + tag[0].length : closeAt(text, '>', i)
-        continue
-      }
-    }
-    if (text.startsWith('<!--', i)) {
-      i = blank(mask, i, closeAt(text, '-->', i + 4))
-      continue
-    }
-    if (region === 'markup') {
-      i++
-      continue
-    }
-    if (region === 'script' && text[i] === '/') {
-      const end = endOfRegex(text, i)
-      if (end !== -1) {
-        i = end
-        continue
-      }
-    }
-    if (
-      text.startsWith('//', i) &&
-      (region === 'script' || (region === 'scss' && text[i - 1] !== ':' && text[i - 1] !== '('))
-    ) {
-      const end = text.indexOf('\n', i)
-      i = blank(mask, i, end === -1 ? text.length : end)
-      continue
-    }
-    // An unclosed `/*` is JSX text or a regex such as `/^\/*/`, not a comment that runs to the end of the file.
-    if (text.startsWith('/*', i) && text.includes('*/', i + 2)) {
-      i = blank(mask, i, closeAt(text, '*/', i + 2))
-      continue
-    }
-    const quote = text[i]
-    if (quote === '"' || quote === "'" || quote === '`') {
-      i = keepTemplate(text, mask, i, false)
-      continue
-    }
-    i++
-  }
-  return mask.join('')
+  return maskText(text, kind, false)
 }
 
-// A `/` opens a regex only where an operand is expected; JSX text after `>` and closing tags after `<` stay plain text.
+// Markup text and JSX children keep their quotes and `//`; only attribute values and `{…}` or `{{ … }}` hold strings.
+function maskText(text, mode, blankStrings) {
+  const ctx = {
+    text,
+    mask: text.split(''),
+    blankStrings,
+    blankedTo: 0,
+    jsxDepth: 0,
+    depthCapped: false,
+    failedJsx: new Set(),
+    jsxSteps: 0,
+    jsxBudget: JSX_STEPS_PER_CHAR * text.length + 10_000,
+  }
+  if (mode === 'markup') scanMarkup(ctx, 0, text.length)
+  else if (mode === 'css' || mode === 'scss') scanStyle(ctx, 0, text.length, mode === 'scss')
+  else scanCode(ctx, 0, text.length, { jsx: mode === 'jsx' })
+  return ctx.mask.join('')
+}
+
+// A `/` opens a regex and a `<` opens JSX only where an operand is expected, so `a / b` and `a < b` stay operators.
 const REGEX_START_RE =
   /(?:[(,=:[!&|?{};~^%]|=>|(?:^|[^\w$])(?:return|typeof|case|void|delete|throw|yield|await|else|do|in|of|new))$/
 
+function expectsOperand(text, start) {
+  let i = start - 1
+  while (i >= 0 && /\s/.test(text[i])) i--
+  return i < 0 || REGEX_START_RE.test(text.slice(Math.max(0, i - 15), i + 1))
+}
+
 function endOfRegex(text, start) {
   if (text[start + 1] === '/' || text[start + 1] === '*') return -1
-  const before = text.slice(Math.max(0, start - 16), start).trimEnd()
-  if (before ? !REGEX_START_RE.test(before) : start > 16) return -1
+  if (!expectsOperand(text, start)) return -1
   let inClass = false
   let i = start + 1
   while (i < text.length) {
@@ -221,32 +199,93 @@ function endOfRegex(text, start) {
   return -1
 }
 
-function maskSource(text, html) {
-  const mask = Array.from(text)
-  let i = 0
-  while (i < text.length) {
+// With `inExpression`, returns the index of the `}` that closes the expression, or -1 when none does before `stop`.
+function scanCode(ctx, start, stop, { jsx, inExpression = false }) {
+  const { text } = ctx
+  let depth = 0
+  let i = start
+  while (i < stop) {
+    if (inExpression) ctx.jsxSteps++
+    const ch = text[i]
     if (text.startsWith('<!--', i)) {
-      i = blank(mask, i, closeAt(text, '-->', i + 4))
+      i = blankHtmlComment(ctx, i, stop)
       continue
     }
-    if (!html && text.startsWith('//', i)) {
-      const end = text.indexOf('\n', i)
-      i = blank(mask, i, end === -1 ? text.length : end)
+    if (ch === '/') {
+      const end = commentEnd(text, i, stop)
+      if (end !== -1) {
+        i = blank(ctx, i, end)
+        continue
+      }
+      const regexEnd = endOfRegex(text, i)
+      i = regexEnd !== -1 && regexEnd <= stop ? regexEnd : i + 1
       continue
     }
-    if (text.startsWith('/*', i)) {
-      i = blank(mask, i, closeAt(text, '*/', i + 2))
+    if (ch === '"' || ch === "'" || ch === '`') {
+      i = scanString(ctx, i, stop)
       continue
     }
-
-    const quote = text[i]
-    if (quote === '"' || quote === "'" || quote === '`') {
-      i = !html && isTemplatePropertyString(text, i) ? keepTemplate(text, mask, i, true) : blankString(text, mask, i)
-      continue
+    if (jsx && ch === '<' && ctx.jsxSteps < ctx.jsxBudget && expectsOperand(text, i)) {
+      const end = scanJsxElement(ctx, i, stop, true)
+      if (end !== -1) {
+        i = end
+        continue
+      }
+    }
+    if (inExpression && ch === '{') depth++
+    if (inExpression && ch === '}') {
+      if (depth === 0) return i
+      depth--
     }
     i++
   }
-  return mask.join('')
+  return inExpression ? -1 : stop
+}
+
+function blankHtmlComment(ctx, start, stop) {
+  return blank(ctx, start, Math.min(closeAt(ctx.text, '-->', start + 4), stop))
+}
+
+// Returns the index after the `}` that closes the JSX expression opening at `open`, or -1.
+function jsxExpressionEnd(ctx, open, stop) {
+  const close = scanCode(ctx, open + 1, stop, { jsx: true, inExpression: true })
+  return close === -1 ? -1 : close + 1
+}
+
+// An unclosed `/*` is a regex such as `/^\/*/` or stray text, not a comment that runs to the end of the file.
+function commentEnd(text, start, stop) {
+  if (text[start + 1] === '/') {
+    const end = text.indexOf('\n', start)
+    return end === -1 || end > stop ? stop : end
+  }
+  if (text[start + 1] === '*') {
+    const end = text.indexOf('*/', start + 2)
+    if (end !== -1 && end + 2 <= stop) return end + 2
+  }
+  return -1
+}
+
+function scanString(ctx, start, stop) {
+  const { text } = ctx
+  const end = Math.min(endOfString(text, start), stop)
+  if (!isTemplatePropertyString(text, start)) return skipString(ctx, start, end)
+  const closed = end - 1 > start && text[end - 1] === text[start]
+  scanMarkup(ctx, start + 1, closed ? end - 1 : end)
+  return end
+}
+
+function skipString(ctx, start, end) {
+  const { text, blankStrings } = ctx
+  if (blankStrings) return blank(ctx, start, end)
+  let i = start + 1
+  while (i < end) {
+    const open = text.indexOf('<!--', i)
+    if (open === -1 || open >= end) break
+    const close = closeAt(text, '-->', open + 4)
+    if (close > end) break
+    i = blank(ctx, open, close)
+  }
+  return end
 }
 
 function isTemplatePropertyString(text, quoteIndex) {
@@ -260,35 +299,201 @@ function isTemplatePropertyString(text, quoteIndex) {
   return text.slice(index + 1, end) === 'template'
 }
 
-function keepTemplate(text, mask, start, blankNested) {
-  const quote = text[start]
-  const stringEnd = endOfString(text, start)
-  let i = start + 1
-  while (i < text.length) {
-    if (text[i] === '\\') {
-      i += 2
+const JSX_NAME_RE = /[A-Za-z][\w.:-]*/y
+const JSX_CLOSE_RE = /<\/\s*([^\s>]*)\s*>/y
+const TS_GENERIC_RE = /\s*(?:[,=]|extends\b)/y
+// Unclosed `<` runs would otherwise nest once per line, overflow the stack and rescan the rest of the file each time.
+const MAX_JSX_DEPTH = 128
+// Invalid code such as unbalanced `{` after `<a>` makes every later `<` rescan to the end; past this budget `<` stays code.
+const JSX_STEPS_PER_CHAR = 20
+
+// Returns the index after the element, or -1. From code, a failed attempt restores the mask so `<` reads as an operator.
+function scanJsxElement(ctx, start, stop, fromCode) {
+  const { text, mask } = ctx
+  let name = ''
+  if (text[start + 1] !== '>') {
+    JSX_NAME_RE.lastIndex = start + 1
+    name = JSX_NAME_RE.exec(text)?.[0] ?? ''
+    if (!name) return -1
+    TS_GENERIC_RE.lastIndex = start + 1 + name.length
+    if (fromCode && TS_GENERIC_RE.test(text)) return -1
+  }
+  // Without remembering failures, nested retries of the same `<` grow exponentially, e.g. `const f: <T>(v: T) => T`.
+  const key = `${start}:${stop}`
+  if (ctx.failedJsx.has(key)) return -1
+  if (ctx.jsxDepth >= MAX_JSX_DEPTH) {
+    ctx.depthCapped = true
+    return -1
+  }
+  const outerBlankedTo = ctx.blankedTo
+  const outerDepthCapped = ctx.depthCapped
+  ctx.blankedTo = start
+  ctx.depthCapped = false
+  ctx.jsxDepth++
+  const end = jsxElementEnd(ctx, name, start + 1 + name.length, stop)
+  ctx.jsxDepth--
+  // A failure caused by the depth cap may succeed when retried from a shallower depth.
+  if (end === -1 && !ctx.depthCapped) ctx.failedJsx.add(key)
+  if (end === -1 && fromCode) {
+    for (let i = start; i < Math.min(stop, ctx.blankedTo); i++) mask[i] = text[i]
+    ctx.blankedTo = start
+  }
+  ctx.blankedTo = Math.max(outerBlankedTo, ctx.blankedTo)
+  ctx.depthCapped ||= outerDepthCapped
+  return end
+}
+
+function jsxElementEnd(ctx, name, from, stop) {
+  const { text, blankStrings } = ctx
+  let i = from
+  while (i < stop) {
+    ctx.jsxSteps++
+    const ch = text[i]
+    if (ch === '"' || ch === "'") {
+      const close = text.indexOf(ch, i + 1)
+      if (close === -1 || close >= stop) return -1
+      i = blankStrings ? blank(ctx, i, close + 1) : close + 1
+      continue
+    }
+    if (ch === '{') {
+      i = jsxExpressionEnd(ctx, i, stop)
+      if (i === -1) return -1
+      continue
+    }
+    if (ch === '/' && text[i + 1] === '>') return i + 2
+    if (ch === '/') {
+      const end = commentEnd(text, i, stop)
+      if (end === -1) return -1
+      i = blank(ctx, i, end)
+      continue
+    }
+    if (ch === '>') return jsxChildrenEnd(ctx, name, i + 1, stop)
+    if ('<;()}'.includes(ch)) return -1
+    i++
+  }
+  return -1
+}
+
+function jsxChildrenEnd(ctx, name, from, stop) {
+  const { text } = ctx
+  let i = from
+  while (i < stop) {
+    ctx.jsxSteps++
+    const ch = text[i]
+    if (ch === '{') {
+      i = jsxExpressionEnd(ctx, i, stop)
+      if (i === -1) return -1
       continue
     }
     if (text.startsWith('<!--', i)) {
-      const end = closeAt(text, '-->', i + 4)
-      if (end <= stringEnd) {
-        i = blank(mask, i, end)
-        continue
-      }
-    }
-    if (blankNested && (text[i] === '"' || text[i] === "'") && text[i] !== quote) {
-      i = blankString(text, mask, i)
+      i = blankHtmlComment(ctx, i, stop)
       continue
     }
-    if (text[i] === quote) return i + 1
-    if (quote !== '`' && text[i] === '\n') return i
+    if (text.startsWith('</', i)) {
+      JSX_CLOSE_RE.lastIndex = i
+      const match = JSX_CLOSE_RE.exec(text)
+      if (!match || match[1] !== name || JSX_CLOSE_RE.lastIndex > stop) return -1
+      return JSX_CLOSE_RE.lastIndex
+    }
+    // JSX text cannot hold a bare `}`, so reaching one means this was a TS generic such as `const f: <T>(x: T) => T`.
+    if (ch === '}') return -1
+    if (ch === '<' && /[A-Za-z>]/.test(text[i + 1] ?? '')) {
+      const end = scanJsxElement(ctx, i, stop, false)
+      if (end === -1) return -1
+      i = end
+      continue
+    }
     i++
   }
-  return i
+  return -1
 }
 
-function blankString(text, mask, start) {
-  return blank(mask, start, endOfString(text, start))
+const MARKUP_TAG_RE = /<([A-Za-z][\w:-]*)/y
+
+function scanMarkup(ctx, start, stop) {
+  const { text } = ctx
+  let i = start
+  while (i < stop) {
+    if (text.startsWith('<!--', i)) {
+      const end = closeAt(text, '-->', i + 4)
+      i = end <= stop ? blank(ctx, i, end) : i + 4
+      continue
+    }
+    if (text.startsWith('{{', i)) {
+      i = scanInterpolation(ctx, i, stop)
+      continue
+    }
+    MARKUP_TAG_RE.lastIndex = i
+    const tag = text[i] === '<' ? MARKUP_TAG_RE.exec(text) : null
+    i = tag ? scanMarkupTag(ctx, i, tag[1].toLowerCase(), stop) : i + 1
+  }
+  return stop
+}
+
+function scanMarkupTag(ctx, start, name, stop) {
+  const { text, blankStrings } = ctx
+  let i = start + 1 + name.length
+  while (i < stop && text[i] !== '>') {
+    const ch = text[i]
+    if (ch === '<') return i
+    const isValue = (ch === '"' || ch === "'") && /=\s*$/.test(text.slice(Math.max(start, i - 16), i))
+    const close = isValue ? text.indexOf(ch, i + 1) : -1
+    if (close !== -1 && close < stop) {
+      i = blankStrings ? blank(ctx, i, close + 1) : close + 1
+      continue
+    }
+    i++
+  }
+  if (i >= stop) return stop
+  const tagClose = i + 1
+  if ((name !== 'script' && name !== 'style') || text[i - 1] === '/') return tagClose
+
+  const closing = new RegExp(`</${name}\\b`, 'gi')
+  closing.lastIndex = tagClose
+  const blockEnd = Math.min(closing.exec(text)?.index ?? stop, stop)
+  const attributes = text.slice(start, tagClose)
+  if (name === 'script') scanCode(ctx, tagClose, blockEnd, { jsx: /\blang\s*=\s*["']?[jt]sx\b/i.test(attributes) })
+  else scanStyle(ctx, tagClose, blockEnd, /\blang\s*=\s*["']?(?:scss|sass|less)\b/i.test(attributes))
+  return blockEnd
+}
+
+function scanInterpolation(ctx, start, stop) {
+  const { text } = ctx
+  const close = text.indexOf('}}', start + 2)
+  if (close === -1 || close + 2 > stop) return start + 2
+  let i = start + 2
+  while (i < close) {
+    const ch = text[i]
+    if (ch === '"' || ch === "'" || ch === '`') {
+      i = skipString(ctx, i, Math.min(endOfString(text, i), close))
+      continue
+    }
+    i++
+  }
+  return close + 2
+}
+
+function scanStyle(ctx, start, stop, scss) {
+  const { text } = ctx
+  let i = start
+  while (i < stop) {
+    const ch = text[i]
+    if (text.startsWith('<!--', i)) {
+      i = blankHtmlComment(ctx, i, stop)
+      continue
+    }
+    const lineComment = scss && text[i + 1] === '/' && text[i - 1] !== ':' && text[i - 1] !== '('
+    const end = ch === '/' && (lineComment || text[i + 1] === '*') ? commentEnd(text, i, stop) : -1
+    if (end !== -1) {
+      i = blank(ctx, i, end)
+      continue
+    }
+    if (ch === '"' || ch === "'" || ch === '`') {
+      i = skipString(ctx, i, Math.min(endOfString(text, i), stop))
+      continue
+    }
+    i++
+  }
 }
 
 /** Returns the index after the string that opens at `start`; with `substitutions`, `${…}` may hold nested strings. */
@@ -334,10 +539,12 @@ export function closingIndex(text, open, left, right) {
   return text.length
 }
 
-function blank(mask, from, to) {
+function blank(ctx, from, to) {
+  const { mask } = ctx
   for (let i = from; i < to; i++) {
     if (mask[i] !== '\n') mask[i] = ' '
   }
+  if (to > ctx.blankedTo) ctx.blankedTo = to
   return to
 }
 
