@@ -367,6 +367,102 @@ describe('scanBalSteps', () => {
     })
   })
 
+  it('lists every step item produced by a loop together with its parent', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'Page.tsx',
+      [
+        'export function Page() {',
+        '  return (',
+        "    <BalSteps value={currentStep.value} color={cond ? 'green' : 'light-blue'} clickable onBalChange={event => goToStep(String(event.detail ?? x))}>",
+        '      {applicationSteps.map((step, index) => (',
+        '        <BalStepItem',
+        '          key={step.value}',
+        '          value={step.value}',
+        '          label={step.label}',
+        '          done={index < stepIndex}',
+        '          active={index === stepIndex}',
+        '        />',
+        '      ))}',
+        '    </BalSteps>',
+        '  )',
+        '}',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'loop.component.html',
+      [
+        '<bal-steps value="a">',
+        '  <bal-step-item *ngFor="let entry of entries; trackBy: track" [value]="entry.value" [label]="entry.label"></bal-step-item>',
+        '</bal-steps>',
+        '@if (show) {',
+        '  <bal-steps value="b">',
+        '    @for (entry of entries; track entry.value) {',
+        '      <bal-step-item [value]="entry.value" [label]="entry.label"></bal-step-item>',
+        '    }',
+        '  </bal-steps>',
+        '}',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'vue-loop.html',
+      [
+        '<template>',
+        '  <bal-steps :value="current">',
+        '    <bal-step-item v-for="entry in entries" :key="entry.value" :value="entry.value" :label="entry.label" />',
+        '  </bal-steps>',
+        '</template>',
+        '',
+      ].join('\n'),
+    )
+
+    const result = scanBalSteps(root)
+    const byFile = Object.fromEntries(result.files.map(entry => [entry.file, entry.findings]))
+
+    expect(byFile['Page.tsx']).toEqual([
+      {
+        line: 3,
+        snippet:
+          "<BalSteps value={currentStep.value} color={cond ? 'green' : 'light-blue'} clickable onBalChange={event =>",
+      },
+      {
+        line: 5,
+        snippet:
+          '<BalStepItem key={step.value} value={step.value} label={step.label} done={index < stepIndex} active={index === stepIndex} />',
+      },
+      { line: 13, snippet: '</BalSteps>' },
+    ])
+    expect(byFile['loop.component.html']).toEqual([
+      { line: 1, snippet: '<bal-steps value="a">' },
+      {
+        line: 2,
+        snippet:
+          '<bal-step-item *ngFor="let entry of entries; trackBy: track" [value]="entry.value" [label]="entry.label">',
+      },
+      { line: 2, snippet: '</bal-step-item>' },
+      { line: 3, snippet: '</bal-steps>' },
+      { line: 5, snippet: '<bal-steps value="b">' },
+      { line: 7, snippet: '<bal-step-item [value]="entry.value" [label]="entry.label">' },
+      { line: 7, snippet: '</bal-step-item>' },
+      { line: 9, snippet: '</bal-steps>' },
+    ])
+    expect(byFile['vue-loop.html']).toEqual([
+      { line: 2, snippet: '<bal-steps :value="current">' },
+      {
+        line: 3,
+        snippet:
+          '<bal-step-item v-for="entry in entries" :key="entry.value" :value="entry.value" :label="entry.label" />',
+      },
+      { line: 4, snippet: '</bal-steps>' },
+    ])
+    expect(result.total).toBe(14)
+  })
+
   it('prints grouped findings as JSON and does not edit files', () => {
     const root = createScratchDir()
     const contents = '<bal-steps value="a"></bal-steps>\n'
