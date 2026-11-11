@@ -36,7 +36,7 @@
 | ⬜     | Progress Bar | Indicators | -                                     | ✅  | ⬜    |
 | ⬜     | Label        | Forms      | -                                     | ✅  | ⬜    |
 | ⬜     | Input        | Forms      | -                                     | ✅  | ⬜    |
-| ⬜     | Textarea     | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Textarea     | Forms      | -                                     | ✅  | ⬜    |
 | ⬜     | Toggle       | Forms      | -                                     | ⬜  | ⬜    |
 | ⬜     | Radio        | Forms      | -                                     | ⬜  | ⬜    |
 | ⬜     | Checkbox     | Forms      | -                                     | ⬜  | ⬜    |
@@ -56,7 +56,7 @@
 | ⬜     | List         | Structure  | -                                     | ⬜  | ⬜    |
 | ⬜     | Root         | Structure  | -                                     | ⬜  | ⬜    |
 | ⬜     | Card         | Structure  | -                                     | ⬜  | ⬜    |
-| ⬜     | Button       | Actions    | Brand Icon, Icon, Spinner             | ⬜  | ⬜    |
+| ⬜     | Button       | Actions    | Brand Icon, Icon, Spinner             | ✅  | ⬜    |
 | ⬜     | Badge        | Indicators | Icon                                  | ✅  | ⬜    |
 | ⬜     | Segment      | Forms      | Icon                                  | ⬜  | ⬜    |
 | ⬜     | Datepicker   | Forms      | Icon                                  | ⬜  | ⬜    |
