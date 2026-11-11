@@ -33,10 +33,19 @@ describe('shared/legacy-config.md', () => {
       'named `balIcon*` imports from `@baloise/ds-icons` that only its `icons` value used',
       'Delete an import when no specifier is left on it',
       'import * as balIcons',
+      'Also keep every `updateBalLanguage` call site',
+      'Delete every `updateBalLanguage(...)` call',
+      "carry `brand: 'baloise'`",
+      "including `brand: 'baloise'` when the call had no `brand` key",
+      'Every `forms` key deleted with the call, with the note from the `forms.*` row of the Config table in `components/app/migration.md`',
+      'Every `updateBalLanguage` call deleted, with the `ds-*` language call that stays next to it',
+      'A `toast` entry that comes only from a `bal-notices` that this run deleted does not count either',
+      'unless an existing `initializeDesignSystem` call already sets `brand`',
     ]) {
       expect(rules, phrase).toContain(phrase)
     }
     expect(rules).not.toContain('ignore the component being migrated, because this migration replaces it')
+    expect(rules).not.toContain('needs no replacement')
   })
 
   it('is the only rule that deletes the legacy call, so shared/icons.md defers to it', () => {

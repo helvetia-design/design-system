@@ -62,6 +62,7 @@ const CHILD_SLUGS = new Map([
   ['navbar-menu', 'navbar'],
   ['navbar-menu-start', 'navbar'],
   ['navbar-menu-end', 'navbar'],
+  ['notices', 'toast'],
   ['radio-group', 'radio'],
   ['radio-icon', 'radio'],
   ['segment-item', 'segment'],

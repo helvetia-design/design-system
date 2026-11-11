@@ -322,6 +322,26 @@ describe('scanMigratable', () => {
     })
   })
 
+  it('counts bal-notices for toast instead of listing it as notYet', () => {
+    const root = createScratchDir()
+    write(root, 'index.html', '<bal-notices interface="toast"></bal-notices>\n')
+    write(
+      root,
+      'App.tsx',
+      [
+        "import { BalNotices } from '@baloise/ds-react'",
+        'defineBalNotices()',
+        'export const App = () => <BalNotices />',
+      ].join('\n'),
+    )
+
+    expect(scanMigratable(root)).toEqual({
+      suggested: [{ name: 'toast', total: 3 }],
+      notYet: [],
+      types: [],
+    })
+  })
+
   it('does not fold a bal-check-list lookalike into checkbox', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-check-list></bal-check-list>\n')
