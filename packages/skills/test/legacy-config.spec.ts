@@ -84,7 +84,7 @@ describe('SKILL.md', () => {
     for (const phrase of [
       'Then run the Scan section of `shared/legacy-config.md`',
       'List each call it marks for deletion after the icon and asset findings',
-      'When step 1 listed icon or asset findings, ask one yes/no: rewrite every listed usage and delete every listed call?',
+      'When step 1 listed icon findings, icon candidates or asset findings, ask one yes/no: rewrite every listed usage and delete every listed call?',
       'When it listed only calls to delete, ask one yes/no: delete every listed call?',
       'Apply the Decide section of `shared/legacy-config.md`',
     ]) {

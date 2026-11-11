@@ -63,7 +63,7 @@ Every component migration also migrates the icons from `@baloise/ds-icons` and `
 
 `app` does not copy `icons` onto `ds-root`. The Registration rules in `shared/icons.md` handle it.
 
-`scripts/scan-icon-imports.mjs` takes the component's finding files as extra arguments and scans only those. Without them it scans the whole project, which the Assets step uses and the component report uses to point at files Assets still has to migrate. `test/scan-icon-imports.spec.ts` checks the map against `@helvetia-design/assets`, a workspace devDependency of this package, as `test/css-utils-map.spec.ts` does with `@helvetia-design/styles`.
+`scripts/scan-icon-imports.mjs` takes the component's finding files as extra arguments and scans only those. Without them it scans the whole project, which the Assets step uses and the component report uses to point at files Assets still has to migrate. It also scans binding values in templates, which the source scan masks, and skips `balIconClick`, the `bal-date` event. A `candidates` list holds string literals in script files only (`.ts .mts .cts .js .mjs .cjs`) that are keys of `shared/icon-name-map.json`, or that start with `alert` or `info` and have `icon` before them on the same line, because a bare `'info'` is usually a color or level. Only Assets rewrites them, after its one confirmation, because a string such as `'message'` can be unrelated. `renameTargets` in the map marks a `changed` name that a rename produces (`contact` to `message`), so the report does not flag it again. `test/scan-icon-imports.spec.ts` checks the map against `@helvetia-design/assets`, a workspace devDependency of this package, as `test/css-utils-map.spec.ts` does with `@helvetia-design/styles`.
 
 ### Shared extension and skip lists
 
