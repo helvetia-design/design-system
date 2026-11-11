@@ -83,10 +83,10 @@ describe('scanCleanup', () => {
       [
         "// import '@baloise/ds-styles/css/normalize.css'",
         "import '@helvetia-design/tokens/css/base'",
-        "import '@helvetia-design/styles/css/design-system.local'",
         `/* ${TODO} */`,
         "import '@baloise/ds-styles/css/structure.css'",
         "import '@baloise/ds-styles/css/core.css'",
+        "import '@helvetia-design/styles/css/design-system.local'",
         "import App from './App'",
         '',
       ].join('\n'),
@@ -99,9 +99,9 @@ describe('scanCleanup', () => {
       installCommand: 'pnpm install',
       remove: {
         lines: [
-          { file: 'src/main.tsx', line: 4, snippet: `/* ${TODO} */`, kind: 'todo' },
-          { file: 'src/main.tsx', line: 5, snippet: "import '@baloise/ds-styles/css/structure.css'", kind: 'import' },
-          { file: 'src/main.tsx', line: 6, snippet: "import '@baloise/ds-styles/css/core.css'", kind: 'import' },
+          { file: 'src/main.tsx', line: 3, snippet: `/* ${TODO} */`, kind: 'todo' },
+          { file: 'src/main.tsx', line: 4, snippet: "import '@baloise/ds-styles/css/structure.css'", kind: 'import' },
+          { file: 'src/main.tsx', line: 5, snippet: "import '@baloise/ds-styles/css/core.css'", kind: 'import' },
         ],
         dependencies: [
           { packageJsonPath: 'package.json', field: 'dependencies', name: '@baloise/ds-react' },
@@ -303,11 +303,11 @@ describe('scanCleanup', () => {
       [
         "/* @import '@baloise/ds-styles/css/all'; */",
         "@import '@helvetia-design/tokens/css/base';",
-        "@import '@helvetia-design/styles/css/design-system';",
         `/* ${TODO} */`,
         "@import '@baloise/ds-styles/css/font';",
         "@import '@baloise/ds-styles/css/structure';",
         "@import '@baloise/ds-styles/css/core';",
+        "@import '@helvetia-design/styles/css/design-system';",
         "@import '@baloise/ds-styles/css/utilities/all';",
         "@import '@helvetia-design/styles/css/utilities';",
         '',
@@ -320,15 +320,15 @@ describe('scanCleanup', () => {
       installCommand: 'npm install',
       remove: {
         lines: [
-          { file: 'src/styles.scss', line: 6, snippet: "@import '@baloise/ds-styles/css/structure';", kind: 'import' },
-          { file: 'src/styles.scss', line: 7, snippet: "@import '@baloise/ds-styles/css/core';", kind: 'import' },
+          { file: 'src/styles.scss', line: 5, snippet: "@import '@baloise/ds-styles/css/structure';", kind: 'import' },
+          { file: 'src/styles.scss', line: 6, snippet: "@import '@baloise/ds-styles/css/core';", kind: 'import' },
         ],
         dependencies: [],
       },
       keep: {
         lines: [
-          { file: 'src/styles.scss', line: 4, snippet: `/* ${TODO} */`, reason: 'legacy-below' },
-          { file: 'src/styles.scss', line: 5, snippet: "@import '@baloise/ds-styles/css/font';", reason: 'assets' },
+          { file: 'src/styles.scss', line: 3, snippet: `/* ${TODO} */`, reason: 'legacy-below' },
+          { file: 'src/styles.scss', line: 4, snippet: "@import '@baloise/ds-styles/css/font';", reason: 'assets' },
           {
             file: 'src/styles.scss',
             line: 8,
@@ -342,7 +342,7 @@ describe('scanCleanup', () => {
             field: 'dependencies',
             name: '@baloise/ds-styles',
             reason: 'used',
-            usedBy: ['src/styles.scss:5', 'src/styles.scss:8'],
+            usedBy: ['src/styles.scss:4', 'src/styles.scss:8'],
           },
         ],
       },
@@ -982,6 +982,131 @@ describe('scanCleanup', () => {
     expect(result.keep.lines.map(({ file, line, reason }) => `${file}:${line} ${reason}`)).toEqual([
       'package.json:4 manual',
     ])
+  })
+
+  it('keeps the core line and the TODO above it for CSS utils while a core.css class is left, and removes the structure line', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { 'react': '19.0.0', '@baloise/ds-styles': '19.0.0' } })
+    write(
+      root,
+      'src/main.tsx',
+      [
+        `/* ${TODO} */`,
+        "import '@baloise/ds-styles/css/structure.css'",
+        "import '@baloise/ds-styles/css/core.css'",
+        '',
+      ].join('\n'),
+    )
+    write(root, 'src/Table.tsx', 'export const T = () => <table className="table is-striped" />\n')
+
+    const result = scanCleanup(root)
+
+    expect(result.status).toBe('ready')
+    expect(result.remove).toEqual({
+      lines: [
+        { file: 'src/main.tsx', line: 2, snippet: "import '@baloise/ds-styles/css/structure.css'", kind: 'import' },
+      ],
+      dependencies: [],
+    })
+    expect(result.keep.lines).toEqual([
+      { file: 'src/main.tsx', line: 1, snippet: `/* ${TODO} */`, reason: 'legacy-below' },
+      { file: 'src/main.tsx', line: 3, snippet: "import '@baloise/ds-styles/css/core.css'", reason: 'css-utils' },
+    ])
+    expect(result.keep.dependencies).toEqual([
+      {
+        packageJsonPath: 'package.json',
+        field: 'dependencies',
+        name: '@baloise/ds-styles',
+        reason: 'used',
+        usedBy: ['src/main.tsx:3'],
+      },
+    ])
+  })
+
+  it('keeps the core line while a core.css selector in code or a core-lost class is left', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { '@baloise/ds-styles': '19.0.0' } })
+    write(root, 'src/styles.scss', "@import '@baloise/ds-styles/css/core';\n")
+    write(root, 'src/main.ts', "document.querySelector('.link')\n")
+
+    expect(scanCleanup(root).keep.lines).toEqual([
+      { file: 'src/styles.scss', line: 1, snippet: "@import '@baloise/ds-styles/css/core';", reason: 'css-utils' },
+    ])
+
+    write(root, 'src/main.ts', '')
+    write(root, 'src/upload.html', '<div class="file"></div>\n')
+
+    expect(scanCleanup(root).keep.lines).toEqual([
+      { file: 'src/styles.scss', line: 1, snippet: "@import '@baloise/ds-styles/css/core';", reason: 'css-utils' },
+    ])
+  })
+
+  it('removes the core line when only the app stylesheet selects a core.css class', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { '@baloise/ds-styles': '19.0.0' } })
+    write(root, 'src/styles.scss', "@import '@baloise/ds-styles/css/core';\n.card .title { margin: 0 }\n")
+
+    const result = scanCleanup(root)
+
+    expect(result.remove.lines).toEqual([
+      { file: 'src/styles.scss', line: 1, snippet: "@import '@baloise/ds-styles/css/core';", kind: 'import' },
+    ])
+    expect(result.keep.lines).toEqual([])
+  })
+
+  it('keeps a minified core entry in angular.json while a core.css class is left', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { '@angular/core': '18.0.0', '@baloise/ds-styles': '19.0.0' } })
+    write(
+      root,
+      'angular.json',
+      [
+        '{',
+        '  "projects": {',
+        '    "app": {',
+        '      "architect": {',
+        '        "build": {',
+        '          "options": {',
+        '            "styles": [',
+        '              "node_modules/@baloise/ds-styles/css/core.min.css",',
+        '              "src/styles.scss"',
+        '            ]',
+        '          }',
+        '        }',
+        '      }',
+        '    }',
+        '  }',
+        '}',
+        '',
+      ].join('\n'),
+    )
+    write(root, 'src/app/app.component.html', '<table class="table"></table>\n')
+
+    const result = scanCleanup(root)
+
+    expect(result.remove.lines).toEqual([])
+    expect(result.keep.lines).toEqual([
+      {
+        file: 'angular.json',
+        line: 8,
+        snippet: '"node_modules/@baloise/ds-styles/css/core.min.css",',
+        reason: 'css-utils',
+      },
+    ])
+  })
+
+  it('removes the core line once only Helvetia classes and utility classes are left', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { '@baloise/ds-styles': '19.0.0' } })
+    write(root, 'src/main.ts', "import '@baloise/ds-styles/css/core'\nconst type = 'button'\n")
+    write(root, 'src/a.html', '<table class="ds-table shadow-small"></table>\n')
+
+    const result = scanCleanup(root)
+
+    expect(result.remove.lines).toEqual([
+      { file: 'src/main.ts', line: 1, snippet: "import '@baloise/ds-styles/css/core'", kind: 'import' },
+    ])
+    expect(result.keep.lines).toEqual([])
   })
 
   it('prints the scan JSON and exits 0', () => {

@@ -18,7 +18,8 @@ import {
 
 const EXTENSIONS = new Set([...SOURCE_EXTENSIONS, ...STYLE_EXTENSIONS])
 const CLASS_ATTRIBUTES = new Set(['ngClass', 'active-class', 'exact-active-class'])
-const GROUP_STRENGTH = ['variant', 'structure', 'renamed', 'approximated', 'lost']
+const GROUP_STRENGTH = ['variant', 'structure', 'core', 'renamed', 'approximated', 'core-lost', 'lost']
+export const CORE_GROUPS = new Set(['core', 'core-lost'])
 const CLASS_TOKEN_RE = /^[a-z0-9][\w:./-]*$/
 const SELECTOR_TAGS =
   'a|article|aside|body|button|div|footer|form|h[1-6]|header|img|input|label|li|main|nav|ol|p|section|span|table|td|th|tr|ul'
@@ -42,8 +43,16 @@ export function loadMap(map = JSON.parse(readFileSync(MAP_PATH, 'utf8'))) {
     identical: pairs(map.variants.identical),
     unsupported: pairs(map.variants.unsupported),
     bases: [lookup(map.structure), lookup(map.renamed), lookup(map.approximated)],
-    structureLost: lookup(map.structureLost),
+    structureLost: new Map([
+      ...Object.entries(map.structureLost).map(([structure, modifiers]) => [structure, { modifiers, group: 'lost' }]),
+      ...Object.entries(map.core.structureLost).map(([structure, modifiers]) => [
+        structure,
+        { modifiers, group: 'core-lost' },
+      ]),
+    ]),
     lost: new Set(map.lost),
+    core: lookup(map.core.structure),
+    coreLost: new Set(map.core.lost),
   }
 }
 
@@ -66,6 +75,9 @@ function stronger(a, b) {
 /** Maps one class token; returns `null` when the token stays as it is. */
 export function mapToken(token, index) {
   const { chain, base } = splitVariants(token, index)
+  // Baloise ships no variant of a `core.css` class, so only a bare token is one.
+  if (chain.length === 0 && index.core.has(base)) return { from: token, to: index.core.get(base), group: 'core' }
+  if (chain.length === 0 && index.coreLost.has(base)) return { from: token, to: null, group: 'core-lost' }
   const key = `${chain.join(':')}|${base}`
   if (chain.length > 0 && index.identical.has(key)) return null
   if (chain.some(v => index.variantLost.has(v)) || index.lost.has(base) || index.unsupported.has(key)) {
@@ -97,16 +109,13 @@ export function mapClassTokens(tokens, index, siblings = []) {
   const names = new Set([...tokens.map(token => token.value), ...siblings])
   const pinned = new Set()
   const pairs = new Map()
-  for (const [structure, modifiers] of index.structureLost) {
+  for (const [structure, { modifiers, group }] of index.structureLost) {
     if (!names.has(structure)) continue
     const lost = modifiers.filter(modifier => names.has(modifier))
     if (lost.length === 0) continue
     pinned.add(structure)
     for (const modifier of lost) pinned.add(modifier)
-    pairs.set(
-      structure,
-      lost.map(modifier => `${structure} ${modifier}`),
-    )
+    pairs.set(structure, { group, from: lost.map(modifier => `${structure} ${modifier}`) })
   }
 
   const moves = []
@@ -116,7 +125,8 @@ export function mapClassTokens(tokens, index, siblings = []) {
       if (move) moves.push({ offset: token.offset, ...move })
       continue
     }
-    for (const from of pairs.get(token.value) ?? []) moves.push({ offset: token.offset, from, to: null, group: 'lost' })
+    const pair = pairs.get(token.value)
+    for (const from of pair?.from ?? []) moves.push({ offset: token.offset, from, to: null, group: pair.group })
     pairs.delete(token.value)
   }
   return moves
@@ -167,16 +177,24 @@ function group(found) {
   return { total: files.reduce((sum, file) => sum + file.findings.length, 0), files }
 }
 
+// A merged place without `group` still blocks the utilities line, so it drops `core` from the kept entry.
 function sortDynamic(dynamic) {
-  const seen = new Set()
-  return dynamic
-    .filter(entry => {
-      const key = `${entry.file}:${entry.line}:${entry.reason}`
-      if (seen.has(key)) return false
-      seen.add(key)
-      return true
-    })
-    .sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line)
+  const seen = new Map()
+  for (const entry of dynamic) {
+    const key = `${entry.file}:${entry.line}:${entry.reason}`
+    const first = seen.get(key)
+    if (!first) seen.set(key, { ...entry })
+    else if (!entry.group) delete first.group
+  }
+  return [...seen.values()].sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line)
+}
+
+function coreOnly(moves) {
+  return moves.every(move => CORE_GROUPS.has(move.group))
+}
+
+function mappedMoves(names, index) {
+  return names.map(name => mapToken(name, index)).filter(Boolean)
 }
 
 function collect({ file, text, comments }, index, found, dynamic) {
@@ -188,7 +206,14 @@ function collect({ file, text, comments }, index, found, dynamic) {
     if (!snippets.has(line)) snippets.set(line, toSnippet(lineText(text, offset)))
     return snippets.get(line)
   }
-  const report = (offset, reason) => dynamic.push({ file, line: lineOf(offset), snippet: snippetAt(offset), reason })
+  const report = (offset, reason, moves = []) =>
+    dynamic.push({
+      file,
+      line: lineOf(offset),
+      snippet: snippetAt(offset),
+      reason,
+      ...(moves.length > 0 && coreOnly(moves) ? { group: 'core' } : {}),
+    })
   const inComment = offset => comments[offset] !== text[offset]
 
   if (STYLE_EXTENSIONS.has(extension)) {
@@ -206,9 +231,8 @@ function collect({ file, text, comments }, index, found, dynamic) {
   for (const context of findContexts(text)) {
     // Object keys inside a call such as `cx({ grid: x })` cannot be rewritten in place, and the call's strings stay uncovered.
     if (context.keys) {
-      if (!inComment(context.start) && context.keys.some(key => mapToken(key, index))) {
-        report(context.start, 'non-literal class binding')
-      }
+      const keyMoves = mappedMoves(context.keys, index)
+      if (!inComment(context.start) && keyMoves.length > 0) report(context.start, 'non-literal class binding', keyMoves)
       continue
     }
     if (inComment(context.start)) {
@@ -240,13 +264,17 @@ function collect({ file, text, comments }, index, found, dynamic) {
   const literals = [...codeLiterals(text, comments, extension), ...boundAttributeLiterals(text)]
   for (const literal of literals) {
     if (inComment(literal.start) || covered.some(([start, end]) => literal.start < end && literal.end > start)) continue
-    const reason = literalReason(literal, index)
-    if (reason) report(literal.start, reason)
+    const found = literalReason(literal, index)
+    if (found) report(literal.start, found.reason, found.moves)
   }
 
   for (const input of classInputs(text)) {
-    if (inComment(input.start) || !tokensOf(input.value, 0).some(token => mapToken(token.value, index))) continue
-    report(input.start, 'class input')
+    const inputMoves = mappedMoves(
+      tokensOf(input.value, 0).map(token => token.value),
+      index,
+    )
+    if (inComment(input.start) || inputMoves.length === 0) continue
+    report(input.start, 'class input', inputMoves)
   }
 }
 
@@ -270,27 +298,60 @@ function elementStart(text, offset) {
   return start + readTag(text, start).length > offset ? start : -1
 }
 
+// `core.css` names such as `'button'` and `'link'` are common code values.
 function literalReason({ value, quote }, index) {
-  const mapped = token => CLASS_TOKEN_RE.test(token) && mapToken(token, index) !== null
+  const mapped = tokens =>
+    mappedMoves(
+      tokens.filter(token => CLASS_TOKEN_RE.test(token)),
+      index,
+    )
   if (quote === '`' && value.includes('${')) {
     const parts = staticParts(value, 0, '${')
-    if (parts.some(part => tokensOf(part.value, 0).some(token => mapped(token.value)))) return 'template substitution'
+    const moves = mapped(parts.flatMap(part => tokensOf(part.value, 0).map(token => token.value)))
+    if (moves.length > 0 && !coreOnly(moves)) return { reason: 'template substitution', moves }
   } else {
     const tokens = tokensOf(value, 0).map(token => token.value)
-    if (tokens.length > 0 && tokens.every(token => CLASS_TOKEN_RE.test(token)) && tokens.some(mapped)) {
-      return 'string literal outside a class context'
+    const moves = mapped(tokens)
+    if (
+      tokens.length > 0 &&
+      tokens.every(token => CLASS_TOKEN_RE.test(token)) &&
+      moves.length > 0 &&
+      !coreOnly(moves)
+    ) {
+      return { reason: 'string literal outside a class context', moves }
     }
   }
-  return selectorNames(value).some(name => mapToken(name, index)) ? 'selector' : undefined
+  const selectorText = quote === '`' ? withoutSubstitutions(value) : value
+  const moves = selectorNames(selectorText)
+    .map(({ name, tagged }) => ({ move: mapToken(name, index), tagged }))
+    .filter(({ move, tagged }) => move && !(tagged && CORE_GROUPS.has(move.group)))
+    .map(({ move }) => move)
+  return moves.length > 0 ? { reason: 'selector', moves } : undefined
 }
 
+function withoutSubstitutions(value) {
+  let text = ''
+  let cursor = 0
+  for (;;) {
+    const at = value.indexOf('${', cursor)
+    if (at === -1) return text + value.slice(cursor)
+    text += `${value.slice(cursor, at)} `
+    cursor = endOfSubstitution(value, at + 2)
+  }
+}
+
+// Translation keys such as `header.title` look like tag-qualified selectors.
 function selectorNames(value) {
-  return [...value.matchAll(SELECTOR_RE)].map(match => match[1].replace(/\\+/g, ''))
+  return [...value.matchAll(SELECTOR_RE)].map(match => {
+    const compound = /[\w.:\\-]*$/.exec(value.slice(0, match.index))[0]
+    return { name: match[1].replace(/\\+/g, ''), tagged: /^[A-Za-z]/.test(compound) && compound !== 'class' }
+  })
 }
 
 function checkStylesheet(source, offset, index, report) {
   for (const match of source.matchAll(STYLESHEET_SELECTOR_RE)) {
-    if (mapToken(match[1].replace(/\\+/g, ''), index)) report(offset + match.index, 'selector in a stylesheet')
+    const move = mapToken(match[1].replace(/\\+/g, ''), index)
+    if (move) report(offset + match.index, 'selector in a stylesheet', [move])
   }
 }
 
@@ -430,13 +491,14 @@ function staticPart(value, from, to, offset, gluedStart = from > 0, gluedEnd = t
   return start < end ? [{ value: value.slice(start, end), offset: offset + start }] : []
 }
 
-// Only a lone literal or a concatenation of literals is a class context; a call such as `cx(…)` is not.
+// Literals joined by operators, such as `ok ? 'table' : ''`, are a class context; a call such as `cx(…)` is not.
 function jsxExpressionContext(text, start, open, close) {
   const expression = text.slice(open, close)
   if (wrapped(expression.trim(), '{', '}')) return bindingContext(text, start, open, close)
   const literals = literalsIn(expression, open)
   const lone = literals.length === 1 && /^\s*["'`]/.test(expression) && /["'`]\s*$/.test(expression)
   if (!lone && !literals.some(literal => literal.concatenated)) {
+    if (literals.length > 0 && !readsValue(expression)) return bindingContext(text, start, open, close)
     const keys = [...expression.matchAll(/[{,]\s*([A-Za-z_$][\w$-]*)\s*:/g)].map(match => match[1])
     return keys.length > 0 ? { start, end: close + 1, keys } : undefined
   }

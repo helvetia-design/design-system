@@ -8,7 +8,7 @@ const MAP = JSON.parse(
   readFileSync(new URL('../skills/ds-migrate-from-baloise/shared/css-utils-map.json', import.meta.url), 'utf8'),
 )
 const VARIANT_RENAMES = MAP.variants.renamed
-const STRUCTURE_RENAMES = MAP.structure
+const STRUCTURE_RENAMES = { ...MAP.structure, ...MAP.core.structure }
 const SUFFIX_RENAMES = [
   ['-hovered', '-hover'],
   ['-pressed', '-active'],
@@ -66,7 +66,9 @@ function atRuleKind(prelude) {
 export function extractModifiers(css, structures) {
   const pairs = new Set()
   for (const selector of selectors(css)) {
-    for (const compound of selector.split(/[\s>+~,()]+/)) {
+    // `a.link:not(.button).is-inverted` pairs `link` with `is-inverted`, never with the negated `button`.
+    const positive = selector.replace(/:not\((?:[^()]|\([^()]*\))*\)/g, '')
+    for (const compound of positive.split(/[\s>+~,()]+/)) {
       const classes = [...compound.matchAll(/\.((?:\\.|[\w-])+)/g)].map(match => match[1].replace(/\\(.)/g, '$1'))
       for (const structure of structures) {
         if (!classes.includes(structure)) continue

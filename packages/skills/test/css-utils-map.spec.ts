@@ -20,6 +20,11 @@ type CssUtilsMap = {
   renamed: Record<string, string>
   approximated: Record<string, string>
   lost: string[]
+  core: {
+    structure: Record<string, string>
+    structureLost: Record<string, string[]>
+    lost: string[]
+  }
 }
 
 const require = createRequire(import.meta.url)
@@ -66,14 +71,27 @@ function splitChain(name: string) {
   return { chain, base }
 }
 
+const structures = { ...map.structure, ...map.core.structure }
+const structureLost = [map.structureLost, map.core.structureLost].flatMap(group =>
+  Object.entries(group).flatMap(([structure, modifiers]) => modifiers.map(modifier => `${structure} ${modifier}`)),
+)
+const coreModifiers = [...new Set(Object.values(map.core.structureLost).flat())]
 const baseKeys = [
   ...Object.keys(map.structure),
   ...Object.keys(map.renamed),
   ...Object.keys(map.approximated),
   ...map.lost,
   ...Object.values(map.structureLost).flat(),
+  ...Object.keys(map.core.structure),
+  ...map.core.lost,
 ]
-const values = [...Object.values(map.structure), ...Object.values(map.renamed), ...Object.values(map.approximated)]
+const groupKeys = [...baseKeys, ...coreModifiers]
+const values = [
+  ...Object.values(map.structure),
+  ...Object.values(map.renamed),
+  ...Object.values(map.approximated),
+  ...Object.values(map.core.structure),
+]
 
 describe('css-utils-map.json', () => {
   it('maps only Baloise classes that Helvetia lacks', () => {
@@ -81,6 +99,12 @@ describe('css-utils-map.json', () => {
       expect(baloise, key).toContain(key)
       expect(helvetia.has(key), key).toBe(false)
     }
+    for (const modifier of coreModifiers) expect(baloise, modifier).toContain(modifier)
+    for (const structure of Object.keys(map.core.structureLost)) expect(map.core.structure).toHaveProperty(structure)
+  })
+
+  it('gives the alias is-list the same lost modifiers as list', () => {
+    expect(map.core.structureLost['is-list']).toEqual(map.core.structureLost.list)
   })
 
   it('maps every class to one that Helvetia ships', () => {
@@ -88,7 +112,7 @@ describe('css-utils-map.json', () => {
   })
 
   it('never maps to a key, so a second run changes nothing', () => {
-    const keys = new Set(baseKeys)
+    const keys = new Set(groupKeys)
     for (const value of [...values, ...Object.values(map.variants.renamed)]) expect(keys.has(value), value).toBe(false)
     for (const value of Object.values(map.variants.renamed)) {
       expect(Object.keys(map.variants.renamed)).not.toContain(value)
@@ -96,11 +120,11 @@ describe('css-utils-map.json', () => {
   })
 
   it('puts no class in two groups', () => {
-    expect(new Set(baseKeys).size).toBe(baseKeys.length)
+    expect(new Set(groupKeys).size).toBe(groupKeys.length)
   })
 
   it('covers every Baloise-only class without a variant prefix with exactly one group', () => {
-    const covered = new Set(baseKeys)
+    const covered = new Set(groupKeys)
     const uncovered = baloise.filter(name => !helvetia.has(name) && splitChain(name).chain.length === 0)
     expect(uncovered.filter(name => !covered.has(name))).toEqual([])
   })
@@ -141,24 +165,21 @@ describe('css-utils-map.json', () => {
   })
 
   it('maps every other Baloise class to a Helvetia class or reports it as lost', () => {
-    const pairModifiers = new Set(Object.values(map.structureLost).flat())
+    const pairModifiers = new Set([...Object.values(map.structureLost).flat(), ...coreModifiers])
     const misses = baloise
       .filter(name => !helvetia.has(name) && !pairModifiers.has(name))
       .map(name => ({ name, move: mapToken(name, index) }))
-      .filter(({ move }) => move === null || (move.group !== 'lost' && !helvetia.has(move.to)))
+      .filter(({ move }) => move === null || (move.to === null ? !move.group.endsWith('lost') : !helvetia.has(move.to)))
       .map(({ name, move }) => `${name} -> ${move?.to ?? 'unchanged'}`)
     expect(misses).toEqual([])
   })
 
   it('lists every structure modifier the Helvetia counterpart lacks, and only those', () => {
-    const counterpart = new Set(helvetiaCss.flatMap(css => extractModifiers(css, Object.values(map.structure))))
+    const counterpart = new Set(helvetiaCss.flatMap(css => extractModifiers(css, Object.values(structures))))
     const missing = baloiseModifiers.filter(pair => {
       const [structure, modifier] = pair.split(' ')
-      return !counterpart.has(`${map.structure[structure]} ${modifier}`)
+      return !counterpart.has(`${structures[structure]} ${modifier}`)
     })
-    const listed = Object.entries(map.structureLost).flatMap(([structure, modifiers]) =>
-      modifiers.map(modifier => `${structure} ${modifier}`),
-    )
-    expect(listed.sort()).toEqual(missing.sort())
+    expect([...structureLost].sort()).toEqual(missing.sort())
   })
 })
