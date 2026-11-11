@@ -5,11 +5,14 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
 const USAGE_RE =
-  /<\/?bal-toast\b|<\/?BalToast\b|\b(?:balToastController|BalToastController|BalToastService|BalToastOptions|BalToast)\b/g
+  /<\/?bal-toast\b|<\/?BalToast\b|\b(?:balToastController|BalToastController|BalToastService|BalToastOptions|BalToast)\b|<\/?bal-notices(?![\w-])|<\/?BalNotices\b|\b(?:BalNotices|defineBalNotices)\b/g
+
+const NOTICES_IMPORT_RE =
+  /(?:\bfrom|\bimport\s*\(?|\brequire\s*\()\s*['"]@baloise\/ds-core\/(?:dist\/)?components\/bal-notices(?:\.js)?['"]/g
 
 export function scanBalToast(rootDir, paths = []) {
   const found = []
-  const unmatched = scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found), { paths })
+  const unmatched = scanSourceFiles(rootDir, source => collect(source, found), { paths })
   const result = group(found)
   return unmatched.length > 0 ? { ...result, unmatched } : result
 }
@@ -40,13 +43,25 @@ function group(found) {
   }
 }
 
-function collect(file, text, masked, found) {
+function collect({ file, text, masked, comments }, found) {
+  const lines = new Set()
   USAGE_RE.lastIndex = 0
   let match
   while ((match = USAGE_RE.exec(masked)) !== null) {
     const index = match.index
     const raw = match[0].startsWith('<') ? readTag(text, index) : lineText(text, index)
-    found.push({ file, index, line: lineAt(text, index), snippet: toSnippet(raw) })
+    const line = lineAt(text, index)
+    lines.add(line)
+    found.push({ file, index, line, snippet: toSnippet(raw) })
+  }
+  if (!text.includes('bal-notices')) return
+  // The import path is a string literal, which `masked` blanks, so it is read from the comment-masked text.
+  NOTICES_IMPORT_RE.lastIndex = 0
+  while ((match = NOTICES_IMPORT_RE.exec(comments)) !== null) {
+    const line = lineAt(text, match.index)
+    if (lines.has(line)) continue
+    lines.add(line)
+    found.push({ file, index: match.index, line, snippet: toSnippet(lineText(text, match.index)) })
   }
 }
 

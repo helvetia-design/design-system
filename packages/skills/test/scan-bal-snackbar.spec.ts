@@ -275,12 +275,7 @@ describe('scanBalSnackbar', () => {
     write(
       root,
       'other.html',
-      [
-        '<bal-snackbar-foo>nope</bal-snackbar-foo>',
-        '<bal-notices>nope</bal-notices>',
-        '<bal-toast (balClose)="x()">nope</bal-toast>',
-        '',
-      ].join('\n'),
+      ['<bal-snackbar-foo>nope</bal-snackbar-foo>', '<bal-toast (balClose)="x()">nope</bal-toast>', ''].join('\n'),
     )
     write(
       root,
@@ -297,6 +292,97 @@ describe('scanBalSnackbar', () => {
     expect(scanBalSnackbar(root)).toEqual({
       total: 1,
       files: [{ file: 'types.ts', findings: [{ line: 4, snippet: 'let comp: Components.BalSnackbar' }] }],
+    })
+  })
+
+  it('lists the bal-notices container, its define call and its import, and skips comments and longer names', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'main.tsx',
+      [
+        '// bal-notices hosts the legacy toasts and snackbars.',
+        "// import { defineCustomElement } from '@baloise/ds-core/components/bal-notices.js'",
+        "import { defineCustomElement as defineBalNotices } from '@baloise/ds-core/components/bal-notices.js'",
+        "import { defineCustomElement } from '@baloise/ds-core/components/bal-notices.js'",
+        "import { BalNotices } from '@baloise/ds-react'",
+        "const _tag = 'bal-notices-foo'",
+        'defineBalNotices()',
+        'export const App = () => <BalNotices />',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'page.html',
+      [
+        '<!-- <bal-notices interface="snackbar"></bal-notices> -->',
+        '<bal-notices interface="snackbar"></bal-notices>',
+        '<bal-notices-foo></bal-notices-foo>',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalSnackbar(root)).toEqual({
+      total: 7,
+      files: [
+        {
+          file: 'main.tsx',
+          findings: [
+            {
+              line: 3,
+              snippet:
+                "import { defineCustomElement as defineBalNotices } from '@baloise/ds-core/components/bal-notices.js'",
+            },
+            { line: 4, snippet: "import { defineCustomElement } from '@baloise/ds-core/components/bal-notices.js'" },
+            { line: 5, snippet: "import { BalNotices } from '@baloise/ds-react'" },
+            { line: 7, snippet: 'defineBalNotices()' },
+            { line: 8, snippet: '<BalNotices />' },
+          ],
+        },
+        {
+          file: 'page.html',
+          findings: [
+            { line: 2, snippet: '<bal-notices interface="snackbar">' },
+            { line: 2, snippet: '</bal-notices>' },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('lists the bal-notices import only in import syntax, and skips config strings and longer names', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'main.ts',
+      [
+        "import '@baloise/ds-core/dist/components/bal-notices'",
+        "const lazy = () => import( '@baloise/ds-core/components/bal-notices.js' )",
+        "const legacy = require('@baloise/ds-core/components/bal-notices.js')",
+        "import { defineCustomElement } from '@baloise/ds-core/components/bal-notices-foo.js'",
+        'const BalNoticesFoo = 1',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'vite.config.ts',
+      "export default { optimizeDeps: { include: ['@baloise/ds-core/components/bal-notices.js'] } }\n",
+    )
+
+    expect(scanBalSnackbar(root)).toEqual({
+      total: 3,
+      files: [
+        {
+          file: 'main.ts',
+          findings: [
+            { line: 1, snippet: "import '@baloise/ds-core/dist/components/bal-notices'" },
+            { line: 2, snippet: "const lazy = () => import( '@baloise/ds-core/components/bal-notices.js' )" },
+            { line: 3, snippet: "const legacy = require('@baloise/ds-core/components/bal-notices.js')" },
+          ],
+        },
+      ],
     })
   })
 

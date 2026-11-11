@@ -2,7 +2,7 @@
 
 Migrate every `bal-toast` usage to `ds-toast`. Init has already added the `@helvetia-design/*` packages. This task rewrites usages only.
 
-The legacy folder has no child elements. Rewrite `bal-toast` only. Leave slotted content in place. `bal-close` is drawn inside the legacy toast and is not a consumer tag. `bal-toaster` and `BalToaster` are not this component and stay unchanged.
+The legacy folder has no child elements. Rewrite `bal-toast` only. Leave slotted content in place. `bal-close` is drawn inside the legacy toast and is not a consumer tag. `bal-toaster` and `BalToaster` are not this component and stay unchanged. `bal-notices` follows the Notices container section.
 
 ## 1. Scan
 
@@ -121,6 +121,15 @@ useEffect(() => {
 
 `useToast` comes from `@helvetia-design/react`, and `balToastController` leaves the `@baloise/ds-core` import. `heading: ''` is added because `Alert.heading` is required and legacy had none. `closable: true` and `duration: 0` keep the legacy defaults. `closeHandler` and `actionHandler` are added because `Alert` requires them. The element variable is gone, and `.close()` becomes `dismissToast()`. Report the cleanup.
 
+### Notices container
+
+`bal-notices` was the legacy container for toasts and snackbars. `dsToastController` creates its own `ds-alert-container`, so the app needs no container. The scan lists `<bal-notices>`, `</bal-notices>`, `BalNotices`, `defineBalNotices` and every import of `@baloise/ds-core/components/bal-notices.js`, under any alias.
+
+- Delete a `<bal-notices>` element whose static `interface` is `toast`, including its closing tag. A `<bal-notices>` with a static `interface="snackbar"` follows the next bullet, so it goes only when no snackbar is left.
+- A `<bal-notices>` with `interface="snackbar"`, without `interface` or with a bound `interface`, a `BalNotices` React element, every call of the `defineCustomElement` imported from `bal-notices.js` (any alias, such as `defineBalNotices()`), and that import go only when no snackbar is left. After this run's rewrite, run `node <this-skill-directory>/scripts/scan-bal-snackbar.mjs <project-root>`. When it lists no finding other than `bal-notices` ones, delete them. Otherwise keep them and report that they go with the snackbar migration.
+- With the last deleted element, delete the `BalNotices` import specifier and its entry in Angular `imports`. Delete an import when no specifier is left on it.
+- Delete a comment block directly above a deleted import or call when it only explains `bal-notices`.
+
 ### Events
 
 | old            | new                                                       | handling                                                                                                                                                                                                                                                                                                                                                |
@@ -152,16 +161,18 @@ Needs your attention when found:
 13. Every `dismissToast()` in a `useEffect` cleanup that can run before `presentToast` resolves. The notice then stays open.
 14. Every component that presents more than one toast through one hook. `dismissToast()` closes only the last one.
 15. Every `balClose` listener left unchanged because its target is unknown.
+16. Every `bal-notices` element, `BalNotices` element, `defineBalNotices()` call or `bal-notices.js` import kept because a snackbar is left. It goes with the snackbar migration.
 
 Coverage only, written to the file:
 
-16. Every added close control.
-17. Every `color="primary"`.
-18. Every dropped `animated` and `container`.
-19. Every `BalToastService` replaced by `DsToastService`.
-20. In React components, every `balToastController` call rewritten to `useToast`, naming the hook as the reason the alert host is registered.
-21. Every module outside React components that got `defineCustomElement` calls for `ds-alert-container` and `ds-toast`.
-22. Every added `duration: 0`.
+17. Every added close control.
+18. Every `color="primary"`.
+19. Every dropped `animated` and `container`.
+20. Every `BalToastService` replaced by `DsToastService`.
+21. In React components, every `balToastController` call rewritten to `useToast`, naming the hook as the reason the alert host is registered.
+22. Every module outside React components that got `defineCustomElement` calls for `ds-alert-container` and `ds-toast`.
+23. Every added `duration: 0`.
+24. Every `bal-notices` element, `BalNotices` element, `defineBalNotices()` call, `bal-notices.js` import and `bal-notices` comment block deleted.
 
 Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 

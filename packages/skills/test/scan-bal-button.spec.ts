@@ -411,7 +411,8 @@ describe('button migration.md', () => {
       'rounded',
       'isActive',
       'bal-popup',
-      'ds-popup',
+      'data-popup',
+      'the popup migration rewrites',
       'components/icon/migration.md',
       'brandIcon',
       'BalButtonBundle',
@@ -429,5 +430,7 @@ describe('button migration.md', () => {
     ]) {
       expect(migration, phrase).toContain(phrase)
     }
+    expect(migration).not.toContain('the `ds-popup` attribute')
+    expect(migration).not.toContain('Rewrite the bare attribute')
   })
 })
