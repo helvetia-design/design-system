@@ -75,7 +75,7 @@ function collectImperative(file, text, masked, found) {
 
   CREATE_RESULT_RE.lastIndex = 0
   while ((match = CREATE_RESULT_RE.exec(masked)) !== null) {
-    const name = match[1].replace(/\$/g, '\\$')
+    const name = match[1].replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     const presentRe = new RegExp(`(?<![\\w$.])(?:this\\.)?${name}\\s*\\??\\.present\\s*\\(`, 'g')
     let call
     while ((call = presentRe.exec(masked)) !== null) add(call.index)
