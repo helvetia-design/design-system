@@ -13,7 +13,7 @@ On invocation, present this menu and wait for one choice:
 
 1. **Init** — bootstrap Helvetia packages alongside the existing Baloise install
 2. **Components** — migrate a specific `bal-*` component to `ds-*`
-3. **CSS utils** — rewrite legacy Baloise utility classes and delete the Baloise utilities line once none is left
+3. **CSS utils** — rewrite legacy Baloise utility classes and `css/core` classes such as `table`, and delete the Baloise utilities line once no legacy utility class is left
 4. **Assets** — migrate legacy icons in files that no component migration touches, move fonts and favicons to `@helvetia-design/assets`, and delete the legacy config call once no `bal-*` component is left
 5. **Cleanup** — once every `bal-*` component is migrated, delete the legacy `structure` and `core` imports and the legacy `@baloise/ds-*` dependencies
 
@@ -49,24 +49,33 @@ If `status` is `ready`, show the detected framework, package manager, version, a
      - `normalize`
      - `font`, `structure`, `core`
      - The Baloise **utilities** line, in any of its real forms: `css/utilities/all`, one of the nine category files under `css/utilities/` (`background`, `border`, `elevation`, `flex`, `grid`, `interaction`, `layout`, `sizing`, `spacing`, `typography`), or the bundled `css/all` (see below)
-   - `normalize`: comment out the original line in place (wrap it as `/* @import '@baloise/ds-styles/css/normalize.css'; */`, or the equivalent for its syntax). Immediately below the commented line, insert both, using the matching at-rule:
+   - `normalize`: comment out the original line in place (wrap it as `/* @import '@baloise/ds-styles/css/normalize.css'; */`, or the equivalent for its syntax). Immediately below the commented line, insert `@helvetia-design/tokens/css/base`, using the matching at-rule. Insert `@helvetia-design/styles/css/design-system` directly after the last Baloise `font`, `structure` or `core` line of that file, and above the Baloise utilities line and its TODO comment when the file has them. When the file has no `font`, `structure` or `core` line, insert it directly below the tokens line. When the `font`, `structure` or `core` lines and `normalize` sit in different entry files, insert it after the last of those lines in load order, for example in the file that holds them, never before them. The design system must load after the Baloise base styles, so Helvetia wins where both style the same element, such as `body`, `button` and `hr` in `structure` or `a.is-link` in `core`. `tokens/css/base` holds only custom properties, so its place does not matter. A file with all of these lines ends up in this order:
 
      ```scss
+     /* @import '@baloise/ds-styles/css/normalize.css'; */
      @import '@helvetia-design/tokens/css/base';
+     /* TODO: remove these legacy Baloise imports once the Helvetia migration is verified */
+     @import '@baloise/ds-styles/css/font.css';
+     @import '@baloise/ds-styles/css/structure.css';
+     @import '@baloise/ds-styles/css/core.css';
      @import '@helvetia-design/styles/css/design-system';
+     /* TODO: remove the legacy Baloise utilities once no legacy utility class is left */
+     @import '@baloise/ds-styles/css/utilities/all.css';
+     @import '@helvetia-design/styles/css/utilities';
      ```
 
-   - `font`, `structure`, `core`: leave these three lines unchanged and keep them. Immediately above the first of the three (or, if `normalize` was on the line directly above, immediately below the two new imports), insert one comment noting they must be removed manually once the migration is verified, e.g. `/* TODO: remove these legacy Baloise imports once the Helvetia migration is verified */`. Insert that comment once, not once per line.
+   - `font`, `structure`, `core`: leave these three lines unchanged and keep them. Immediately above the first of the three (or, if `normalize` was on the line directly above, immediately below the new tokens import), insert one comment noting they must be removed manually once the migration is verified, e.g. `/* TODO: remove these legacy Baloise imports once the Helvetia migration is verified */`. Insert that comment once, not once per line.
    - Baloise **utilities** line (`css/utilities/all`, any of the nine category files, or `css/utilities/<name>`): leave the line unchanged and keep it. The app markup still uses the legacy utility classes, and many of them have no Helvetia equivalent. Insert the `@helvetia-design/styles/css/utilities` equivalent once, immediately below the last Baloise utilities line, using the matching at-rule or the equivalent local form for the project's `framework`. The Helvetia line must load after the Baloise one, so Helvetia wins where both define the same class. Immediately above the first Baloise utilities line, insert one comment noting it must be removed manually once the migration is verified, e.g. `/* TODO: remove the legacy Baloise utilities once no legacy utility class is left */`.
-   - Bundled `css/all`: this one file contains normalize + font + structure + core + utilities together. Its normalize clashes with the Helvetia design system, so comment out the original line in place. Immediately below it, insert the Helvetia base imports, then the legacy parts without normalize, then the Helvetia utilities, using the matching at-rule:
+   - Bundled `css/all`: this one file contains normalize + font + structure + core + utilities together. Its normalize clashes with the Helvetia design system, so comment out the original line in place. Immediately below it, insert the tokens import, then the legacy parts without normalize, then the design system, then the Baloise and Helvetia utilities, using the matching at-rule. The design system sits after `core` for the same reason as in the `normalize` rule:
 
      ```scss
+     /* @import '@baloise/ds-styles/css/all'; */
      @import '@helvetia-design/tokens/css/base';
-     @import '@helvetia-design/styles/css/design-system';
      /* TODO: remove these legacy Baloise imports once the Helvetia migration is verified */
      @import '@baloise/ds-styles/css/font';
      @import '@baloise/ds-styles/css/structure';
      @import '@baloise/ds-styles/css/core';
+     @import '@helvetia-design/styles/css/design-system';
      @import '@baloise/ds-styles/css/utilities/all';
      @import '@helvetia-design/styles/css/utilities';
      ```
@@ -236,11 +245,11 @@ Scope does not follow imports. A child component in another folder stays `bal-*`
 
 ### CSS utils
 
-Rewrite the legacy Baloise utility classes in the project to their Helvetia names, following `shared/css-utils.md`, and delete the Baloise utilities line once no legacy class is left. Component migrations do not rewrite utility classes. This step covers them for the whole project or for a path list.
+Rewrite the legacy Baloise utility classes and the plain `css/core` classes, such as `table` and `link`, in the project to their Helvetia names, following `shared/css-utils.md`. Delete the Baloise utilities line once no legacy utility class is left. Component migrations do not rewrite these classes. This step covers them for the whole project or for a path list. Run it before **Cleanup**, which keeps the legacy `css/core` line while a `css/core` class is left.
 
-1. Ask whether to scan the whole project or a list of paths. Run the Scan section of `shared/css-utils.md`, with the paths when the user gave any. Show the findings grouped by file (path, line, snippet, and each class move), the total per group, and the `dynamic` list. Then decide whether the Baloise utilities line can go: it can when a whole-project scan (the same one, when no paths were given) reports no `lost` move, no `dynamic` place and no move outside the scanned files. In that case, list each Baloise utilities line that the Legacy utilities line section of `shared/css-utils.md` would delete after the findings.
-2. When step 1 listed class moves with a `to`, ask one yes/no: rewrite every listed class and delete every listed line? When it listed only lines to delete, ask one yes/no: delete every listed line? On no, stop with the files unchanged. When it listed neither, say that nothing can be rewritten or deleted, naming the `lost` moves and `dynamic` places, and skip to step 5.
-3. Apply the Rewrite section of `shared/css-utils.md` to every listed move.
+1. Ask whether to scan the whole project or a list of paths. Run the Scan section of `shared/css-utils.md`, with the paths when the user gave any. Show the findings grouped by file (path, line, snippet, and each class move), the total per group, and the `dynamic` list. Then decide whether the Baloise utilities line can go: it can when a whole-project scan (the same one, when no paths were given) reports no `lost` move, no `dynamic` place and no move outside the scanned files. Ignore `core` and `core-lost` moves and `dynamic` places with `group: 'core'` here, because those classes depend on the legacy `css/core` line, not on the utilities line. In that case, list each Baloise utilities line that the Legacy utilities line section of `shared/css-utils.md` would delete after the findings.
+2. When step 1 listed class moves with a `to`, ask one yes/no: rewrite every listed class and delete every listed line? When it listed only lines to delete, ask one yes/no: delete every listed line? On no, stop with the files unchanged. When it listed neither, say that nothing can be rewritten or deleted, naming the `lost` and `core-lost` moves and the `dynamic` places, and skip to step 5.
+3. Apply the Rewrite section of `shared/css-utils.md` to every listed move. Skip a `core` class that the project's own stylesheet defines, and write a class only once per element.
 4. Apply the Legacy utilities line section of `shared/css-utils.md`. It scans the whole project again and deletes only the lines that step 2 confirmed.
 5. Append a `css-utils` section to `ds-migration-report.md` as `shared/report.md` describes. Its checklist holds the `U1.`, `U2.`, ... items from the Report section of `shared/css-utils.md`.
 6. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.
@@ -262,7 +271,7 @@ Migrate every legacy icon left in the project, following `shared/icons.md`. Comp
 
 Delete what Init kept for the transition, once the migration is complete, following `shared/cleanup.md`. Run this step last, after **Components**, **CSS utils** and **Assets**.
 
-1. Run `scan-cleanup.mjs` from the Scan section of `shared/cleanup.md`. It runs `scan-migratable.mjs` first.
+1. Run `scan-cleanup.mjs` from the Scan section of `shared/cleanup.md`. It runs `scan-migratable.mjs` first. It also runs the **CSS utils** scan and keeps the `css/core` line while a `css/core` class is left.
    - When `status` is `incomplete`, do not edit files. List every entry in `outstanding.suggested` with its `total` and say to migrate it with **Components** first. List every entry in `outstanding.notYet` with its `total` as a component that this version of the skill cannot migrate, which the consumer must replace by hand. List every entry in `outstanding.types` with its `total` as legacy types that the consumer must replace by hand, because removing the `@baloise/ds-*` dependency breaks every file that still imports them. List every line in `outstanding.hidden` (path, line, snippet) as a `bal-*` tag that the scan cannot attribute to a component, which the consumer must migrate by hand. Stop.
    - When `status` is `nothing-to-clean-up`, do not edit files. Say there is nothing to clean up. List every line in `keep.lines`, every entry in `keep.dependencies` and every file in `unreadable` as in step 2. Stop.
 2. When `status` is `ready`, show what the step deletes: every line in `remove.lines` (path, line, snippet) and every entry in `remove.dependencies` (manifest, field, name). Then show what stays: every line in `keep.lines` and every entry in `keep.dependencies` with the pointer that the Scan section of `shared/cleanup.md` gives for its `reason`, and every file in `unreadable`. Say that the scan skips build output such as `dist` and `build`, and ask the consumer to check build tooling outside the scanned files for legacy references. Ask one yes/no: delete every listed line and dependency? On no, stop with the files unchanged.

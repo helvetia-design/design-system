@@ -34,11 +34,11 @@ describe('scanAssets', () => {
       [
         "// import '@baloise/ds-styles/css/normalize.css'",
         "import '@helvetia-design/tokens/css/base'",
-        "import '@helvetia-design/styles/css/design-system'",
         '/* TODO: remove these legacy Baloise imports once the Helvetia migration is verified */',
         "import '@baloise/ds-styles/css/font.css'",
         "import '@baloise/ds-styles/css/structure.css'",
         "import '@baloise/ds-styles/css/core.css'",
+        "import '@helvetia-design/styles/css/design-system'",
         "import '@helvetia-design/styles/css/utilities'",
         '',
       ].join('\n'),
@@ -73,8 +73,8 @@ describe('scanAssets', () => {
         {
           file: 'src/main.tsx',
           findings: [
-            { line: 3, snippet: "import '@helvetia-design/styles/css/design-system'" },
-            { line: 5, snippet: "import '@baloise/ds-styles/css/font.css'" },
+            { line: 4, snippet: "import '@baloise/ds-styles/css/font.css'" },
+            { line: 7, snippet: "import '@helvetia-design/styles/css/design-system'" },
           ],
         },
       ],

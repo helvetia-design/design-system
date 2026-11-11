@@ -763,6 +763,7 @@ describe('places a rewrite would break', () => {
 
     expect(moves(scanCssUtils(root)).map(({ file, line, from }) => ({ file, line, from }))).toEqual([
       { file: 'a.component.html', line: 1, from: 'grid' },
+      { file: 'a.component.html', line: 1, from: 'list' },
       { file: 'a.component.html', line: 2, from: 'container' },
       { file: 'b.tsx', line: 1, from: 'grid' },
       { file: 'b.tsx', line: 1, from: 'col' },
@@ -876,5 +877,127 @@ describe('places a rewrite would break', () => {
       { file: 'a.vue', line: 3, reason: 'class input' },
       { file: 'a.vue', line: 5, reason: 'string literal outside a class context' },
     ])
+  })
+
+  it('renames core.css classes in class contexts and reports those without counterpart as core-lost', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'a.component.html',
+      [
+        '<table class="table is-striped is-hoverable w-full"></table>',
+        '<a class="link" routerLink="/">Home</a>',
+        '<div class="file"><input class="file-input" type="file" /></div>',
+        '',
+      ].join('\n'),
+    )
+
+    const result = scanCssUtils(root)
+    expect(moves(result).map(({ line, from, to, group }) => ({ line, from, to, group }))).toEqual([
+      { line: 1, from: 'table', to: 'ds-table', group: 'core' },
+      { line: 2, from: 'link', to: 'ds-link', group: 'core' },
+      { line: 3, from: 'file', to: null, group: 'core-lost' },
+      { line: 3, from: 'file-input', to: null, group: 'core-lost' },
+    ])
+    expect(result.dynamic).toEqual([])
+  })
+
+  it('reports a core.css class with a modifier its counterpart lacks as a core-lost pair, and the modifier alone not at all', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'a.tsx',
+      [
+        'export const A = () => <table className="table is-bordered" />',
+        'export const B = () => <div className="field has-addons" />',
+        'export const C = () => <li className="is-selected is-bordered" />',
+        '',
+      ].join('\n'),
+    )
+
+    expect(moves(scanCssUtils(root)).map(({ line, from, to, group }) => ({ line, from, to, group }))).toEqual([
+      { line: 1, from: 'table is-bordered', to: null, group: 'core-lost' },
+      { line: 2, from: 'field has-addons', to: null, group: 'core-lost' },
+    ])
+  })
+
+  it('does not report a code literal that holds only core.css classes', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'a.ts',
+      [
+        "const type = 'button'",
+        "const variants = ['button', 'reset', 'submit']",
+        "const icon = { name: 'file' }",
+        'const text = `${option?.label} link`',
+        "t('header.title') + t('nav.grid.title')",
+        '',
+      ].join('\n'),
+    )
+    write(root, 'b.component.html', `<ds-button [color]="'link'"></ds-button>\n`)
+
+    expect(scanCssUtils(root)).toEqual({ total: 0, files: [], dynamic: [] })
+  })
+
+  it('marks dynamic places whose only mapped classes are core.css classes with the core group', () => {
+    const root = createScratchDir()
+    write(root, 'a.scss', ['.table td { padding: 0 }', '.grid .link {}', '.shadow-small {}', ''].join('\n'))
+    write(
+      root,
+      'b.ts',
+      ["document.querySelector('.table')", "const round = 'radius-normal button'", "el.closest('.grid')", ''].join(
+        '\n',
+      ),
+    )
+    write(root, 'c.vue', '<template><my-card body-class="title"></my-card></template>\n')
+
+    expect(scanCssUtils(root).dynamic.map(({ file, line, reason, group }) => ({ file, line, reason, group }))).toEqual([
+      { file: 'a.scss', line: 1, reason: 'selector in a stylesheet', group: 'core' },
+      { file: 'a.scss', line: 2, reason: 'selector in a stylesheet', group: undefined },
+      { file: 'a.scss', line: 3, reason: 'selector in a stylesheet', group: undefined },
+      { file: 'b.ts', line: 1, reason: 'selector', group: 'core' },
+      { file: 'b.ts', line: 2, reason: 'string literal outside a class context', group: undefined },
+      { file: 'b.ts', line: 3, reason: 'selector', group: undefined },
+      { file: 'c.vue', line: 1, reason: 'class input', group: 'core' },
+    ])
+  })
+
+  it('drops the core group when a merged place also names a non-core class', () => {
+    const root = createScratchDir()
+    write(root, 'a.scss', '.link .grid {}\n')
+    write(root, 'b.ts', "document.querySelector('div.grid')\n")
+
+    expect(scanCssUtils(root).dynamic.map(({ file, line, reason, group }) => ({ file, line, reason, group }))).toEqual([
+      { file: 'a.scss', line: 1, reason: 'selector in a stylesheet', group: undefined },
+      { file: 'b.ts', line: 1, reason: 'selector', group: undefined },
+    ])
+  })
+
+  it('marks an object key in a className call with the core group only when every key is a core.css class', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'a.tsx',
+      [
+        'export const A = () => <div className={cx({ table: a })} />',
+        'export const B = () => <div className={cx({ table: a, grid: b })} />',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanCssUtils(root).dynamic.map(({ line, reason, group }) => ({ line, reason, group }))).toEqual([
+      { line: 1, reason: 'non-literal class binding', group: 'core' },
+      { line: 2, reason: 'non-literal class binding', group: undefined },
+    ])
+  })
+
+  it('renames a core.css class in a conditional className expression', () => {
+    const root = createScratchDir()
+    write(root, 'a.tsx', "export const A = () => <div className={ok ? 'table' : ''} />\n")
+
+    const result = scanCssUtils(root)
+    expect(moves(result)).toEqual([{ file: 'a.tsx', line: 1, from: 'table', to: 'ds-table', group: 'core' }])
+    expect(result.dynamic).toEqual([])
   })
 })

@@ -11,6 +11,7 @@ import {
   installCommand,
   LOCKFILES,
 } from './detect-baloise.mjs'
+import { CORE_GROUPS, scanCssUtils } from './scan-css-utils.mjs'
 import { scanMigratable } from './scan-migratable.mjs'
 import { scanSourceFiles, toSnippet } from './source-scan.mjs'
 
@@ -25,8 +26,10 @@ const LEGACY_KEY_RE = /^@baloise\/ds-[a-z]/
 const PACKAGE_RE = /@baloise\/ds-[a-z0-9-]+/g
 const DEPENDENCY_LINE_RE = /^\s*"@baloise\/ds-[a-z0-9-]+"\s*:/
 const TODO_RE = /TODO: remove these legacy Baloise imports once the Helvetia migration is verified/
-const REMOVE_RE = /@baloise\/ds-styles\/(?:dist\/)?css\/(?:structure|core)(?:\.min)?(?:\.css)?(?![\w/-])/
-const TARGET = `[^'"\\s]*@baloise\\/ds-styles\\/(?:dist\\/)?css\\/(?:structure|core)(?:\\.min)?(?:\\.css)?`
+const stylesPath = names => String.raw`@baloise\/ds-styles\/(?:dist\/)?css\/(?:${names})(?:\.min)?(?:\.css)?`
+const CORE_RE = new RegExp(`${stylesPath('core')}(?![\\w/-])`)
+const REMOVE_RE = new RegExp(`${stylesPath('structure|core')}(?![\\w/-])`)
+const TARGET = `[^'"\\s]*${stylesPath('structure|core')}`
 const STATEMENT_RES = [
   new RegExp(`^@(?:import|use)\\s+(['"])${TARGET}\\1\\s*;?$`),
   new RegExp(`^import\\s+(['"])${TARGET}\\1\\s*;?$`),
@@ -44,6 +47,7 @@ const UTILITIES_RE = /@baloise\/ds-styles\/(?:dist\/)?css\/utilities\//
 export function scanCleanup(rootDir) {
   const root = realpathSync(resolve(rootDir))
   const { suggested, notYet, types } = scanMigratable(root, [], { extensions: GATE_EXTENSIONS })
+  const coreClassesLeft = hasCoreClasses(scanCssUtils(root))
 
   const hidden = []
   const lines = []
@@ -66,7 +70,7 @@ export function scanCleanup(rootDir) {
         manifests.push({ packageJsonPath: file, manifest })
         dependencyKeys = findDependencyKeys(text)
       }
-      collectLines(file, text, source.comments, dependencyKeys, lines)
+      collectLines(file, text, source.comments, dependencyKeys, coreClassesLeft, lines)
     },
     { extensions: EXTENSIONS },
   )
@@ -123,7 +127,17 @@ function collectHiddenTags(file, text, source, found) {
   })
 }
 
-function collectLines(file, text, comments, dependencyKeys, found) {
+// `css/core` also styles plain classes such as `table` and `link`, not only `bal-*` components.
+// A selector in the app's own stylesheet does not use `css/core`, and CSS utils never edits stylesheets.
+function hasCoreClasses({ files, dynamic }) {
+  const moves = files.flatMap(entry => entry.findings.flatMap(finding => finding.classes))
+  return (
+    moves.some(move => CORE_GROUPS.has(move.group)) ||
+    dynamic.some(entry => entry.group === 'core' && entry.reason !== 'selector in a stylesheet')
+  )
+}
+
+function collectLines(file, text, comments, dependencyKeys, coreClassesLeft, found) {
   const isYaml = YAML_EXTENSIONS.has(extname(file))
   const raw = text.split('\n')
   const plain = blankRanges(text, dependencyKeys).split('\n')
@@ -133,6 +147,7 @@ function collectLines(file, text, comments, dependencyKeys, found) {
     isPackageJson: basename(file) === 'package.json',
     isYaml,
     hasStringEntries: STRING_ENTRY_FILES.has(basename(file)),
+    coreClassesLeft,
   }
   const entries = plain.map((line, index) => classify(line, active[index] ?? '', context))
 
@@ -149,7 +164,7 @@ function blankRanges(text, ranges) {
   return result
 }
 
-function classify(line, activeLine, { isPackageJson, isYaml, hasStringEntries }) {
+function classify(line, activeLine, { isPackageJson, isYaml, hasStringEntries, coreClassesLeft }) {
   const statement = activeLine.trim()
   if (TODO_RE.test(line) && statement === '') return { type: 'todo' }
   if (!LEGACY_RE.test(line)) return null
@@ -159,7 +174,9 @@ function classify(line, activeLine, { isPackageJson, isYaml, hasStringEntries })
   const keep = reason => ({ type: 'keep', reason, packages })
   if (isPackageJson && DEPENDENCY_LINE_RE.test(activeLine)) return keep('manual')
   if (STATEMENT_RES.some(re => re.test(statement)) || (hasStringEntries && STRING_ENTRY_RE.test(statement))) {
-    return { type: 'remove', kind: 'import', packages }
+    return coreClassesLeft && CORE_RE.test(activeLine)
+      ? keep('css-utils')
+      : { type: 'remove', kind: 'import', packages }
   }
   if (REMOVE_RE.test(activeLine)) return keep('manual')
   if (ASSETS_RES.some(re => re.test(activeLine))) return keep('assets')

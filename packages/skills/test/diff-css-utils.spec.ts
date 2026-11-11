@@ -41,6 +41,13 @@ describe('extractModifiers', () => {
       'grid is-mobile',
     ])
   })
+
+  it('skips the classes inside :not()', () => {
+    const css = 'a.link:not(.button).is-light {} .select:not(.is-multiple)::after {}'
+
+    expect(extractModifiers(css, ['link', 'select'])).toEqual(['link is-light'])
+    expect(extractModifiers('.link:not(:is(.a, .b)).is-light {}', ['link'])).toEqual(['link is-light'])
+  })
 })
 
 describe('diffClasses', () => {
@@ -64,6 +71,10 @@ describe('diffClasses', () => {
       'widescreen:flex': 'desktop-lg:flex',
       'font-family-title': 'font-family-heading',
     })
+  })
+
+  it('proposes the ds-* counterpart of a core.css base class', () => {
+    expect(diffClasses(['table', 'file'], ['ds-table']).proposed).toEqual({ table: 'ds-table' })
   })
 
   it('proposes the -active counterpart of a -pressed class', () => {
