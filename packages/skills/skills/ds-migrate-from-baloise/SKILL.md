@@ -174,7 +174,7 @@ Every component migration applies these rules in its Rewrite step. They cover ea
 
 **Angular bundles.** In `imports: [...]` of a standalone component or an NgModule, replace a `...Bal<X>Bundle` spread with the `Ds*` standalone symbols that the migrated template uses. Import them from `@helvetia-design/angular`. The template is the `.html` beside the class or the inline `template:`. Without these symbols Angular fails with NG8001 on the `ds-*` tag, and `formControlName` finds no ControlValueAccessor. The "Tags and imports" section of each `migration.md` names its bundle and its symbols.
 
-- Keep the spread and its import while the template still uses a legacy tag from that bundle. Examples are `bal-check` and `bal-switch` (checkbox), `bal-radio-icon` (radio), a group left in place, or a `bal-field` left in place. Add the `Ds*` symbols next to the spread.
+- Keep the spread and its import while the template still uses a legacy tag from that bundle. Examples are `bal-check` and `bal-switch` (checkbox), a `bal-radio-icon` outside a radio, a group left in place, or a `bal-field` left in place. Add the `Ds*` symbols next to the spread.
 - Delete the bundle symbol from the `@baloise/ds-angular` import once its last spread is gone.
 - A component migration never removes a multi-family bundle: `BalFormBundle`, `BalLayoutBundle`, `BalTypographyBundle` or `BalComponentBundle`. Add the `Ds*` symbols next to it.
 - `BalFieldBundle` and `BalFormGridBundle` have no `Ds*` symbols. Remove them once no tag of the bundle is left in that template. Add nothing.
