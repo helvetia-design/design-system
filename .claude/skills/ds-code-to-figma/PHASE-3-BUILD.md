@@ -234,7 +234,9 @@ values**; clone a prototype and change only text and positions.
    later (e.g. `Button` → `Label`) needs the variants re-centred (seen on `ds-button`: up to 6px).
    **Taller than the `Documentation` column:** the cloned `Component Sets` column is `FILL`
    height and clips anything below it. Set it to `layoutSizingVertical = 'HUG'` (seen on
-   `ds-input`, 120 variants: the lower 9 row dividers reported no render bounds).
+   `ds-input`, 120 variants: the lower 9 row dividers reported no render bounds). Only then:
+   on a frame whose `Documentation` column is taller, `HUG` cuts the column's background panel
+   short, so keep `FILL` (the template stays `FILL`).
 5. **Every set is labeled — no axis count is exempt, not even a single-axis set.** With no row axis
    (e.g. a lone `size` axis) there are just `Column Labels` and no `Row Labels`.
 6. **Labels and grid lines, cloned from template prototypes** — a `Column Labels` text, a

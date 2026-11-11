@@ -299,9 +299,16 @@ nested:
   - childTag: ds-icon
     childMappingFile: ../../media/icon/icon.figma.md
     usage: 'shown in `description` before the invalid-text message, only when invalid && invalidText (field.util.tsx)'
-    fixedProps: { name: alert } # hardcoded in field.util.tsx — not driven by any ds-input prop,
-    # so this is a fixed instance override, not an INSTANCE_SWAP icon slot
-    figmaComponentKey: '2056:8249' # icon.figma.md sets[0] — Icon wrapper COMPONENT_SET
+    fixedProps: { name: alert } # hardcoded in field.util.tsx — a fixed icon (conventions/content-selection-and-mitigations.md → "Fixed icons"), no INSTANCE_SWAP
+    fixedIcon: # since 11.11.2026: the `alert` glyph (2053:7) nested directly as `icon`, replacing the Icon wrapper (size=sm)
+      glyph: alert
+      size: 'base, 16px (measured on the dev server: host 16 × 16, drawn glyph 14 × 14) — width/height bound to 🧩 Component/Icon/Size/Base (137:1457); padding 1px literal, like Button (Icon/Padding/* not in Figma yet)'
+      colorSource:
+        {
+          default: '🧩 Component/Form/Danger/Description/Color (137:1590)',
+          disabled: '🧩 Component/Form/Disabled/Description/Color (137:1610)',
+        }
+      shownWhen: color=invalid # 24 variants
 
 tokens:
   - cssVar: --ds-form-container-radius

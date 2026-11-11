@@ -114,3 +114,9 @@ Verification run of the two new skill rules (`docs/plans/figma-text-properties-p
 
 **Verdict: `pass`** for the re-checked rules. Not re-checked: the old component-state model
 (`state` still holds `disabled` / `loading`; separate TODO).
+
+### Follow-up: fixed `alert` icon (11.11.2026, on main)
+
+| #   | Check      | Result | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| --- | ---------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 4c  | Fixed icon | pass   | 24 / 24 `color=invalid` variants: `icon` = `alert` glyph (2053:7) nested directly, not exposed, no swap property; 16 × 16 bound to `Component/Icon/Size/Base` (137:1457), matching the dev server (host 16 × 16, glyph 14 × 14); vector fill `Form/Danger/Description/Color` (137:1590) × 20, `Form/Disabled/Description/Color` (137:1610) × 4 (disabled). 0 Icon wrapper instances left in the set; 0 variants off-centre. |
