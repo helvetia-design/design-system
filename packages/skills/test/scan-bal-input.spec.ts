@@ -341,6 +341,47 @@ describe('scanBalInput', () => {
     })
   })
 
+  it('lists BalEvents types and the bare CustomEvent once per occurrence, but not slider, stepper or group types', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        "import { BalFormBundle } from '@baloise/ds-angular'",
+        '@Component({ imports: [...BalFormBundle] })',
+        'export class ApplicationComponent {',
+        '  onName(event: BalEvents.BalInputCustomEvent<string>) {}',
+        '  onBirthday(event: BalEvents.BalInputDateCustomEvent<string>) {}',
+        '  onBare(event: BalInputCustomEvent<string>) {}',
+        '  detail?: BalEvents.BalInputChangeDetail',
+        '  both(a: BalEvents.BalInputBlur, b: BalInputDateCustomEvent<string>) {}',
+        '  onSlider(event: BalEvents.BalInputSliderCustomEvent<number>) {}',
+        '  onStepper(event: BalEvents.BalInputStepperChange) {}',
+        '  onGroup(event: BalEvents.BalInputGroupCustomEvent<string>) {}',
+        '  autocomplete?: BalProps.BalInputAutocomplete',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalInput(root)).toEqual({
+      total: 6,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            { line: 4, snippet: 'onName(event: BalEvents.BalInputCustomEvent<string>) {}' },
+            { line: 5, snippet: 'onBirthday(event: BalEvents.BalInputDateCustomEvent<string>) {}' },
+            { line: 6, snippet: 'onBare(event: BalInputCustomEvent<string>) {}' },
+            { line: 7, snippet: 'detail?: BalEvents.BalInputChangeDetail' },
+            { line: 8, snippet: 'both(a: BalEvents.BalInputBlur, b: BalInputDateCustomEvent<string>) {}' },
+            { line: 8, snippet: 'both(a: BalEvents.BalInputBlur, b: BalInputDateCustomEvent<string>) {}' },
+          ],
+        },
+      ],
+    })
+  })
+
   it('prints grouped findings as JSON and does not edit files', () => {
     const root = createScratchDir()
     const contents = '<bal-input name="a"></bal-input>\n'

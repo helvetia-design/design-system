@@ -208,6 +208,43 @@ describe('scanBalInputSlider', () => {
     expect(scanBalInputSlider(root).total).toBe(2)
   })
 
+  it('lists BalEvents types and the bare CustomEvent once per occurrence, but not input types', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        "import { BalFormBundle } from '@baloise/ds-angular'",
+        '@Component({ imports: [...BalFormBundle] })',
+        'export class ApplicationComponent {',
+        '  onChange(event: BalEvents.BalInputSliderCustomEvent<number>) {}',
+        '  onBare(event: BalInputSliderCustomEvent<number>) {}',
+        '  detail?: BalEvents.BalInputSliderChangeDetail',
+        '  both(a: BalEvents.BalInputSliderBlur, b: BalInputSliderCustomEvent<number>) {}',
+        '  onInput(event: BalEvents.BalInputCustomEvent<string>) {}',
+        '  el?: HTMLBalInputSliderElement',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalInputSlider(root)).toEqual({
+      total: 5,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            { line: 4, snippet: 'onChange(event: BalEvents.BalInputSliderCustomEvent<number>) {}' },
+            { line: 5, snippet: 'onBare(event: BalInputSliderCustomEvent<number>) {}' },
+            { line: 6, snippet: 'detail?: BalEvents.BalInputSliderChangeDetail' },
+            { line: 7, snippet: 'both(a: BalEvents.BalInputSliderBlur, b: BalInputSliderCustomEvent<number>) {}' },
+            { line: 7, snippet: 'both(a: BalEvents.BalInputSliderBlur, b: BalInputSliderCustomEvent<number>) {}' },
+          ],
+        },
+      ],
+    })
+  })
+
   it('prints grouped findings as JSON and does not edit files', () => {
     const root = createScratchDir()
     const contents = '<bal-input-slider></bal-input-slider>\n'
@@ -242,7 +279,7 @@ describe('Detect', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-input-slider></bal-input-slider>\n')
 
-    expect(scanMigratable(root).suggested).toEqual([{ name: 'input-slider', total: 2 }])
+    expect(scanMigratable(root).suggested).toEqual([{ name: 'input-slider', total: 1 }])
   })
 })
 

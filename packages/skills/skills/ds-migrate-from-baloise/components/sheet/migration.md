@@ -36,12 +36,12 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-sheet`)                                                                                                           | new (`ds-sheet`)  | handling                                                                                                                                                                                                        |
-| --------------------------------------------------------------------------------------------------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `container-size="fluid"` / `"compact"` (React / Angular: `containerSize`)                                                   | same              | Copy as-is. Also keep the single-quoted and `{"…"}` / `{'…'}` forms.                                                                                                                                            |
-| _(no `container-size`)_, `container-size=""`                                                                                | same              | Copy as-is. Both components use the default width, so nothing is added.                                                                                                                                         |
-| `container-size="detail-page"` / `"blog-page"`                                                                              | _(no equivalent)_ | Do not rewrite. Leave it in place and record the file, line, and old value for the report. `ds-sheet` only accepts `fluid` and `compact`, and `@OneOf` logs a warning for any other value.                      |
-| `[containerSize]="x"`, `[attr.container-size]="x"`, `containerSize={x}`, `:container-size="x"`, `v-bind:container-size="x"` | same              | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line for manual review. The value may be `detail-page` or `blog-page` at runtime, which `ds-sheet` does not support. |
+| old (`bal-sheet`)                                                                                                           | new (`ds-sheet`)  | handling                                                                                                                                                                                                                                                                                                                                                           |
+| --------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `container-size="fluid"` / `"compact"` (React / Angular: `containerSize`)                                                   | same              | Copy as-is. Also keep the single-quoted and `{"…"}` / `{'…'}` forms.                                                                                                                                                                                                                                                                                               |
+| _(no `container-size`)_, `container-size=""`                                                                                | same              | Copy as-is. Both components use the default width, so nothing is added.                                                                                                                                                                                                                                                                                            |
+| `container-size="detail-page"` / `"blog-page"`                                                                              | _(no equivalent)_ | Apply Unmapped props and handlers (`SKILL.md`). `ds-sheet` only accepts `fluid` and `compact`, and `@OneOf` logs a warning for any other value.                                                                                                                                                                                                                    |
+| `[containerSize]="x"`, `[attr.container-size]="x"`, `containerSize={x}`, `:container-size="x"`, `v-bind:container-size="x"` | same              | Dynamic value. Do not guess the mapping. HTML: copy the binding unchanged and list the file and line for manual review, because the value may be `detail-page` or `blog-page` at runtime. React and Angular: copy it when the expression's type only admits `fluid` or `compact` (`SheetContainerSize`). Otherwise apply Unmapped props and handlers (`SKILL.md`). |
 
 ### Tags and imports
 
@@ -63,13 +63,12 @@ Write the report as `shared/report.md` describes, with the per-file summary unde
 
 Needs your attention when found:
 
-1. Every dynamic `containerSize` binding left for manual review.
-2. Every static `container-size` value left in place.
-3. Every `container-size="detail-page"` and `"blog-page"`, because `ds-sheet` has no such width. Name file, line and old value.
-4. Every type reference that the scan cannot see, such as `BalProps.BalSheetContainer`.
-5. One-time note, when at least one sheet was migrated: the scan cannot see custom `--bal-sheet-background`, `--bal-sheet-radius`, `--bal-sheet-shadow` and `--bal-sheet-position-bottom` overrides, and they do not carry over to `ds-sheet`. The variables are renamed to `--sheet-background`, `--sheet-radius`, `--sheet-shadow` and `--sheet-position-bottom`.
-6. One-time note, when at least one sheet was migrated: the scan cannot see `.bal-sheet` and `.bal-sheet__container` selectors, and they do not carry over to `ds-sheet`, which renders in shadow DOM.
-7. One-time note, when at least one sheet was migrated: the host no longer sets font family, weight and size, so content inherits them from its surroundings.
+1. Every dynamic `containerSize` binding, with the framework outcome (copied in HTML, copied or removed in React and Angular).
+2. Every `container-size="detail-page"` and `"blog-page"`, because `ds-sheet` has no such width. Name file, line and old value, with its Unmapped props and handlers outcome.
+3. Every type reference that the scan cannot see, such as `BalProps.BalSheetContainer`.
+4. One-time note, when at least one sheet was migrated: the scan cannot see custom `--bal-sheet-background`, `--bal-sheet-radius`, `--bal-sheet-shadow` and `--bal-sheet-position-bottom` overrides, and they do not carry over to `ds-sheet`. The variables are renamed to `--sheet-background`, `--sheet-radius`, `--sheet-shadow` and `--sheet-position-bottom`.
+5. One-time note, when at least one sheet was migrated: the scan cannot see `.bal-sheet` and `.bal-sheet__container` selectors, and they do not carry over to `ds-sheet`, which renders in shadow DOM.
+6. One-time note, when at least one sheet was migrated: the host no longer sets font family, weight and size, so content inherits them from its surroundings.
 
 Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 

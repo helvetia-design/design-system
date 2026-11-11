@@ -1,8 +1,10 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { afterEach, describe, expect, it } from 'vitest'
 import { diff, inventory } from '../harness/inventory.mjs'
+import { SKIPPED_DIRS, SOURCE_EXTENSIONS } from '../skills/ds-migrate-from-baloise/scripts/source-scan.mjs'
 
 const scratches: string[] = []
 
@@ -79,6 +81,44 @@ describe('inventory', () => {
     const report = inventory(root)
     expect(report.total).toBe(1)
     expect(report.files[0].hits[0].inComment).toBe(true)
+  })
+
+  it('counts hits in a .vue file', () => {
+    const root = createScratchDir()
+    write(root, 'src/App.vue', '<template><bal-button>Hi</bal-button></template>\n')
+
+    expect(inventory(root).files.map(entry => entry.file)).toEqual(['src/App.vue'])
+  })
+
+  it('imports nothing from the scanners it checks', () => {
+    const source = readFileSync(fileURLToPath(new URL('../harness/inventory.mjs', import.meta.url)), 'utf8')
+
+    expect(source).not.toMatch(/(?:from|import|import\s*\(|require\s*\()\s*['"][^'"]*(?:scripts\/|source-scan)/)
+  })
+
+  it('keeps its hand-copied lists aligned with the scanners', () => {
+    const source = readFileSync(fileURLToPath(new URL('../harness/inventory.mjs', import.meta.url)), 'utf8')
+    const list = (name: string) =>
+      [...(new RegExp(`const ${name} = new Set\\(\\[([^\\]]*)\\]`).exec(source)?.[1] ?? '').matchAll(/'([^']+)'/g)].map(
+        match => match[1],
+      )
+
+    expect(list('SKIP_DIRS').sort()).toEqual([...SKIPPED_DIRS].sort())
+    expect(list('EXTENSIONS')).toEqual(expect.arrayContaining([...SOURCE_EXTENSIONS]))
+  })
+
+  it('counts hits in .mts, .cts, .cjs and .htm files and skips .nx, .nuxt, .output and storybook-static', () => {
+    const root = createScratchDir()
+    for (const file of ['src/a.mts', 'src/b.cts', 'src/c.cjs', 'public/d.htm']) write(root, file, '<bal-button>\n')
+    for (const dir of ['.nx/cache', '.nuxt', '.output/public', 'storybook-static'])
+      write(root, `${dir}/x.js`, 'BalButton')
+
+    expect(inventory(root).files.map(entry => entry.file)).toEqual([
+      'public/d.htm',
+      'src/a.mts',
+      'src/b.cts',
+      'src/c.cjs',
+    ])
   })
 
   it('skips node_modules, build output and lockfiles', () => {

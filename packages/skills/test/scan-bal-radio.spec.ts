@@ -85,7 +85,6 @@ describe('scanBalRadio', () => {
       'types.ts',
       [
         'const el: HTMLBalRadioElement | null = null',
-        'type A = BalEvents.BalRadioChangeDetail',
         "const b: BalProps.BalRadioInterface = 'tile'",
         'type C = BalRadioOption',
       ].join('\n'),
@@ -318,6 +317,114 @@ describe('scanBalRadio', () => {
     })
   })
 
+  it('flags setValue() on a legacy radio group ref in the sibling .ts, but not a FormControl.setValue', () => {
+    const root = createScratchDir()
+    write(root, 'plan.component.html', '<bal-radio-group #planGroup></bal-radio-group>\n')
+    write(
+      root,
+      'plan.component.ts',
+      [
+        'export class PlanComponent {',
+        "  @ViewChild('planGroup') planGroup!: ElementRef<HTMLBalRadioGroupElement>",
+        "  readonly plan = viewChild<ElementRef<HTMLBalRadioGroupElement>>('planGroup')",
+        "  readonly form = new FormGroup({ plan: new FormControl('basic') })",
+        '  reset() {',
+        "    this.planGroup.nativeElement.setValue('basic')",
+        "    this.plan()?.nativeElement?.setValue('basic')",
+        "    this.form.controls.plan.setValue('basic')",
+        '  }',
+        '}',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'checkbox.ts',
+      ['export function reset(group: HTMLBalCheckboxGroupElement) {', '  group.setValue([])', '}', ''].join('\n'),
+    )
+
+    expect(scanBalRadio(root, ['plan.component.html'])).toEqual({
+      total: 4,
+      files: [
+        {
+          file: 'plan.component.html',
+          findings: [
+            { line: 1, snippet: '<bal-radio-group #planGroup>' },
+            { line: 1, snippet: '</bal-radio-group>' },
+          ],
+        },
+        {
+          file: 'plan.component.ts',
+          findings: [
+            { line: 6, snippet: "this.planGroup.nativeElement.setValue('basic')", setValue: true },
+            { line: 7, snippet: "this.plan()?.nativeElement?.setValue('basic')", setValue: true },
+          ],
+        },
+      ],
+    })
+    expect(scanBalRadio(root).total).toBe(4)
+  })
+
+  it('does not flag a commented-out setValue() on a legacy radio group ref', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'plan.ts',
+      [
+        'export function reset(group: HTMLBalRadioGroupElement) {',
+        "  // group.setValue('basic')",
+        "  /* group.setValue('basic') */",
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalRadio(root)).toEqual({ total: 0, files: [] })
+  })
+
+  it('lists the bundle and BalEvents types once per occurrence, but not BalProps or multi-family bundles', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        "import { BalFormBundle, BalRadioBundle } from '@baloise/ds-angular'",
+        '@Component({ imports: [...BalRadioBundle, ...BalFormBundle] })',
+        'export class ApplicationComponent {',
+        '  onSalutation(event: BalEvents.BalRadioCustomEvent<boolean>) {}',
+        '  onPlan(event: BalEvents.BalRadioGroupCustomEvent<string>) {}',
+        '  onBare(event: BalRadioGroupCustomEvent<string>) {}',
+        '  detail?: BalEvents.BalRadioChangeDetail',
+        '  both(a: BalEvents.BalRadioBlur, b: BalRadioCustomEvent<boolean>) {}',
+        '  look?: BalProps.BalRadioInterface',
+        '  el?: HTMLBalRadioElement',
+        '  onIcon(event: BalRadioIconCustomEvent<boolean>) {}',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalRadio(root)).toEqual({
+      total: 9,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            { line: 1, snippet: "import { BalFormBundle, BalRadioBundle } from '@baloise/ds-angular'" },
+            { line: 2, snippet: '@Component({ imports: [...BalRadioBundle, ...BalFormBundle] })' },
+            { line: 4, snippet: 'onSalutation(event: BalEvents.BalRadioCustomEvent<boolean>) {}' },
+            { line: 5, snippet: 'onPlan(event: BalEvents.BalRadioGroupCustomEvent<string>) {}' },
+            { line: 6, snippet: 'onBare(event: BalRadioGroupCustomEvent<string>) {}' },
+            { line: 7, snippet: 'detail?: BalEvents.BalRadioChangeDetail' },
+            { line: 8, snippet: 'both(a: BalEvents.BalRadioBlur, b: BalRadioCustomEvent<boolean>) {}' },
+            { line: 8, snippet: 'both(a: BalEvents.BalRadioBlur, b: BalRadioCustomEvent<boolean>) {}' },
+            { line: 11, snippet: 'onIcon(event: BalRadioIconCustomEvent<boolean>) {}' },
+          ],
+        },
+      ],
+    })
+  })
+
   it('prints grouped findings as JSON and does not edit files', () => {
     const root = createScratchDir()
     const html = '<bal-radio value="1"></bal-radio>\n'
@@ -364,8 +471,9 @@ describe('Detect', () => {
     // bal-radio-group and bal-radio-icon have no migration of their own; the radio
     // migration covers them, so they count towards radio rather than showing up as notYet.
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'radio', total: 6 }],
+      suggested: [{ name: 'radio', total: 3 }],
       notYet: [],
+      types: [],
     })
   })
 })
@@ -399,6 +507,9 @@ describe('radio migration.md', () => {
       'dsChange',
       'balChange',
       'HTMLBalRadioElement',
+      'HTMLBalRadioGroupElement',
+      'setValue',
+      'el.value',
       'per-file summary',
       'git commit',
     ]) {

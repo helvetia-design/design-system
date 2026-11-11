@@ -24,7 +24,7 @@ node <this-skill-directory>/scripts/scan-migratable.mjs <project-root>
 
 When **Detect** already ran this script and no file has changed since, reuse its JSON instead.
 
-Every component that `suggested` or `notYet` lists counts as left, with one exception. In a component migration, the component being migrated does not count when this migration rewrites every usage of it. A usage that its migration file leaves in place or reports as not migrated, such as a `bal-navbar` with `interface="simple"`, counts as a `bal-*` component left. Judge that from the component findings and the migration file's rules.
+Every component that `suggested` or `notYet` lists counts as left, with one exception. Entries in `types` are legacy type namespaces, not components, and do not count as left. In a component migration, the component being migrated does not count when this migration rewrites every usage of it. A usage that its migration file leaves in place or reports as not migrated, such as a `bal-navbar` with `interface="simple"`, counts as a `bal-*` component left. Judge that from the component findings and the migration file's rules.
 
 When no `bal-*` component is left, show each legacy config call (path, line, snippet) as a call to delete, before the confirmation that covers the edits.
 
@@ -45,7 +45,7 @@ Check the answer again after the Rewrite step. When the Rewrite left a usage of 
 
 ## Report
 
-These items come last, after the `I` items of `shared/icons.md`. Each one gets its own line in `ds-migration-report.md`, as `shared/report.md` describes. The `icons` value stays or goes with the call.
+These items come last, after the `I` items of `shared/icons.md` and, in the **Assets** step, after the `A` items of `shared/fonts-favicons.md`. Each one gets its own line in `ds-migration-report.md`, as `shared/report.md` describes. The `icons` value stays or goes with the call.
 
 Needs your attention when found:
 

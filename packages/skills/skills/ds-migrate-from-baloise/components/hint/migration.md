@@ -36,13 +36,13 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-hint`) | new (`ds-hint`)        | handling                                                                                                                                                                                                                                                            |
-| ---------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `closeLabel`     | `closeLabel`           | Copy as-is, including bindings (`[closeLabel]`, `closeLabel={label}`). The button is now shown in the drawer on touch viewports.                                                                                                                                    |
-| `small`          | _(no equivalent prop)_ | Leave the attribute in place, do not drop it. `ds-hint` has no way to hide the close button on larger viewports, so it has no effect after the migration. In strictly typed React or Angular templates it may not compile. Flag every occurrence for manual review. |
-| _(none)_         | `label`                | New prop (title text). Leave unset, keep `bal-hint-title` as `ds-hint-title`.                                                                                                                                                                                       |
-| _(none)_         | `placement`            | New prop (desktop popup placement, default `right`). Leave unset.                                                                                                                                                                                                   |
-| _(none)_         | `triggerLabel`         | New prop (accessible label of the trigger button). Leave unset.                                                                                                                                                                                                     |
+| old (`bal-hint`) | new (`ds-hint`)        | handling                                                                                                                         |
+| ---------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `closeLabel`     | `closeLabel`           | Copy as-is, including bindings (`[closeLabel]`, `closeLabel={label}`). The button is now shown in the drawer on touch viewports. |
+| `small`          | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). `ds-hint` has no way to hide the close button on larger viewports.               |
+| _(none)_         | `label`                | New prop (title text). Leave unset, keep `bal-hint-title` as `ds-hint-title`.                                                    |
+| _(none)_         | `placement`            | New prop (desktop popup placement, default `right`). Leave unset.                                                                |
+| _(none)_         | `triggerLabel`         | New prop (accessible label of the trigger button). Leave unset.                                                                  |
 
 ### Tags and imports
 
@@ -64,7 +64,7 @@ Write the report as `shared/report.md` describes, with the per-file summary unde
 
 Needs your attention when found:
 
-1. Every `small` left for manual review.
+1. Every `small`, with its Unmapped props and handlers outcome.
 
 Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 

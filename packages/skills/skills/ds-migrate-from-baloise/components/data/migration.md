@@ -72,7 +72,7 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Events
 
-`bal-data-value` emitted `balClick`, `balFocus`, and `balBlur` from its edit button. `ds-data-item` emits none of them, and its inner `ds-button` is not exposed. Do not rewrite or remove existing handlers (`(balClick)="x()"`, `onBalClick={x}`, `addEventListener('balClick', ...)`). List each one by file and line in the report as "event no longer emitted, needs manual rework", and do not invent a replacement.
+`bal-data-value` emitted `balClick`, `balFocus`, and `balBlur` from its edit button. `ds-data-item` emits none of them, and its inner `ds-button` is not exposed. Apply Unmapped props and handlers (`SKILL.md`) to each handler (`(balClick)="x()"`, `onBalClick={x}`, `addEventListener('balClick', ...)`).
 
 ### Methods
 
@@ -86,7 +86,7 @@ Needs your attention when found:
 
 1. Every dropped `disabled`. The legacy prop only disabled the edit button.
 2. Every dynamic `editable` or `multiline` binding left for manual review.
-3. Every event handler that no longer fires, listed as "event no longer emitted, needs manual rework".
+3. Every `balClick`, `balFocus` and `balBlur` handler, which no longer fires, with its Unmapped props and handlers outcome.
 4. Every file where `border` was dropped. `ds-data` always shows dividers in the vertical layout and has no `border` prop. Do not add attributes to compensate.
 5. Every `horizontal` data list, since the horizontal layout may look different.
 6. Every selector that targets the legacy elements and that the scan cannot see. The legacy components set the classes `bal-data`, `bal-data--is-horizontal`, `bal-data--has-border`, `bal-data-item`, `bal-data-label`, `bal-data-value`, and `bal-data-value__button` on their hosts, and the edit button carried `data-testid="bal-data-value-button"`. Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.

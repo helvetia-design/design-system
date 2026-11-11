@@ -38,6 +38,7 @@ describe('scanMigratable', () => {
     expect(scanMigratable(root)).toEqual({
       suggested: [{ name: 'spinner', total: 2 }],
       notYet: [{ name: 'fictional', total: 2 }],
+      types: [],
     })
   })
 
@@ -56,8 +57,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-app></bal-app>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'app', total: 2 }],
+      suggested: [{ name: 'app', total: 1 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -71,8 +73,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-app></bal-app>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'app', total: 4 }],
+      suggested: [{ name: 'app', total: 3 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -100,8 +103,9 @@ describe('scanMigratable', () => {
     // The child tags have no migration of their own; the accordion migration covers
     // them, so they count towards accordion rather than showing up as notYet.
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'accordion', total: 8 }],
+      suggested: [{ name: 'accordion', total: 5 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -122,10 +126,11 @@ describe('scanMigratable', () => {
 
     expect(scanMigratable(root)).toEqual({
       suggested: [
-        { name: 'input-stepper', total: 2 },
-        { name: 'steps', total: 6 },
+        { name: 'input-stepper', total: 1 },
+        { name: 'steps', total: 4 },
       ],
       notYet: [],
+      types: [],
     })
   })
 
@@ -134,8 +139,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-step-item value="a" label="One"></bal-step-item>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'steps', total: 2 }],
+      suggested: [{ name: 'steps', total: 1 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -148,8 +154,9 @@ describe('scanMigratable', () => {
     )
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'tag', total: 4 }],
-      notYet: [{ name: 'tab', total: 2 }],
+      suggested: [{ name: 'tag', total: 2 }],
+      notYet: [{ name: 'tab', total: 1 }],
+      types: [],
     })
   })
 
@@ -163,8 +170,9 @@ describe('scanMigratable', () => {
     )
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'tabs', total: 6 }],
+      suggested: [{ name: 'tabs', total: 4 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -173,8 +181,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-tab-item value="a" label="One"></bal-tab-item>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'tabs', total: 2 }],
+      suggested: [{ name: 'tabs', total: 1 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -183,8 +192,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-textarea name="a"></bal-textarea>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'textarea', total: 2 }],
+      suggested: [{ name: 'textarea', total: 1 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -210,8 +220,9 @@ describe('scanMigratable', () => {
     // The child tags have no migration of their own; the card migration covers
     // them, so they count towards card rather than showing up as notYet.
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'card', total: 8 }],
+      suggested: [{ name: 'card', total: 5 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -239,8 +250,9 @@ describe('scanMigratable', () => {
     // The child tag has no migration of its own; the carousel migration covers
     // it, so it counts towards carousel rather than showing up as notYet.
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'carousel', total: 6 }],
+      suggested: [{ name: 'carousel', total: 4 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -262,8 +274,9 @@ describe('scanMigratable', () => {
     // bal-button-group has no migration of its own; the button migration covers
     // it, so it counts towards button rather than showing up as notYet.
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'button', total: 6 }],
+      suggested: [{ name: 'button', total: 4 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -287,9 +300,33 @@ describe('scanMigratable', () => {
     // bal-checkbox-group has no migration of its own; the checkbox migration covers
     // it, so it counts towards checkbox rather than showing up as notYet.
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'checkbox', total: 6 }],
+      suggested: [{ name: 'checkbox', total: 4 }],
       notYet: [],
+      types: [],
     })
+  })
+
+  it('folds bal-check and bal-switch into checkbox instead of listing them as notYet', () => {
+    const root = createScratchDir()
+    write(root, 'index.html', ['<bal-check checked></bal-check>', '<bal-switch></bal-switch>', ''].join('\n'))
+    write(
+      root,
+      'App.tsx',
+      ["import { BalCheck, BalSwitch } from '@baloise/ds-react'", 'export const App = () => <BalSwitch />'].join('\n'),
+    )
+
+    expect(scanMigratable(root)).toEqual({
+      suggested: [{ name: 'checkbox', total: 5 }],
+      notYet: [],
+      types: [],
+    })
+  })
+
+  it('does not fold a bal-check-list lookalike into checkbox', () => {
+    const root = createScratchDir()
+    write(root, 'index.html', '<bal-check-list></bal-check-list>\n')
+
+    expect(scanMigratable(root).suggested).toEqual([])
   })
 
   it('suggests hint, folding the hint-title and hint-text children into it', () => {
@@ -307,8 +344,9 @@ describe('scanMigratable', () => {
     )
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'hint', total: 6 }],
+      suggested: [{ name: 'hint', total: 3 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -326,8 +364,9 @@ describe('scanMigratable', () => {
     )
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'input', total: 4 }],
-      notYet: [{ name: 'input-group', total: 2 }],
+      suggested: [{ name: 'input', total: 2 }],
+      notYet: [{ name: 'input-group', total: 1 }],
+      types: [],
     })
   })
 
@@ -344,8 +383,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-file-upload label="Drop"></bal-file-upload>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'file-upload', total: 4 }],
+      suggested: [{ name: 'file-upload', total: 3 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -359,8 +399,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-toast message="Hi"></bal-toast>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'toast', total: 4 }],
+      suggested: [{ name: 'toast', total: 3 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -374,8 +415,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-text>Hi</bal-text>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'text', total: 5 }],
+      suggested: [{ name: 'text', total: 3 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -392,8 +434,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-tooltip reference="save">Hint</bal-tooltip>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'tooltip', total: 5 }],
+      suggested: [{ name: 'tooltip', total: 3 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -407,8 +450,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-badge color="grey">2</bal-badge>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'badge', total: 5 }],
+      suggested: [{ name: 'badge', total: 3 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -422,8 +466,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-close inverted></bal-close>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'close', total: 4 }],
+      suggested: [{ name: 'close', total: 3 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -439,8 +484,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-content align="center"></bal-content>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'content', total: 4 }],
+      suggested: [{ name: 'content', total: 3 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -466,8 +512,9 @@ describe('scanMigratable', () => {
     )
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'data', total: 10 }],
+      suggested: [{ name: 'data', total: 6 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -476,8 +523,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', ['<bal-date></bal-date>', '<bal-date-calendar></bal-date-calendar>', ''].join('\n'))
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'date', total: 4 }],
+      suggested: [{ name: 'date', total: 2 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -493,8 +541,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-divider color="white"></bal-divider>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'divider', total: 4 }],
+      suggested: [{ name: 'divider', total: 3 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -503,8 +552,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-footer></bal-footer>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'footer', total: 2 }],
+      suggested: [{ name: 'footer', total: 1 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -513,8 +563,9 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-heading level="h2"></bal-heading>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'heading', total: 2 }],
+      suggested: [{ name: 'heading', total: 1 }],
       notYet: [],
+      types: [],
     })
   })
 
@@ -528,8 +579,32 @@ describe('scanMigratable', () => {
     write(root, 'index.html', '<bal-icon name="check"></bal-icon>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'icon', total: 4 }],
+      suggested: [{ name: 'icon', total: 3 }],
       notYet: [],
+      types: [],
+    })
+  })
+
+  it('suggests button for a React app whose JSX lives only in .js files', () => {
+    const root = createScratchDir()
+    write(root, 'src/App.js', 'export const App = () => <bal-button>Hi</bal-button>\n')
+
+    expect(scanMigratable(root)).toEqual({ suggested: [{ name: 'button', total: 1 }], notYet: [], types: [] })
+  })
+
+  it('suggests button for a Vue template and finds .js and .vue paths', () => {
+    const root = createScratchDir()
+    write(root, 'src/App.js', 'export const App = () => <bal-button>Hi</bal-button>\n')
+    write(root, 'src/g.vue', '<template>\n  <bal-button>Go</bal-button>\n</template>\n')
+
+    expect(scanMigratable(root, ['src/App.js', 'src/g.vue'])).toEqual({
+      suggested: [{ name: 'button', total: 2 }],
+      notYet: [],
+      types: [],
+      files: [
+        { file: 'src/App.js', components: [{ name: 'button', total: 1 }] },
+        { file: 'src/g.vue', components: [{ name: 'button', total: 1 }] },
+      ],
     })
   })
 
@@ -539,7 +614,8 @@ describe('scanMigratable', () => {
 
     expect(scanMigratable(root)).toEqual({
       suggested: [],
-      notYet: [{ name: 'fictional', total: 2 }],
+      notYet: [{ name: 'fictional', total: 1 }],
+      types: [],
     })
   })
 
@@ -557,9 +633,33 @@ describe('scanMigratable', () => {
     write(root, 'dist/index.html', '<bal-button></bal-button>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'spinner', total: 2 }],
+      suggested: [{ name: 'spinner', total: 1 }],
       notYet: [],
+      types: [],
     })
+  })
+
+  it('finds tags after an apostrophe, a URL or a regex literal on the same line', () => {
+    const root = createScratchDir()
+    write(root, 'a.html', "<p>Don't panic <bal-button>x</bal-button></p>\n")
+    write(root, 'b.ts', "@Component({ template: `<p>Don't forget</p> <bal-button>Save</bal-button>` })\n")
+    write(root, 'c.tsx', 'const A = () => <p>see http://x <BalButton/></p>\n')
+    write(root, 'd.tsx', 'const r = /"/; const B = () => <BalButton/>\n')
+    write(root, 'e.html', "<p>l'assurance <bal-tag>a</bal-tag> dell'anno <bal-card></bal-card></p>\n")
+
+    expect(scanMigratable(root, ['.']).files).toEqual([
+      { file: 'a.html', components: [{ name: 'button', total: 1 }] },
+      { file: 'b.ts', components: [{ name: 'button', total: 1 }] },
+      { file: 'c.tsx', components: [{ name: 'button', total: 1 }] },
+      { file: 'd.tsx', components: [{ name: 'button', total: 1 }] },
+      {
+        file: 'e.html',
+        components: [
+          { name: 'card', total: 1 },
+          { name: 'tag', total: 1 },
+        ],
+      },
+    ])
   })
 
   it('prints the detection result as JSON', () => {
@@ -575,8 +675,248 @@ describe('scanMigratable', () => {
       }),
     ).toBe(0)
     expect(JSON.parse(text)).toEqual({
-      suggested: [{ name: 'spinner', total: 2 }],
+      suggested: [{ name: 'spinner', total: 1 }],
       notYet: [],
+      types: [],
+    })
+  })
+
+  it('limits the scan to the given paths and breaks the counts down per file', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/page/page.component.html',
+      '<bal-card><bal-card-title>T</bal-card-title><bal-fictional></bal-fictional><bal-button>Go</bal-button></bal-card>\n',
+    )
+    write(root, 'src/page/page.component.ts', "import { BalCard } from '@baloise/ds-angular'\n")
+    write(root, 'src/page/empty.ts', 'export const nothing = 1\n')
+    write(root, 'src/other/other.html', '<bal-tag></bal-tag>\n')
+
+    expect(scanMigratable(root, ['src/page', 'src/missing.html'])).toEqual({
+      suggested: [
+        { name: 'button', total: 1 },
+        { name: 'card', total: 3 },
+      ],
+      notYet: [{ name: 'fictional', total: 1 }],
+      types: [],
+      files: [
+        {
+          file: 'src/page/page.component.html',
+          components: [
+            { name: 'button', total: 1 },
+            { name: 'card', total: 2 },
+            { name: 'fictional', total: 1 },
+          ],
+        },
+        { file: 'src/page/page.component.ts', components: [{ name: 'card', total: 1 }] },
+      ],
+      unmatched: ['src/missing.html'],
+    })
+  })
+
+  it('prints the per-file breakdown without unmatched when every path matches', () => {
+    const root = createScratchDir()
+    write(root, 'src/a.html', '<bal-tag></bal-tag>\n')
+    let text = ''
+
+    expect(
+      run(
+        root,
+        {
+          write(chunk: string) {
+            text += chunk
+          },
+        },
+        ['src/a.html'],
+      ),
+    ).toBe(0)
+    expect(JSON.parse(text)).toEqual({
+      suggested: [{ name: 'tag', total: 1 }],
+      notYet: [],
+      types: [],
+      files: [{ file: 'src/a.html', components: [{ name: 'tag', total: 1 }] }],
+    })
+  })
+
+  it('maps services, controllers, modules and events to their component and lists type namespaces as types', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/a.ts',
+      [
+        "import { BalToastService, BalModalService, BalButtonModule, BalInputCustomEvent, BalBreakpointsService, BalConfigState } from '@baloise/ds-angular'",
+        "import { balToastController, BalModalController } from '@baloise/ds-core'",
+        '',
+      ].join('\n'),
+    )
+    write(root, 'src/a.html', ['<button bal-popup="p1">x</button>', '<bal-select></bal-select>', ''].join('\n'))
+
+    expect(scanMigratable(root)).toEqual({
+      suggested: [
+        { name: 'button', total: 1 },
+        { name: 'input', total: 1 },
+        { name: 'modal', total: 2 },
+        { name: 'popup', total: 1 },
+        { name: 'select', total: 1 },
+        { name: 'toast', total: 2 },
+      ],
+      notYet: [],
+      types: [
+        { name: 'breakpoints', total: 1 },
+        { name: 'config', total: 1 },
+      ],
+    })
+  })
+
+  it('counts a BalEvents or BalProps member only when it maps to an available migration', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/segment.component.ts',
+      [
+        "import { BalEvents, BalProps, BalLanguage } from '@baloise/ds-angular'",
+        'export class SegmentComponent {',
+        "  language: BalLanguage = 'de'",
+        '  onChange(event: BalEvents.BalSegmentCustomEvent<BalProps.BalSegmentValue>) {}',
+        '  onOpen(event: BalEvents . BalPopoverCustomEvent<boolean>) {}',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanMigratable(root)).toEqual({
+      suggested: [{ name: 'segment', total: 1 }],
+      notYet: [],
+      types: [
+        { name: 'events', total: 3 },
+        { name: 'language', total: 2 },
+        { name: 'props', total: 2 },
+      ],
+    })
+  })
+
+  it('suggests snackbar for a lowercase controller alone', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/notify.ts',
+      [
+        "balSnackbarController.create({ message: 'Saved' })",
+        'const a = globalToastController',
+        'const b = balController',
+        'const c = balToastControllerFactory',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanMigratable(root)).toEqual({
+      suggested: [{ name: 'snackbar', total: 1 }],
+      notYet: [],
+      types: [],
+    })
+  })
+
+  it('counts the bal-popup trigger attribute in every binding form and the bal-popup tag once', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/a.html',
+      [
+        '<button bal-popup="p1">x</button>',
+        '<button bal-popup>x</button>',
+        '<button [bal-popup]="id">x</button>',
+        '<button [attr.bal-popup]="id">x</button>',
+        '<button\n  [attr.bal-popup]="id">x</button>',
+        '<bal-popup id="p1" bal-popup-placement="bottom"></bal-popup>',
+        '<button [class.bal-popup]="open">x</button>',
+        '<p>Open the bal-popup to continue</p>',
+        '<style>',
+        '.bal-popup { color: red }',
+        'bal-popup { display: block }',
+        '[bal-popup] { outline: 0 }',
+        '</style>',
+        '',
+      ].join('\n'),
+    )
+    write(root, 'src/a.scss', '.bal-popup { color: red; }\nbal-popup { display: block; }\n')
+
+    expect(scanMigratable(root)).toEqual({
+      suggested: [{ name: 'popup', total: 6 }],
+      notYet: [],
+      types: [],
+    })
+  })
+
+  it('strips every service, type and event suffix and keeps a bare suffix name as its own slug', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/a.ts',
+      [
+        "import { BalToastOptions, BalSnackbarProps, BalFooterEvents, BalTabsDetail } from '@baloise/ds-core'",
+        "import { BalModalServiceOptions, BalOptions } from '@baloise/ds-angular'",
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanMigratable(root)).toEqual({
+      suggested: [
+        { name: 'footer', total: 1 },
+        { name: 'modal', total: 1 },
+        { name: 'snackbar', total: 1 },
+        { name: 'tabs', total: 1 },
+        { name: 'toast', total: 1 },
+      ],
+      notYet: [{ name: 'options', total: 1 }],
+      types: [],
+    })
+  })
+
+  it('lists language, region, breakpoint, platform and config types, also behind a suffix', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/a.ts',
+      [
+        "import { BalSwissLanguage, BalLanguageService, BalRegion, BalBreakpoint } from '@baloise/ds-core'",
+        "import { BalBreakpointsService, BalPlatformConfig, BalConfigState } from '@baloise/ds-angular'",
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanMigratable(root)).toEqual({
+      suggested: [],
+      notYet: [],
+      types: [
+        { name: 'breakpoints', total: 2 },
+        { name: 'config', total: 1 },
+        { name: 'language', total: 2 },
+        { name: 'platform', total: 1 },
+        { name: 'region', total: 1 },
+      ],
+    })
+  })
+
+  it('keeps types out of the per-file breakdown when paths are given', () => {
+    const root = createScratchDir()
+    write(root, 'src/a.ts', "import { BalLanguage } from '@baloise/ds-core'\nbalToastController.create({})\n")
+
+    expect(scanMigratable(root, ['src'])).toEqual({
+      suggested: [{ name: 'toast', total: 1 }],
+      notYet: [],
+      types: [{ name: 'language', total: 1 }],
+      files: [{ file: 'src/a.ts', components: [{ name: 'toast', total: 1 }] }],
+    })
+  })
+
+  it('counts a JSX element once and not its closing tag', () => {
+    const root = createScratchDir()
+    write(root, 'App.tsx', 'export const App = () => <BalText>Hi</BalText>\n')
+
+    expect(scanMigratable(root)).toEqual({
+      suggested: [{ name: 'text', total: 1 }],
+      notYet: [],
+      types: [],
     })
   })
 })

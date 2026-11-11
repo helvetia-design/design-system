@@ -5,16 +5,23 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
 const USAGE_RE =
-  /<\/?bal-modal(?:-header|-body)?(?![\w-])|<\/?BalModal(?:Header|Body)?\b|\b(?:balModalController|BalModalController|BalModalService|BalModalOptions|BalModalBundle|BalModalHeader|BalModalBody|BalModal)\b/g
+  /<\/?bal-modal(?:-header|-body)?(?![\w-])|<\/?BalModal(?:Header|Body)?\b|\b(?:balModalController|BalModalController|BalModalService|BalModalOptions|BalModalBundle|BalModalHeader|BalModalBody|BalModal|HTMLBalModal(?:Header|Body)?Element)\b/g
 
-export function scanBalModal(rootDir) {
+const REF_CALL_RE =
+  /(?<![\w$])[\w$]*[mM]odal[\w$]*(?:\(\))?(?:(?:\?\.|!\.|\.)(?:current|nativeElement))*(?:\?\.|!\.|\.)(?:open|close)\s*\(/g
+const COMPONENT_PROPS_RE = /\bcomponentProps\s*:\s*\{/g
+const CREATE_RESULT_RE =
+  /(?<![\w$.])(?:(?:const|let|var)\s+|this\.)([\w$]+)\s*(?::[^=;\n]+?)?\s*=\s*await[ \t]+(?:[\w$]+(?:\?\.|\.))*[\w$]*[mM]odal[\w$]*(?:\?\.|\.)create\s*\(/g
+
+export function scanBalModal(rootDir, paths = []) {
   const found = []
-  scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found))
-  return group(found)
+  const unmatched = scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found), { paths })
+  const result = group(found)
+  return unmatched.length > 0 ? { ...result, unmatched } : result
 }
 
-export function run(rootDir, stdout) {
-  stdout.write(`${JSON.stringify(scanBalModal(rootDir), null, 2)}\n`)
+export function run(rootDir, stdout, paths = []) {
+  stdout.write(`${JSON.stringify(scanBalModal(rootDir, paths), null, 2)}\n`)
   return 0
 }
 
@@ -47,6 +54,32 @@ function collect(file, text, masked, found) {
     const raw = match[0].startsWith('<') ? readTag(text, index) : lineText(text, index)
     found.push({ file, index, line: lineAt(text, index), snippet: toSnippet(raw) })
   }
+  if (found.some(finding => finding.file === file)) collectImperative(file, text, masked, found)
+}
+
+function collectImperative(file, text, masked, found) {
+  const seen = new Set(found.filter(finding => finding.file === file).map(finding => finding.line))
+  const add = index => {
+    const line = lineAt(text, index)
+    if (seen.has(line)) return
+    seen.add(line)
+    found.push({ file, index, line, snippet: toSnippet(lineText(text, index)) })
+  }
+
+  REF_CALL_RE.lastIndex = 0
+  let match
+  while ((match = REF_CALL_RE.exec(masked)) !== null) add(match.index)
+
+  COMPONENT_PROPS_RE.lastIndex = 0
+  while ((match = COMPONENT_PROPS_RE.exec(masked)) !== null) add(match.index)
+
+  CREATE_RESULT_RE.lastIndex = 0
+  while ((match = CREATE_RESULT_RE.exec(masked)) !== null) {
+    const name = match[1].replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const presentRe = new RegExp(`(?<![\\w$.])(?:this\\.)?${name}\\s*\\??\\.present\\s*\\(`, 'g')
+    let call
+    while ((call = presentRe.exec(masked)) !== null) add(call.index)
+  }
 }
 
 function isMainModule() {
@@ -62,7 +95,7 @@ function isMainModule() {
 if (isMainModule()) {
   const root = process.argv[2] ? resolve(process.argv[2]) : process.cwd()
   try {
-    process.exit(run(root, process.stdout))
+    process.exit(run(root, process.stdout, process.argv.slice(3)))
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
     process.exit(1)

@@ -182,6 +182,43 @@ describe('scanBalButton', () => {
     })
   })
 
+  it('lists tags in a React .js file and a Vue template, also when both are passed as paths', () => {
+    const root = createScratchDir()
+    write(root, 'src/App.js', 'export const App = () => <bal-button>Hi</bal-button>\n')
+    write(root, 'src/g.vue', '<template>\n  <bal-button>Go</bal-button>\n</template>\n')
+    const expected = {
+      total: 4,
+      files: [
+        {
+          file: 'src/App.js',
+          findings: [
+            { line: 1, snippet: '<bal-button>' },
+            { line: 1, snippet: '</bal-button>' },
+          ],
+        },
+        {
+          file: 'src/g.vue',
+          findings: [
+            { line: 2, snippet: '<bal-button>' },
+            { line: 2, snippet: '</bal-button>' },
+          ],
+        },
+      ],
+    }
+
+    expect(scanBalButton(root)).toEqual(expected)
+    expect(scanBalButton(root, ['src/App.js', 'src/g.vue'])).toEqual(expected)
+  })
+
+  it('lists tags in .htm, .mjs and .cjs files', () => {
+    const root = createScratchDir()
+    write(root, 'a.htm', '<bal-button>a</bal-button>\n')
+    write(root, 'b.mjs', 'export const b = () => <bal-button>b</bal-button>\n')
+    write(root, 'c.cjs', 'module.exports = () => <bal-button>c</bal-button>\n')
+
+    expect(scanBalButton(root).files.map((entry: { file: string }) => entry.file)).toEqual(['a.htm', 'b.mjs', 'c.cjs'])
+  })
+
   it('lists every tag of a button group and the buttons inside it, each on its own line', () => {
     const root = createScratchDir()
     write(
@@ -286,6 +323,41 @@ describe('scanBalButton', () => {
     }
 
     expect(scanBalButton(root)).toEqual({ total: 0, files: [] })
+  })
+
+  it('lists BalEvents types and the bare CustomEvent once per occurrence, but not BalProps', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        'export class ApplicationComponent {',
+        '  onSave(event: BalEvents.BalButtonCustomEvent<MouseEvent>) {}',
+        '  onBare(event: BalButtonCustomEvent<MouseEvent>) {}',
+        '  onGroup(event: BalButtonGroupCustomEvent<void>) {}',
+        '  both(a: BalEvents.BalButtonNavigate, b: BalButtonCustomEvent<MouseEvent>) {}',
+        '  color?: BalProps.BalButtonColor',
+        '  el?: HTMLBalButtonElement',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalButton(root)).toEqual({
+      total: 5,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            { line: 2, snippet: 'onSave(event: BalEvents.BalButtonCustomEvent<MouseEvent>) {}' },
+            { line: 3, snippet: 'onBare(event: BalButtonCustomEvent<MouseEvent>) {}' },
+            { line: 4, snippet: 'onGroup(event: BalButtonGroupCustomEvent<void>) {}' },
+            { line: 5, snippet: 'both(a: BalEvents.BalButtonNavigate, b: BalButtonCustomEvent<MouseEvent>) {}' },
+            { line: 5, snippet: 'both(a: BalEvents.BalButtonNavigate, b: BalButtonCustomEvent<MouseEvent>) {}' },
+          ],
+        },
+      ],
+    })
   })
 
   it('prints grouped findings as JSON and does not edit files', () => {

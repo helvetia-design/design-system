@@ -78,7 +78,6 @@ describe('scanBalSegment', () => {
       'types.ts',
       [
         'const el: HTMLBalSegmentElement | null = null',
-        'type A = BalEvents.BalSegmentChangeDetail',
         'const b: BalProps.BalSegmentValue = 1',
         'type C = BalSegmentValue',
       ].join('\n'),
@@ -271,6 +270,47 @@ describe('scanBalSegment', () => {
     expect(scanBalSegment(root)).toEqual({ total: 0, files: [] })
   })
 
+  it('lists the bundle and BalEvents types once per occurrence, but not BalProps or multi-family bundles', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        "import { BalFormBundle, BalSegmentBundle } from '@baloise/ds-angular'",
+        '@Component({ imports: [...BalSegmentBundle, ...BalFormBundle] })',
+        'export class ApplicationComponent {',
+        '  onChange(event: BalEvents.BalSegmentCustomEvent<string>) {}',
+        '  onItem(event: BalEvents.BalSegmentItemCustomEvent<string>) {}',
+        '  onBare(event: BalSegmentCustomEvent<string>) {}',
+        '  detail?: BalEvents.BalSegmentChangeDetail',
+        '  both(a: BalEvents.BalSegmentBlur, b: BalSegmentItemCustomEvent<string>) {}',
+        '  value?: BalProps.BalSegmentValue',
+        '  el?: HTMLBalSegmentElement',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalSegment(root)).toEqual({
+      total: 8,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            { line: 1, snippet: "import { BalFormBundle, BalSegmentBundle } from '@baloise/ds-angular'" },
+            { line: 2, snippet: '@Component({ imports: [...BalSegmentBundle, ...BalFormBundle] })' },
+            { line: 4, snippet: 'onChange(event: BalEvents.BalSegmentCustomEvent<string>) {}' },
+            { line: 5, snippet: 'onItem(event: BalEvents.BalSegmentItemCustomEvent<string>) {}' },
+            { line: 6, snippet: 'onBare(event: BalSegmentCustomEvent<string>) {}' },
+            { line: 7, snippet: 'detail?: BalEvents.BalSegmentChangeDetail' },
+            { line: 8, snippet: 'both(a: BalEvents.BalSegmentBlur, b: BalSegmentItemCustomEvent<string>) {}' },
+            { line: 8, snippet: 'both(a: BalEvents.BalSegmentBlur, b: BalSegmentItemCustomEvent<string>) {}' },
+          ],
+        },
+      ],
+    })
+  })
+
   it('prints grouped findings as JSON and does not edit files', () => {
     const root = createScratchDir()
     const html = '<bal-segment value="1"></bal-segment>\n'
@@ -312,8 +352,9 @@ describe('Detect', () => {
     // bal-segment-item has no migration of its own; the segment migration covers it,
     // so it counts towards segment rather than showing up as notYet.
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'segment', total: 4 }],
+      suggested: [{ name: 'segment', total: 2 }],
       notYet: [],
+      types: [],
     })
   })
 })

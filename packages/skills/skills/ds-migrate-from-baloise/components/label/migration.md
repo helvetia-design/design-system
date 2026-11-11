@@ -36,19 +36,19 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-label`)    | new (`ds-label`)       | handling                                                                                                                                                                                                                            |
-| -------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `htmlFor`            | `htmlFor`              | Copy as-is, including bindings.                                                                                                                                                                                                     |
-| `htmlId`             | `htmlId`               | Copy as-is, including bindings.                                                                                                                                                                                                     |
-| `required`           | `required`             | Copy as-is, including `required="false"` and `required={false}`. The default is still `true`.                                                                                                                                       |
-| `noWrap`             | `noWrap`               | Copy as-is, including bindings.                                                                                                                                                                                                     |
-| `valid`, `invalid`   | `valid`, `invalid`     | Copy as-is, including bindings.                                                                                                                                                                                                     |
-| `disabled`           | `disabled`             | Copy as-is, including bindings.                                                                                                                                                                                                     |
-| `readonly`           | `disabled`             | `bal-label` styled `readonly` like `disabled`. Rename to `disabled`, keeping the value or binding. When `disabled` is already on the same element, drop `readonly`. List every rename for the report.                               |
-| `multiline`          | _(now the default)_    | Drop the attribute, since `ds-label` wraps by default. When the value is a binding (`[multiline]`, `multiline={x}`), drop it too and flag the occurrence, because a binding that resolved to `false` now wraps.                     |
-| `size="small"`       | `size="sm"`            | Rewrite static values: `small` to `sm`, `large` to `lg`, `x-large` to `xl`, `xx-large` to `2xl`, `xxx-large` to `3xl`. Drop `size=""`. Leave bindings (`[size]`, `size={x}`) unchanged and flag them, the value set is different.   |
-| `weight`             | _(no equivalent prop)_ | Leave the attribute in place, do not drop it. `ds-label` has no weight, so `weight="regular"` has no effect after the migration. In strictly typed React or Angular templates it may not compile. Flag every occurrence for review. |
-| `hovered`, `pressed` | _(internal)_           | Were `@internal`, not a consumer API. Leave them in place and flag them.                                                                                                                                                            |
+| old (`bal-label`)    | new (`ds-label`)       | handling                                                                                                                                                                                                                          |
+| -------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `htmlFor`            | `htmlFor`              | Copy as-is, including bindings.                                                                                                                                                                                                   |
+| `htmlId`             | `htmlId`               | Copy as-is, including bindings.                                                                                                                                                                                                   |
+| `required`           | `required`             | Copy as-is, including `required="false"` and `required={false}`. The default is still `true`.                                                                                                                                     |
+| `noWrap`             | `noWrap`               | Copy as-is, including bindings.                                                                                                                                                                                                   |
+| `valid`, `invalid`   | `valid`, `invalid`     | Copy as-is, including bindings.                                                                                                                                                                                                   |
+| `disabled`           | `disabled`             | Copy as-is, including bindings.                                                                                                                                                                                                   |
+| `readonly`           | `disabled`             | `bal-label` styled `readonly` like `disabled`. Rename to `disabled`, keeping the value or binding. When `disabled` is already on the same element, drop `readonly`. List every rename for the report.                             |
+| `multiline`          | _(now the default)_    | Drop the attribute, since `ds-label` wraps by default. When the value is a binding (`[multiline]`, `multiline={x}`), drop it too and flag the occurrence, because a binding that resolved to `false` now wraps.                   |
+| `size="small"`       | `size="sm"`            | Rewrite static values: `small` to `sm`, `large` to `lg`, `x-large` to `xl`, `xx-large` to `2xl`, `xxx-large` to `3xl`. Drop `size=""`. Leave bindings (`[size]`, `size={x}`) unchanged and flag them, the value set is different. |
+| `weight`             | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). `ds-label` has no weight.                                                                                                                                                         |
+| `hovered`, `pressed` | _(internal)_           | Were `@internal`, not a consumer API. Apply Unmapped props and handlers (`SKILL.md`).                                                                                                                                             |
 
 ### Tags and imports
 
@@ -81,8 +81,8 @@ Needs your attention when found:
 
 1. Every `multiline` binding that was dropped. A binding that resolved to `false` now wraps.
 2. Every dynamic `size` binding left unchanged. The value set is different.
-3. Every `weight` left for manual review.
-4. Every `hovered` or `pressed` left for manual review.
+3. Every `weight`, with its Unmapped props and handlers outcome.
+4. Every `hovered` or `pressed`, with its Unmapped props and handlers outcome.
 5. Every migrated label inside a `bal-field` that stays until its control is migrated, as "inside a `bal-field` that stays until `<control>` is migrated". It stays unlinked until then.
 
 Coverage only, written to the file:

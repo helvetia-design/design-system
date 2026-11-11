@@ -207,6 +207,43 @@ describe('scanBalNumberInput', () => {
     expect(scanBalNumberInput(root).total).toBe(2)
   })
 
+  it('lists BalEvents types and the bare CustomEvent once per occurrence, but not BalFormBundle', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        "import { BalFormBundle } from '@baloise/ds-angular'",
+        '@Component({ imports: [...BalFormBundle] })',
+        'export class ApplicationComponent {',
+        '  onChange(event: BalEvents.BalNumberInputCustomEvent<number | undefined>) {}',
+        '  onBare(event: BalNumberInputCustomEvent<number>) {}',
+        '  detail?: BalEvents.BalNumberInputChangeDetail',
+        '  both(a: BalEvents.BalNumberInputBlur, b: BalNumberInputCustomEvent<number>) {}',
+        '  onInput(event: BalEvents.BalInputCustomEvent<string>) {}',
+        '  el?: HTMLBalNumberInputElement',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalNumberInput(root)).toEqual({
+      total: 5,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            { line: 4, snippet: 'onChange(event: BalEvents.BalNumberInputCustomEvent<number | undefined>) {}' },
+            { line: 5, snippet: 'onBare(event: BalNumberInputCustomEvent<number>) {}' },
+            { line: 6, snippet: 'detail?: BalEvents.BalNumberInputChangeDetail' },
+            { line: 7, snippet: 'both(a: BalEvents.BalNumberInputBlur, b: BalNumberInputCustomEvent<number>) {}' },
+            { line: 7, snippet: 'both(a: BalEvents.BalNumberInputBlur, b: BalNumberInputCustomEvent<number>) {}' },
+          ],
+        },
+      ],
+    })
+  })
+
   it('prints grouped findings as JSON and does not edit files', () => {
     const root = createScratchDir()
     const contents = '<bal-number-input></bal-number-input>\n'
@@ -241,7 +278,7 @@ describe('Detect', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-number-input></bal-number-input>\n')
 
-    expect(scanMigratable(root).suggested).toEqual([{ name: 'number-input', total: 2 }])
+    expect(scanMigratable(root).suggested).toEqual([{ name: 'number-input', total: 1 }])
   })
 })
 

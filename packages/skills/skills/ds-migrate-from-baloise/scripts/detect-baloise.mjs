@@ -4,30 +4,21 @@ import { existsSync, readdirSync, readFileSync, realpathSync } from 'node:fs'
 import { extname, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
+import { SKIPPED_DIRS, SOURCE_EXTENSIONS } from './source-scan.mjs'
 
 const LEGACY_SCOPE = '@baloise'
 const TARGET_SCOPE = '@helvetia-design'
-const INSTALL_NAMES = ['angular', 'core', 'react', 'styles']
-const SHORT_NAMES = [...INSTALL_NAMES, 'icons', 'brand-icons']
-const ICON_PACKAGES = new Set([`${LEGACY_SCOPE}/ds-icons`, `${LEGACY_SCOPE}/ds-brand-icons`])
-const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', 'out', '.next', '.angular', '.git', '.claude', 'coverage'])
-const LOCKFILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'npm-shrinkwrap.json'])
-const IMPORT_EXTENSIONS = new Set([
-  '.html',
-  '.htm',
-  '.ts',
-  '.tsx',
-  '.js',
-  '.jsx',
-  '.mjs',
-  '.cjs',
-  '.css',
-  '.scss',
-  '.sass',
-  '.vue',
-  '.json',
-])
-const DEPENDENCY_FIELDS = ['dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies']
+const STYLES_NAME = 'styles'
+const INSTALL_NAMES = ['angular', 'core', 'react', STYLES_NAME]
+const ICON_NAMES = ['icons', 'brand-icons']
+const FONT_FAVICON_NAMES = ['fonts', 'favicons']
+const SHORT_NAMES = [...INSTALL_NAMES, ...ICON_NAMES]
+const DEPENDENCY_NAMES = [...SHORT_NAMES, ...FONT_FAVICON_NAMES]
+const ASSET_NAMES = [...ICON_NAMES, STYLES_NAME, ...FONT_FAVICON_NAMES]
+const ASSET_PACKAGES = new Set(ASSET_NAMES.map(short => `${LEGACY_SCOPE}/ds-${short}`))
+export const LOCKFILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'npm-shrinkwrap.json'])
+export const IMPORT_EXTENSIONS = new Set([...SOURCE_EXTENSIONS, '.css', '.scss', '.sass', '.json'])
+export const DEPENDENCY_FIELDS = ['dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies']
 const NOTHING = 'no Baloise Design System installation detected, nothing to migrate'
 
 function targetPackageName(short) {
@@ -39,6 +30,7 @@ const MISSING_LATEST = `npm view ${targetPackageName('core')} dist-tags did not 
 const execFileAsync = promisify(execFile)
 const PACKAGE_RE = new RegExp(`${LEGACY_SCOPE}/ds-(?:${SHORT_NAMES.join('|')})\\b`)
 const INSTALL_RE = new RegExp(`^${LEGACY_SCOPE}/ds-(?:${INSTALL_NAMES.join('|')})$`)
+const DEPENDENCY_RE = new RegExp(`${LEGACY_SCOPE}/ds-(?:${DEPENDENCY_NAMES.join('|')})\\b`)
 
 export async function readNpmDistTags(execImpl = execFileAsync) {
   const { stdout } = await execImpl('npm', ['view', targetPackageName('core'), 'dist-tags', '--json'], {
@@ -46,6 +38,73 @@ export async function readNpmDistTags(execImpl = execFileAsync) {
   })
   const parsed = JSON.parse(stdout)
   return typeof parsed === 'string' ? JSON.parse(parsed) : parsed
+}
+
+export async function readNpmAngularPeers(version, execImpl = execFileAsync) {
+  const { stdout } = await execImpl(
+    'npm',
+    ['view', `${targetPackageName('angular')}@${version}`, 'peerDependencies', '--json'],
+    { encoding: 'utf8' },
+  )
+  if (!stdout.trim()) return {}
+  const parsed = JSON.parse(stdout)
+  return typeof parsed === 'string' ? JSON.parse(parsed) : parsed
+}
+
+const VERSION_PART = String.raw`v?(\d+)(?:\.(?:\d+|[xX*]))?(?:\.(?:\d+|[xX*]))?(?:[-+][0-9A-Za-z.+-]+)?`
+const LOWER_BOUND_RE = new RegExp(`^(?:\\^|~|>=|=)?${VERSION_PART}$`)
+const UPPER_BOUND_RE = new RegExp(`^<=?${VERSION_PART}$`)
+
+export function lowestMajor(spec) {
+  if (typeof spec !== 'string') return null
+  const [lower, ...upper] = spec
+    .trim()
+    .replace(/(>=|<=|<|=|\^|~)\s+/g, '$1')
+    .split(/\s+/)
+  const match = LOWER_BOUND_RE.exec(lower)
+  if (!match || !upper.every(part => UPPER_BOUND_RE.test(part))) return null
+  return Number(match[1])
+}
+
+function angularCoreSpec(manifest) {
+  for (const field of DEPENDENCY_FIELDS) {
+    const spec = manifest?.[field]?.['@angular/core']
+    if (typeof spec === 'string') return spec
+  }
+  return undefined
+}
+
+async function checkAngular(manifest, packageJsonPath, version, readAngularPeers) {
+  const peerPackage = `${targetPackageName('angular')}@${version}`
+  const installed = angularCoreSpec(manifest)
+  let required
+  try {
+    const peers = await readAngularPeers(version)
+    required = peers?.['@angular/core']
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error)
+    return { error: `Could not read the peer dependencies of ${peerPackage}: ${reason}` }
+  }
+  if (typeof required !== 'string') {
+    return { error: `${peerPackage} declares no @angular/core peer range, so the Angular version cannot be checked` }
+  }
+  const installedMajor = lowestMajor(installed)
+  if (installedMajor === null) {
+    return {
+      error: `Cannot read the major of @angular/core "${installed}" in ${packageJsonPath}. Use a plain version such as ^19.2.0 and run the migration again.`,
+    }
+  }
+  const requiredMajor = lowestMajor(required)
+  if (requiredMajor === null) {
+    return { error: `Cannot read the major of the @angular/core peer range "${required}" of ${peerPackage}` }
+  }
+  const compatible = installedMajor >= requiredMajor
+  const angular = { installed, required, compatible }
+  if (compatible) return { angular }
+  return {
+    angular,
+    error: `${packageJsonPath} declares @angular/core ${installed}, but ${peerPackage} requires @angular/core ${required}. Upgrade the app to Angular ${requiredMajor} or later before running the migration; Angular ${installedMajor} is not supported.`,
+  }
 }
 
 export async function detectBaloise(rootDir, options = {}) {
@@ -62,6 +121,22 @@ export async function detectBaloise(rootDir, options = {}) {
   }
 
   const framework = detectFramework(found.manifest)
+  let angular
+  if (framework === 'angular') {
+    const check = await checkAngular(
+      found.manifest,
+      found.packageJsonPath,
+      version,
+      options.readAngularPeers ?? readNpmAngularPeers,
+    )
+    if (check.error) {
+      return check.angular
+        ? { status: 'error', message: check.error, angular: check.angular }
+        : { status: 'error', message: check.error }
+    }
+    angular = check.angular
+  }
+
   const packageManager = detectPackageManager(rootDir)
   return {
     status: 'ready',
@@ -73,6 +148,7 @@ export async function detectBaloise(rootDir, options = {}) {
     imports: found.imports,
     version,
     aliases: aliasesFor(framework, version, found.dependencies),
+    ...(angular && { angular }),
   }
 }
 
@@ -82,20 +158,20 @@ export async function run(rootDir, stdout, options = {}) {
   return result.status === 'error' ? 1 : 0
 }
 
-function installCommand(packageManager) {
+export function installCommand(packageManager) {
   if (packageManager === 'pnpm') return 'pnpm install'
   if (packageManager === 'yarn') return 'yarn install'
   return 'npm install'
 }
 
-function detectPackageManager(rootDir) {
+export function detectPackageManager(rootDir) {
   if (existsSync(join(rootDir, 'pnpm-lock.yaml'))) return 'pnpm'
   if (existsSync(join(rootDir, 'yarn.lock'))) return 'yarn'
   if (existsSync(join(rootDir, 'package-lock.json'))) return 'npm'
   return 'npm'
 }
 
-function detectFramework(manifest) {
+export function detectFramework(manifest) {
   const names = new Set(dependencyNames(manifest))
   if (names.has('@angular/core')) return 'angular'
   if (names.has('react') || names.has('react-dom')) return 'react'
@@ -117,8 +193,11 @@ function detectFramework(manifest) {
  * linked, those imports fail to resolve. Declaring what the skill tells the consumer to import
  * is the fix.
  *
- * `assets` is added only when the app declared `@baloise/ds-icons` or `@baloise/ds-brand-icons`
- * directly, because only then does it import icon symbols itself.
+ * `assets` is added when the app declared `@baloise/ds-icons` or `@baloise/ds-brand-icons`
+ * directly, because then it imports icon symbols itself. It is also added for `@baloise/ds-styles`,
+ * `@baloise/ds-fonts` and `@baloise/ds-favicons`, because the Assets step copies the self-hosted
+ * fonts and favicons from `node_modules/@helvetia-design/assets`, which pnpm only links when the
+ * app declares it.
  */
 function aliasesFor(framework, version, dependencies) {
   const shared = {
@@ -126,13 +205,13 @@ function aliasesFor(framework, version, dependencies) {
     [targetPackageName('styles')]: version,
     [targetPackageName('tokens')]: version,
   }
-  if (dependencies.some(name => ICON_PACKAGES.has(name))) shared[targetPackageName('assets')] = version
+  if (dependencies.some(name => ASSET_PACKAGES.has(name))) shared[targetPackageName('assets')] = version
   if (framework === 'react') return { [targetPackageName('react')]: version, ...shared }
   if (framework === 'angular') return { [targetPackageName('angular')]: version, ...shared }
   return shared
 }
 
-function dependencyNames(manifest) {
+export function dependencyNames(manifest) {
   const names = []
   for (const field of DEPENDENCY_FIELDS) {
     const block = manifest?.[field]
@@ -141,8 +220,8 @@ function dependencyNames(manifest) {
   return names
 }
 
-function baloiseDependencies(manifest) {
-  return [...new Set(dependencyNames(manifest).filter(name => PACKAGE_RE.test(name)))].sort()
+export function baloiseDependencies(manifest) {
+  return [...new Set(dependencyNames(manifest).filter(name => DEPENDENCY_RE.test(name)))].sort()
 }
 
 function scan(rootDir) {
@@ -175,7 +254,7 @@ function walk(rootDir, dir, packages, imports) {
   for (const entry of entries) {
     if (entry.isSymbolicLink()) continue
     if (entry.isDirectory()) {
-      if (SKIP_DIRS.has(entry.name)) continue
+      if (SKIPPED_DIRS.has(entry.name)) continue
       walk(rootDir, join(dir, entry.name), packages, imports)
       continue
     }
@@ -230,7 +309,7 @@ function isIgnorableLine(line) {
   return trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*') || trimmed.startsWith('<!--')
 }
 
-function readJson(filePath) {
+export function readJson(filePath) {
   try {
     return JSON.parse(readFileSync(filePath, 'utf8'))
   } catch {

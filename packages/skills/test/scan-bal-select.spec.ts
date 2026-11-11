@@ -79,7 +79,6 @@ describe('scanBalSelect', () => {
       [
         'const el: HTMLBalSelectElement | null = null',
         'const opt: HTMLBalSelectOptionElement | null = null',
-        'type A = BalEvents.BalSelectChangeDetail',
         'const b: BalProps.BalSelectFilter = "includes"',
         'type C = BalSelectValue',
       ].join('\n'),
@@ -272,6 +271,47 @@ describe('scanBalSelect', () => {
     expect(scanBalSelect(root)).toEqual({ total: 0, files: [] })
   })
 
+  it('lists the bundle and BalEvents types once per occurrence, but not BalProps or multi-family bundles', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        "import { BalFormBundle, BalSelectBundle } from '@baloise/ds-angular'",
+        '@Component({ imports: [...BalSelectBundle, ...BalFormBundle] })',
+        'export class ApplicationComponent {',
+        '  onChange(event: BalEvents.BalSelectCustomEvent<string>) {}',
+        '  onOption(event: BalEvents.BalSelectOptionCustomEvent<string>) {}',
+        '  onBare(event: BalSelectCustomEvent<string>) {}',
+        '  detail?: BalEvents.BalSelectChangeDetail',
+        '  both(a: BalEvents.BalSelectBlur, b: BalSelectOptionCustomEvent<string>) {}',
+        '  filter?: BalProps.BalSelectFilter',
+        '  el?: HTMLBalSelectElement',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalSelect(root)).toEqual({
+      total: 8,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            { line: 1, snippet: "import { BalFormBundle, BalSelectBundle } from '@baloise/ds-angular'" },
+            { line: 2, snippet: '@Component({ imports: [...BalSelectBundle, ...BalFormBundle] })' },
+            { line: 4, snippet: 'onChange(event: BalEvents.BalSelectCustomEvent<string>) {}' },
+            { line: 5, snippet: 'onOption(event: BalEvents.BalSelectOptionCustomEvent<string>) {}' },
+            { line: 6, snippet: 'onBare(event: BalSelectCustomEvent<string>) {}' },
+            { line: 7, snippet: 'detail?: BalEvents.BalSelectChangeDetail' },
+            { line: 8, snippet: 'both(a: BalEvents.BalSelectBlur, b: BalSelectOptionCustomEvent<string>) {}' },
+            { line: 8, snippet: 'both(a: BalEvents.BalSelectBlur, b: BalSelectOptionCustomEvent<string>) {}' },
+          ],
+        },
+      ],
+    })
+  })
+
   it('prints grouped findings as JSON and does not edit files', () => {
     const root = createScratchDir()
     const html = '<bal-select value="1"></bal-select>\n'
@@ -315,8 +355,9 @@ describe('Detect', () => {
     // bal-select-option has no migration of its own; the select migration covers it,
     // so it counts towards select rather than showing up as notYet.
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'select', total: 4 }],
+      suggested: [{ name: 'select', total: 2 }],
       notYet: [],
+      types: [],
     })
   })
 })

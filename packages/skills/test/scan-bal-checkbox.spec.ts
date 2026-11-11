@@ -368,6 +368,466 @@ describe('scanBalCheckbox', () => {
     })
   })
 
+  it('lists bal-check and bal-switch tags and the BalCheck and BalSwitch symbols, without matching them inside bal-checkbox', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'indicators.html',
+      [
+        '<bal-check checked></bal-check>',
+        '<bal-switch [checked]="on" inverted></bal-switch>',
+        '<bal-checkbox value="1"></bal-checkbox>',
+        '<bal-check-list></bal-check-list>',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'Indicators.tsx',
+      [
+        "import { BalCheck, BalCheckbox, BalSwitch } from '@baloise/ds-react'",
+        'type BalCheckOption = string',
+        'export const Indicators = () => <BalCheck checked />',
+        'export const Toggle = () => <BalSwitch checked />',
+        '',
+      ].join('\n'),
+    )
+
+    const importLine = "import { BalCheck, BalCheckbox, BalSwitch } from '@baloise/ds-react'"
+
+    expect(scanBalCheckbox(root)).toEqual({
+      total: 11,
+      files: [
+        {
+          file: 'indicators.html',
+          findings: [
+            { line: 1, snippet: '<bal-check checked>' },
+            { line: 1, snippet: '</bal-check>' },
+            { line: 2, snippet: '<bal-switch [checked]="on" inverted>' },
+            { line: 2, snippet: '</bal-switch>' },
+            { line: 3, snippet: '<bal-checkbox value="1">' },
+            { line: 3, snippet: '</bal-checkbox>' },
+          ],
+        },
+        {
+          file: 'Indicators.tsx',
+          findings: [
+            { line: 1, snippet: importLine },
+            { line: 1, snippet: importLine },
+            { line: 1, snippet: importLine },
+            { line: 3, snippet: '<BalCheck checked />' },
+            { line: 4, snippet: '<BalSwitch checked />' },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('flags a switch group with a bound value or a forms binding as switchGroup', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'Topics.tsx',
+      [
+        'export const Topics = () => (',
+        '  <BalCheckboxGroup name="topics" value={topics} interface="switch" onBalChange={onChange}>',
+        '    <BalCheckbox value="news">News</BalCheckbox>',
+        '  </BalCheckboxGroup>',
+        ')',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'topics.component.html',
+      [
+        '<bal-checkbox-group formControlName="topics">',
+        '  <bal-checkbox value="news" interface="switch"></bal-checkbox>',
+        '</bal-checkbox-group>',
+        '<bal-checkbox-group [value]="topics">',
+        '  <bal-checkbox value="news" [interface]="\'switch\'"></bal-checkbox>',
+        '</bal-checkbox-group>',
+        '<bal-checkbox-group interface="switch">',
+        '  <bal-checkbox value="news"></bal-checkbox>',
+        '</bal-checkbox-group>',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalCheckbox(root)).toEqual({
+      total: 16,
+      files: [
+        {
+          file: 'topics.component.html',
+          findings: [
+            { line: 1, snippet: '<bal-checkbox-group formControlName="topics">', switchGroup: true },
+            { line: 2, snippet: '<bal-checkbox value="news" interface="switch">' },
+            { line: 2, snippet: '</bal-checkbox>' },
+            { line: 3, snippet: '</bal-checkbox-group>' },
+            { line: 4, snippet: '<bal-checkbox-group [value]="topics">', switchGroup: true },
+            { line: 5, snippet: '<bal-checkbox value="news" [interface]="\'switch\'">' },
+            { line: 5, snippet: '</bal-checkbox>' },
+            { line: 6, snippet: '</bal-checkbox-group>' },
+            { line: 7, snippet: '<bal-checkbox-group interface="switch">' },
+            { line: 8, snippet: '<bal-checkbox value="news">' },
+            { line: 8, snippet: '</bal-checkbox>' },
+            { line: 9, snippet: '</bal-checkbox-group>' },
+          ],
+        },
+        {
+          file: 'Topics.tsx',
+          findings: [
+            {
+              line: 2,
+              snippet: '<BalCheckboxGroup name="topics" value={topics} interface="switch" onBalChange={onChange}>',
+              switchGroup: true,
+            },
+            { line: 3, snippet: '<BalCheckbox value="news">' },
+            { line: 3, snippet: '</BalCheckbox>' },
+            { line: 4, snippet: '</BalCheckboxGroup>' },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('flags a bound group without control as unboundControl and a forms-bound single checkbox as formsBinding', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'form.component.html',
+      [
+        '<bal-checkbox-group [formControl]="topics"></bal-checkbox-group>',
+        '<bal-checkbox-group [(ngModel)]="topics"></bal-checkbox-group>',
+        '<bal-checkbox-group control [value]="topics"></bal-checkbox-group>',
+        '<bal-checkbox-group control value="a"></bal-checkbox-group>',
+        '<bal-checkbox formControlName="terms"></bal-checkbox>',
+        '<bal-checkbox [(ngModel)]="terms"></bal-checkbox>',
+        '<bal-checkbox [checked]="terms" (ngModelChange)="x"></bal-checkbox>',
+        '',
+      ].join('\n'),
+    )
+    write(root, 'Group.tsx', 'export const Group = () => <BalCheckboxGroup value={topics} onBalChange={onChange} />\n')
+
+    expect(scanBalCheckbox(root)).toEqual({
+      total: 15,
+      files: [
+        {
+          file: 'form.component.html',
+          findings: [
+            { line: 1, snippet: '<bal-checkbox-group [formControl]="topics">', unboundControl: true },
+            { line: 1, snippet: '</bal-checkbox-group>' },
+            { line: 2, snippet: '<bal-checkbox-group [(ngModel)]="topics">', unboundControl: true },
+            { line: 2, snippet: '</bal-checkbox-group>' },
+            { line: 3, snippet: '<bal-checkbox-group control [value]="topics">' },
+            { line: 3, snippet: '</bal-checkbox-group>' },
+            { line: 4, snippet: '<bal-checkbox-group control value="a">' },
+            { line: 4, snippet: '</bal-checkbox-group>' },
+            { line: 5, snippet: '<bal-checkbox formControlName="terms">', formsBinding: true },
+            { line: 5, snippet: '</bal-checkbox>' },
+            { line: 6, snippet: '<bal-checkbox [(ngModel)]="terms">', formsBinding: true },
+            { line: 6, snippet: '</bal-checkbox>' },
+            { line: 7, snippet: '<bal-checkbox [checked]="terms" (ngModelChange)="x">' },
+            { line: 7, snippet: '</bal-checkbox>' },
+          ],
+        },
+        {
+          file: 'Group.tsx',
+          findings: [
+            {
+              line: 1,
+              snippet: '<BalCheckboxGroup value={topics} onBalChange={onChange} />',
+              unboundControl: true,
+            },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('flags setValue() on a legacy group ref in the sibling .ts, but not a FormControl.setValue', () => {
+    const root = createScratchDir()
+    write(root, 'topics.component.html', '<bal-checkbox-group #topicsGroup></bal-checkbox-group>\n')
+    write(
+      root,
+      'topics.component.ts',
+      [
+        'export class TopicsComponent {',
+        "  @ViewChild('topicsGroup') topicsGroup?: ElementRef<HTMLBalCheckboxGroupElement>",
+        '  readonly form = new FormGroup({ topics: new FormControl<string[]>([]) })',
+        '  reset() {',
+        '    this.topicsGroup?.nativeElement.setValue([])',
+        "    this.form.controls.topics.setValue(['news'])",
+        "    this.form.get('topics')?.setValue([])",
+        '    // this.topicsGroup?.nativeElement.setValue([])',
+        '  }',
+        '}',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'other.ts',
+      [
+        'export function reset(group: HTMLBalCheckboxGroupElement, control: FormControl) {',
+        '  group.setValue([])',
+        '  control.setValue([])',
+        "  ;(document.querySelector('bal-checkbox-group') as HTMLBalCheckboxGroupElement).setValue([])",
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    const expected = {
+      total: 5,
+      files: [
+        {
+          file: 'other.ts',
+          findings: [
+            { line: 2, snippet: 'group.setValue([])', setValue: true },
+            {
+              line: 4,
+              snippet: ";(document.querySelector('bal-checkbox-group') as HTMLBalCheckboxGroupElement).setValue([])",
+              setValue: true,
+            },
+          ],
+        },
+        {
+          file: 'topics.component.html',
+          findings: [
+            { line: 1, snippet: '<bal-checkbox-group #topicsGroup>' },
+            { line: 1, snippet: '</bal-checkbox-group>' },
+          ],
+        },
+        {
+          file: 'topics.component.ts',
+          findings: [{ line: 5, snippet: 'this.topicsGroup?.nativeElement.setValue([])', setValue: true }],
+        },
+      ],
+    }
+
+    expect(scanBalCheckbox(root)).toEqual(expected)
+    expect(scanBalCheckbox(root, ['topics.component.html'])).toEqual({
+      total: 3,
+      files: expected.files.slice(1),
+    })
+  })
+
+  it('flags setValue() on a typed group ref in .mts and Vue script files', () => {
+    const root = createScratchDir()
+    const reset = 'export function reset(group: HTMLBalCheckboxGroupElement) {\n  group.setValue([])\n}\n'
+    write(root, 'reset.mts', reset)
+    write(root, 'g.vue', `<script setup lang="ts">\n${reset}</script>\n`)
+
+    expect(scanBalCheckbox(root)).toEqual({
+      total: 2,
+      files: [
+        { file: 'g.vue', findings: [{ line: 3, snippet: 'group.setValue([])', setValue: true }] },
+        { file: 'reset.mts', findings: [{ line: 2, snippet: 'group.setValue([])', setValue: true }] },
+      ],
+    })
+  })
+
+  it('reads JSX arrow handlers inside a tag when it computes the flags', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'Arrows.tsx',
+      [
+        'export const Arrows = () => (',
+        '  <>',
+        '    <BalCheckboxGroup onBalChange={e => setTopics(e.detail)} value={topics} interface="switch">',
+        '      <BalCheckbox value="news">News</BalCheckbox>',
+        '    </BalCheckboxGroup>',
+        '    <BalCheckboxGroup value={topics} onBalChange={e => setTopics(e.detail)}>',
+        '      <BalCheckbox onBalChange={e => track(e, { a: "}" })} interface="switch" value="a">A</BalCheckbox>',
+        '    </BalCheckboxGroup>',
+        '  </>',
+        ')',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalCheckbox(root).files[0].findings).toEqual([
+      {
+        line: 3,
+        snippet: '<BalCheckboxGroup onBalChange={e => setTopics(e.detail)} value={topics} interface="switch">',
+        switchGroup: true,
+      },
+      { line: 4, snippet: '<BalCheckbox value="news">' },
+      { line: 4, snippet: '</BalCheckbox>' },
+      { line: 5, snippet: '</BalCheckboxGroup>' },
+      {
+        line: 6,
+        snippet: '<BalCheckboxGroup value={topics} onBalChange={e => setTopics(e.detail)}>',
+        switchGroup: true,
+      },
+      {
+        line: 7,
+        snippet: '<BalCheckbox onBalChange={e => track(e, { a: "}" })} interface="switch" value="a">',
+      },
+      { line: 7, snippet: '</BalCheckbox>' },
+      { line: 8, snippet: '</BalCheckboxGroup>' },
+    ])
+  })
+
+  it('flags each sibling group on its own and lets switchGroup win over control and unboundControl', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'groups.component.html',
+      [
+        '<bal-checkbox-group [formControl]="plain">',
+        '  <bal-checkbox value="x"></bal-checkbox>',
+        '</bal-checkbox-group>',
+        '<bal-checkbox-group [formControl]="switches">',
+        '  <bal-checkbox value="y" interface="switch"></bal-checkbox>',
+        '</bal-checkbox-group>',
+        '<bal-checkbox-group value="a"></bal-checkbox-group>',
+        '<bal-checkbox-group [control]="c" [value]="v"></bal-checkbox-group>',
+        '<bal-checkbox-group control interface="switch" [(ngModel)]="t"></bal-checkbox-group>',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalCheckbox(root).files[0].findings).toEqual([
+      { line: 1, snippet: '<bal-checkbox-group [formControl]="plain">', unboundControl: true },
+      { line: 2, snippet: '<bal-checkbox value="x">' },
+      { line: 2, snippet: '</bal-checkbox>' },
+      { line: 3, snippet: '</bal-checkbox-group>' },
+      { line: 4, snippet: '<bal-checkbox-group [formControl]="switches">', switchGroup: true },
+      { line: 5, snippet: '<bal-checkbox value="y" interface="switch">' },
+      { line: 5, snippet: '</bal-checkbox>' },
+      { line: 6, snippet: '</bal-checkbox-group>' },
+      { line: 7, snippet: '<bal-checkbox-group value="a">' },
+      { line: 7, snippet: '</bal-checkbox-group>' },
+      { line: 8, snippet: '<bal-checkbox-group [control]="c" [value]="v">' },
+      { line: 8, snippet: '</bal-checkbox-group>' },
+      { line: 9, snippet: '<bal-checkbox-group control interface="switch" [(ngModel)]="t">', switchGroup: true },
+      { line: 9, snippet: '</bal-checkbox-group>' },
+    ])
+  })
+
+  it('flags setValue() through useRef, casts, viewChild.required, multiline chains and aliases only', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'refs.component.ts',
+      [
+        'export class RefsComponent {',
+        "  @ViewChild('g') g?: ElementRef<HTMLBalCheckboxGroupElement>",
+        '  a!: ElementRef<HTMLBalCheckboxGroupElement>',
+        "  readonly req = viewChild.required<ElementRef<HTMLBalCheckboxGroupElement>>('g')",
+        '  reset() {',
+        '    this.g',
+        '      ?.nativeElement.setValue([])',
+        '    const el = this.g?.nativeElement',
+        '    el?.setValue([])',
+        '    this.req().nativeElement.setValue([])',
+        '    this.a.setValue([])',
+        '  }',
+        '}',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'Refs.tsx',
+      [
+        'export function Refs() {',
+        '  const group = useRef<HTMLBalCheckboxGroupElement>(null)',
+        '  const reset = () => group.current?.setValue([])',
+        '  const clear = (el: Element) => {',
+        '    const g = el as HTMLBalCheckboxGroupElement',
+        '    g.setValue([])',
+        '  }',
+        '  return null',
+        '}',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'radio.ts',
+      ['export function reset(group: HTMLBalRadioGroupElement) {', "  group.setValue('a')", '}', ''].join('\n'),
+    )
+
+    expect(scanBalCheckbox(root)).toEqual({
+      total: 5,
+      files: [
+        {
+          file: 'refs.component.ts',
+          findings: [
+            { line: 7, snippet: '?.nativeElement.setValue([])', setValue: true },
+            { line: 9, snippet: 'el?.setValue([])', setValue: true },
+            { line: 10, snippet: 'this.req().nativeElement.setValue([])', setValue: true },
+          ],
+        },
+        {
+          file: 'Refs.tsx',
+          findings: [
+            { line: 3, snippet: 'const reset = () => group.current?.setValue([])', setValue: true },
+            { line: 6, snippet: 'g.setValue([])', setValue: true },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('keeps the plain { line, snippet } shape for an unbound group', () => {
+    const root = createScratchDir()
+    write(root, 'plain.html', '<bal-checkbox-group interface="switch" name="a"></bal-checkbox-group>\n')
+
+    expect(scanBalCheckbox(root).files[0].findings[0]).toEqual({
+      line: 1,
+      snippet: '<bal-checkbox-group interface="switch" name="a">',
+    })
+  })
+
+  it('lists the bundle spread in application.component.ts and BalEvents types once per occurrence, but not the bal-check and bal-switch types that stay legacy', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        "import { BalCheckboxBundle, BalFormBundle } from '@baloise/ds-angular'",
+        '@Component({ imports: [...BalCheckboxBundle, ...BalFormBundle] })',
+        'export class ApplicationComponent {',
+        '  onTerms(event: BalEvents.BalCheckboxCustomEvent<boolean>) {}',
+        '  onTopics(event: BalEvents.BalCheckboxGroupCustomEvent<string[]>) {}',
+        '  onBare(event: BalCheckboxCustomEvent<boolean>) {}',
+        '  detail?: BalEvents.BalCheckboxChangeDetail',
+        '  both(a: BalEvents.BalCheckboxBlur, b: BalCheckboxGroupCustomEvent<string[]>) {}',
+        '  onCheck(event: BalEvents.BalCheckCustomEvent<boolean>) {}',
+        '  onSwitch(event: BalEvents.BalSwitchCustomEvent<boolean>) {}',
+        '  onBareCheck(event: BalCheckCustomEvent<boolean>) {}',
+        '  onBareSwitch(event: BalSwitchCustomEvent<boolean>) {}',
+        '  look?: BalProps.BalCheckboxInterface',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalCheckbox(root)).toEqual({
+      total: 8,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            { line: 1, snippet: "import { BalCheckboxBundle, BalFormBundle } from '@baloise/ds-angular'" },
+            { line: 2, snippet: '@Component({ imports: [...BalCheckboxBundle, ...BalFormBundle] })' },
+            { line: 4, snippet: 'onTerms(event: BalEvents.BalCheckboxCustomEvent<boolean>) {}' },
+            { line: 5, snippet: 'onTopics(event: BalEvents.BalCheckboxGroupCustomEvent<string[]>) {}' },
+            { line: 6, snippet: 'onBare(event: BalCheckboxCustomEvent<boolean>) {}' },
+            { line: 7, snippet: 'detail?: BalEvents.BalCheckboxChangeDetail' },
+            { line: 8, snippet: 'both(a: BalEvents.BalCheckboxBlur, b: BalCheckboxGroupCustomEvent<string[]>) {}' },
+            { line: 8, snippet: 'both(a: BalEvents.BalCheckboxBlur, b: BalCheckboxGroupCustomEvent<string[]>) {}' },
+          ],
+        },
+      ],
+    })
+  })
+
   it('prints grouped findings as JSON and does not edit files', () => {
     const root = createScratchDir()
     const contents = '<bal-checkbox value="1"></bal-checkbox>\n'
@@ -416,6 +876,13 @@ describe('checkbox migration.md', () => {
       'ds-toggle',
       'control',
       'visual benefit persists, but value binding breaks',
+      '`switchGroup: true`',
+      '`unboundControl: true`',
+      '`formsBinding: true`',
+      '`setValue: true`',
+      'role="group"',
+      '`bal-check`',
+      'bal-switch',
       'hideTrigger',
       'slight design deviation',
       'tileColor',

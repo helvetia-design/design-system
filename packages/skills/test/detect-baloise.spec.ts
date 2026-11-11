@@ -1,8 +1,14 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
-import { afterEach, describe, expect, it } from 'vitest'
-import { detectBaloise, readNpmDistTags, run } from '../skills/ds-migrate-from-baloise/scripts/detect-baloise.mjs'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import {
+  detectBaloise,
+  lowestMajor,
+  readNpmAngularPeers,
+  readNpmDistTags,
+  run,
+} from '../skills/ds-migrate-from-baloise/scripts/detect-baloise.mjs'
 
 const NOTHING = 'no Baloise Design System installation detected, nothing to migrate'
 
@@ -29,6 +35,10 @@ function distTags(version: string) {
   // Includes an unrelated tag alongside `latest` to prove resolution reads
   // `latest` specifically, not just the first key in the object.
   return async () => ({ latest: version, snapshot: '0.0.5-snapshot.1-abc1234' })
+}
+
+function angularPeers(range = '>=22.0.0') {
+  return async () => ({ '@angular/core': range, '@angular/common': range, '@angular/forms': range })
 }
 
 describe('detectBaloise', () => {
@@ -92,10 +102,12 @@ describe('detectBaloise', () => {
       '<script type="module" src="node_modules/@baloise/ds-core/dist/design-system/design-system.esm.js"></script>\n',
     )
     write(root, 'coverage/app.js', "import '@baloise/ds-core'\n")
+    write(root, 'storybook-static/main.js', "import '@baloise/ds-core'\n")
+    write(root, '.nx/cache/app.js', "import '@baloise/ds-core'\n")
 
     const result = await detectBaloise(root, {
       readDistTags: async () => {
-        throw new Error('imports under dist and coverage are not an install')
+        throw new Error('imports under dist, coverage, storybook-static and .nx are not an install')
       },
     })
 
@@ -137,6 +149,19 @@ describe('detectBaloise', () => {
     })
 
     expect(result).toEqual({ status: 'nothing-to-migrate', message: NOTHING })
+  })
+
+  it('detects an import in a .mts file', async () => {
+    const root = createScratchDir()
+    write(root, 'package.json', JSON.stringify({ dependencies: { '@baloise/ds-core': '19.10.2' } }))
+    write(root, 'src/setup.mts', "import '@baloise/ds-core'\n")
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.0') })
+
+    expect(result).toMatchObject({
+      status: 'ready',
+      imports: [{ file: 'src/setup.mts', line: 1, snippet: "import '@baloise/ds-core'" }],
+    })
   })
 
   it('detects a React app, pnpm, and aliases for the resolved latest version', async () => {
@@ -186,6 +211,7 @@ describe('detectBaloise', () => {
       version: '20.0.0',
       aliases: {
         '@helvetia-design/react': '20.0.0',
+        '@helvetia-design/assets': '20.0.0',
         '@helvetia-design/core': '20.0.0',
         '@helvetia-design/styles': '20.0.0',
         '@helvetia-design/tokens': '20.0.0',
@@ -294,10 +320,14 @@ describe('detectBaloise', () => {
       }),
     )
 
-    const result = await detectBaloise(root, { readDistTags: distTags('20.0.1') })
+    const result = await detectBaloise(root, {
+      readDistTags: distTags('20.0.1'),
+      readAngularPeers: angularPeers(),
+    })
 
     expect(result).toMatchObject({
       framework: 'angular',
+      angular: { installed: '22.0.0', required: '>=22.0.0', compatible: true },
       packageJsonPath: 'package.json',
       aliases: {
         '@helvetia-design/angular': '20.0.1',
@@ -333,7 +363,10 @@ describe('detectBaloise', () => {
     )
     write(root, 'apps/web/src/styles.scss', "@import '@baloise/ds-styles/css/design-system';\n")
 
-    const result = await detectBaloise(root, { readDistTags: distTags('20.0.1') })
+    const result = await detectBaloise(root, {
+      readDistTags: distTags('20.0.1'),
+      readAngularPeers: angularPeers(),
+    })
 
     expect(result).toMatchObject({
       packageManager: 'pnpm',
@@ -405,11 +438,14 @@ describe('detectBaloise', () => {
     write(
       root,
       'apps/web/package.json',
-      JSON.stringify({ dependencies: { '@baloise/ds-angular': '19.11.0', '@angular/core': '18.0.0' } }),
+      JSON.stringify({ dependencies: { '@baloise/ds-angular': '19.11.0', '@angular/core': '22.0.0' } }),
     )
     write(root, 'apps/web/src/main.ts', "import { BaloiseDesignSystemModule } from '@baloise/ds-angular'\n")
 
-    const result = await detectBaloise(root, { readDistTags: distTags('20.0.0') })
+    const result = await detectBaloise(root, {
+      readDistTags: distTags('20.0.0'),
+      readAngularPeers: angularPeers(),
+    })
 
     expect(result).toMatchObject({
       status: 'ready',
@@ -481,12 +517,208 @@ describe('readNpmDistTags', () => {
   })
 })
 
+describe('readNpmAngularPeers', () => {
+  it('asks npm view for the peerDependencies of the resolved @helvetia-design/angular version', async () => {
+    const calls: unknown[][] = []
+    const peers = await readNpmAngularPeers('0.0.6', async (command: string, args: string[]) => {
+      calls.push([command, args])
+      return { stdout: JSON.stringify({ '@angular/core': '>=22.0.0' }) }
+    })
+
+    expect(calls).toEqual([['npm', ['view', '@helvetia-design/angular@0.0.6', 'peerDependencies', '--json']]])
+    expect(peers).toEqual({ '@angular/core': '>=22.0.0' })
+  })
+
+  it('parses a double-encoded npm view result', async () => {
+    const peers = await readNpmAngularPeers('0.0.6', async () => ({
+      stdout: JSON.stringify(JSON.stringify({ '@angular/core': '>=22.0.0' })),
+    }))
+    expect(peers).toEqual({ '@angular/core': '>=22.0.0' })
+  })
+
+  it('reads an empty npm view result as no peers', async () => {
+    const peers = await readNpmAngularPeers('0.0.6', async () => ({ stdout: '\n' }))
+    expect(peers).toEqual({})
+  })
+})
+
+describe('lowestMajor', () => {
+  it.each([
+    ['^19.2.0', 19],
+    ['~19.2.0', 19],
+    ['19.2.0', 19],
+    ['>=19.2.0', 19],
+    ['>=22.0.0', 22],
+    ['19.x', 19],
+    ['19.X', 19],
+    ['>= 22.0.0', 22],
+    ['>=19 <20', 19],
+    ['>=22.0.0 <=24.0.0', 22],
+    ['*', null],
+    ['latest', null],
+    ['^18 || ^19', null],
+    ['>22', null],
+    ['19 - 22', null],
+    ['>=19 >20', null],
+    ['workspace:*', null],
+    ['catalog:', null],
+    ['git+https://x', null],
+  ])('reads %s as %s', (spec, expected) => {
+    expect(lowestMajor(spec)).toBe(expected)
+  })
+
+  it('returns null for a non-string', () => {
+    expect(lowestMajor(undefined)).toBeNull()
+  })
+})
+
+describe('Angular peer check', () => {
+  function angularApp(lockfile?: string, spec = '^19.2.0') {
+    const root = createScratchDir()
+    if (lockfile) write(root, lockfile, '')
+    write(
+      root,
+      'package.json',
+      JSON.stringify({ dependencies: { '@angular/core': spec, '@baloise/ds-angular': '19.10.2' } }),
+    )
+    write(root, 'src/main.ts', "import { BaloiseDesignSystemModule } from '@baloise/ds-angular'\n")
+    return root
+  }
+
+  const detectAngular = (root: string, readAngularPeers: (version: string) => Promise<unknown>) =>
+    detectBaloise(root, { readDistTags: distTags('0.0.6'), readAngularPeers })
+
+  it('stops on Angular ^19.2.0 against >=22.0.0 and names both values', async () => {
+    const result = (await detectAngular(angularApp(), angularPeers())) as {
+      status: string
+      message: string
+      angular: unknown
+    }
+
+    expect(result.status).toBe('error')
+    expect(result.message).toContain('^19.2.0')
+    expect(result.message).toContain('>=22.0.0')
+    expect(result.message).toContain('Upgrade the app to Angular 22')
+    expect(result.angular).toEqual({ installed: '^19.2.0', required: '>=22.0.0', compatible: false })
+  })
+
+  it.each(['pnpm-lock.yaml', 'yarn.lock', 'package-lock.json'])(
+    'stops with the Angular error under %s',
+    async lockfile => {
+      const result = await detectAngular(angularApp(lockfile), angularPeers())
+      expect(result).toMatchObject({
+        status: 'error',
+        message: expect.stringContaining('Upgrade the app to Angular 22'),
+        angular: { installed: '^19.2.0', required: '>=22.0.0', compatible: false },
+      })
+    },
+  )
+
+  it('reads @angular/core from devDependencies', async () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'package.json',
+      JSON.stringify({
+        dependencies: { '@baloise/ds-angular': '19.10.2' },
+        devDependencies: { '@angular/core': '^19.2.0' },
+      }),
+    )
+    write(root, 'src/main.ts', "import { BaloiseDesignSystemModule } from '@baloise/ds-angular'\n")
+
+    const result = await detectAngular(root, angularPeers())
+    expect(result).toMatchObject({ status: 'error', angular: { installed: '^19.2.0', compatible: false } })
+  })
+
+  it('proceeds when the peer range has an upper bound', async () => {
+    const result = await detectAngular(angularApp(undefined, '^22.0.0'), angularPeers('>=22.0.0 <24.0.0'))
+    expect(result).toMatchObject({
+      status: 'ready',
+      angular: { installed: '^22.0.0', required: '>=22.0.0 <24.0.0', compatible: true },
+    })
+  })
+
+  it('proceeds on Angular ^22.0.0', async () => {
+    const result = await detectAngular(angularApp(undefined, '^22.0.0'), angularPeers())
+    expect(result).toMatchObject({
+      status: 'ready',
+      angular: { installed: '^22.0.0', required: '>=22.0.0', compatible: true },
+    })
+  })
+
+  it('passes the resolved version to the reader', async () => {
+    const versions: string[] = []
+    await detectAngular(angularApp(undefined, '^22.0.0'), async version => {
+      versions.push(version)
+      return { '@angular/core': '>=22.0.0' }
+    })
+    expect(versions).toEqual(['0.0.6'])
+  })
+
+  it('returns error when the peer lookup fails', async () => {
+    const result = await detectAngular(angularApp(), async () => {
+      throw new Error('npm view failed')
+    })
+    expect(result).toMatchObject({ status: 'error' })
+    expect((result as { message: string }).message).toContain('@helvetia-design/angular@0.0.6')
+    expect(result).not.toHaveProperty('angular')
+  })
+
+  it('returns error when the peers have no @angular/core range', async () => {
+    const result = await detectAngular(angularApp(), async () => ({ '@angular/common': '>=22.0.0' }))
+    expect(result).toMatchObject({ status: 'error' })
+  })
+
+  it.each(['*', 'latest', '^18 || ^19', 'workspace:*', 'catalog:', 'git+https://example.com/x.git'])(
+    'returns error naming the unparseable spec %s',
+    async spec => {
+      const result = await detectAngular(angularApp(undefined, spec), angularPeers())
+      expect(result).toMatchObject({ status: 'error' })
+      expect((result as { message: string }).message).toContain(spec)
+    },
+  )
+
+  it('returns error for an unparseable peer range', async () => {
+    const result = await detectAngular(angularApp(undefined, '^22.0.0'), angularPeers('^21 || ^22'))
+    expect(result).toMatchObject({ status: 'error' })
+    expect((result as { message: string }).message).toContain('^21 || ^22')
+  })
+
+  it.each([
+    [
+      'React',
+      { 'react': '19.0.0', '@baloise/ds-react': '19.0.0' },
+      'src/a.tsx',
+      "import { BalButton } from '@baloise/ds-react'\n",
+    ],
+    [
+      'plain HTML',
+      { '@baloise/ds-core': '19.0.0' },
+      'index.html',
+      '<script src="node_modules/@baloise/ds-core/dist/ds-core.js"></script>\n',
+    ],
+  ])('does not read peers or add angular for a %s project', async (_name, dependencies, file, contents) => {
+    const root = createScratchDir()
+    write(root, 'package.json', JSON.stringify({ dependencies }))
+    write(root, file, contents)
+    const readAngularPeers = vi.fn()
+
+    const result = await detectAngular(root, readAngularPeers)
+    expect(readAngularPeers).not.toHaveBeenCalled()
+    expect(result).toMatchObject({ status: 'ready' })
+    expect(result).not.toHaveProperty('angular')
+  })
+})
+
 describe('aliasesFor declares every package the migration makes the consumer import', () => {
   async function aliasesForDeps(dependencies: Record<string, string>) {
     const root = createScratchDir()
     write(root, 'package.json', JSON.stringify({ dependencies }))
     write(root, 'src/entry.ts', "import '@baloise/ds-styles/css/normalize.css'\n")
-    const result = await detectBaloise(root, { readDistTags: distTags('20.0.0') })
+    const result = await detectBaloise(root, {
+      readDistTags: distTags('20.0.0'),
+      readAngularPeers: angularPeers(),
+    })
     return Object.keys((result as { aliases: Record<string, string> }).aliases).sort()
   }
 
@@ -505,7 +737,7 @@ describe('aliasesFor declares every package the migration makes the consumer imp
   })
 
   it('declares tokens and core for an Angular app', async () => {
-    expect(await aliasesForDeps({ '@baloise/ds-angular': '19.0.0', '@angular/core': '18.0.0' })).toEqual([
+    expect(await aliasesForDeps({ '@baloise/ds-angular': '19.0.0', '@angular/core': '22.0.0' })).toEqual([
       '@helvetia-design/angular',
       '@helvetia-design/core',
       '@helvetia-design/styles',
@@ -521,15 +753,54 @@ describe('aliasesFor declares every package the migration makes the consumer imp
     ])
   })
 
-  it.each(['@baloise/ds-icons', '@baloise/ds-brand-icons'])(
-    'declares assets when %s is a direct dependency',
-    async name => {
-      expect(await aliasesForDeps({ '@baloise/ds-core': '19.0.0', [name]: '19.0.0' })).toEqual([
-        '@helvetia-design/assets',
-        '@helvetia-design/core',
-        '@helvetia-design/styles',
-        '@helvetia-design/tokens',
-      ])
-    },
-  )
+  it.each([
+    '@baloise/ds-icons',
+    '@baloise/ds-brand-icons',
+    '@baloise/ds-styles',
+    '@baloise/ds-fonts',
+    '@baloise/ds-favicons',
+  ])('declares assets when %s is a direct dependency', async name => {
+    expect(await aliasesForDeps({ '@baloise/ds-core': '19.0.0', [name]: '19.0.0' })).toEqual([
+      '@helvetia-design/assets',
+      '@helvetia-design/core',
+      '@helvetia-design/styles',
+      '@helvetia-design/tokens',
+    ])
+  })
+
+  it('lists @baloise/ds-fonts and @baloise/ds-favicons in dependencies and declares assets', async () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'package.json',
+      JSON.stringify({
+        dependencies: {
+          'react': '19.0.0',
+          '@baloise/ds-react': '19.0.0',
+          '@baloise/ds-fonts': '19.0.0',
+          '@baloise/ds-favicons': '19.0.0',
+        },
+      }),
+    )
+    write(root, 'src/entry.ts', "import '@baloise/ds-styles/css/normalize.css'\n")
+
+    const result = (await detectBaloise(root, { readDistTags: distTags('20.0.0') })) as {
+      dependencies: string[]
+      aliases: Record<string, string>
+    }
+
+    expect(result.dependencies).toEqual(['@baloise/ds-favicons', '@baloise/ds-fonts', '@baloise/ds-react'])
+    expect(result.aliases['@helvetia-design/assets']).toBe('20.0.0')
+  })
+
+  it('does not pick a manifest that declares only @baloise/ds-fonts', async () => {
+    const root = createScratchDir()
+    write(root, 'package.json', JSON.stringify({ dependencies: { '@baloise/ds-fonts': '19.0.0' } }))
+    write(root, 'src/entry.ts', "import '@baloise/ds-styles/css/normalize.css'\n")
+
+    expect(await detectBaloise(root, { readDistTags: distTags('20.0.0') })).toEqual({
+      status: 'nothing-to-migrate',
+      message: NOTHING,
+    })
+  })
 })

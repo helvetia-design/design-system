@@ -4,8 +4,19 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { scanSourceFiles } from './source-scan.mjs'
 
-const COMPONENT_RE =
-  /<\/?bal-([a-z][a-z0-9]*(?:-[a-z0-9]+)*)\b|<\/?Bal([A-Z][A-Za-z0-9]*)\b|\bBal([A-Z][A-Za-z0-9]*)\b/g
+const USAGE_RE = new RegExp(
+  [
+    String.raw`<\/(?:bal-[a-z]|Bal[A-Z])`,
+    String.raw`<bal-(?<tag>[a-z][a-z0-9]*(?:-[a-z0-9]+)*)\b`,
+    String.raw`(?<=<[A-Za-z][^<>]*(?:[\s\[]|\[attr\.))(?<popup>bal-popup)(?![\w-])`,
+    String.raw`\bbal(?<controller>[A-Z][A-Za-z0-9]*?)Controller\b`,
+    String.raw`\bBal(?<namespace>Props|Events)\s*\.\s*Bal(?<member>[A-Z][A-Za-z0-9]*)\b`,
+    String.raw`\bBal(?<symbol>[A-Z][A-Za-z0-9]*)\b`,
+  ].join('|'),
+  'g',
+)
+const SUFFIX_RE = /(?<=.)(?:Service|Controller|Module|CustomEvent|Options|Props|Events|Detail)$/
+const TYPE_NAMESPACE_RE = /^(?:(Events|Props|Region)$|(Config|Breakpoint|Platform)(?=[A-Z]|s|$))|(Language)$/
 const COMPONENTS_DIR = join(dirname(fileURLToPath(import.meta.url)), '../components')
 
 // Legacy child tags that one parent migration covers. Listed explicitly rather than
@@ -22,6 +33,7 @@ const CHILD_SLUGS = new Map([
   ['card-title', 'card'],
   ['button-group', 'button'],
   ['carousel-item', 'carousel'],
+  ['check', 'checkbox'],
   ['checkbox-group', 'checkbox'],
   ['data-item', 'data'],
   ['data-label', 'data'],
@@ -56,6 +68,7 @@ const CHILD_SLUGS = new Map([
   ['select-option', 'select'],
   ['step-item', 'steps'],
   ['step-option', 'steps'],
+  ['switch', 'checkbox'],
   ['tag-group', 'tag'],
   ['tab-item', 'tabs'],
   ['tab-option', 'tabs'],
@@ -75,33 +88,87 @@ function isBundle(slug) {
   return slug.endsWith('-bundle')
 }
 
-export function scanMigratable(rootDir) {
-  const available = availableMigrations()
-  const totals = new Map()
-
-  scanSourceFiles(rootDir, ({ masked }) => {
-    COMPONENT_RE.lastIndex = 0
-    let match
-    while ((match = COMPONENT_RE.exec(masked)) !== null) {
-      const slug = match[1] ?? componentNameToSlug(match[2] ?? match[3])
-      if (isBundle(slug)) continue
-      const name = CHILD_SLUGS.get(slug) ?? slug
-      totals.set(name, (totals.get(name) ?? 0) + 1)
-    }
-  })
-
-  const used = [...totals.entries()]
-    .map(([name, total]) => ({ name, total }))
-    .sort((a, b) => a.name.localeCompare(b.name))
-
-  return {
-    suggested: used.filter(component => available.has(component.name)),
-    notYet: used.filter(component => !available.has(component.name)),
-  }
+function stripSuffixes(name) {
+  let base = name
+  while (SUFFIX_RE.test(base)) base = base.replace(SUFFIX_RE, '')
+  return base
 }
 
-export function run(rootDir, stdout) {
-  stdout.write(`${JSON.stringify(scanMigratable(rootDir), null, 2)}\n`)
+function symbolToSlug(name) {
+  const slug = componentNameToSlug(stripSuffixes(name))
+  return CHILD_SLUGS.get(slug) ?? slug
+}
+
+function typeNamespace(name) {
+  const match = TYPE_NAMESPACE_RE.exec(name) ?? TYPE_NAMESPACE_RE.exec(stripSuffixes(name))
+  if (!match) return null
+  const namespace = match[1] ?? match[2] ?? match[3]
+  return namespace === 'Breakpoint' ? 'breakpoints' : componentNameToSlug(namespace)
+}
+
+function classify(groups, available) {
+  if (groups.tag) return { component: CHILD_SLUGS.get(groups.tag) ?? groups.tag }
+  if (groups.popup) return { component: 'popup' }
+  if (groups.controller) return { component: symbolToSlug(groups.controller) }
+  if (groups.namespace) {
+    const member = symbolToSlug(groups.member)
+    return { type: componentNameToSlug(groups.namespace), component: available.has(member) ? member : null }
+  }
+  if (groups.symbol) {
+    if (isBundle(componentNameToSlug(groups.symbol))) return {}
+    const type = typeNamespace(groups.symbol)
+    return type ? { type } : { component: symbolToSlug(groups.symbol) }
+  }
+  return {}
+}
+
+function increment(totals, name) {
+  totals.set(name, (totals.get(name) ?? 0) + 1)
+}
+
+export function scanMigratable(rootDir, paths = [], { extensions } = {}) {
+  const available = availableMigrations()
+  const totals = new Map()
+  const typeTotals = new Map()
+  const perFile = new Map()
+
+  const unmatched = scanSourceFiles(
+    rootDir,
+    ({ file, masked }) => {
+      const fileTotals = new Map()
+      for (const match of masked.matchAll(USAGE_RE)) {
+        const { component, type } = classify(match.groups, available)
+        if (type) increment(typeTotals, type)
+        if (component) {
+          increment(totals, component)
+          increment(fileTotals, component)
+        }
+      }
+      if (fileTotals.size > 0) perFile.set(file, fileTotals)
+    },
+    extensions ? { paths, extensions } : { paths },
+  )
+
+  const used = toComponents(totals)
+  const result = {
+    suggested: used.filter(component => available.has(component.name)),
+    notYet: used.filter(component => !available.has(component.name)),
+    types: toComponents(typeTotals),
+  }
+  if (paths.length === 0) return result
+
+  const files = [...perFile.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([file, fileTotals]) => ({ file, components: toComponents(fileTotals) }))
+  return unmatched.length > 0 ? { ...result, files, unmatched } : { ...result, files }
+}
+
+function toComponents(totals) {
+  return [...totals.entries()].map(([name, total]) => ({ name, total })).sort((a, b) => a.name.localeCompare(b.name))
+}
+
+export function run(rootDir, stdout, paths = []) {
+  stdout.write(`${JSON.stringify(scanMigratable(rootDir, paths), null, 2)}\n`)
   return 0
 }
 
@@ -135,7 +202,7 @@ function isMainModule() {
 if (isMainModule()) {
   const root = process.argv[2] ? resolve(process.argv[2]) : process.cwd()
   try {
-    process.exit(run(root, process.stdout))
+    process.exit(run(root, process.stdout, process.argv.slice(3)))
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
     process.exit(1)
