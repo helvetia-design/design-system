@@ -23,6 +23,50 @@ function write(root: string, rel: string, contents: string) {
   writeFileSync(file, contents)
 }
 
+describe('scanAssets project framework', () => {
+  it('reads the framework from the Baloise app manifest below a workspace root', () => {
+    const root = createScratchDir()
+    write(root, 'package.json', JSON.stringify({ name: 'workspace' }))
+    write(
+      root,
+      'apps/web/package.json',
+      JSON.stringify({ dependencies: { '@angular/core': '22.0.0', '@baloise/ds-angular': '19.0.0' } }),
+    )
+    write(root, 'apps/web/src/styles.scss', "@import '@baloise/ds-styles/css/all';\n")
+
+    expect(scanAssets(root).project.framework).toBe('angular')
+  })
+
+  it('falls back to the root framework when two sub-apps depend on Baloise', () => {
+    const root = createScratchDir()
+    write(root, 'package.json', JSON.stringify({ dependencies: { react: '19.0.0' } }))
+    for (const app of ['a', 'b']) {
+      write(
+        root,
+        `apps/${app}/package.json`,
+        JSON.stringify({ dependencies: { '@angular/core': '22.0.0', '@baloise/ds-angular': '19.0.0' } }),
+      )
+      write(root, `apps/${app}/src/styles.scss`, "@import '@baloise/ds-styles/css/all';\n")
+    }
+
+    expect(scanAssets(root).project.framework).toBe('react')
+  })
+
+  it('prefers the root manifest over sub-app manifests', () => {
+    const root = createScratchDir()
+    write(root, 'package.json', JSON.stringify({ dependencies: { 'react': '19.0.0', '@baloise/ds-react': '19.0.0' } }))
+    write(root, 'src/main.tsx', "import '@baloise/ds-styles/css/all.css'\n")
+    write(
+      root,
+      'apps/web/package.json',
+      JSON.stringify({ dependencies: { '@angular/core': '22.0.0', '@baloise/ds-angular': '19.0.0' } }),
+    )
+    write(root, 'apps/web/src/styles.scss', "@import '@baloise/ds-styles/css/all';\n")
+
+    expect(scanAssets(root).project.framework).toBe('react')
+  })
+})
+
 describe('scanAssets', () => {
   it('lists the legacy and new style imports of a React app after Init, including commented lines', () => {
     const root = createScratchDir()

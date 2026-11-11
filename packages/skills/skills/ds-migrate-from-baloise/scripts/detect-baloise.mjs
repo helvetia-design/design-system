@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import { execFile } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, realpathSync } from 'node:fs'
-import { extname, join, relative, resolve, sep } from 'node:path'
+import { basename, dirname, extname, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
-import { SKIPPED_DIRS, SOURCE_EXTENSIONS } from './source-scan.mjs'
+import { maskComments, SKIPPED_DIRS, SOURCE_EXTENSIONS, sourceMode } from './source-scan.mjs'
 
 const LEGACY_SCOPE = '@baloise'
 const TARGET_SCOPE = '@helvetia-design'
@@ -16,7 +16,22 @@ const SHORT_NAMES = [...INSTALL_NAMES, ...ICON_NAMES]
 const DEPENDENCY_NAMES = [...SHORT_NAMES, ...FONT_FAVICON_NAMES]
 const ASSET_NAMES = [...ICON_NAMES, STYLES_NAME, ...FONT_FAVICON_NAMES]
 const ASSET_PACKAGES = new Set(ASSET_NAMES.map(short => `${LEGACY_SCOPE}/ds-${short}`))
-export const LOCKFILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'npm-shrinkwrap.json'])
+const LOCKFILE_MANAGERS = [
+  ['pnpm-lock.yaml', 'pnpm'],
+  ['yarn.lock', 'yarn'],
+  ['bun.lock', 'bun'],
+  ['package-lock.json', 'npm'],
+  ['npm-shrinkwrap.json', 'npm'],
+]
+export const LOCKFILES = new Set(LOCKFILE_MANAGERS.map(([name]) => name))
+const SASS_RE = new RegExp(`${LEGACY_SCOPE}/ds-styles/sass/`)
+const BARE_STYLES_RE = new RegExp(`"${LEGACY_SCOPE}/ds-styles/`)
+const CONFIG_FILES = new Set(['angular.json', 'project.json'])
+const PACKAGE_MANAGERS = new Set(['npm', 'pnpm', 'yarn', 'bun'])
+const NPM_TIMEOUT_MS = 30_000
+const VERSION_RE = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/
+const SASS_NOTE =
+  'Baloise Sass entry file. @helvetia-design/styles exports no matching Sass path and its mixins differ, so Init does not duplicate it. Migrate it by hand.'
 export const IMPORT_EXTENSIONS = new Set([...SOURCE_EXTENSIONS, '.css', '.scss', '.sass', '.json'])
 export const DEPENDENCY_FIELDS = ['dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies']
 const NOTHING = 'no Baloise Design System installation detected, nothing to migrate'
@@ -32,19 +47,32 @@ const PACKAGE_RE = new RegExp(`${LEGACY_SCOPE}/ds-(?:${SHORT_NAMES.join('|')})\\
 const INSTALL_RE = new RegExp(`^${LEGACY_SCOPE}/ds-(?:${INSTALL_NAMES.join('|')})$`)
 const DEPENDENCY_RE = new RegExp(`${LEGACY_SCOPE}/ds-(?:${DEPENDENCY_NAMES.join('|')})\\b`)
 
-export async function readNpmDistTags(execImpl = execFileAsync) {
-  const { stdout } = await execImpl('npm', ['view', targetPackageName('core'), 'dist-tags', '--json'], {
-    encoding: 'utf8',
-  })
+export function npmOptions(platform = process.platform) {
+  return { encoding: 'utf8', timeout: NPM_TIMEOUT_MS, shell: platform === 'win32' }
+}
+
+export function npmFailureReason(error) {
+  if (error?.killed) return `timed out after ${NPM_TIMEOUT_MS / 1000} s`
+  const stderr = typeof error?.stderr === 'string' ? error.stderr.trim() : ''
+  if (stderr) return stderr
+  return error instanceof Error ? error.message : String(error)
+}
+
+export async function readNpmDistTags(execImpl = execFileAsync, platform = process.platform) {
+  const { stdout } = await execImpl(
+    'npm',
+    ['view', targetPackageName('core'), 'dist-tags', '--json'],
+    npmOptions(platform),
+  )
   const parsed = JSON.parse(stdout)
   return typeof parsed === 'string' ? JSON.parse(parsed) : parsed
 }
 
-export async function readNpmAngularPeers(version, execImpl = execFileAsync) {
+export async function readNpmAngularPeers(version, execImpl = execFileAsync, platform = process.platform) {
   const { stdout } = await execImpl(
     'npm',
     ['view', `${targetPackageName('angular')}@${version}`, 'peerDependencies', '--json'],
-    { encoding: 'utf8' },
+    npmOptions(platform),
   )
   if (!stdout.trim()) return {}
   const parsed = JSON.parse(stdout)
@@ -82,8 +110,9 @@ async function checkAngular(manifest, packageJsonPath, version, readAngularPeers
     const peers = await readAngularPeers(version)
     required = peers?.['@angular/core']
   } catch (error) {
-    const reason = error instanceof Error ? error.message : String(error)
-    return { error: `Could not read the peer dependencies of ${peerPackage}: ${reason}` }
+    return {
+      error: `Could not read the peer dependencies of ${peerPackage}: ${npmFailureReason(error)}.`,
+    }
   }
   if (typeof required !== 'string') {
     return { error: `${peerPackage} declares no @angular/core peer range, so the Angular version cannot be checked` }
@@ -108,16 +137,36 @@ async function checkAngular(manifest, packageJsonPath, version, readAngularPeers
 }
 
 export async function detectBaloise(rootDir, options = {}) {
+  if (options.version !== undefined && !VERSION_RE.test(options.version)) {
+    return { status: 'error', message: `--version "${options.version}" is not a plain version such as 1.2.3` }
+  }
   const found = scan(rootDir)
+  if (found?.error) return { status: 'error', message: found.error }
   if (!found) {
     return { status: 'nothing-to-migrate', message: NOTHING }
   }
 
-  const readDistTags = options.readDistTags ?? readNpmDistTags
-  const distTags = await readDistTags()
-  const version = typeof distTags?.latest === 'string' ? distTags.latest : ''
+  let version = options.version ?? ''
+  if (!version) {
+    let distTags
+    try {
+      distTags = await (options.readDistTags ?? readNpmDistTags)()
+    } catch (error) {
+      return {
+        status: 'error',
+        message: `Could not run npm view ${targetPackageName('core')} dist-tags: ${npmFailureReason(error)}. Rerun with --version <version> to skip the lookup.`,
+      }
+    }
+    version = typeof distTags?.latest === 'string' ? distTags.latest : ''
+  }
   if (!version) {
     return { status: 'error', message: MISSING_LATEST }
+  }
+  if (!VERSION_RE.test(version)) {
+    return {
+      status: 'error',
+      message: `npm view ${targetPackageName('core')} dist-tags returned the latest tag "${version}", which is not a plain version such as 1.2.3`,
+    }
   }
 
   const framework = detectFramework(found.manifest)
@@ -161,14 +210,22 @@ export async function run(rootDir, stdout, options = {}) {
 export function installCommand(packageManager) {
   if (packageManager === 'pnpm') return 'pnpm install'
   if (packageManager === 'yarn') return 'yarn install'
+  if (packageManager === 'bun') return 'bun install'
   return 'npm install'
 }
 
 export function detectPackageManager(rootDir) {
-  if (existsSync(join(rootDir, 'pnpm-lock.yaml'))) return 'pnpm'
-  if (existsSync(join(rootDir, 'yarn.lock'))) return 'yarn'
-  if (existsSync(join(rootDir, 'package-lock.json'))) return 'npm'
-  return 'npm'
+  let dir = resolve(rootDir)
+  for (;;) {
+    const declared = readJson(join(dir, 'package.json'))?.packageManager
+    const name = typeof declared === 'string' ? declared.split('@')[0] : ''
+    if (PACKAGE_MANAGERS.has(name)) return name
+    const lockfile = LOCKFILE_MANAGERS.find(([file]) => existsSync(join(dir, file)))
+    if (lockfile) return lockfile[1]
+    const parent = dirname(dir)
+    if (parent === dir) return 'npm'
+    dir = parent
+  }
 }
 
 export function detectFramework(manifest) {
@@ -230,17 +287,34 @@ function scan(rootDir) {
   walk(rootDir, rootDir, packages, imports)
   if (packages.length === 0 || imports.length === 0) return null
 
-  packages.sort(
-    (a, b) => a.packageJsonPath.length - b.packageJsonPath.length || a.packageJsonPath.localeCompare(b.packageJsonPath),
-  )
+  const selected = selectManifest(packages)
+  if (selected.error) return { error: selected.error }
   imports.sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line)
-  const chosen = packages[0]
   return {
-    manifest: chosen.manifest,
-    packageJsonPath: chosen.packageJsonPath,
-    dependencies: chosen.dependencies,
+    manifest: selected.manifest,
+    packageJsonPath: selected.packageJsonPath,
+    dependencies: selected.dependencies,
     imports,
   }
+}
+
+function selectManifest(packages) {
+  const atRoot = packages.find(candidate => candidate.packageJsonPath === 'package.json')
+  if (atRoot) return atRoot
+  if (packages.length === 1) return packages[0]
+  const paths = packages.map(candidate => candidate.packageJsonPath).sort()
+  return {
+    error: `Found several apps that depend on the Baloise Design System: ${paths.join(', ')}. Run the migration again with the folder of one app as <project-root>.`,
+  }
+}
+
+export function findBaloiseManifest(rootDir) {
+  const packages = []
+  walk(rootDir, rootDir, packages, null)
+  if (packages.length === 0) return null
+  const selected = selectManifest(packages)
+  if (selected.error) return { error: selected.error }
+  return { manifest: selected.manifest, packageJsonPath: selected.packageJsonPath }
 }
 
 function walk(rootDir, dir, packages, imports) {
@@ -271,7 +345,7 @@ function walk(rootDir, dir, packages, imports) {
       continue
     }
     if (LOCKFILES.has(entry.name) || !IMPORT_EXTENSIONS.has(extname(entry.name))) continue
-    collectImports(rootDir, filePath, imports)
+    if (imports) collectImports(rootDir, filePath, imports)
   }
 }
 
@@ -282,31 +356,32 @@ function collectImports(rootDir, filePath, imports) {
   } catch {
     return
   }
+  if (!PACKAGE_RE.test(text)) return
+  const file = toPosix(rootDir, filePath)
   const lines = text.split(/\r?\n/)
+  const masked = maskComments(text, sourceMode(extname(filePath))).split(/\r?\n/)
   for (let index = 0; index < lines.length; index++) {
-    const line = lines[index]
-    if (isIgnorableLine(line) || !PACKAGE_RE.test(line)) continue
-    const snippet = line.trim().slice(0, 240)
+    const code = masked[index] ?? ''
+    if (!PACKAGE_RE.test(code)) continue
+    const kind = kindOf(code, basename(filePath))
     imports.push({
-      file: toPosix(rootDir, filePath),
+      file,
       line: index + 1,
-      snippet,
-      kind: kindOf(line),
+      snippet: lines[index].trim().slice(0, 240),
+      kind,
+      ...(SASS_RE.test(code) && { note: SASS_NOTE }),
     })
   }
 }
 
-function kindOf(line) {
+function kindOf(line, fileName) {
+  if (SASS_RE.test(line)) return 'reference'
   if (/<link\b/i.test(line) || /<script\b/i.test(line)) return 'bootstrap'
   if (/@import\b/.test(line) || /@use\b/.test(line)) return 'bootstrap'
   if (new RegExp(`import\\s+['"]${LEGACY_SCOPE}/ds-(?:core|styles)\\b`).test(line)) return 'bootstrap'
   if (new RegExp(`node_modules/${LEGACY_SCOPE}/ds-(?:styles|core)\\b`).test(line)) return 'bootstrap'
+  if (CONFIG_FILES.has(fileName) && BARE_STYLES_RE.test(line)) return 'bootstrap'
   return 'reference'
-}
-
-function isIgnorableLine(line) {
-  const trimmed = line.trim()
-  return trimmed.startsWith('//') || trimmed.startsWith('/*') || trimmed.startsWith('*') || trimmed.startsWith('<!--')
 }
 
 export function readJson(filePath) {
@@ -331,12 +406,33 @@ function isMainModule() {
   }
 }
 
+export function parseArgs(argv) {
+  let root
+  let version
+  for (let index = 0; index < argv.length; index++) {
+    const arg = argv[index]
+    if (arg === '--version') {
+      version = argv[++index]
+      if (version === undefined) return { error: '--version needs a value, for example --version 1.2.3' }
+    } else if (arg.startsWith('--version=')) {
+      version = arg.slice('--version='.length)
+    } else if (root === undefined) {
+      root = arg
+    }
+  }
+  return { root, version }
+}
+
+function fail(message) {
+  process.stdout.write(`${JSON.stringify({ status: 'error', message }, null, 2)}\n`)
+  process.exit(1)
+}
+
 if (isMainModule()) {
-  const root = process.argv[2] ? resolve(process.argv[2]) : process.cwd()
-  run(root, process.stdout)
+  const args = parseArgs(process.argv.slice(2))
+  if (args.error) fail(args.error)
+  const root = args.root ? resolve(args.root) : process.cwd()
+  run(root, process.stdout, args.version === undefined ? {} : { version: args.version })
     .then(code => process.exit(code))
-    .catch(error => {
-      process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
-      process.exit(1)
-    })
+    .catch(error => fail(error instanceof Error ? error.message : String(error)))
 }

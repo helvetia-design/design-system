@@ -14,7 +14,7 @@ The script prints one JSON object and does not edit files. It first runs `scan-m
 
 Then it runs the **CSS utils** scan, `scan-css-utils.mjs`, on the whole project. While that scan reports a `core` or `core-lost` move or a `dynamic` place with `group: 'core'` and a reason other than `selector in a stylesheet`, every `css/core` line that would go to `remove.lines` goes to `keep.lines` with `reason` `css-utils`. The `structure` lines still go.
 
-Without an outstanding entry, `status` is `ready`, or `nothing-to-clean-up` when both `remove` lists are empty. `packageManager` and `installCommand` come from the lockfile at `<project-root>`, as in Init.
+Without an outstanding entry, `status` is `ready`, or `nothing-to-clean-up` when both `remove` lists are empty. `packageManager` and `installCommand` come from the `packageManager` field or the nearest lockfile at or above `<project-root>`, as in Init. `installCommand` can be `bun install`.
 
 The script reads the source files listed in the Init section of `SKILL.md`, every stylesheet (`.css`, `.scss`, `.sass`, `.less`), every `.json` file and every `.yml` or `.yaml` file. It skips lockfiles and the folders that Init lists. Build tooling outside these files can still name a legacy package, so the consumer checks it before confirming.
 
