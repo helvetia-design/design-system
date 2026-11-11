@@ -156,6 +156,32 @@ Report every item this rule handles under Needs your attention. Name the file, t
 
 Inside a batch the rule applies the same way, because it is part of the Rewrite step.
 
+#### Legacy types and bundles
+
+Every component migration applies these rules in its Rewrite step. They cover each file with a finding and the same-basename `.ts` beside every `.html` finding. The event type and element type rules also apply to React `.tsx` and `.ts` files. Inside a batch the rules apply the same way, because they are part of the Rewrite step.
+
+**Event types.** A handler parameter typed with a legacy event type no longer type-checks once its binding becomes `ds*`. Angular with `strictTemplates` fails with TS2345. Take the new type from the tag the handler is bound to after the rewrite, not from the old name. `ds-<tag>` gives `Ds<Tag>CustomEvent` in PascalCase. A former `BalInputStepperCustomEvent` on a `ds-counter` becomes `DsCounterCustomEvent`, and a former `BalDateCustomEvent` becomes `DsDatepickerCustomEvent`.
+
+- `BalEvents.Bal<X>CustomEvent<T>` and the bare `Bal<X>CustomEvent<T>` become `Ds<Y>CustomEvent<T>`, where `ds-<y>` is the new tag. Use the detail type that the Events table of that component's `migration.md` names for the event as the new `T`. Keep the legacy `T` only when that table names no detail, and report it. A legacy `T` that allows `undefined` where the new detail has `null` always becomes the new type.
+- An event alias such as `BalEvents.BalInputChange` becomes `Ds<Y>CustomEvent<detail>`, with the detail from that table.
+- A detail alias such as `BalEvents.BalInputChangeDetail` has no `Ds*` counterpart. Write the detail type out from that table.
+- `BalProps.*` types have no `Ds*` counterpart for form controls. Leave them unchanged.
+- A handler that stays bound to a legacy `bal-*` element keeps its legacy type.
+- Import the new types with `import type { … } from '@helvetia-design/core'`. Merge them into an existing import from that module.
+- A component `migration.md` that gives its own type rule wins. Tabs, steps and carousel use `CustomEvent<{ value: string }>`.
+
+**Element types.** Every `HTMLBal<X>Element` that names an element migrated in this run becomes `HTMLDs<Y>Element` of the new tag. This covers `ElementRef<HTMLBal<X>Element>`, `@ViewChild(...) x?: HTMLBal<X>Element`, `viewChild<...>` and every other use. These types are global, so they need no import. Then apply the Methods rules of that `migration.md` to the calls on the ref. The new type makes `tsc` show every call to a removed method.
+
+**Angular bundles.** In `imports: [...]` of a standalone component or an NgModule, replace a `...Bal<X>Bundle` spread with the `Ds*` standalone symbols that the migrated template uses. Import them from `@helvetia-design/angular`. The template is the `.html` beside the class or the inline `template:`. Without these symbols Angular fails with NG8001 on the `ds-*` tag, and `formControlName` finds no ControlValueAccessor. The "Tags and imports" section of each `migration.md` names its bundle and its symbols.
+
+- Keep the spread and its import while the template still uses a legacy tag from that bundle. Examples are `bal-check` and `bal-switch` (checkbox), `bal-radio-icon` (radio), a group left in place, or a `bal-field` left in place. Add the `Ds*` symbols next to the spread.
+- Delete the bundle symbol from the `@baloise/ds-angular` import once its last spread is gone.
+- A component migration never removes a multi-family bundle: `BalFormBundle`, `BalLayoutBundle`, `BalTypographyBundle` or `BalComponentBundle`. Add the `Ds*` symbols next to it.
+- `BalFieldBundle` and `BalFormGridBundle` have no `Ds*` symbols. Remove them once no tag of the bundle is left in that template. Add nothing.
+- When `shared/field.md` removes the last `bal-field*` tag of a template, the control migration also removes the `...BalFieldBundle` spread of that template.
+
+Report each `BalProps.*` left in place, each legacy `T` kept because the Events table names no detail, each detail alias written out, each multi-family bundle kept and each spread kept because a legacy tag is left. Name the file and the line. They go under Needs your attention. The `migration.md` checklist item that covers types or bundles gets one outcome line per occurrence.
+
 #### Manual
 
 List every file matching `components/*.md` or `components/*/migration.md` in this skill folder. Build a picker from each file's title (the first Markdown heading). Wait for one choice, then ask the cascade question below.
@@ -174,7 +200,7 @@ The script prints one JSON object. `suggested` contains used `bal-*` components 
 
 Show `notYet`, if it is not empty, as used components that cannot be migrated by this version of the skill. Do not offer them as choices.
 
-If `types` is not empty, show it as a note: these legacy types stay until their code is rewritten by hand.
+If `types` is not empty, show it as a note: a component migration rewrites the legacy types of the components it migrates (see Legacy types and bundles), and the other legacy types stay until their code is rewritten by hand.
 
 If `suggested` is empty, report that none of the used components has an available migration, then stop.
 

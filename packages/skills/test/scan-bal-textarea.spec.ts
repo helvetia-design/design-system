@@ -73,16 +73,7 @@ describe('scanBalTextarea', () => {
   it('does not match longer names that merely start with BalTextarea or bal-textarea', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-textarea-group></bal-textarea-group>\n')
-    write(
-      root,
-      'types.ts',
-      [
-        'class BalTextareaValueAccessor {}',
-        'type BalTextareaCustomEvent<T> = T',
-        'type BalTextareaInputs = string',
-        '',
-      ].join('\n'),
-    )
+    write(root, 'types.ts', ['class BalTextareaValueAccessor {}', 'type BalTextareaInputs = string', ''].join('\n'))
 
     expect(scanBalTextarea(root)).toEqual({ total: 0, files: [] })
   })
@@ -223,6 +214,42 @@ describe('scanBalTextarea', () => {
           findings: [
             { line: 1, snippet: '<bal-textarea name="a">' },
             { line: 1, snippet: '</bal-textarea>' },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('lists BalEvents types and the bare CustomEvent once per occurrence, but not BalFormBundle', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        "import { BalFormBundle } from '@baloise/ds-angular'",
+        '@Component({ imports: [...BalFormBundle] })',
+        'export class ApplicationComponent {',
+        '  onChange(event: BalEvents.BalTextareaCustomEvent<string>) {}',
+        '  onBare(event: BalTextareaCustomEvent<string>) {}',
+        '  detail?: BalEvents.BalTextareaChangeDetail',
+        '  both(a: BalEvents.BalTextareaBlur, b: BalTextareaCustomEvent<string>) {}',
+        '  el?: HTMLBalTextareaElement',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalTextarea(root)).toEqual({
+      total: 5,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            { line: 4, snippet: 'onChange(event: BalEvents.BalTextareaCustomEvent<string>) {}' },
+            { line: 5, snippet: 'onBare(event: BalTextareaCustomEvent<string>) {}' },
+            { line: 6, snippet: 'detail?: BalEvents.BalTextareaChangeDetail' },
+            { line: 7, snippet: 'both(a: BalEvents.BalTextareaBlur, b: BalTextareaCustomEvent<string>) {}' },
+            { line: 7, snippet: 'both(a: BalEvents.BalTextareaBlur, b: BalTextareaCustomEvent<string>) {}' },
           ],
         },
       ],

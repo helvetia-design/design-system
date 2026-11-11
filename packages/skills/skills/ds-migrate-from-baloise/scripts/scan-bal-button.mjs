@@ -4,7 +4,8 @@ import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
-const USAGE_RE = /<\/?bal-button\b|<\/?BalButton(?:Group)?\b|\bBalButton(?:Group|Bundle)?\b/g
+const USAGE_RE =
+  /<\/?bal-button\b|<\/?BalButton(?:Group)?\b|\bBalEvents\.BalButton[A-Z]\w*|\bBalButton(?:Group)?CustomEvent\b|\bBalButton(?:Group|Bundle)?\b/g
 
 export function scanBalButton(rootDir, paths = []) {
   const found = []

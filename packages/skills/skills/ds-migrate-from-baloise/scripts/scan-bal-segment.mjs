@@ -4,7 +4,8 @@ import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
-const USAGE_RE = /<\/?bal-segment(?:-item)?(?![\w-])|<\/?BalSegment(?:Item)?\b|\bBalSegment(?:Item)?\b/g
+const USAGE_RE =
+  /<\/?bal-segment(?:-item)?(?![\w-])|<\/?BalSegment(?:Item)?\b|\bBalEvents\.BalSegment[A-Z]\w*|\bBalSegment(?:Item)?(?:CustomEvent)?\b|\bBalSegmentBundle\b/g
 
 export function scanBalSegment(rootDir, paths = []) {
   const found = []

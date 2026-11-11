@@ -95,7 +95,6 @@ describe('scanBalField', () => {
       root,
       'types.ts',
       [
-        'type A = BalFieldCustomEvent<string>',
         'type B = BalProps.BalFormColSize',
         'type C = BalProps.BalFieldLabelSize',
         'const BalForm = 1',
@@ -217,6 +216,63 @@ describe('scanBalField', () => {
           findings: [
             { line: 1, snippet: '<bal-form-col>' },
             { line: 1, snippet: '</bal-form-col>' },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('lists both bundles and BalEvents types once per occurrence, but not BalForm or BalFormBundle', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        "import { BalFieldBundle, BalFormBundle, BalFormGridBundle } from '@baloise/ds-angular'",
+        '@Component({ imports: [...BalFieldBundle, ...BalFormGridBundle, ...BalFormBundle] })',
+        'export class ApplicationComponent {',
+        '  onField(event: BalEvents.BalFieldCustomEvent<string>) {}',
+        '  onBare(event: BalFieldCustomEvent<string>) {}',
+        '  labelledBy?: BalEvents.BalFieldAriaLabelledBy',
+        '  onForm(event: BalEvents.BalFormCustomEvent<string>) {}',
+        '  form?: BalForm',
+        '  size?: BalProps.BalFormColSize',
+        '  onGridChange(event: BalEvents.BalFormGridChange) {}',
+        '  onColChange(event: BalEvents.BalFormColChange) {}',
+        '  onLabel(event: BalFieldLabelCustomEvent<string>) {}',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalField(root)).toEqual({
+      total: 10,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            {
+              line: 1,
+              snippet: "import { BalFieldBundle, BalFormBundle, BalFormGridBundle } from '@baloise/ds-angular'",
+            },
+            {
+              line: 1,
+              snippet: "import { BalFieldBundle, BalFormBundle, BalFormGridBundle } from '@baloise/ds-angular'",
+            },
+            {
+              line: 2,
+              snippet: '@Component({ imports: [...BalFieldBundle, ...BalFormGridBundle, ...BalFormBundle] })',
+            },
+            {
+              line: 2,
+              snippet: '@Component({ imports: [...BalFieldBundle, ...BalFormGridBundle, ...BalFormBundle] })',
+            },
+            { line: 4, snippet: 'onField(event: BalEvents.BalFieldCustomEvent<string>) {}' },
+            { line: 5, snippet: 'onBare(event: BalFieldCustomEvent<string>) {}' },
+            { line: 6, snippet: 'labelledBy?: BalEvents.BalFieldAriaLabelledBy' },
+            { line: 10, snippet: 'onGridChange(event: BalEvents.BalFormGridChange) {}' },
+            { line: 11, snippet: 'onColChange(event: BalEvents.BalFormColChange) {}' },
+            { line: 12, snippet: 'onLabel(event: BalFieldLabelCustomEvent<string>) {}' },
           ],
         },
       ],

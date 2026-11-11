@@ -54,26 +54,26 @@ The legacy default slot was rendered as the text content of the native `<textare
 ### Tags and imports
 
 - **HTML**: `<bal-textarea>` becomes `<ds-textarea>`, including the closing tag.
-- **Angular**: the same tag rename in `.html` templates and in inline `template:` strings, including the closing tag. When a file imports `BalTextarea` from `@baloise/ds-angular`, move only that symbol to `import { DsTextarea } from '@helvetia-design/angular'` and leave the other symbols on the `@baloise` import. Rename it in `imports: [...]` as well. `DsTextarea` brings its own `ControlValueAccessor`, so `ngModel` and reactive forms keep working.
+- **Angular**: the same tag rename in `.html` templates and in inline `template:` strings, including the closing tag. When a file imports `BalTextarea` from `@baloise/ds-angular`, move only that symbol to `import { DsTextarea } from '@helvetia-design/angular'` and leave the other symbols on the `@baloise` import. Rename it in `imports: [...]` as well. `DsTextarea` brings its own `ControlValueAccessor`, so `ngModel` and reactive forms keep working. `bal-textarea` has no own bundle. Only multi-family bundles such as `BalFormBundle` or `BalComponentBundle` hold it. They stay, and `DsTextarea` is added next to them, as `SKILL.md` "Legacy types and bundles" describes.
 - **React**: `<BalTextarea>` becomes `<DsTextarea>`, including the closing tag. Import it from `@helvetia-design/react`. When the existing `@baloise/ds-react` import also binds other symbols, move only `BalTextarea` and leave the others on the `@baloise` import. If the file already imports from `@helvetia-design/react`, add to that import instead of creating a second one.
 
 ### Events
 
 `ds-textarea` emits the same five events, and adds `dsClick`.
 
-| old           | new          | handling                                                                                                                                                            |
-| ------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balChange`   | `dsChange`   | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. |
-| `balInput`    | `dsInput`    | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms.                                                                   |
-| `balBlur`     | `dsBlur`     | Same shapes.                                                                                                                                                        |
-| `balFocus`    | `dsFocus`    | Same shapes.                                                                                                                                                        |
-| `balKeyPress` | `dsKeyPress` | Same shapes.                                                                                                                                                        |
+| old           | new          | handling                                                                                                                                                                                                                    |
+| ------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `balChange`   | `dsChange`   | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `string \| null`, legacy `string \| undefined`. |
+| `balInput`    | `dsInput`    | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `string \| null`.                                                                                                 |
+| `balBlur`     | `dsBlur`     | Same shapes.                                                                                                                                                                                                                |
+| `balFocus`    | `dsFocus`    | Same shapes.                                                                                                                                                                                                                |
+| `balKeyPress` | `dsKeyPress` | Same shapes.                                                                                                                                                                                                                |
 
 Rewrite only handlers that are attached to the element being migrated. `balChange`, `balInput`, `balBlur`, and `balFocus` are emitted by many other legacy components, so never rewrite a handler on another element, and never rename them by search and replace across the file.
 
 When the value in `balChange` or `balInput` is read, note that it is `string | undefined` in legacy and `string | null` in `ds-textarea`. A cleared field now yields `null`. Do not edit the handler, report it.
 
-The detail types `BalEvents.BalTextarea*Detail` and the wrapper type `BalTextareaCustomEvent` are not rewritten. List each use as "type needs manual rework".
+Retype handler parameters and refs as `SKILL.md` "Legacy types and bundles" describes. `BalEvents.BalTextarea*` and the wrapper type `BalTextareaCustomEvent` become `DsTextareaCustomEvent`. Write a detail alias such as `BalEvents.BalTextareaChangeDetail` out as the new detail type, `string | null` for `dsChange` and `dsInput`. `HTMLBalTextareaElement` becomes `HTMLDsTextareaElement`. The scan lists the `BalEvents.*` and `Bal*CustomEvent` types. It does not list `BalProps.*` or `HTMLBal*Element`, so search for them yourself in each file with a finding.
 
 ### Methods
 
@@ -89,7 +89,7 @@ Needs your attention when found:
 
 1. Every handler that needs manual rework.
 2. Every piece of slot content that needs manual rework.
-3. Every type that needs manual rework.
+3. Every legacy type left or written out and every bundle kept, as `SKILL.md` "Legacy types and bundles" describes: each `BalProps.BalTextarea*` type left in place, each detail alias such as `BalEvents.BalTextareaChangeDetail` written out, and each multi-family bundle such as `BalFormBundle` or `BalComponentBundle` kept with `DsTextarea` added next to it.
 4. Every unsupported `clickable`, with its Unmapped props and handlers outcome.
 5. Every handler or form binding that reads the value. A cleared field now yields `null` where legacy yielded `undefined`. Code that checks `=== undefined` needs review.
 6. One-time note: `ds-textarea` has `label`, `description` and `color`. Fields may need a `label` now. Do not add one yourself, and do not add attributes to compensate.

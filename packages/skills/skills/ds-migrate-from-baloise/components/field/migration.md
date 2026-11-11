@@ -52,11 +52,16 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 - Rename the closing tags too.
 - A dynamic `size` (`[size]`, `:size`, `size={x}`) is not mapped. Leave that `bal-form-col` in place and report it.
 - In React, `BalFormGrid` and `BalFormCol` become the `div` elements above. Delete the symbols from the `@baloise/ds-react` import when the file has no usage left. In Angular, delete `BalFormGrid` and `BalFormCol` from the `@baloise/ds-angular` import and from `imports: [...]`.
+- `BalFieldBundle` and `BalFormGridBundle` have no `Ds*` symbols. Remove a `...BalFieldBundle` or `...BalFormGridBundle` spread, and the bundle from the `@baloise/ds-angular` import, once no tag of that bundle is left in the template. Keep it while a `bal-field` or a `bal-form-col` stays in place. A multi-family bundle such as `BalFormBundle` stays. `SKILL.md` "Legacy types and bundles" has the full bundle rule.
 - The `ds-form` and `ds-form-col` classes come from `@helvetia-design/styles`, which Init has already imported.
 
 ### Fields
 
 Apply every rule in `shared/field.md` to each remaining `bal-field`. That file covers the label, message, `required`, hints, icons, props without a target, a `bal-field` that stays in place and a `bal-field-message` that sits next to a control outside any `bal-field`. In this run, that last rule applies to every `bal-field-message` that directly follows a `ds-*` control and is not inside a `bal-field`.
+
+### Types
+
+`ds-form` and `ds-form-col` are CSS classes, so they have no event or element types. A handler typed `BalEvents.BalField*` or `BalFieldCustomEvent` has no target type, and neither has a ref typed `HTMLBalField*Element` or `HTMLBalFormGridElement` or `HTMLBalFormColElement`. Leave them in place and report them. The scan lists the `BalEvents.*` and `Bal*CustomEvent` types. It does not list `BalProps.*` or `HTMLBal*Element`, so search for them yourself in each file with a finding.
 
 ## 4. Report
 
@@ -65,11 +70,12 @@ Write the report as `shared/report.md` describes, with the per-file summary unde
 Needs your attention when found:
 
 1. Every `bal-form-col` with a dynamic `size` left in place.
+2. Every legacy type left in place and every bundle kept, as `SKILL.md` "Legacy types and bundles" describes: each `BalEvents.BalField*`, `BalFieldCustomEvent`, `HTMLBalField*Element` or `HTMLBalFormGridElement` or `HTMLBalFormColElement` type, which has no target, and each `BalFieldBundle`, `BalFormGridBundle` or multi-family bundle kept.
 
 Coverage only, written to the file:
 
-2. Every `bal-form-grid` rewritten to `<div class="ds-form">`.
-3. Every `bal-form-col` rewritten to `<div class="ds-form-col">`, with its `desktop:is-N` class.
+3. Every `bal-form-grid` rewritten to `<div class="ds-form">`.
+4. Every `bal-form-col` rewritten to `<div class="ds-form-col">`, with its `desktop:is-N` class.
 
 Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 

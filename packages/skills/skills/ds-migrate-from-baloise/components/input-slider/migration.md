@@ -48,24 +48,24 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 ### Tags and imports
 
 - **HTML**: `<bal-input-slider>` becomes `<ds-slider>`, including the closing tag.
-- **Angular**: the same tag rename in `.html` templates and in inline `template:` strings, including the closing tag. When a file imports `BalInputSlider` from `@baloise/ds-angular`, move only that symbol to `import { DsSlider } from '@helvetia-design/angular'` and leave the other symbols on the `@baloise` import. Rename it in `imports: [...]` as well. `DsSlider` brings its own `ControlValueAccessor`, so `ngModel` and reactive forms keep working.
+- **Angular**: the same tag rename in `.html` templates and in inline `template:` strings, including the closing tag. When a file imports `BalInputSlider` from `@baloise/ds-angular`, move only that symbol to `import { DsSlider } from '@helvetia-design/angular'` and leave the other symbols on the `@baloise` import. Rename it in `imports: [...]` as well. `DsSlider` brings its own `ControlValueAccessor`, so `ngModel` and reactive forms keep working. `bal-input-slider` has no own bundle. Only multi-family bundles such as `BalFormBundle` or `BalComponentBundle` hold it. They stay, and `DsSlider` is added next to them, as `SKILL.md` "Legacy types and bundles" describes.
 - **React**: `<BalInputSlider>` becomes `<DsSlider>`, including the closing tag. Import it from `@helvetia-design/react`. When the existing `@baloise/ds-react` import also binds other symbols, move only `BalInputSlider` and leave the others on the `@baloise` import. If the file already imports from `@helvetia-design/react`, add to that import instead of creating a second one.
 
 ### Events
 
-| old           | new        | handling                                                                                                                                                            |
-| ------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balChange`   | `dsChange` | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. |
-| `balInput`    | `dsInput`  | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms.                                                                   |
-| `balBlur`     | `dsBlur`   | Same shapes.                                                                                                                                                        |
-| `balFocus`    | `dsFocus`  | Same shapes.                                                                                                                                                        |
-| `balKeyPress` | _(none)_   | No equivalent. Apply Unmapped props and handlers (`SKILL.md`).                                                                                                      |
+| old           | new        | handling                                                                                                                                                                                                                 |
+| ------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `balChange`   | `dsChange` | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `number`, legacy `string \| number \| null`. |
+| `balInput`    | `dsInput`  | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `number`.                                                                                                      |
+| `balBlur`     | `dsBlur`   | Same shapes.                                                                                                                                                                                                             |
+| `balFocus`    | `dsFocus`  | Same shapes.                                                                                                                                                                                                             |
+| `balKeyPress` | _(none)_   | No equivalent. Apply Unmapped props and handlers (`SKILL.md`).                                                                                                                                                           |
 
 `ds-slider` adds `dsClick`. There is nothing to migrate from.
 
 Rewrite only handlers that are attached to the element being migrated. `balChange`, `balInput`, `balBlur`, and `balFocus` are emitted by many other legacy components, so never rewrite a handler on another element, and never rename them by search and replace across the file.
 
-The detail types `BalEvents.BalInputSlider*Detail` are not rewritten. List each use as "type needs manual rework".
+Retype handler parameters and refs as `SKILL.md` "Legacy types and bundles" describes. `BalEvents.BalInputSlider*` and `BalInputSliderCustomEvent` become `DsSliderCustomEvent`, because the type follows the new tag `ds-slider`. Write a detail alias such as `BalEvents.BalInputSliderChangeDetail` out as the new detail type, `number` for `dsChange` and `dsInput`. `HTMLBalInputSliderElement` becomes `HTMLDsSliderElement`. The scan lists the `BalEvents.*` and `Bal*CustomEvent` types. It does not list `BalProps.*` or `HTMLBal*Element`, so search for them yourself in each file with a finding.
 
 When the value in `balChange` or `balInput` is read, note that it was `string | number | null` in legacy and is always a `number` in `ds-slider`. Do not edit the handler, report it.
 
@@ -86,7 +86,7 @@ Needs your attention when found:
 3. Every dynamic `step` binding. The value must now be a string, or `"any"`.
 4. Every `getInputElement()` call, listed as "return type changed, check the caller".
 5. Every `setAriaForm()` call, with its Unmapped props and handlers outcome.
-6. Every detail-type use, listed as "type needs manual rework".
+6. Every legacy type left or written out and every bundle kept, as `SKILL.md` "Legacy types and bundles" describes: each `BalProps.BalInputSlider*` type left in place, each detail alias such as `BalEvents.BalInputSliderChangeDetail` written out, and each multi-family bundle such as `BalFormBundle` or `BalComponentBundle` kept with `DsSlider` added next to it.
 7. Every static or bound value that can be empty. A slider can never be empty, so a legacy `value=""`, `null` or `undefined` now resolves to `min`.
 8. One-time note: handlers and form controls now receive a `number`, never a string or `null`.
 9. Every selector that targets the legacy element and that the scan cannot see, such as classes starting with `bal-input-slider` and `data-testid="bal-input-slider"`. Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.

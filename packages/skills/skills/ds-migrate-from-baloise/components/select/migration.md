@@ -6,7 +6,7 @@ Both legacy tags are migrated together, not separately. A legacy `bal-select` re
 
 Apply `shared/field.md` in the Rewrite step to every migrated `ds-select` that sits inside a `bal-field`, in the same pass. It moves the label, description and message of the wrapper onto the control and removes the wrapper tags. A `bal-field` around a control that is still a legacy `bal-*` tag stays unchanged. `components/field/migration.md` migrates `bal-form-grid`, `bal-form-col` and every `bal-field` that is left.
 
-The scan does not match the ambient `HTMLBalSelectElement`, `HTMLBalSelectOptionElement`, `BalProps.BalSelect*` or `BalEvents.BalSelect*` types. Those are Report items, not rewrites. Search for them yourself in each file with a finding.
+The scan also lists `BalSelectBundle` and the `BalEvents.BalSelect*` and `BalSelect*CustomEvent` types. It does not match the ambient `HTMLBalSelectElement`, `HTMLBalSelectOptionElement` or `BalProps.BalSelect*` types. Search for them yourself in each file with a finding. `SKILL.md` "Legacy types and bundles" says how to rewrite all of them.
 
 ## 1. Scan
 
@@ -60,24 +60,26 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 ### Tags and imports
 
 - **HTML**: `<bal-select>` becomes `<ds-select>`, including the closing tag. `<bal-select-option>` becomes `<ds-select-option>`, including the closing tag.
-- **Angular**: the same tag rewrites in `.html` templates and in inline `template:` strings. When a file imports `BalSelect` and/or `BalSelectOption` from `@baloise/ds-angular`, replace only the ones used with `DsSelect`/`DsSelectOption` from `@helvetia-design/angular`, keeping the rest on the `@baloise` import.
+- **Angular**: the same tag rewrites in `.html` templates and in inline `template:` strings. When a file imports `BalSelect` and/or `BalSelectOption` from `@baloise/ds-angular`, replace only the ones used with `DsSelect`/`DsSelectOption` from `@helvetia-design/angular`, keeping the rest on the `@baloise` import. A `...BalSelectBundle` spread in `imports: [...]` becomes `DsSelect` and `DsSelectOption`. A multi-family bundle such as `BalFormBundle` stays, and the `Ds*` symbols are added next to it. `SKILL.md` "Legacy types and bundles" has the full bundle rule.
 - **React**: `<BalSelect>`/`</BalSelect>` becomes `<DsSelect>`/`</DsSelect>`, `<BalSelectOption>`/`</BalSelectOption>` becomes `<DsSelectOption>`/`</DsSelectOption>`. Import the renamed symbols from `@helvetia-design/react`, keeping only the ones actually used. When the existing `@baloise/ds-react` import also binds other symbols, move only `BalSelect` and `BalSelectOption` and leave the rest on the `@baloise` import.
 
 ### Events
 
 Only `bal-select` emits events; `bal-select-option` has none.
 
-| old                                    | new               | handling                                                                                                                                                                                                                                                                      |
-| -------------------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balChange`                            | `dsChange`        | Rewrite `addEventListener('balChange'` to `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. The detail for an empty single select changes from `undefined` to `null`: note it once per migrated handler. |
-| `balFocus`                             | `dsFocus`         | Same shapes as `balChange`: `addEventListener`, `(balFocus)`, `onBalFocus` become `dsFocus`, `(dsFocus)`, `onDsFocus`. Flag with **"check behaviour"**: it now fires when the dropdown opens, and the event is synthetic, so `target` and `relatedTarget` are missing.        |
-| `balBlur`                              | `dsBlur`          | Same shapes as `balFocus`, targeting `blur`. Flag with **"check behaviour"**: it now fires when the dropdown closes, with a synthetic event.                                                                                                                                  |
-| `balInputClick`                        | `dsClick`         | Same shapes: `addEventListener`, `(balInputClick)`, `onBalInputClick` become `dsClick`, `(dsClick)`, `onDsClick`. Flag with **"check behaviour"**: it now fires for a click anywhere on the field, label and description included, not only on the input.                     |
-| `balInput`, `balKeyPress`, `balCancel` | _(no equivalent)_ | Apply Unmapped props and handlers (`SKILL.md`). `balCancel` was only emitted by the removed `cancel()` method.                                                                                                                                                                |
+| old                                    | new               | handling                                                                                                                                                                                                                                                                                                            |
+| -------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `balChange`                            | `dsChange`        | Rewrite `addEventListener('balChange'` to `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `string \| string[] \| null`. The detail for an empty single select changes from `undefined` to `null`: note it once per migrated handler. |
+| `balFocus`                             | `dsFocus`         | Same shapes as `balChange`: `addEventListener`, `(balFocus)`, `onBalFocus` become `dsFocus`, `(dsFocus)`, `onDsFocus`. Flag with **"check behaviour"**: it now fires when the dropdown opens, and the event is synthetic, so `target` and `relatedTarget` are missing. Detail: `FocusEvent`.                        |
+| `balBlur`                              | `dsBlur`          | Same shapes as `balFocus`, targeting `blur`. Flag with **"check behaviour"**: it now fires when the dropdown closes, with a synthetic event. Detail: `FocusEvent`.                                                                                                                                                  |
+| `balInputClick`                        | `dsClick`         | Same shapes: `addEventListener`, `(balInputClick)`, `onBalInputClick` become `dsClick`, `(dsClick)`, `onDsClick`. Flag with **"check behaviour"**: it now fires for a click anywhere on the field, label and description included, not only on the input. Detail: `MouseEvent`.                                     |
+| `balInput`, `balKeyPress`, `balCancel` | _(no equivalent)_ | Apply Unmapped props and handlers (`SKILL.md`). `balCancel` was only emitted by the removed `cancel()` method.                                                                                                                                                                                                      |
 
 Rewrite only handlers that are attached to the element being migrated. `balChange`, `balFocus` and `balBlur` are emitted by many other legacy components, so never rewrite a handler on another element, and never rename them by search and replace across the file.
 
 Legacy `balChange` was emitted for user changes only. `ds-select` also emits `dsChange` when `value` is set from code and the selection actually changes (setting the same value again emits nothing). Mention this once, not per handler, and tell the consumer to verify handlers that write `value`.
+
+Retype handler parameters and refs as `SKILL.md` "Legacy types and bundles" describes. `BalEvents.BalSelect*` and `BalSelectCustomEvent` become `DsSelectCustomEvent`. Use the detail from the table above as the type argument, so a legacy `BalSelectCustomEvent<string | string[] | undefined>` becomes `DsSelectCustomEvent<string | string[] | null>`. Write a detail alias such as `BalEvents.BalSelectChangeDetail` out as `string | string[] | null`. `HTMLBalSelectElement` becomes `HTMLDsSelectElement`, and `HTMLBalSelectOptionElement` becomes `HTMLDsSelectOptionElement`.
 
 For every finding in a `.html` file, also open the same-basename `.ts` file beside it and apply these rules there — the Angular case where the template holds the tag and the class file handles the event or calls a method without ever naming `bal-select`.
 
@@ -108,7 +110,7 @@ Needs your attention when found:
 6. Every `balChange` handler, with the note that the detail for an empty single select is now `null` instead of `undefined`.
 7. Every `balInput`, `balKeyPress` and `balCancel` handler, with its Unmapped props and handlers outcome.
 8. Every `getValue()`, `clear()`, `cancel()` and `select()` call, with its Unmapped props and handlers outcome.
-9. Every type reference that the scan cannot see, such as `HTMLBalSelectElement`, `HTMLBalSelectOptionElement` or `BalEvents.BalSelectChange`. These resolve from the ambient namespaces and stop compiling once `@baloise/ds-core` is removed.
+9. Every legacy type left or written out and every bundle kept, as `SKILL.md` "Legacy types and bundles" describes: each `BalProps.BalSelect*` type left in place, each detail alias such as `BalEvents.BalSelectChangeDetail` written out, each `BalSelectBundle` spread kept because a legacy tag is left, and each multi-family bundle kept.
 10. One-time note: an empty value is now `null`. This matters for code that checks `value.length` or `=== undefined`.
 11. One-time note: programmatic `value` changes now emit `dsChange`. Verify handlers that write `value`.
 12. One-time note: files which only listen or call methods, and have no scanned `.html` of the same name beside them, were not scanned.

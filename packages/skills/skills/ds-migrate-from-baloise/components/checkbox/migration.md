@@ -16,7 +16,7 @@ Apply `shared/field.md` in the Rewrite step to every migrated `ds-checkbox`, `ds
 node <this-skill-directory>/scripts/scan-bal-checkbox.mjs <project-root>
 ```
 
-The script prints one JSON object. `total` is the number of findings. `files` groups them by path. Each finding has `line` and `snippet`. The scan also matches bare `newBalCheckboxOption` calls, since a file can build the dropped `options` array (see Props below) without ever naming a tag. It also matches `bal-check`, `bal-switch`, `BalCheck` and `BalSwitch`.
+The script prints one JSON object. `total` is the number of findings. `files` groups them by path. Each finding has `line` and `snippet`. The scan also matches bare `newBalCheckboxOption` calls, since a file can build the dropped `options` array (see Props below) without ever naming a tag. It also matches `bal-check`, `bal-switch`, `BalCheck` and `BalSwitch`. It lists `BalCheckboxBundle` and the `BalEvents.BalCheckbox*` and `BalCheckbox*CustomEvent` types too. It does not match the ambient `HTMLBalCheckboxElement` or `BalProps.BalCheckbox*` types, so search for them yourself in each file with a finding. `SKILL.md` "Legacy types and bundles" says how to rewrite all of them.
 
 Some findings carry one extra flag. A flag is only present when it is true, so most findings have only `line` and `snippet`. A forms binding below means `formControlName`, `formControl` or `ngModel` in any binding form, such as `[formControl]` or `[(ngModel)]`. A bound `value` means Angular `[value]` or React `value={…}`.
 
@@ -217,7 +217,7 @@ Until `DsCheckbox` has a value accessor, this is the only path that works. A sin
 
 - **Not rewritten**: `<bal-check>`, `<bal-switch>`, `BalCheck` and `BalSwitch` stay as they are. A switch group with a bound value becomes a `div`, not a `ds-checkbox-group`.
 - **HTML**: `<bal-checkbox>` becomes `<ds-checkbox>` (or `<ds-toggle>` per the Shape section above), including the closing tag. `<bal-checkbox-group>` becomes `<ds-checkbox-group>`, including the closing tag.
-- **Angular**: the same tag rewrites in `.html` templates and in inline `template:` strings. When a file imports `BalCheckbox` and/or `BalCheckboxGroup` from `@baloise/ds-angular` (there is no bundle export for checkbox, unlike carousel or card — each is its own symbol), replace only the ones used with `DsCheckbox`/`DsCheckboxGroup` from `@helvetia-design/angular`, keeping the rest on the `@baloise` import. A checkbox rewritten to `ds-toggle` instead imports `DsToggle`.
+- **Angular**: the same tag rewrites in `.html` templates and in inline `template:` strings. When a file imports `BalCheckbox` and/or `BalCheckboxGroup` from `@baloise/ds-angular`, replace only the ones used with `DsCheckbox`/`DsCheckboxGroup` from `@helvetia-design/angular`, keeping the rest on the `@baloise` import. A checkbox rewritten to `ds-toggle` instead imports `DsToggle`. `BalCheckboxBundle` is the legacy array `[BalCheckbox, BalCheckboxGroup, BalCheck, BalSwitch]`. A `...BalCheckboxBundle` spread in `imports: [...]` becomes the `DsCheckbox`, `DsCheckboxGroup` and `DsToggle` symbols the template uses. Keep the spread, and add the `Ds*` symbols next to it, while the template still has a `bal-check` or `bal-switch`, which always stay (see Not rewritten). A multi-family bundle such as `BalFormBundle` stays, and the `Ds*` symbols are added next to it. `SKILL.md` "Legacy types and bundles" has the full bundle rule.
 - **React**: `<BalCheckbox>`/`</BalCheckbox>` becomes `<DsCheckbox>`/`</DsCheckbox>` (or `<DsToggle>`/`</DsToggle>` per Shape), `<BalCheckboxGroup>`/`</BalCheckboxGroup>` becomes `<DsCheckboxGroup>`/`</DsCheckboxGroup>`. Import the renamed symbols from `@helvetia-design/react`, keeping only the ones actually used; when the existing `@baloise/ds-react` import also binds other symbols, move only the checkbox ones and leave the rest on the `@baloise` import.
 
 ### Events
@@ -228,7 +228,7 @@ Until `DsCheckbox` has a value accessor, this is the only path that works. A sin
 | `balFocus`  | `dsFocus`  | Same shapes as `balChange`: `addEventListener`, `(balFocus)`, `onBalFocus` become `dsFocus`, `(dsFocus)`, `onDsFocus`. Detail stays `FocusEvent`.                                                                                                                                                                                                                                        |
 | `balBlur`   | `dsBlur`   | Same shapes as `balFocus`, targeting `blur`.                                                                                                                                                                                                                                                                                                                                             |
 
-A handler parameter typed with a legacy event type, such as `BalEvents.BalCheckboxCustomEvent<boolean>` or `BalCheckboxGroupCustomEvent<any[]>`, no longer type-checks under Angular `strictTemplates`. Retype it from the element the handler is bound to after the rewrite, not from the old annotation: `DsCheckboxCustomEvent` on a `ds-checkbox`, `DsToggleCustomEvent` on a `ds-toggle`, and `DsCheckboxGroupCustomEvent` on a `ds-checkbox-group`. Keep the type argument when it still matches the detail, and use `any[]` for a group. Import the types with `import type { … } from '@helvetia-design/core/components'`.
+Retype handler parameters as `SKILL.md` "Legacy types and bundles" describes. A legacy type such as `BalEvents.BalCheckboxCustomEvent<boolean>` or `BalCheckboxGroupCustomEvent<any[]>` takes its new type from the element the handler is bound to after the rewrite: `DsCheckboxCustomEvent` on a `ds-checkbox`, `DsToggleCustomEvent` on a `ds-toggle`, and `DsCheckboxGroupCustomEvent` on a `ds-checkbox-group`. Keep the type argument when it still matches the detail, and use `any[]` for a group.
 
 In each file that has a finding, also rewrite `balChange`, `balFocus`, and `balBlur` listeners that are not on the element itself, including `addEventListener`. For every finding in a `.html` file, also open the same-basename `.ts` file beside it and apply these rules there — the Angular case where the template holds the tag and the class file handles the event without ever naming `bal-checkbox`.
 
@@ -236,9 +236,9 @@ The scan does not list a file that only listens and never uses `bal-checkbox`/`b
 
 ### Methods
 
-`setFocus()`, `setBlur()`, `getInputElement()`, and `getOption()` do not exist on `ds-checkbox`. Flag every call site for manual review; there is no replacement.
+`setFocus()`, `setBlur()`, `getInputElement()`, and `getOption()` do not exist on `ds-checkbox` or `ds-toggle`. Apply Unmapped props and handlers (`SKILL.md`). The retyped ref makes every such call fail `tsc`.
 
-`getOptionByValue()` does not exist on `ds-checkbox-group`. It is tied to the dropped `options` array — flag every call site alongside the `options` occurrence it belongs to.
+`getOptionByValue()` does not exist on `ds-checkbox-group`. Apply Unmapped props and handlers (`SKILL.md`). It is tied to the dropped `options` array, so report every call site alongside the `options` occurrence it belongs to.
 
 `setValue()` on `bal-checkbox-group` is never dropped silently. The legacy types declare it publicly as `setValue(value: any[])`. Angular apps call it through a typed ref in the `.ts` beside the template, for example `this.topicsGroup?.nativeElement.setValue(['news'])` with `@ViewChild('topicsGroup') topicsGroup?: ElementRef<HTMLBalCheckboxGroupElement>`. The scan flags these calls with `setValue: true`. `ds-checkbox-group` has no `setValue()`. Rewrite each call by how the group is bound, and report each rewrite:
 
@@ -270,14 +270,15 @@ Needs your attention when found:
 10. Every dropped `nonSubmit`. The checkbox is now always submitted with the form.
 11. Every dropped `verticalOnMobile`.
 12. Every dropped `expanded`.
-13. Every dropped `options` or `newBalCheckboxOption`, flagged for manual conversion to slotted children, together with every `getOptionByValue()` call tied to it.
-14. Every `setFocus()`, `setBlur()`, `getInputElement()` or `getOption()` call, flagged as having no replacement.
+13. Every dropped `options` or `newBalCheckboxOption`, flagged for manual conversion to slotted children, together with every `getOptionByValue()` call tied to it and its Unmapped props and handlers outcome.
+14. Every `setFocus()`, `setBlur()`, `getInputElement()` or `getOption()` call, with its Unmapped props and handlers outcome.
 15. One-time note: the scan reports `setValue()` on a ref typed `HTMLBalCheckboxGroupElement` in every scanned file. It does not report other method calls or listeners in a file that has no finding and no scanned `.html` of the same name beside it.
+16. Every legacy type left or written out and every bundle kept, as `SKILL.md` "Legacy types and bundles" describes: each `BalProps.BalCheckbox*` type left in place, each detail alias such as `BalEvents.BalCheckboxChangeDetail` written out, each `BalCheckboxBundle` spread kept because a `bal-check` or `bal-switch` is left, and each multi-family bundle kept.
 
 Coverage only, written to the file:
 
-16. Every `interface="switch"` rewritten to `ds-toggle`.
-17. One-time note, for groups outside a `bal-field` only: `ds-checkbox-group` defaults its new `required` prop to `true`, and the migration left it alone. It only shows once the group gets a `label`.
+17. Every `interface="switch"` rewritten to `ds-toggle`.
+18. One-time note, for groups outside a `bal-field` only: `ds-checkbox-group` defaults its new `required` prop to `true`, and the migration left it alone. It only shows once the group gets a `label`.
 
 Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 

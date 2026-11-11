@@ -50,24 +50,26 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 ### Tags and imports
 
 - **HTML**: `<bal-date>` becomes `<ds-datepicker>`, including the closing tag.
-- **Angular**: `<bal-date>` becomes `<ds-datepicker>` in `.html` templates and in inline `template:` strings, including the closing tag. When a file imports `BalDate` from `@baloise/ds-angular`, move only `BalDate` to `import { DsDatepicker } from '@helvetia-design/angular'` and leave the other symbols on the `@baloise` import. Replace `BalDate` with `DsDatepicker` in `imports:` lists too. `DsDatepicker` brings its own `ControlValueAccessor`, so `ngModel` and reactive forms keep working.
+- **Angular**: `<bal-date>` becomes `<ds-datepicker>` in `.html` templates and in inline `template:` strings, including the closing tag. When a file imports `BalDate` from `@baloise/ds-angular`, move only `BalDate` to `import { DsDatepicker } from '@helvetia-design/angular'` and leave the other symbols on the `@baloise` import. Replace `BalDate` with `DsDatepicker` in `imports:` lists too. `DsDatepicker` brings its own `ControlValueAccessor`, so `ngModel` and reactive forms keep working. `bal-date` has no own bundle. Only multi-family bundles such as `BalFormBundle` or `BalComponentBundle` hold it. They stay, and `DsDatepicker` is added next to them, as `SKILL.md` "Legacy types and bundles" describes.
 - **React**: `<BalDate>` becomes `<DsDatepicker>` and `</BalDate>` becomes `</DsDatepicker>`. Import `DsDatepicker` from `@helvetia-design/react`. When the existing `@baloise/ds-react` import also binds other symbols, move only `BalDate` and leave the others on the `@baloise` import.
 
 ### Events
 
-| old (`bal-date`)                  | new (`ds-datepicker`) | handling                                                                                                                                                            |
-| --------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balChange`                       | `dsChange`            | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. |
-| `balInput`                        | `dsInput`             | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms.                                                                   |
-| `balBlur`                         | `dsBlur`              | Same shapes.                                                                                                                                                        |
-| `balFocus`                        | `dsFocus`             | Same shapes.                                                                                                                                                        |
-| `balInputClick`                   | `dsClick`             | Same shapes: `(balInputClick)` becomes `(dsClick)` and `onBalInputClick` becomes `onDsClick`.                                                                       |
-| `balIconClick`                    | _(no equivalent)_     | Apply Unmapped props and handlers (`SKILL.md`).                                                                                                                     |
-| `balWillAnimate`, `balDidAnimate` | _(no equivalent)_     | Apply Unmapped props and handlers (`SKILL.md`).                                                                                                                     |
+| old (`bal-date`)                  | new (`ds-datepicker`) | handling                                                                                                                                                                                                                    |
+| --------------------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `balChange`                       | `dsChange`            | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `string \| null`, legacy `string \| undefined`. |
+| `balInput`                        | `dsInput`             | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `string \| null`.                                                                                                 |
+| `balBlur`                         | `dsBlur`              | Same shapes.                                                                                                                                                                                                                |
+| `balFocus`                        | `dsFocus`             | Same shapes.                                                                                                                                                                                                                |
+| `balInputClick`                   | `dsClick`             | Same shapes: `(balInputClick)` becomes `(dsClick)` and `onBalInputClick` becomes `onDsClick`.                                                                                                                               |
+| `balIconClick`                    | _(no equivalent)_     | Apply Unmapped props and handlers (`SKILL.md`).                                                                                                                                                                             |
+| `balWillAnimate`, `balDidAnimate` | _(no equivalent)_     | Apply Unmapped props and handlers (`SKILL.md`).                                                                                                                                                                             |
 
 Rewrite only handlers that are attached to the `bal-date` element being migrated. `balChange`, `balInput`, `balBlur`, and `balFocus` are emitted by many other legacy components, so never rewrite a handler on another element, and never rename them by search and replace across the file.
 
 When the value in `balChange` or `balInput` is read, note that it is `string | undefined` in legacy and `string | null` in `ds-datepicker`. A cleared field now yields `null`. Do not edit the handler, report it.
+
+Retype handler parameters and refs as `SKILL.md` "Legacy types and bundles" describes. `BalEvents.BalDate*` and `BalDateCustomEvent` become `DsDatepickerCustomEvent`. Write a detail alias such as `BalEvents.BalDateChangeDetail` out as the new detail type, `string | null` for `dsChange` and `dsInput`. `HTMLBalDateElement` becomes `HTMLDsDatepickerElement`. The scan lists the `BalEvents.BalDate*` and `BalDateCustomEvent` types, but not the `BalDateCalendar*` ones. It does not list `BalProps.*` or `HTMLBal*Element`, so search for them yourself in each file with a finding.
 
 ### Methods
 
@@ -91,13 +93,14 @@ Needs your attention when found:
 8. Every dropped `closeOnSelect` that was set to false. `ds-datepicker` closes the popup after every selection, so that behaviour is lost.
 9. One-time note: `ds-datepicker` has `label`, `description`, and `color`. Fields may need a `label` now. Do not add one yourself.
 10. Every selector that targets the legacy elements and that the scan cannot see. The legacy component set the classes `bal-date`, `bal-date__icon`, `bal-date__icon--is-clickable`, `bal-date__popup`, and `bal-date__popup--is-visible` on its host and its parts, and rendered `bal-input-date`, `bal-input-group`, and `bal-date-calendar` inside. Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.
+11. Every legacy type left or written out and every bundle kept, as `SKILL.md` "Legacy types and bundles" describes: each `BalProps.BalDate*` type left in place, each detail alias such as `BalEvents.BalDateChangeDetail` written out, and each multi-family bundle such as `BalFormBundle` or `BalComponentBundle` kept with `DsDatepicker` added next to it.
 
 Coverage only, written to the file:
 
-11. Every `required` that was set to false.
-12. Every dropped `triggerIcon`.
-13. Every dropped `closeOnSelect`.
-14. Every event handler that was renamed.
+12. Every `required` that was set to false.
+13. Every dropped `triggerIcon`.
+14. Every dropped `closeOnSelect`.
+15. Every event handler that was renamed.
 
 Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 

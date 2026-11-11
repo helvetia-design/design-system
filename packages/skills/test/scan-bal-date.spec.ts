@@ -200,6 +200,44 @@ describe('scanBalDate', () => {
     })
   })
 
+  it('lists BalEvents types and the bare CustomEvent once per occurrence, but not calendar or calendar cell types', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        'export class ApplicationComponent {',
+        '  onChange(event: BalEvents.BalDateCustomEvent<string>) {}',
+        '  onBare(event: BalDateCustomEvent<string>) {}',
+        '  detail?: BalEvents.BalDateChangeDetail',
+        '  both(a: BalEvents.BalDateBlur, b: BalDateCustomEvent<string>) {}',
+        '  onCell(event: BalEvents.BalDateCalendarCustomEvent<string>) {}',
+        '  onCellBare(event: BalDateCalendarCustomEvent<string>) {}',
+        '  allowed?: BalProps.BalDateCallback',
+        '  onCellSelect(event: BalEvents.BalDateCellSelect) {}',
+        '  cellDetail?: BalEvents.BalDateCellSelectDetail',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalDate(root)).toEqual({
+      total: 5,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            { line: 2, snippet: 'onChange(event: BalEvents.BalDateCustomEvent<string>) {}' },
+            { line: 3, snippet: 'onBare(event: BalDateCustomEvent<string>) {}' },
+            { line: 4, snippet: 'detail?: BalEvents.BalDateChangeDetail' },
+            { line: 5, snippet: 'both(a: BalEvents.BalDateBlur, b: BalDateCustomEvent<string>) {}' },
+            { line: 5, snippet: 'both(a: BalEvents.BalDateBlur, b: BalDateCustomEvent<string>) {}' },
+          ],
+        },
+      ],
+    })
+  })
+
   it('does not edit files and prints grouped findings as JSON', () => {
     const root = createScratchDir()
     const html = '<bal-date required></bal-date>\n'

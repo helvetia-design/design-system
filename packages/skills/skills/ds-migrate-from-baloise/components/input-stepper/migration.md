@@ -43,23 +43,23 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 ### Tags and imports
 
 - **HTML**: `<bal-input-stepper>` becomes `<ds-counter>`, including the closing tag.
-- **Angular**: the same tag rename in `.html` templates and in inline `template:` strings, including the closing tag. When a file imports `BalInputStepper` from `@baloise/ds-angular`, move only that symbol to `import { DsCounter } from '@helvetia-design/angular'` and leave the other symbols on the `@baloise` import. Rename it in `imports: [...]` as well. `DsCounter` brings its own `ControlValueAccessor`, so `ngModel` and reactive forms keep working.
+- **Angular**: the same tag rename in `.html` templates and in inline `template:` strings, including the closing tag. When a file imports `BalInputStepper` from `@baloise/ds-angular`, move only that symbol to `import { DsCounter } from '@helvetia-design/angular'` and leave the other symbols on the `@baloise` import. Rename it in `imports: [...]` as well. `DsCounter` brings its own `ControlValueAccessor`, so `ngModel` and reactive forms keep working. `bal-input-stepper` has no own bundle. Only multi-family bundles such as `BalFormBundle` or `BalComponentBundle` hold it. They stay, and `DsCounter` is added next to them, as `SKILL.md` "Legacy types and bundles" describes.
 - **React**: `<BalInputStepper>` becomes `<DsCounter>`, including the closing tag. Import it from `@helvetia-design/react`. When the existing `@baloise/ds-react` import also binds other symbols, move only `BalInputStepper` and leave the others on the `@baloise` import. If the file already imports from `@helvetia-design/react`, add to that import instead of creating a second one.
 
 ### Events
 
-| old           | new          | handling                                                                                                                                                            |
-| ------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balChange`   | `dsChange`   | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. |
-| `balInput`    | `dsInput`    | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms.                                                                   |
-| `balIncrease` | `dsIncrease` | Same shapes.                                                                                                                                                        |
-| `balDecrease` | `dsDecrease` | Same shapes.                                                                                                                                                        |
-| `balFocus`    | `dsFocus`    | Same shapes.                                                                                                                                                        |
-| `balBlur`     | `dsBlur`     | Same shapes.                                                                                                                                                        |
+| old           | new          | handling                                                                                                                                                                                                            |
+| ------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `balChange`   | `dsChange`   | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `number`, legacy `number \| undefined`. |
+| `balInput`    | `dsInput`    | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `number`.                                                                                                 |
+| `balIncrease` | `dsIncrease` | Same shapes.                                                                                                                                                                                                        |
+| `balDecrease` | `dsDecrease` | Same shapes.                                                                                                                                                                                                        |
+| `balFocus`    | `dsFocus`    | Same shapes.                                                                                                                                                                                                        |
+| `balBlur`     | `dsBlur`     | Same shapes.                                                                                                                                                                                                        |
 
 Rewrite only handlers that are attached to the element being migrated. `balChange`, `balInput`, `balBlur`, and `balFocus` are emitted by many other legacy components, so never rewrite a handler on another element, and never rename them by search and replace across the file.
 
-The detail types `BalEvents.BalInputStepper*Detail` are not rewritten. List each use as "type needs manual rework".
+Retype handler parameters and refs as `SKILL.md` "Legacy types and bundles" describes. `BalEvents.BalInputStepper*` and `BalInputStepperCustomEvent` become `DsCounterCustomEvent`, because the type follows the new tag `ds-counter`. Write a detail alias such as `BalEvents.BalInputStepperChangeDetail` out as the new detail type, `number` for `dsChange`, `dsInput`, `dsIncrease` and `dsDecrease`. `HTMLBalInputStepperElement` becomes `HTMLDsCounterElement`. The scan lists the `BalEvents.*` and `Bal*CustomEvent` types. It does not list `BalProps.*` or `HTMLBal*Element`, so search for them yourself in each file with a finding.
 
 Do not edit handler bodies. Report these detail changes so the consumer can check them:
 
@@ -81,7 +81,7 @@ Needs your attention when found:
 1. Every `ev.detail` read on `dsFocus` or `dsBlur`, listed as "event detail removed, needs manual rework".
 2. Every `getInputElement()` call, listed as "return type changed, check the caller".
 3. Every `setAriaForm()` call, with its Unmapped props and handlers outcome.
-4. Every detail-type use, listed as "type needs manual rework".
+4. Every legacy type left or written out and every bundle kept, as `SKILL.md` "Legacy types and bundles" describes: each `BalProps.BalInputStepper*` type left in place, each detail alias such as `BalEvents.BalInputStepperChangeDetail` written out, and each multi-family bundle such as `BalFormBundle` or `BalComponentBundle` kept with `DsCounter` added next to it.
 5. Every static or bound value that can be empty or out of range. Every write is resolved onto `[min, max]`, and an empty value (`null`, `undefined`, `NaN`) becomes `min`. No `dsChange` fires for that, so a bound value outside the range stays unchanged on the framework side while the element shows the clamped one.
 6. Every file where the rendered label changed. `shared/field.md` moves the label of a surrounding `bal-field` onto `ds-counter` and decides `required` from the wrapper. `ds-counter` defaults `required` to `true`, which only shows once a `label` is set. A counter without any `required` on the wrapper gets `required="false"` and now shows the "(optional)" suffix, which the legacy label did not.
 7. One-time note: `ds-counter` takes a `color` and shows the buttons as ghost buttons. Visual snapshots of the legacy outlined buttons break.
