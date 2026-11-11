@@ -247,7 +247,7 @@ function endOfRegex(text, start) {
 const VUE_BLOCK_RE = /^<(\/?)(script|style)(?=[\s>/])/i
 
 function maskSource(text, kind) {
-  const mask = Array.from(text)
+  const mask = text.split('')
   let region = kind === 'script' ? 'script' : 'markup'
   let i = 0
   while (i < text.length) {
