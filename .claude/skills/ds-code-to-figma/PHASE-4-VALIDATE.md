@@ -156,7 +156,10 @@ Labels`, set, `Grid`). Below the set, the set's fill covers every divider.
    e. **Every variation**, one check each: take one `get_screenshot` per variations `Preview` and
    compare each instance with its `snapshot` case — part present, its position relative to its
    neighbor (right / bottom), gap, size relation, color. The skip in d doesn't apply here. A
-   variation whose snapshot doesn't exist is `not verified`.
+   variation whose snapshot doesn't exist is `not verified`. Say whether a difference is in the
+   shown part (gap, position) or in the default variant itself (size, color of the whole
+   component): the latter is a set bug that every instance has (seen on `ds-spinner`: default
+   `size=sm`).
 7. **Write the validation report** (see [Output](#output)).
 
 ## Rules

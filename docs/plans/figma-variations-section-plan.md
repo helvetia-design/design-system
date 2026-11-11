@@ -2,7 +2,7 @@
 
 Package: `.claude/skills/ds-code-to-figma`
 
-Status: Decisions agreed (grilling session 10.11.2026). Skill steps implemented 10.11.2026. Verify run: `ds-button` done 11.11.2026 on Figma branch `TMW8IfOY7LbN3IXvu3cI15` (findings folded into the skill; see `button.figma-validation.md`); `ds-spinner` and snapshot re-creation (`/update-screenshots`) open.
+Status: Decisions agreed (grilling session 10.11.2026). Skill steps implemented 10.11.2026. Verify run: `ds-button` done 11.11.2026 on Figma branch `TMW8IfOY7LbN3IXvu3cI15` (findings folded into the skill; see `button.figma-validation.md`); `ds-spinner` done 11.11.2026 (fail: two pre-existing Spinner bugs the section found — see `spinner.figma-validation.md`); snapshot re-creation (`/update-screenshots` for `button-icon`, `spinner-circle-variation`) open.
 
 ## Goal
 
