@@ -31,7 +31,7 @@ function buckets(report: string) {
 }
 
 const expectedCounts: Record<string, { attention: number; coverage: number }> = {
-  'accordion': { attention: 12, coverage: 3 },
+  'accordion': { attention: 13, coverage: 3 },
   'app': { attention: 5, coverage: 4 },
   'badge': { attention: 3, coverage: 3 },
   'button': { attention: 12, coverage: 4 },
@@ -160,6 +160,36 @@ describe('Report items the issue requires by name', () => {
     const numbers = itemNumbers('accordion', ['`button-wide`', '`openIcon`', '`closeIcon`'])
 
     expect(new Set(numbers).size).toBe(numbers.length)
+  })
+
+  it('accordion checks every single-icon trigger on its own line', () => {
+    const { attention } = bucketsOf('accordion')
+
+    expect(attention.filter(item => item.text.includes('single-icon trigger'))).toHaveLength(1)
+  })
+
+  it('accordion maps legacy open labels and icons to the ds-accordion close props', () => {
+    const migration = read('components/accordion/migration.md')
+    const lineOf = (start: string) => {
+      const lines = migration.split('\n').filter(line => line.startsWith(start))
+      expect(lines, start).toHaveLength(1)
+      return lines[0]
+    }
+    const targetOf = (start: string) => lineOf(start).split('|')[2]
+    const shape1After = lineOf('<ds-accordion button ')
+
+    expect(shape1After).toContain('button-label-close="Show more"')
+    expect(shape1After).toContain('button-label-open="Show less"')
+    expect(targetOf('| `bal-accordion` `openLabel`')).toContain('`buttonLabelClose`')
+    expect(targetOf('| `bal-accordion` `closeLabel`')).toContain('`buttonLabelOpen`')
+    expect(targetOf('| `bal-accordion` `openIcon`')).toContain('`buttonIconClose`')
+    expect(targetOf('| `bal-accordion` `closeIcon`')).toContain('`buttonIconOpen`')
+    expect(targetOf('| `bal-accordion-trigger` `openLabel`')).toMatch(/^\s*`button-label-close` \/ `button-label-open`/)
+    expect(targetOf('| `bal-accordion-trigger` `openIcon`')).toMatch(/^\s*`button-icon-close` \/ `button-icon-open`/)
+    expect(lineOf('- **Trigger, `openIcon` set and `closeIcon` empty or absent.**')).toMatch(
+      /both `button-icon-close` and `button-icon-open`/,
+    )
+    expect(lineOf('| `bal-accordion` bound `active`')).toContain('`[open]="x"`')
   })
 
   it('button checks each of the four colour collisions on its own line', () => {
