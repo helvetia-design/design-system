@@ -39,6 +39,19 @@ the measurements triage (6) are presented **once for the whole family** (`conven
    `figmaOptions:` in canonical order per `conventions/component-set-rendering.md` → "Option and
    axis ordering": code default first (hard rule A), then canonical order (hard rule B) — e.g.
    `base · sm · md · lg`. The implicit unset default is named `base`.
+   - **Text:** for every string prop, record whether `render()` shows it as text and in which
+     `@part` (`label`, `description`, `placeholder`, `value`, `invalidText`). Also record every
+     **text-only slot** (a slot whose content is text, e.g. `ds-button`'s default slot) as a text
+     prop named after its `@part` (`label`). Both are consumer-authored text →
+     `figmaPropertyType: text`. Text the component generates itself (page numbers, counter digits,
+     weekday names) is recorded as `generated — no property`, so the omission is visible.
+     Generated text inside a consumer-authored part (`ds-input`'s label appends the i18n
+     `" (optional)"` when not required) becomes its own text node with no property, so the text
+     property binds to the consumer text alone.
+   - **Shared text nodes:** when one part renders two props (`ds-input`'s `input` part shows
+     `value`, else `placeholder`; its `description` part shows `invalidText` when invalid), record
+     which prop wins under which condition and whether the color token differs
+     (`PHASE-2-PROPOSE.md` → mapping table, the two "One node, two props" rows).
    - On a sub-component, also extract every `@internal` prop the owner sets ("Set by ds-…") and
      record it with `drivenBy: <owner tag>.<owner prop>` (`conventions/families.md` §3). Find the
      owner prop by reading where the owner writes it (e.g. `ds-tabs`' `updateChildren()`).
@@ -59,10 +72,12 @@ the measurements triage (6) are presented **once for the whole family** (`conven
      only for a sub-component with more than one `@part` (`conventions/families.md` §5).
      Sub-component mapping files have no `anatomy:`. The owner's list is skipped only when it has
      no `@part`s and no contained sub-components.
-3. Read the component's `<name>.host.scss` and scan for **pseudo-class states** —
-   `:hover`, `:focus`, `:active`, `:disabled`, and any loading-related
-   class/attribute selector. These don't show up as props but still need a Figma
-   representation (see `PHASE-2-PROPOSE.md` → mapping table, `state` row).
+3. Read the component's `<name>.host.scss` and scan for **states** (CSS pseudo-classes and state classes) —
+   `:hover`, `:focus`, `:active`, `:disabled`, and any loading- or invalid-related
+   class/attribute selector. Interaction states (`:hover`, `:focus`, `:active`) become the `state`
+   variant; component-state props (`disabled`, `loading`, `invalid`, …) become their own `false` /
+   `true` variants (see `PHASE-2-PROPOSE.md` → mapping table, interaction-state and component-state
+   rows).
    - Also scan **every text-bearing part for every attribute a Figma text node needs**: font
      family, font size, font weight, line-height, letter-spacing, color, text-decoration. A
      component's own SCSS commonly sets only some of these explicitly (e.g. a `::part(label)`
@@ -91,8 +106,25 @@ the measurements triage (6) are presented **once for the whole family** (`conven
    sub-component instances under `slots:` (default fill proposed in Phase 2;
    `conventions/families.md` §4). Mark every nested `ds-icon` /
    `ds-brand-icon` as an **icon slot** (see `conventions/content-selection-and-mitigations.md` →
-   "Icon slots in a parent component"): record the code prop driving it, whether `ds-brand-icon`
+   "Icon slots in a parent component"): record the code prop driving it, its color source per variant and state (as `colorSource`,
+   `examples/mapping-file-format.md`), whether `ds-brand-icon`
    can fill the same slot, and how code sets its `size` and color.
+   - 4a. **Variations** (`PHASE-3-BUILD.md` → "Variations"). For every render-guarded part
+     (`hasValue(x) && …`, a `show*` boolean), record its `show <name>` boolean and its
+     **dependent axes**: the axes whose CSS only applies while the part exists (e.g.
+     `.label-bottom` selectors → `label position`). Only booleans that default to `false` get
+     variations — one that defaults to `true` (`ds-input`'s `show label`) is already on in the
+     set. Derive the variation list per set:
+     - one entry per option of each dependent axis, with the boolean `true` and every other axis
+       at the default variant (no dependent axis → one entry);
+     - plus one **"all on"** entry per set (every `show` boolean `true`, default variant
+       otherwise), when the set has more than one `show` boolean defaulting to `false`;
+     - covered sets: the default set and every rule-1 top-level split (`SpinnerLogo`,
+       `SpinnerCircle`), never an `…Inverted` set; in a family, sub-component sets too. A set with
+       no `show` boolean defaulting to `false` gets no entry.
+     - **Snapshot coverage:** for each variation, find a case in `test/<name>.visual.html` with
+       the same props (default state). Record the matching snapshot name, or `missing`.
+       Write it to the draft's `variations:` (`examples/mapping-file-format.md`).
 5. For every value the component's SCSS binds to a CSS custom property (`var(--ds-...)`),
    resolve it to the matching Figma variable **id** — resolve this entirely locally, no Figma
    call needed for the common case.
@@ -190,7 +222,7 @@ Tokens` collection has exactly those three. Any other mixin (`desktop-lg`, `desk
 6. **Measurements triage** — decide which sizes Phase 8's "📏 Measurements" section shows. Rules:
    `conventions/measurements.md`. Numbers come from the browser, groups come from the SCSS.
    - 6a. **Measure.** Start the dev server from the repo root (`pnpm start`) if it isn't
-     running, and open the component's `test/*.visual.html`. For every option of the Variants axis (one element each; default
+     running, and open the component's `test/*.visual.html`. For every option of the table axis (one element each; default
      values for every other prop), read the host and every `[part]` in its `shadowRoot`:
      ```js
      const px = v => parseFloat(v) || 0
@@ -232,7 +264,7 @@ Tokens` collection has exactly those three. Any other mixin (`desktop-lg`, `desk
      listed — except a box size, which becomes `derived`. Then run the two checks from
      `conventions/measurements.md`: **does each limit bind?** (a `min-*`/`max-*` that no realistic
      content reaches → `skip`, reported as a finding) and **border visibility** (measure every
-     Variants color option's `background` vs `border` color; the default option stays the
+     color option's `background` vs `border` color; the default option stays the
      `drawnColor` unless its border = fill, then the first option where they differ is proposed;
      none → ask), and **shape visibility** (default state with a transparent background and no
      border → propose a `drawnState`, e.g. `hover`).
@@ -269,11 +301,13 @@ Tokens` collection has exactly those three. Any other mixin (`desktop-lg`, `desk
 A draft mapping file `<name>.figma.md`, written per
 [`examples/mapping-file-format.md`](examples/mapping-file-format.md), containing:
 
-- Extracted public props (type, default)
+- Extracted public props (type, default), with every consumer-authored text (string prop or
+  text-only slot) and every generated text marked
 - Lettered anatomy (`@part` tags cross-checked against `render()`)
-- Pseudo-class states from `<name>.host.scss`
+- Interaction and component states from `<name>.host.scss`
 - Resolved token/variable id for every CSS-var binding, including responsive `device:` bindings
 - Nested DS component references (their Figma component keys)
+- The `variations:` list per covered set, with each entry's snapshot case or `missing`
 - The completeness checklist
 - The confirmed `measurements:` triage (measured values, group, token, proposal per property)
 

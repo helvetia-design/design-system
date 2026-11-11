@@ -48,16 +48,29 @@ props:
   figmaProperty: size
   figmaPropertyType: variant
   figmaOptions: [base, sm] # code default first (top-left = default variant), then canonical order
-- name: label
+- name: label # consumer-authored text: a string prop rendered as text, or a text-only slot (named after its @part)
   type: string
-  figmaProperty: null
-  figmaPropertyType: instance-text-override
+  figmaProperty: label
+  figmaPropertyType: text # TEXT component property bound to the node's characters on every variant
+  node: label # text layer name
+  default: Label # property name in sentence case
+- name: placeholder # one part rendering two props → two nodes, each with its own text property
+  type: string
+  figmaProperty: placeholder
+  figmaPropertyType: text
+  node: placeholder
+  default: Placeholder
+  shownWhen: filled=false # the variant(s) where this node is visible (e.g. color=invalid)
+- name: pageNumber
+  figmaPropertyType: excluded # generated — no property
   states:
   figmaProperty: state
-  options: [default, hover, focus, active, disabled]
+  options: [default, hover, focus, active] # interaction states only
   sources:
   hover: ":hover (spinner.host.scss)"
-  disabled: "disabled prop"
+  componentStates: # component-state props → own false/true variants, true only with state=default (PHASE-2-PROPOSE.md)
+  disabled: { figmaProperty: disabled, options: [false, true], source: "disabled prop" }
+  loading: { figmaProperty: loading, options: [false, true], source: "loading prop" }
   nested:
 - childTag: ds-icon
   childMappingFile: ../icon/icon.figma.md
@@ -66,7 +79,14 @@ props:
   codeProp: icon # → INSTANCE_SWAP property `icon`
   acceptsBrandIcon: true # brandIcon replaces icon in part="icon" → brand-icon library in preferredValues
   size: follows parent size # icon right: fixed sm
-  color: follows inverted
+  colorSource: # Phase 1 fills it, Phase 3 binds from it, Phase 4 checks against it.
+  # Key = state, or a component state for its `true` variant (`disabled`, `loading`); `default` covers every
+  # state not listed. Value = the variable the vector fill
+  # binds to, and where code takes it from. Use `<color>` for a per-variant token.
+  default: "Button/Color/<color>/Base/Text (--icon-color)"
+  hover: "Button/Color/<color>/Hover/Text (--icon-color)"
+  active: "Button/Color/<color>/Active/Text (--icon-color)"
+  disabled: "Button/Color/Disabled/Base/Text (--icon-color)"
   device: # omit entirely if Phase 1 step 5a found no breakpoint-driven token differences.
   # One entry per responsive binding — the single place that owns the mechanism detail (which
   # routing variable, its per-mode aliases, why this component needed it). tokens:/measurements: entries
@@ -104,7 +124,7 @@ props:
   resolved: true
   measurements: # confirmed measurements triage (PHASE-1-ANALYZE.md step 6), rendered by Phase 8. Rules:
   # conventions/measurements.md
-  drawnOption: base # the Variants-axis option shown on the drawn card
+  drawnOption: base # the table-axis option shown on the drawn card
   drawnColor: secondary # the color option every drawn instance uses — the default, unless its
   # border = fill (conventions/measurements.md → "Border visibility"); omit when there is no color axis
   drawnColorReason: "primary draws the border in the fill color — confirmed by the user" # required
@@ -112,7 +132,7 @@ props:
   drawnState: hover # optional: the state the main instance is drawn in when the default state
   # can't show the shape (transparent background, no border — conventions/measurements.md →
   # "Shape visibility"); omit for default. Needs drawnStateReason, like drawnColor
-  options: [base, sm, lg] # table columns, code default first (like the component set); [] when there is no Variants axis
+  options: [base, sm, lg] # table columns, code default first (like the component set); [] when there is no table axis
   behavior: # triage rows proposed as `behavior` land here, not in rows:. Omit when the size
   # never changes with content/container (icon, spinner)
   width: hug # hug | fill — from the behavior probe
@@ -168,6 +188,29 @@ props:
 
 Notes on this mapping, open questions, and rationale for any non-obvious grouping decision go
 here as prose, below the YAML block.
+```
+
+## Variations field
+
+Drafted in Phase 1 (step 4a), confirmed in Phase 2, node ids written back by Phase 3. In the
+owner's file for a family (it covers sub-component sets too). Omit it when no set has a
+`show <name>` boolean.
+
+```yaml
+variations:
+  figmaSectionNodeId: null # the kind=variations Section in the Documentation column
+  sets: # default set and rule-1 splits, never …Inverted; build order in a family
+    - set: SpinnerLogo
+      previewNodeId: null
+      entries:
+        - caption: 'show label · right' # one per option of each dependent axis
+          props: { show label: true, label position: right }
+          snapshot: spinner-label-right # visual test case, or missing (Phase 2 adds it)
+          nodeId: null
+        - caption: 'all on' # every show boolean true, default variant otherwise
+          props: { show label: true }
+          snapshot: missing
+          nodeId: null
 ```
 
 ## Family fields

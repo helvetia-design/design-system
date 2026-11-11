@@ -1,6 +1,7 @@
 # Conventions — documentation sections: `Section` / `Preview` / `Title` (Phases 6–8)
 
-How to fill the documentation frame's left-column sections (Copy me, Anatomy, Measurements). The frame
+How to fill the documentation frame's left-column sections (Copy me, Anatomy, Measurements,
+Variations). The frame
 itself, its header and the 2-column body come from the `🗂️ Template / Category` clone in
 `../PHASE-3-BUILD.md`; the `Documentation` column already holds placeholder `Section` instances.
 See `../CONVENTIONS.md` for the index.
@@ -10,7 +11,7 @@ See `../CONVENTIONS.md` for the index.
 All three live on the `🧰 Annotations` page. Find them by name; the node ids are hints only.
 
 - **`Title`** (`COMPONENT_SET`, `2199:13`) — one `kind` variant per section: `copy-me`, `anatomy`,
-  `measurements`, `component-set`. Don't use `kind=variants` (retired).
+  `measurements`, `variations` (`2199:9`, "🔀 Variations"), `component-set`.
 - **`Preview`** (`COMPONENT_SET`, `2192:7497`) — the bordered content box. Contains a real `SLOT`
   node with a hidden `Placeholder` inside. Get a variant via
   `previewSet.children.find(v => v.name === 'Variant=Default')`; `2182:2` is only its `Flat`
@@ -54,5 +55,9 @@ A nested `Preview` you create (rather than clone) starts at the master's fixed w
   diagram and legend.
 - **Measurements**: `Section` `Flat`; up to three nested `Default` `Preview`s, stacked — drawing,
   sizes table, behavior. See `measurements.md` → "Section layout".
+- **Variations**: `Section` `Flat`, last in the column (template placeholder `4627:4226`); one
+  nested `Default` `Preview` per covered set, each holding a `variations-set` card (`title` = set
+  name, `entries` › `entry` = instance + `caption`). Filled in Phase 3, see
+  `../PHASE-3-BUILD.md` → "Variations".
 - **Component Set**: not a `Section`/`Preview` — see `../PHASE-3-BUILD.md`'s "Labeled component
   set". The labeled set never sits inside another bordered `Preview`.

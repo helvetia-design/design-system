@@ -2,7 +2,7 @@
 
 Package: `.claude/skills/ds-code-to-figma`
 
-Status: Decisions agreed (grilling session 10.11.2026). Implementation open.
+Status: Decisions agreed (grilling session 10.11.2026). Skill steps implemented 10.11.2026. Verify run: `ds-button` (blocked on `/update-screenshots`) and `ds-input` (pass) done 11.11.2026, both on Figma branch `TMW8IfOY7LbN3IXvu3cI15`; findings folded into the skill (see each `*.figma-validation.md`).
 
 ## Goal
 

@@ -1,6 +1,7 @@
 # pagination → Figma validation
 
-Run: 05.11.2026. File: `NzMFv5HwO14Mmro8bWyvlO`, page `Core / Navigation` (`4401:2`), frame
+Run: 05.11.2026; checks 4b, 4c and 6 re-run 10.11.2026 after the move to the new `Button` set
+(other checks are unaffected and not re-run). File: `NzMFv5HwO14Mmro8bWyvlO`, page `Core / Navigation` (`4401:2`), frame
 `Pagination Documentation` (`4401:6`). Sets: `Pagination` (`4407:292`), `PaginationDots`
 (`4407:293`).
 
@@ -69,23 +70,28 @@ read via `use_figma` from nodes `4407:292`/`4407:293`.
 | `counter` badge min/max-width, min-height   | hardcoded 63/88/32 (accepted, no token)                                                   | `minWidth=63, maxWidth=88, minHeight=32`                                                                                                          | pass            |
 | dot-row min-width/diameter                  | hardcoded 10px (accepted, no token)                                                       | not built (≤5-page dot-row sub-case deliberately excluded per Phase 2) — **not applicable**                                                       |
 
-**4b. Nested instance keys.** Sampled every `previous`/`next`/`page-*` instance across all 6
-variants (28 button instances total) and every `icon` instance (6 total — 2 per non-disabled
-variant × 3 non-disabled variants):
+**4b. Nested instance keys** — re-run 10.11.2026 after moving to the new `Button` set. Every
+button instance in all 12 variants of `Pagination/Default` (`4407:292`, 24), `Pagination/Dots`
+(`4407:293`, 2), `Pagination/DotsRow` (`4430:1316`, 2) and `Bubu` (`4563:6887`, 24):
 
-- Every button instance's `mainComponent.parent.id === "3048:2541"` (the `Button/Primary` set) —
-  true for all 28. Variant names matched expected (`color=ghost|primary, size=base|sm,
-state=default|disabled`) in every case. **pass.**
-- Every icon instance's `mainComponent.parent.id === "2056:8249"` (the `Icon` wrapper set) — true
-  for all 6. **pass.**
+- `mainComponent.parent.id === "4594:1327"` and `.key === "8956ebb803a4c6fe3749f84119915335d0d43ade"`
+  (the `Button` set) — true for 52/52, 0 on the old `3048:2541`. **pass.**
+- Icon wrapper instances (`2056:8249`) left: 0. **pass.**
 
-**4c. Icon slots.** Every `icon` instance's `Icon#2056:0` INSTANCE_SWAP property is set
-(`2053:34` = `caret-left` for `previous`, `2053:37` = `caret-right` for `next`), `size` = `md`
-(base-tier `Pagination` variants) or `sm` (sm-tier `Pagination` variants and both `PaginationDots`
-variants — correct, since code forces `is-sm` unconditionally in dots mode), `color` = `primary`.
-No exposed nested properties beyond the icon's own `size`/`color`/swap. **pass.**
+**4c. Icon slots** — re-run 10.11.2026. Every visible `icon` in a `previous`/`next` button is a
+directly nested glyph (`caret-left#2053:34` / `caret-right#2053:37`), `isExposedInstance: false`,
+set via the Button set's `icon#4594:470` swap property. Size 16×16 (base) / 14×14 (sm and both
+dots sets). Vector fill bound to `VariableID:137:1018` (`🧩 Component/Button/Color/Ghost/Base/Text`)
+= the label's fill variable, on all 12 visible glyphs. On the first read the 4 base-tier glyphs
+(`I4404:211`, `I4404:221`, `I4563:6889`, `I4563:6900` → vector) had **no** fill binding: the
+`check` default glyph's binding is lost on the swap. They were re-bound as part of the migration,
+then re-read. **pass.**
 
-Evidence: full dump via `use_figma`, nodes `4407:292`/`4407:293` and their descendants, 05.11.2026.
+Note: the base-tier caret was `Icon size=md` before and is now the Button set's base icon size
+(16px). Code renders `<ds-icon size="sm">` in both tiers, so this is not a regression against
+code.
+
+Evidence: `use_figma` dump of the 4 sets' descendants, 10.11.2026.
 
 ### 5. Component set layout vs. template
 
@@ -126,6 +132,14 @@ not a check.**
 Read `test/pagination.visual.html` (6 sections: basic, alignment, ranges, disabled, sizes, dots)
 and the matching `*-Desktop-Chrome-linux.png` snapshots.
 
+- **10.11.2026 re-run (Button set migration):** before/after `node.screenshot()` of `4407:292`,
+  `4563:6887`, `4407:293` and `4430:1316`, then `Sets` (`4401:15`). Same silhouette, labels,
+  colours and active/disabled treatment. The only visible change is the smaller base-tier caret
+  (see 4c). The three doc-template instances (`I4401:10…4416:331`, `I4401:11…4401:227`,
+  `I4401:12…4422:452`) render the same. **pass.** Seen in passing, existing before this change
+  and not caused by it: `Bubu` overlaps the `Pagination` stack, and `Sets` (fixed 828px) clips
+  the `PaginationDotsRow` stack.
+
 - **Screenshots taken** of each labeled set during the Phase 3 build and re-confirmed here:
   `Pagination` stack `4401:16` (full labeled grid, both rows/columns, all dividers visible),
   `PaginationDots` stack `4408:286` (same). Every vertical and horizontal grid line is visible in
@@ -153,8 +167,8 @@ and the matching `*-Desktop-Chrome-linux.png` snapshots.
 | 2    | Header                          | pass                                                                                              |
 | 3a–c | Prop/state mapping              | pass                                                                                              |
 | 4a   | Pagination-owned token bindings | pass (after repair)                                                                               |
-| 4b   | Nested instance keys            | pass — re-confirmed, 26 button + 6 icon instances all keyed to `3048:2541`/`2056:8249`            |
-| 4c   | Icon slots                      | pass                                                                                              |
+| 4b   | Nested instance keys            | pass — 10.11.2026: 52/52 button instances on `Button` (`4594:1327`), 0 Icon wrappers              |
+| 4c   | Icon slots                      | pass — 10.11.2026: direct caret glyphs, fill bound to `137:1018` (4 re-bound)                     |
 | 5a   | Grid dividers                   | pass — re-confirmed, both `Grid` nodes still `[Column Labels, set, Grid]` order, dividers visible |
 | 5b   | Label centering                 | pass                                                                                              |
 | 5c   | Ordering                        | pass                                                                                              |

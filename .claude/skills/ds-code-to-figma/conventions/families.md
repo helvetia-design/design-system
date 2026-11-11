@@ -44,14 +44,14 @@ start of Phase 1, together with the anatomy review.
 
 Phases 1–5 cover the whole family; Phases 6–8 cover the owner only.
 
-| Phase      | Family behaviour                                                                                                                                                                                                                                                     |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 Analyze  | One mapping file per member, next to its `.tsx`. **One** anatomy review (merged list, §5), **one** measurements triage (grouped by set, §6), **one** batch of token gaps for the family.                                                                             |
-| 2 Propose  | **One** proposal and **one** sign-off covering every set of the family, including the parent-set props (§3) and slot default fills (§4). The 500-variant check runs per mapping file.                                                                                |
-| 3 Build    | One documentation frame (the owner's). **Build order**: contained sub-components → owner → wrapping sub-components (each set needs the sets it instantiates). The **first-variant checkpoint runs per set**. The documentation-frame approval runs once, at the end. |
-| 4 Validate | Run per mapping file, one `<name>.figma-validation.md` each. Header checks only on the owner's. The **family verdict** is the worst of all reports (`fail` > `blocked` > `pass`).                                                                                    |
-| 5 Repair   | Per failing mapping file; the 3-iteration limit counts family re-validations, not per file.                                                                                                                                                                          |
-| 6–8 Docs   | Owner only. Copy me is the owner's default variant. Anatomy and Measurements cover sub-components per §5 and §6.                                                                                                                                                     |
+| Phase      | Family behaviour                                                                                                                                                                                                                                                                                                                           |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1 Analyze  | One mapping file per member, next to its `.tsx`. **One** anatomy review (merged list, §5), **one** measurements triage (grouped by set, §6), **one** batch of token gaps for the family.                                                                                                                                                   |
+| 2 Propose  | **One** proposal and **one** sign-off covering every set of the family, including the parent-set props (§3) and slot default fills (§4). The 500-variant check runs per mapping file.                                                                                                                                                      |
+| 3 Build    | One documentation frame (the owner's). **Build order**: contained sub-components → owner → wrapping sub-components (each set needs the sets it instantiates). The **first-variant checkpoint runs per set**. Variations covers owner and sub-component sets alike, in build order. The documentation-frame approval runs once, at the end. |
+| 4 Validate | Run per mapping file, one `<name>.figma-validation.md` each. Header checks only on the owner's. The **family verdict** is the worst of all reports (`fail` > `blocked` > `pass`).                                                                                                                                                          |
+| 5 Repair   | Per failing mapping file; the 3-iteration limit counts family re-validations, not per file.                                                                                                                                                                                                                                                |
+| 6–8 Docs   | Owner only. Copy me is the owner's default variant. Anatomy and Measurements cover sub-components per §5 and §6.                                                                                                                                                                                                                           |
 
 ## 3. Parent-set props (`drivenBy`)
 
@@ -70,7 +70,7 @@ sub-component's mapping file it carries `drivenBy: <owner tag>.<owner prop>`.
 - Public props the owner also sets on the sub-component (`selected` on `ds-tab`) stay
   designer-facing: no `drivenBy`, the designer picks them per instance.
 - Identifier props with no visual effect (`name`, `for`) are excluded, per the Phase 2 table's
-  free-text/no-visual-effect rows.
+  no-visual-effect row: they aren't rendered as text, so they get no text property either.
 
 ## 4. Composition — native Figma slots
 
@@ -83,7 +83,8 @@ the owner, e.g. `ButtonGroup`'s slot holds `Button` instances).
 - **Preferred instances** = the matching sets (`Tab`; `TabInverted` in `TabsInverted`).
 - **Default fill** is part of the Phase 2 proposal and sign-off: how many instances, which one
   shows non-default props, placeholder text. Tabs: 3 × `Tab` (first `selected=true`, labels
-  `Tab 1`, `Tab 2`, `Tab 3`) and 1 × `TabPanel` (the selected one).
+  `Tab 1`, `Tab 2`, `Tab 3`) and 1 × `TabPanel` (the selected one). The labels are set through
+  each instance's text property (`setProperties`), never by editing `characters`.
 - Record it under `slots:` in the mapping file of the component that owns the slot
   (`../examples/mapping-file-format.md`).
 

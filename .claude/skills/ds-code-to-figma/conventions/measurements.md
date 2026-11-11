@@ -176,15 +176,17 @@ pill or its number. Mention the remaining overlap to the user when confirming th
 The Measurements `Section` (`Flat`) holds up to three nested `Default` `Preview`s, in this order:
 
 1. **Drawing** — **every numbered table row is drawn here exactly once.** One **main** instance
-   of the default Variants-axis option (`base`, or the implicit default), default state, every
+   of the default table-axis option (`base`, or the implicit default), default state, every
    optional part on, in the `drawnColor` (see "Border visibility"). Add an **extra** instance only
    for a row that can't be drawn on the main one — a value that only exists in a state (the focus
    ring on `focus`), or a limit that only binds with other content (a `min width` that a short
    label actually hits). Extra instances sit in a row below the main one, each with a one-word
-   caption (`Focus`, `Min content`) and only its own markers. Never one instance per Variants-axis option —
+   caption (`Focus`, `Min content`) and only its own markers. Never one instance per table-axis option —
    the table compares options; the only exception is an option that changes the structure (other
-   parts or layout), not just values.
-2. **Sizes table** — rows = properties, columns = the Variants-axis options with the code default
+   parts or layout), not just values. A part built as two text nodes
+   (`../PHASE-3-BUILD.md` → "Text properties") is measured and marked on the node visible in
+   the main instance.
+2. **Sizes table** — rows = properties, columns = the table-axis options with the code default
    first, like the component set (`base · sm · md · lg`). Each cell shows the token's short name and px (`Gap/XS · 8`). A row whose
    value is the same for every option shows it once, spanning the columns. Rows are grouped by kind
    in the order `size → spacing → shape → type`, each row starting with its number bubble. Numbers
@@ -196,7 +198,7 @@ The Measurements `Section` (`Flat`) holds up to three nested `Default` `Preview`
    min-content case lives in the drawing. Skip this card for components whose size never changes
    with content or container (icon, spinner, close).
 
-A component with no Variants axis has one column in the table, headed with its name.
+A component with no table axis has one column in the table, headed with its name.
 
 ## 4. Behavior probe (Phase 1)
 

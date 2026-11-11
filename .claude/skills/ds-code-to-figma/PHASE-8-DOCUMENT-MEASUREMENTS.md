@@ -2,7 +2,8 @@
 
 ## Objective
 
-Fill in the last section of the `Documentation` column: "📏 Measurements". It renders the measurements
+Fill in the third section of the `Documentation` column: "📏 Measurements", above the Variations
+section Phase 3 already filled. It renders the measurements
 triage confirmed in Phase 1 step 6 — no new analysis happens here.
 
 Build this right after Anatomy (or right after Copy me, if the Anatomy placeholder was deleted). This
@@ -65,7 +66,7 @@ tree explains it.
 ### 1. Structure
 
 Fill the `Section` placeholder whose `Title` is `kind=measurements` (`Flat`; 🛑 hard stop if missing) —
-don't create a new one. Inside its slot, stack up to three nested `Default` `Preview`s, in the
+don't create a new one, and never move it or append anything after the Variations section below it. Inside its slot, stack up to three nested `Default` `Preview`s, in the
 order from `conventions/measurements.md` → "Section layout": **Drawing**, **Sizes table**,
 **Behavior** (only when `measurements.behavior` exists).
 
@@ -113,7 +114,9 @@ table, prefix each sub-component row's property with its set name (`Tab · Paddi
      its ticks 4px right of the instance (`x = right + 4`). The padding starts inside the border
      (CSS `border-box`), so inset the tint by the border width on every side it touches
      (`ds-button`: 2px border → `x = 2`, `y = 2`, `height − 4`), and round its outer corners to
-     `radius − border` (`4 − 2 = 2`) so it follows the component's inner edge without gaps.
+     `radius − border` (`4 − 2 = 2`) so it follows the component's inner edge without gaps. When
+     the radius is wider than the tint (a pill), rounding can't follow the edge: put the tints in a
+     frame the size of the instance, `clipsContent` on, radius bound to the component's radius.
    - **gap** → `Spec/Gap` over each gap the token applies to, plus a `Spec/Dimension`
      (`kind=spacing`) per gap, on the same row as the padding lines of that side: a row gap gets
      `side=bottom` under it, a column gap (vertical layout) `side=right` beside it. Inset

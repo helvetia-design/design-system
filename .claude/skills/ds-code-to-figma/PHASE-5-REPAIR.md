@@ -41,6 +41,9 @@ for the whole family. The retry limit counts family iterations.
 - MUST fix only checks marked `fail`; leave nodes that passed untouched.
 - MUST reuse existing components and variables.
 - MUST NOT delete and rebuild nodes or regenerate the component.
+- A failed variation is usually a bug in the component set (gap, alignment, a missing token on the
+  hidden layer): fix it on the **master variant**, never on the Variations instance, and never
+  override an instance property to make the check pass.
 - MUST NOT modify the confirmed mapping file `<name>.figma.md` to make validation pass — if a fix requires it,
   stop and request approval.
 

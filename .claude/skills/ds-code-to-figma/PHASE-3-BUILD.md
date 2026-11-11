@@ -54,9 +54,13 @@ runs once, for the whole frame; step 7 writes back into every member's mapping f
      black). See `conventions/build-mechanics.md` → "Color and paint".
    - Every nested component as an **instance of the existing Figma component** resolved in
      Phase 1, step 4 — never redrawn from scratch. **Icon slots** (nested `ds-icon` /
-     `ds-brand-icon`) get an `INSTANCE_SWAP` property with preferred values and an unexposed nested
-     instance, per `conventions/content-selection-and-mitigations.md` → "Icon slots in a parent
-     component".
+     `ds-brand-icon`) get an `INSTANCE_SWAP` property with preferred values and the glyph library
+     component nested directly (no Icon wrapper, no question to the user), per `conventions/content-selection-and-mitigations.md` → "Icon slots in a parent
+     component". Bind the glyph's vector fill on every variant to the slot's `colorSource` entry
+     for that variant's state.
+   - Every text node for consumer-authored text, with its sentence-case default characters and
+     its tokens; the text properties themselves come after combining, per
+     [Text properties](#text-properties).
    - **No Figma default layer names** (`Frame 1`, `Line`, `Ellipse`, `Vector`, `Group 1`). Name
      built layers after their part (`icon`, `label`, `track`); cloned layers keep their template
      name.
@@ -124,15 +128,17 @@ Responsive Tokens` first — **reuse it if it already exists** rather than creat
 4. **Stop and have the user confirm this one variant directly in Figma** — give them the node link
    (`https://www.figma.com/design/<fileKey>?node-id=<id>`) and wait. Don't send a screenshot as
    the checkpoint. This catches a structural mistake (wrong variable bound, wrong nested
-   instance) once, before it's replicated across the whole component set.
+   instance) once, before it's replicated across the whole component set. List the text
+   properties it carries, so the user can try them from the right panel.
 5. On confirmation, fan out: build the remaining variants, reusing the same
    bindings and nested instances, and present them as a labeled set per
    [Labeled component set](#labeled-component-set) below — inside the same `Sets` frame.
+   Then fill the Variations placeholder, per [Variations](#variations).
 6. **Stop and have the user approve the documentation frame directly in Figma** — the filled
-   `Header` and the finished component set(s) — give them the link to the frame and wait. Any change loops back to step 5. Don't continue to Phase 4 on an
+   `Header`, the finished component set(s) and the Variations section — give them the link to the frame and wait. Any change loops back to step 5. Don't continue to Phase 4 on an
    assumed approval.
 7. Write `sets:` (name, `figmaComponentKey`, `figmaMasterNodeId` per set, default set first),
-   `figmaPage` and `figmaDocFrameNodeId` back into the mapping file. For a family: into every
+   `figmaPage`, `figmaDocFrameNodeId` and the `variations:` node ids back into the mapping file. For a family: into every
    member's file (`figmaDocFrameNodeId` is the owner's frame in all of them), and each
    sub-component's key into the owner's matching `nested:` entry.
 
@@ -159,19 +165,20 @@ what's listed below.
      never from a sibling component, so styling can't drift).
 3. In the cloned page/frame, keep `Component A Documentation` as this component's frame: rename it
    `<Component> Documentation`, delete `Component B Documentation` if it came along, and leave
-   `body`'s placeholder content for Phases 6–8.
+   `body`'s placeholder content for Phases 6–8 (the Variations placeholder is filled in step 5).
 4. Fill the header, per [Documentation frame header](#documentation-frame-header).
 
 **Layer-name contract.** This skill addresses the template by these layer names only. If any is
 missing, **hard stop** and report which — never fall back to hand-building.
 
-| Where               | Layer names touched                                                                                                                                                                     |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Page                | `Category Frame` › `Category Header` (`component`, `lead`) › `Documentation Frames`                                                                                                     |
-| Documentation frame | `Component A Documentation` › `Header`, `body` › `Documentation` › 3 `Section` placeholders (`Title` `kind` = `copy-me`, `anatomy`, `measurements`), `body` › `Component Sets` › `Sets` |
-| Sets stack          | `Sets` › `Primary` (`sub-label`, `Labeled Set` › `Row Labels` › `lane-<axis>` › `bracket-<n>`, `Column + Box` › `Column Labels`, set, `Grid` › `divider-row-<n>` / `divider-col-<n>`)   |
-| `Header`            | `kicker`, `title` › `component`, `review-status`, `body` › `lead`, `meta` › `row` (`label`/`value`)                                                                                     |
-| `Header` links      | `links` › `link-row-storybook` / `link-row-toky` / `link-row-github` › `link-storybook`, `link-toky`, `link-github`                                                                     |
+| Where               | Layer names touched                                                                                                                                                                                   |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page                | `Category Frame` › `Category Header` (`component`, `lead`) › `Documentation Frames`                                                                                                                   |
+| Documentation frame | `Component A Documentation` › `Header`, `body` › `Documentation` › 4 `Section` placeholders (`Title` `kind` = `copy-me`, `anatomy`, `measurements`, `variations`), `body` › `Component Sets` › `Sets` |
+| Variations          | `kind=variations` `Section` › nested `Preview` › `variations-set` (`title`, `entries` › `entry` (`Component`, `caption`))                                                                             |
+| Sets stack          | `Sets` › `Primary` (`sub-label`, `Labeled Set` › `Row Labels` › `lane-<axis>` › `bracket-<n>`, `Column + Box` › `Column Labels`, set, `Grid` › `divider-row-<n>` / `divider-col-<n>`)                 |
+| `Header`            | `kicker`, `title` › `component`, `review-status`, `body` › `lead`, `meta` › `row` (`label`/`value`)                                                                                                   |
+| `Header` links      | `links` › `link-row-storybook` / `link-row-toky` / `link-row-github` › `link-storybook`, `link-toky`, `link-github`                                                                                   |
 
 ### Labeled component set
 
@@ -201,12 +208,18 @@ values**; clone a prototype and change only text and positions.
    Source every inverted stack from the template's `Inverted` stack and every other stack from its
    `Primary` stack. Delete template stacks that aren't needed.
 
-2. **Combine** the stack's variants into a `COMPONENT_SET` with `combineAsVariants()`. Clone the
+2. **Combine** the stack's variants into a `COMPONENT_SET` with `combineAsVariants()`. **First put
+   the variants in grid reading order as layers in one parent** (`insertChild`), default variant
+   first: Figma sets each property's option order once, at combine time, from the first layer that
+   uses each value, and ignores the order of the array passed in. Reordering layers or renaming
+   afterwards doesn't change it, and the Plugin API has no setter. Check
+   `componentPropertyDefinitions[axis].variantOptions` right after combining. Clone the
    template set's fill, stroke (dashed, purple, variable-bound) and corner radius onto it by
    copying them from the template set — never recreate them. Put the new set **in the template
    set's place** in `Column + Box` (between `Column Labels` and `Grid`), never after `Grid`.
 3. **Axes → grid.** Per `PHASE-2-PROPOSE.md` step 2: `state` is the column axis (`size` only when
-   there is no `state` axis); every other axis is a row, nested outer→inner by ascending option count (ties: prop declaration order).
+   there is no `state` axis), followed by one column per component-state variant (`disabled`, `loading`, …,
+   `PHASE-2-PROPOSE.md` → "Component-state columns"); every other axis is a row, nested outer→inner by ascending option count (ties: prop declaration order).
    Order the options within each axis per `conventions/component-set-rendering.md` → "Option and
    axis ordering" — code default first (top-left cell = default variant), then smallest left/top,
    largest right/bottom.
@@ -215,7 +228,13 @@ values**; clone a prototype and change only text and positions.
    uniform cell size. Centre each variant in its cell by computed x/y, then resize the set to
    cols × rows cells. Order the variant layers in grid reading order — rows top→bottom, then
    columns left→right (`insertChild`) — because Figma's variant picker lists options in layer
-   order.
+   order. **Lay out the grid after the component properties are added and bound** (`show <name>`
+   booleans, swaps, text properties): binding a layer's `visible` or a text default changes the
+   variant's width, so variants placed before stay off-centre. Changing a text property's default
+   later (e.g. `Button` → `Label`) needs the variants re-centred (seen on `ds-button`: up to 6px).
+   **Taller than the `Documentation` column:** the cloned `Component Sets` column is `FILL`
+   height and clips anything below it. Set it to `layoutSizingVertical = 'HUG'` (seen on
+   `ds-input`, 120 variants: the lower 9 row dividers reported no render bounds).
 5. **Every set is labeled — no axis count is exempt, not even a single-axis set.** With no row axis
    (e.g. a lone `size` axis) there are just `Column Labels` and no `Row Labels`.
 6. **Labels and grid lines, cloned from template prototypes** — a `Column Labels` text, a
@@ -223,7 +242,9 @@ values**; clone a prototype and change only text and positions.
    column/row axis and option outside the set. Label text repeats the property value exactly
    (`base`, `sm`, `none`, `leading`) — never title-cased, abbreviated or reworded.
    - **`Column Labels`:** keep the cloned strip as is. Centre the axis name on the set and each
-     value text on its column; `Column Labels` width = set width.
+     value text on its column; `Column Labels` width = set width. With component-state columns,
+     centre `state` on the interaction-state columns only, and label each component-state column with its prop name
+     (`disabled`, `loading`) on the value line.
    - **`Row Labels`: one lane (`lane-<axis>`) per row axis**, outer→inner, left→right. Lane width =
      longest text in the lane, axis name included. Labels are left-aligned in their lane and
      vertically centred on the rows they cover; the axis name sits at the lane's left edge, on the
@@ -246,7 +267,8 @@ values**; clone a prototype and change only text and positions.
      3. Read back from **this `Grid` node's `children`** — never a name search across the page:
         every documentation frame (and the template) has nodes named `divider-col-1` etc. Confirm
         the count, that each divider's styling matches the prototype, a non-empty
-        `absoluteRenderBounds`, and the **layer order**: `Grid` comes after the set in
+        `absoluteRenderBounds` on every `divider-row` (`divider-col` reports `null` even when it
+        renders — check it on a screenshot), and the **layer order**: `Grid` comes after the set in
         `Column + Box` (`Column Labels`, set, `Grid`), so it draws on top. A `Grid` below the set is
         covered by the set's fill and every divider disappears.
 
@@ -263,7 +285,81 @@ in layer order · `state` on the column axis · remaining options ordered per co
 property name and option value lowercase, every set name PascalCase and every `sub-label` equal
 to its set name per `PHASE-2-PROPOSE.md` → "Naming" · fixed uniform cell grid · dashed outer stroke
 **and** inner dashed grid lines — per set `(cols − 1) + (rows − 1)` dividers, styled like the prototypes, `Grid` above the set · outside labels naming every axis and option · variant layers in
-grid reading order · no Figma default layer names · no styling literal written by this skill.
+grid reading order · every consumer-authored text bound to its text property on every variant ·
+no Figma default layer names · no styling literal written by this skill.
+
+### Text properties
+
+Every `figmaPropertyType: text` prop from the mapping file becomes a `TEXT` component property
+(`PHASE-2-PROPOSE.md` → mapping table and "Naming").
+
+1. After `combineAsVariants()`, add them on the set **in render order** (top → bottom):
+   `set.addComponentProperty('<name>', 'TEXT', '<Sentence case default>')`. Store the returned key
+   (it comes back suffixed, `label#123:4`) and use it for every reference and `setProperties`.
+2. On **every** variant, set `textNode.componentPropertyReferences = { characters: key }` on the
+   matching node. A node can carry both `characters` and `visible` references (text property +
+   `show <name>`). Mechanics: `conventions/build-mechanics.md` → "Text properties".
+3. **Two nodes for one part** (mapping table, "One node, two props" rows): build both nodes in
+   every variant. With the `filled` axis, set each node's `visible` statically per variant
+   (`filled=false` → placeholder node, `filled=true` → value node). With an existing axis
+   deciding (`color=invalid`), the `show <name>` boolean binds only to the default node
+   (`description`); the node that option stands for (`invalid text`, with its fixed icon) is
+   always visible there, because the option already means that text is set.
+   - **Wrapping a text node in a new frame** (e.g. `label` + generated `optional`): keep the text
+     `FILL` with `textAutoResize = 'HEIGHT'` so it still wraps like code. Next to a second node in
+     a horizontal row, use `HUG` + `maxWidth` (row width − the other node), since Figma can't flow
+     two text nodes inline.
+4. **Nested non-slot DS instance whose text the parent passes in:** set `isExposedInstance = true`
+   on it in every variant. Never on an icon slot, never on a child whose text properties the
+   parent's code doesn't set.
+5. **Slot default fills** (`conventions/families.md` §4, e.g. 3 × `Tab`): set their text with
+   `instance.setProperties({ [key]: 'Tab 1' })`, never by editing `characters`.
+6. Generated text stays a plain text node with no reference.
+
+### Interactions
+
+When the set has a `state` axis, wire the interaction states as prototype reactions on the
+variants (`setReactionsAsync`), so an instance reacts like the code in prototypes. Per row (every
+other axis fixed, every component state `false`):
+
+| From variant    | Trigger                     | To             |
+| --------------- | --------------------------- | -------------- |
+| `state=default` | `ON_HOVER` (while hovering) | `state=hover`  |
+| `state=default` | `ON_PRESS` (while pressing) | `state=active` |
+| `state=hover`   | `ON_PRESS` (while pressing) | `state=active` |
+
+- Action: `{ type: 'NODE', destinationId: <target variant id>, navigation: 'CHANGE_TO',
+transition: null }` (instant). Both triggers revert by themselves on mouse-leave / release — no
+  return reactions.
+- Only the options the component has: no `hover` → no hover reaction; no `active` → no press
+  reaction.
+- **No reactions** on `state=focus` (Figma has no keyboard-focus trigger, and a click must not show
+  the `:focus-visible` ring), on `state=active`, and on every variant with a component state `true`
+  (`disabled`, `loading`, `invalid` don't react in code).
+- A CSS `transition` in code is not copied into Figma — note it in the mapping file.
+- Set reactions after the grid is final (variants recreated later lose them).
+
+### Variations
+
+The last section of the `Documentation` column shows every `show <name>` layer turned on, so
+Phase 4 can check it against the visual test snapshots. Built from the mapping file's confirmed
+`variations:`, after the labeled sets and their text properties, booleans and reactions are final.
+
+1. Find the cloned frame's `Section` whose `Title` is `kind=variations`. 🛑 **Hard stop** if it's
+   missing — never build the chrome.
+2. **No `show` boolean defaulting to `false` anywhere in the family** (empty `variations:`):
+   delete the placeholder and skip the rest.
+3. **One nested `Default` `Preview` per covered set**, in build order: clone the template's
+   `Preview` (with its `variations-set` card) for each set, delete the unused ones, set
+   `layoutSizingHorizontal = 'FILL'` on each (`conventions/document-sections.md` → "Sizing"). Set
+   the card's `title` to the set name.
+4. **One `entry` per variation**: clone the card's first `entry`, delete the unused ones. Replace
+   its `Component` with `variant.createInstance()` of the set's default variant, named after the
+   set, then `setProperties` with the entry's `props` (booleans and dependent-axis options) —
+   nothing else. Never place a variant node, never `detachInstance()`. Set `caption` to the
+   entry's caption (`show label · bottom`, `all on`).
+5. Fixes found later go on the master variant, never on these instances
+   (`PHASE-5-REPAIR.md`).
 
 ### Documentation frame header
 
@@ -317,6 +413,8 @@ re-set all three hyperlinks, unconditionally, even if they look correct. A human
   `review-status` at `status=review` and all three links hyperlinked.
 - `sets:` (every set, default first), `figmaPage` and `figmaDocFrameNodeId` are written back into
   every family member's mapping file.
+- The Variations section holds one `Preview` per covered set and one instance per confirmed
+  variation (or its placeholder was deleted), and its node ids are in `variations:`.
 - For a family: every sub-component set was built before the sets that instantiate it, each with
   its own confirmed first variant; every `slots:` entry is a native `SLOT` with its preferred
   instances and default fill; every `drivenBy` prop matches its owner variant.
@@ -325,3 +423,7 @@ re-set all three hyperlinks, unconditionally, even if they look correct. A human
 
 Proceed to [`PHASE-4-VALIDATE.md`](PHASE-4-VALIDATE.md) once the full component set is built, the
 category page exists, and the mapping-file fields are written back.
+
+🛑 **Hard stop before Phase 4** while any variation has no `*-Desktop-Chrome-linux.png` snapshot
+yet (cases added in Phase 2, created by `/update-screenshots` in CI). Name the missing cases and
+wait for the user.

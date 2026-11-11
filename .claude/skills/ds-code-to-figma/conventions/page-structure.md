@@ -16,7 +16,9 @@ Relevant to Phase 3's category-page setup and documentation frame. See
   page.
 - **One documentation frame per documentation owner (Storybook page), never per sub-component.**
   Every sub-component set is an extra stack in the owner's `Component Sets` column, in build order;
-  Copy me, Anatomy and Measurements are built once, for the owner (`families.md`,
+  The `Documentation` column has four sections — Copy me, Anatomy, Measurements, Variations. Copy
+  me, Anatomy and Measurements are built once, for the owner; Variations covers every set of the
+  family (`families.md`,
   [ADR-0036](../../../../docs/adr/0036-figma-doc-unit-follows-storybook-page.md)).
 - **One documentation frame per owner, always — a hard invariant, with no exception for an
   inverted axis.** An inverted axis only affects the `Component Sets` column: both the default and the `…Inverted` component sets are shown stacked vertically inside

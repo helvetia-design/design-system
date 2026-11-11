@@ -139,7 +139,8 @@ tokens:
       RESOLVED (anomaly 2) — not used in this build. Confirmed: Figma mirrors today's real code
       behavior (disabled always wins over inverted, combination unreachable). Orphaned token,
       flagged as a separate code/design-token follow-up, not fixed here.
-```
+## Notes
+
 
 ## Anomalies found in Phase 1 — resolved
 
@@ -177,15 +178,18 @@ needed. No separate `state` axis at all now (folded into `color`); `shadow`/`tur
 **Grid sketch — 2 axes, the normal case**: `color` (rows) × `size` (columns):
 
 ```
+
             Base   SM    MD    LG    XL
-Primary   [cell] [cell] [cell] [cell] [cell]
-Info      [cell] [cell] [cell] [cell] [cell]
-Grey      [cell] [cell] [cell] [cell] [cell]
-Success   [cell] [cell] [cell] [cell] [cell]
-Danger    [cell] [cell] [cell] [cell] [cell]
-Warning   [cell] [cell] [cell] [cell] [cell]
-Inverted  [cell] [cell] [cell] [cell] [cell]
-Disabled  [cell] [cell] [cell] [cell] [cell]
+
+Primary [cell] [cell] [cell] [cell] [cell]
+Info [cell] [cell] [cell] [cell] [cell]
+Grey [cell] [cell] [cell] [cell] [cell]
+Success [cell] [cell] [cell] [cell] [cell]
+Danger [cell] [cell] [cell] [cell] [cell]
+Warning [cell] [cell] [cell] [cell] [cell]
+Inverted [cell] [cell] [cell] [cell] [cell]
+Disabled [cell] [cell] [cell] [cell] [cell]
+
 ```
 
 One flat 8×5 table, 40 cells, matching the variant count exactly — the simplest possible
@@ -285,3 +289,4 @@ All sections screenshot-verified.
 **Phase 4 status: closed, no Figma-side defects found.** `ds-icon` is live in Figma: page
 `⏳ Core / Media / Icon`, wrapper set `2056:8249` (40 variants), 79-member Instance Swap library,
 full documentation page (Header / Copy me / Variants / Main components / Icon names).
+```
