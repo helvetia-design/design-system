@@ -91,7 +91,7 @@ When you add a migration, place it in the order list in `shared/batch.md` when i
 
 ### Legacy config call stays until the last `bal-*` component
 
-The legacy config call (`initializeBaloiseDesignSystem`, `useBaloiseDesignSystem`, `provideBaloiseDesignSystem`) fills the only config that `bal-*` components read, so no migration deletes it while one `bal-*` component is left. The `app` migration copies its values onto `ds-root` and leaves the call unchanged. `shared/legacy-config.md` is the one place that deletes it: `SKILL.md` runs it at the end of every component migration and in **Assets**, and it deletes the call only when `scan-migratable.mjs` reports no other `bal-*` component.
+The legacy config call (`initializeBaloiseDesignSystem`, `useBaloiseDesignSystem`, `provideBaloiseDesignSystem`) fills the only config that `bal-*` components read, so no migration deletes it while one `bal-*` component is left. The `app` migration copies its values onto `ds-root` and leaves the call unchanged. A call without `brand` still applied the legacy default `baloise`, so the migration writes `brand="baloise"` then, and also when no call exists. `forms` has no target and stays in the call, reported. `updateBalLanguage` follows the same rule: the migration adds `DsConfigService.setLanguage()` (Angular, with `provideDesignSystem()` when missing) or `updateDsLanguage()` (React, HTML) after it and keeps it. `shared/legacy-config.md` is the one place that deletes the call and every `updateBalLanguage`: `SKILL.md` runs it at the end of every component migration and in **Assets**, and it deletes them only when `scan-migratable.mjs` reports no other `bal-*` component.
 
 ### Fonts and favicons in Assets
 
@@ -101,6 +101,7 @@ The legacy config call (`initializeBaloiseDesignSystem`, `useBaloiseDesignSystem
 - **No third-party font host.** The skill never writes `fonts.css` or `fonts.cdn.css` and never keeps an `http(s)` `$font-path`. Those load the fonts from www.baloise.ch or cdn.jsdelivr.net and send visitor IP addresses there, which matters under the Swiss nDSG.
 - **Favicons.** `@baloise/ds-favicons/assets/<colour>` paths become `@helvetia-design/assets/src/favicons/<colour>`. The files and the six colours are identical, so tags that point at a copied folder keep their `href`.
 - **Init stays out of it.** When Init comments out `css/all`, it reports under "Needs your attention" that the line carried `@font-face` and the app renders Arial until **Assets** runs. It does not insert `design-system.local` itself.
+- **Vite tooling is reported only.** The Vite config section lists each line of a root `vite.config.*` that names `@baloise/` or `@vite-ignore` as removable once no `@baloise/*` import is left. The skill never edits a Vite config. **Assets** reads it in step 1 and reports it in every run, without a confirmation and also when nothing else was found.
 - **`assets` is declared early.** `detect-baloise.mjs` adds `@helvetia-design/assets` to the aliases when the app declares `@baloise/ds-styles`, `@baloise/ds-fonts` or `@baloise/ds-favicons`, because pnpm links only declared packages and the copy source is `node_modules/@helvetia-design/assets`.
 
 The `A` items sit between the `I` items of `shared/icons.md` and the `L` items of `shared/legacy-config.md` in the Assets checklist.
@@ -160,6 +161,8 @@ Every `ds-*` form control renders its own field, so a control inside the legacy 
 ### Toast and snackbar: hooks inside components, controller outside
 
 In React components and custom hooks, `balToastController` and `balSnackbarController` calls become `useToast()` and `useSnackbar()`. The hooks return `[present, dismiss]`, and `dismiss()` closes only the last notice presented through that hook. Outside components, the migration uses `dsToastController` and `dsSnackbarController` with `defineCustomElement` calls for `ds-alert-container` and the notice element. A `balClose` listener belongs to the component run (toast or snackbar) whose tag it targets. When the target cannot be resolved, the run reports the listener instead of rewriting it.
+
+The controllers create their own `ds-alert-container`, so the legacy `bal-notices` container goes. Both scanners list `<bal-notices>`, `BalNotices`, `defineBalNotices` and the `bal-notices.js` import, which they read from the comment-masked text because the path is a string. That match needs import syntax (`from`, `import`, `import(` or `require(` before the path), so an `optimizeDeps` string in a Vite config is not a finding. Each run deletes a `<bal-notices>` whose static `interface` is its own. A container with the other static `interface`, a shared container, the define call and the import go only when the other scanner reports nothing but `bal-notices`, so a snackbar-only container cannot block Detect forever. Detect counts `bal-notices` for `toast` through `CHILD_SLUGS`, although snackbar can also remove it, so it never sits in `notYet` and blocks `shared/legacy-config.md` and Cleanup.
 
 ### Fixed-group versioning
 
@@ -224,7 +227,7 @@ Spinner: `node <skill>/scripts/scan-bal-spinner.mjs <project>` prints JSON findi
 
 Accordion: `node <skill>/scripts/scan-bal-accordion.mjs <project>` prints the same JSON shape and does not edit files. The regex covers `bal-accordion` and its `bal-accordion-summary`, `bal-accordion-trigger`, and `bal-accordion-details` children, plus the `BalAccordion*` bindings and `BalAccordionBundle`. After one yes, the agent rewrites from `components/accordion/migration.md` and leaves the result unstaged.
 
-App: `node <skill>/scripts/scan-bal-app.mjs <project>` prints the same JSON shape and does not edit files. The regex also matches `initializeBaloiseDesignSystem`, `useBaloiseDesignSystem` and `provideBaloiseDesignSystem`, so the startup file that holds the language and region is found even though it never names the tag. After one yes, the agent rewrites from `components/app/migration.md` and leaves the result unstaged.
+App: `node <skill>/scripts/scan-bal-app.mjs <project>` prints the same JSON shape and does not edit files. The regex also matches `initializeBaloiseDesignSystem`, `useBaloiseDesignSystem` and `provideBaloiseDesignSystem`, so the startup file that holds the language and region is found even though it never names the tag. It also matches `updateBalLanguage`, which usually sits in a component class without the tag. After one yes, the agent rewrites from `components/app/migration.md` and leaves the result unstaged.
 
 Badge: `node <skill>/scripts/scan-bal-badge.mjs <project>` prints the same JSON shape and does not edit files. After one yes, the agent rewrites from `components/badge/migration.md` and leaves the result unstaged.
 

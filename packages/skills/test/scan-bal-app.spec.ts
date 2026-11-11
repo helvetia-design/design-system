@@ -139,6 +139,38 @@ describe('scanBalApp', () => {
     })
   })
 
+  it('finds updateBalLanguage calls and imports in a class that never names the component', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/app/app.component.ts',
+      [
+        "import { updateBalLanguage, BalLanguage } from '@baloise/ds-angular'",
+        'export class AppComponent {',
+        '  // updateBalLanguage(language) also ran here',
+        '  changeLanguage(language: BalLanguage) {',
+        '    updateBalLanguage(language)',
+        '  }',
+        '}',
+        'const updateBalLanguageFoo = 1',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalApp(root)).toEqual({
+      total: 2,
+      files: [
+        {
+          file: 'src/app/app.component.ts',
+          findings: [
+            { line: 1, snippet: "import { updateBalLanguage, BalLanguage } from '@baloise/ds-angular'" },
+            { line: 5, snippet: 'updateBalLanguage(language)' },
+          ],
+        },
+      ],
+    })
+  })
+
   it('does not match a longer name that merely starts with BalApp or a config call, or the CSS height variable', () => {
     const root = createScratchDir()
     write(
@@ -372,6 +404,11 @@ describe('app migration.md', () => {
       'shared/legacy-config.md',
       'Keep the `useBaloiseDesignSystem()` call and its import specifier unchanged',
       'Remove only `BalApp` from the `@baloise/ds-react` import',
+      'updateBalLanguage',
+      'DsConfigService',
+      'updateDsLanguage',
+      'provideDesignSystem()',
+      'DsLanguage',
     ]) {
       expect(migration, phrase).toContain(phrase)
     }

@@ -108,7 +108,7 @@ Done when every icon rule has been applied to the touched files.
 
 Follow `shared/legacy-config.md` once for the whole project. Run its `scan-bal-app.mjs <project-root>` call without path arguments, even when `app` ran in this batch, and do not reuse the findings of a scan on the file set. The batch rewrite has already happened, so run its `scan-migratable.mjs` call again without path arguments, and count every component it lists as left. Then apply its **Decide** section and note the outcome of every `L` item.
 
-When a `bal-*` component is left, name the remaining components with their `total` under L5.
+When a `bal-*` component is left, name the remaining components with their `total` under L7.
 
 Done when every legacy config call is deleted or reported as staying.
 
