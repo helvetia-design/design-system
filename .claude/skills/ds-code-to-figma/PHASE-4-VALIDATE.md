@@ -46,8 +46,9 @@ worst of all reports (`fail` > `blocked` > `pass`) and decides [Next Phase](#nex
    and every `sub-label` equals its set name, per `PHASE-2-PROPOSE.md` → "Naming"
    (list each wrong name). Same layers/different token → a variant property on the
    `COMPONENT_SET`, never a shared "style" variant. `state` holds interaction states only; every
-   component-state prop (`disabled`, `loading`, `invalid`, …) is its own `false` / `true` variant, with `true`
-   only on `state=default` variants — a `disabled` / `loading` option inside `state` is a `fail`.
+   component-state prop (`disabled`, `loading`, `invalid`, …) is its own `false` / `true` variant — a
+   `disabled` / `loading` option inside `state` is a `fail`. A blocked one (`interactive: false`)
+   has `true` only on `state=default`; an interactive one has `true` on every interaction state.
    **Text properties** (`PHASE-3-BUILD.md` → "Text properties"): every `figmaPropertyType: text`
    prop exists as a `TEXT` property with the agreed name and sentence-case default, created in
    render order, and is bound (`componentPropertyReferences.characters`) on every variant where
@@ -93,9 +94,10 @@ worst of all reports (`fail` > `blocked` > `pass`) and decides [Next Phase](#nex
    "created N, removed N"; never change the main component (e.g. the boolean's default) instead.
    Layers that are hidden without a boolean (Badge `sm`) are never shown: skip them.
    e. **Interactions** (`PHASE-3-BUILD.md` → "Interactions"): every `state=default` / `state=hover`
-   variant with all component states `false` has exactly the listed reactions (trigger type,
-   `CHANGE_TO`, instant), each pointing at the variant with the same other axes and the target
-   `state`; every other variant has none. Report found vs. expected counts per set.
+   variant with all component states `false`, or in an interactive component state's group, has
+   exactly the listed reactions (trigger type, `CHANGE_TO`, instant), each pointing at the variant
+   with the same other axes (component states included) and the target `state`; every other
+   variant has none. Report found vs. expected counts per set.
 5. **Check the component set's layout against the template** (`🗂️ Template / Category` →
    `Labeled component set` in `PHASE-3-BUILD.md`):
    a. **Outer stroke and grid dividers**, per set. Find the set's own `Grid` through its parent

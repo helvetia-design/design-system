@@ -78,24 +78,18 @@ props:
     default: primary
     figmaProperty: color
     figmaPropertyType: variant
-    figmaOptions: [primary, danger, success, warning, invalid] # code default first, then declared
-    # order, then the synthetic `invalid` option appended last — see Phase 2 "Collapse decision":
-    # `invalid` (below) was folded into this same property as a 5th option rather than crossed
-    # independently, since invalid=true always forces the identical danger visual in code.
+    figmaOptions: [primary, danger, success, warning] # `invalid` moved out into its own component state 11.11.2026
   - name: loading
     type: boolean
     default: false
     figmaProperty: loading
-    figmaPropertyType: variant
+    figmaPropertyType: 'variant false/true (component state, interactive — see componentStates)'
     figmaOptions: ['false', 'true']
-    # note: Phase 2 folds this into the `state` axis instead (table rule: pseudo-class/state-ish
-    # props always collapse into one `state` property) — not its own boolean in the final mapping.
   - name: invalid
     type: boolean
     default: false
-    figmaProperty: null
-    figmaPropertyType: none # Phase 2 "Collapse decision": folded into `color` as its 5th option
-    # (`invalid`) rather than crossed as its own boolean — see Phase 2 section below.
+    figmaProperty: invalid
+    figmaPropertyType: 'variant false/true (component state, interactive — see componentStates); was the 5th `color` option until 11.11.2026'
   - name: invalidText
     type: string
     default: ''
@@ -223,10 +217,8 @@ props:
     type: boolean
     default: false
     figmaProperty: disabled
-    figmaPropertyType: variant
+    figmaPropertyType: 'variant false/true (component state, blocked — see componentStates)'
     figmaOptions: ['false', 'true']
-    # note: Phase 2 folds this into the `state` axis instead (table rule: pseudo-class/state-ish
-    # props always collapse into one `state` property) — not its own boolean in the final mapping.
   - name: readonly
     type: boolean
     default: false
@@ -268,13 +260,35 @@ props:
 
 states:
   figmaProperty: state
-  options: [default, hover, active, focus, disabled]
+  options: [default, hover, focus, active] # interaction states only (migrated 11.11.2026)
   sources:
     hover: ':hover, .is-hovered (form.mixin.scss container())'
     active: ':active, .is-pressed (form.mixin.scss container())'
     focus: ':focus-within, .is-focused (form.mixin.scss container())'
-    disabled: 'disabled prop → :host(.is-disabled) (input.host.scss)'
-  # color/invalid (.is-danger/.is-success/.is-warning) are a separate axis — see props: color/invalid
+  interactions: 'per row and group (normal, loading=true, invalid=true): default → while hovering → hover; default / hover → while pressing → active; instant. 144 reactions. None on disabled=true.'
+componentStates: # 208 variants = 16 rows (filled × required × color) × 13 columns: state 4 · loading 4 · invalid 4 · disabled 1
+  loading:
+    {
+      figmaProperty: loading,
+      options: [false, true],
+      interactive: true,
+      source: 'loading prop only adds the ds-spinner in `control` (field.util.tsx); no hover/focus gating',
+    }
+  invalid:
+    {
+      figmaProperty: invalid,
+      options: [false, true],
+      interactive: true,
+      source: 'invalid prop → .is-danger (input.host.scss:76–80): border stays danger on hover/active, hover background still applies (form.mixin.scss:67–75)',
+    }
+  disabled:
+    {
+      figmaProperty: disabled,
+      options: [false, true],
+      interactive: false,
+      source: 'disabled prop → :host(.is-disabled) pointer-events: none (input.host.scss:106–111)',
+    }
+  combinations: none # two component states true at once are not built
 
 variations: # only show booleans that default to false; show label defaults to true → no entry
   figmaSectionNodeId: '6013:685'

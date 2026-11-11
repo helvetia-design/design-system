@@ -27,7 +27,7 @@ top (row axes), largest/last at the right or bottom**:
    the rest keep scale order: `base · xs · sm · md · lg`.
 2. **`state`:** `default / hover / focus / active` (only those the component has), interaction
    states only. Component-state variants (`disabled`, `loading`, `invalid`, …) follow as extra
-   columns in prop declaration order (`../PHASE-2-PROPOSE.md` → "Component-state columns"). `readonly` is out of scope for
+   columns (one per blocked state, a group of interaction-state columns per interactive one) in prop declaration order (`../PHASE-2-PROPOSE.md` → "Component-state columns"). `readonly` is out of scope for
    Figma.
 3. **Boolean axes:** `false` first, then `true` (unless the code default is `true`).
 4. **Any other axis:** source order of the TypeScript union/enum. Never alphabetical.
