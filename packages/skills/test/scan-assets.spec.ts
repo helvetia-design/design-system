@@ -283,11 +283,12 @@ describe('scanAssets', () => {
     })
   })
 
-  it('scans .vue, .htm, .mts and Nx project.json files', () => {
+  it('scans .vue, .htm, .mts, .cts and Nx project.json files', () => {
     const root = createScratchDir()
     write(root, 'src/App.vue', "<style>@import '@baloise/ds-styles/css/font.css';</style>\n")
     write(root, 'public/index.htm', '<link rel="icon" href="/favicon.ico" />\n')
     write(root, 'src/styles.mts', "import '@helvetia-design/styles/css/design-system'\n")
+    write(root, 'src/legacy.cts', "require('@baloise/ds-styles/css/font.css')\n")
     write(
       root,
       'apps/web/project.json',
@@ -302,6 +303,7 @@ describe('scanAssets', () => {
       ['apps/web/project.json', [6]],
       ['public/index.htm', [1]],
       ['src/App.vue', [1]],
+      ['src/legacy.cts', [1]],
       ['src/styles.mts', [1]],
     ])
   })

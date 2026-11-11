@@ -25,9 +25,39 @@
 import { readdirSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { extname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 
-const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', 'out', '.next', '.angular', '.git', '.claude', 'coverage'])
+const SKIP_DIRS = new Set([
+  'node_modules',
+  'dist',
+  'build',
+  'out',
+  '.next',
+  '.angular',
+  '.git',
+  '.claude',
+  'coverage',
+  '.nx',
+  '.nuxt',
+  '.output',
+  'storybook-static',
+])
 const SKIP_FILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock'])
-const EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.html', '.css', '.scss', '.sass', '.json'])
+const EXTENSIONS = new Set([
+  '.ts',
+  '.tsx',
+  '.mts',
+  '.cts',
+  '.js',
+  '.jsx',
+  '.mjs',
+  '.cjs',
+  '.vue',
+  '.html',
+  '.htm',
+  '.css',
+  '.scss',
+  '.sass',
+  '.json',
+])
 
 /**
  * Alternatives are ordered most specific first, because JavaScript's alternation is

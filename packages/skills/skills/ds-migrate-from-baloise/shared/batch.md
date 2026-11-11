@@ -17,7 +17,7 @@ A batch exists because a parent and its children must change together. `ds-butto
 
    When the JSON has an `unmatched` list, those paths are not source files or folders under `<project-root>`. Fix the paths and run the scan again before you continue.
 
-3. The migration list is every entry in `suggested`. Run the scanner of every migration in the list on the same paths, as in step 4 below. The file set is every file that at least one of these scanners reports. Do not filter by `files`: it counts tags and `Bal*` names only, so it misses a class file that uses only a controller or service such as `balToastController` or `BalModalService`.
+3. The migration list is every entry in `suggested`. Run the scanner of every migration in the list on the same paths, as in step 4 below. The file set is every file that at least one of these scanners reports. Do not filter by `files`: it counts only what Detect sees. The component scanners also match test commands and other component-specific forms, so the file set still comes from the scanners.
 
 If `suggested` is empty, report that the files use no component with an available migration, show `notYet`, and stop.
 

@@ -242,7 +242,7 @@ describe('Detect', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-input-slider></bal-input-slider>\n')
 
-    expect(scanMigratable(root).suggested).toEqual([{ name: 'input-slider', total: 2 }])
+    expect(scanMigratable(root).suggested).toEqual([{ name: 'input-slider', total: 1 }])
   })
 })
 

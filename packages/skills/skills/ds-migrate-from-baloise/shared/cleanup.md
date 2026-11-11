@@ -10,11 +10,11 @@ Once no `bal-*` component is left, no `ds-*` component uses the legacy `structur
 node <this-skill-directory>/scripts/scan-cleanup.mjs <project-root>
 ```
 
-The script prints one JSON object and does not edit files. It first runs `scan-migratable.mjs` on the whole project, including `.vue`, `.js`, `.mjs` and `.htm` files. It also lists under `hidden` every line with a `bal-*` tag that `scan-migratable.mjs` cannot see, such as a tag inside a string literal (`el.innerHTML = '<bal-tag>'`), with `file`, `line` and `snippet`. When `suggested`, `notYet` or `hidden` lists anything, it prints `status` `incomplete` and the three lists under `outstanding`, and nothing else.
+The script prints one JSON object and does not edit files. It first runs `scan-migratable.mjs` on the whole project, including `.vue`, `.js`, `.mjs` and `.htm` files. It also lists under `hidden` every line with a `bal-*` tag that `scan-migratable.mjs` cannot see, such as a tag inside a string literal (`el.innerHTML = '<bal-tag>'`), with `file`, `line` and `snippet`. When `suggested`, `notYet`, `types` or `hidden` lists anything, it prints `status` `incomplete` and the four lists under `outstanding`, and nothing else. `types` are the legacy type namespaces such as `BalEvents` that `scan-migratable.mjs` lists. They block Cleanup, because the dependency removal would break every file that still imports them.
 
 Otherwise `status` is `ready`, or `nothing-to-clean-up` when both `remove` lists are empty. `packageManager` and `installCommand` come from the lockfile at `<project-root>`, as in Init.
 
-The script reads every source and stylesheet file (including `.less`, `.mts` and `.cts`), every `.json` file and every `.yml` or `.yaml` file. It skips lockfiles and the folders `node_modules`, `dist`, `build`, `out`, `.next`, `.angular`, `.git`, `.claude`, `coverage`, `.nx` and `storybook-static`. Build tooling outside these files can still name a legacy package, so the consumer checks it before confirming.
+The script reads the source files listed in the Init section of `SKILL.md`, every stylesheet (`.css`, `.scss`, `.sass`, `.less`), every `.json` file and every `.yml` or `.yaml` file. It skips lockfiles and the folders that Init lists. Build tooling outside these files can still name a legacy package, so the consumer checks it before confirming.
 
 The script sorts every line that names an `@baloise/ds-*` package into one list:
 

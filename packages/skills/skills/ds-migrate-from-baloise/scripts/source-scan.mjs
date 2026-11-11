@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { extname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 
-const SKIP_DIRS = new Set([
+export const SKIPPED_DIRS = new Set([
   'node_modules',
   'dist',
   'build',
@@ -12,14 +12,30 @@ const SKIP_DIRS = new Set([
   '.claude',
   'coverage',
   '.nx',
+  '.nuxt',
+  '.output',
   'storybook-static',
 ])
-const EXTENSIONS = new Set(['.tsx', '.jsx', '.html', '.ts'])
+export const SOURCE_EXTENSIONS = new Set([
+  '.ts',
+  '.tsx',
+  '.mts',
+  '.cts',
+  '.js',
+  '.jsx',
+  '.mjs',
+  '.cjs',
+  '.vue',
+  '.html',
+  '.htm',
+])
+export const MARKUP_EXTENSIONS = new Set(['.html', '.htm', '.vue'])
+export const STYLE_EXTENSIONS = new Set(['.css', '.scss', '.sass', '.less'])
 
 /**
  * Walks the source files under `rootDir`, or only the files and directories in `paths`, and returns the paths that match no source file.
  */
-export function scanSourceFiles(rootDir, collect, { extensions = EXTENSIONS, paths = [] } = {}) {
+export function scanSourceFiles(rootDir, collect, { extensions = SOURCE_EXTENSIONS, paths = [] } = {}) {
   const root = realpathSync(resolve(rootDir))
   if (!statSync(root).isDirectory()) throw new Error(`Scan root is not a directory: ${root}`)
   if (paths.length === 0) {
@@ -41,7 +57,7 @@ export function scanSourceFiles(rootDir, collect, { extensions = EXTENSIONS, pat
     } else if (
       !target.real ||
       isAbsolute(target.rel) ||
-      target.rel.split('/').some(part => part === '..' || SKIP_DIRS.has(part))
+      target.rel.split('/').some(part => part === '..' || SKIPPED_DIRS.has(part))
     ) {
       unmatched.add(target.rel)
     } else if (statSync(target.real).isDirectory()) {
@@ -83,7 +99,7 @@ function walk(rootDir, dir, collect, extensions) {
     const entryPath = canonicalChild(rootDir, join(dir, entry.name))
     if (!entryPath) continue
     if (entry.isDirectory()) {
-      if (SKIP_DIRS.has(entry.name)) continue
+      if (SKIPPED_DIRS.has(entry.name)) continue
       walk(rootDir, entryPath, collect, extensions)
       continue
     }
@@ -131,12 +147,14 @@ function readSource(rootDir, filePath, collect) {
 export const JSX_EXTENSIONS = new Set(['.tsx', '.jsx', '.js'])
 
 function sourceMode(extension) {
-  if (extension === '.html' || extension === '.htm' || extension === '.vue') return 'markup'
+  if (MARKUP_EXTENSIONS.has(extension)) return 'markup'
   if (extension === '.css') return 'css'
   if (extension === '.scss' || extension === '.sass' || extension === '.less') return 'scss'
   if (JSX_EXTENSIONS.has(extension)) return 'jsx'
   return 'script'
 }
+
+const SCSS_LANG_RE = /\blang\s*=\s*["']?(?:scss|sass|less)\b/i
 
 /**
  * Blanks comments only and keeps every string. `kind` is `script`, `jsx` (script that may hold JSX), `css`, `scss`
@@ -453,7 +471,7 @@ function scanMarkupTag(ctx, start, name, stop) {
   const blockEnd = Math.min(closing.exec(text)?.index ?? stop, stop)
   const attributes = text.slice(start, tagClose)
   if (name === 'script') scanCode(ctx, tagClose, blockEnd, { jsx: /\blang\s*=\s*["']?[jt]sx\b/i.test(attributes) })
-  else scanStyle(ctx, tagClose, blockEnd, /\blang\s*=\s*["']?(?:scss|sass|less)\b/i.test(attributes))
+  else scanStyle(ctx, tagClose, blockEnd, SCSS_LANG_RE.test(attributes))
   return blockEnd
 }
 
@@ -614,7 +632,7 @@ export function siblingScript(file) {
   return file.endsWith('.html') ? `${file.slice(0, -'.html'.length)}.ts` : undefined
 }
 
-const SCRIPT_RE = /\.[jt]sx?$/
+const SCRIPT_RE = /\.(?:[cm]?[jt]s|[jt]sx|vue)$/
 
 /**
  * Runs `scanSourceFiles` and then pushes a `setValue: true` finding into `found` for every `.setValue(` call on a ref

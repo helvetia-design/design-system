@@ -4,6 +4,7 @@ import { existsSync, readdirSync, readFileSync, realpathSync } from 'node:fs'
 import { extname, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
+import { SKIPPED_DIRS, SOURCE_EXTENSIONS } from './source-scan.mjs'
 
 const LEGACY_SCOPE = '@baloise'
 const TARGET_SCOPE = '@helvetia-design'
@@ -15,24 +16,8 @@ const SHORT_NAMES = [...INSTALL_NAMES, ...ICON_NAMES]
 const DEPENDENCY_NAMES = [...SHORT_NAMES, ...FONT_FAVICON_NAMES]
 const ASSET_NAMES = [...ICON_NAMES, STYLES_NAME, ...FONT_FAVICON_NAMES]
 const ASSET_PACKAGES = new Set(ASSET_NAMES.map(short => `${LEGACY_SCOPE}/ds-${short}`))
-const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', 'out', '.next', '.angular', '.git', '.claude', 'coverage'])
 export const LOCKFILES = new Set(['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'npm-shrinkwrap.json'])
-export const IMPORT_EXTENSIONS = new Set([
-  '.html',
-  '.htm',
-  '.ts',
-  '.tsx',
-  '.js',
-  '.jsx',
-  '.mjs',
-  '.cjs',
-  '.css',
-  '.scss',
-  '.sass',
-  '.vue',
-  '.json',
-])
-export const SOURCE_EXTENSIONS = new Set([...IMPORT_EXTENSIONS, '.mts', '.cts'])
+export const IMPORT_EXTENSIONS = new Set([...SOURCE_EXTENSIONS, '.css', '.scss', '.sass', '.json'])
 export const DEPENDENCY_FIELDS = ['dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies']
 const NOTHING = 'no Baloise Design System installation detected, nothing to migrate'
 
@@ -55,6 +40,73 @@ export async function readNpmDistTags(execImpl = execFileAsync) {
   return typeof parsed === 'string' ? JSON.parse(parsed) : parsed
 }
 
+export async function readNpmAngularPeers(version, execImpl = execFileAsync) {
+  const { stdout } = await execImpl(
+    'npm',
+    ['view', `${targetPackageName('angular')}@${version}`, 'peerDependencies', '--json'],
+    { encoding: 'utf8' },
+  )
+  if (!stdout.trim()) return {}
+  const parsed = JSON.parse(stdout)
+  return typeof parsed === 'string' ? JSON.parse(parsed) : parsed
+}
+
+const VERSION_PART = String.raw`v?(\d+)(?:\.(?:\d+|[xX*]))?(?:\.(?:\d+|[xX*]))?(?:[-+][0-9A-Za-z.+-]+)?`
+const LOWER_BOUND_RE = new RegExp(`^(?:\\^|~|>=|=)?${VERSION_PART}$`)
+const UPPER_BOUND_RE = new RegExp(`^<=?${VERSION_PART}$`)
+
+export function lowestMajor(spec) {
+  if (typeof spec !== 'string') return null
+  const [lower, ...upper] = spec
+    .trim()
+    .replace(/(>=|<=|<|=|\^|~)\s+/g, '$1')
+    .split(/\s+/)
+  const match = LOWER_BOUND_RE.exec(lower)
+  if (!match || !upper.every(part => UPPER_BOUND_RE.test(part))) return null
+  return Number(match[1])
+}
+
+function angularCoreSpec(manifest) {
+  for (const field of DEPENDENCY_FIELDS) {
+    const spec = manifest?.[field]?.['@angular/core']
+    if (typeof spec === 'string') return spec
+  }
+  return undefined
+}
+
+async function checkAngular(manifest, packageJsonPath, version, readAngularPeers) {
+  const peerPackage = `${targetPackageName('angular')}@${version}`
+  const installed = angularCoreSpec(manifest)
+  let required
+  try {
+    const peers = await readAngularPeers(version)
+    required = peers?.['@angular/core']
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error)
+    return { error: `Could not read the peer dependencies of ${peerPackage}: ${reason}` }
+  }
+  if (typeof required !== 'string') {
+    return { error: `${peerPackage} declares no @angular/core peer range, so the Angular version cannot be checked` }
+  }
+  const installedMajor = lowestMajor(installed)
+  if (installedMajor === null) {
+    return {
+      error: `Cannot read the major of @angular/core "${installed}" in ${packageJsonPath}. Use a plain version such as ^19.2.0 and run the migration again.`,
+    }
+  }
+  const requiredMajor = lowestMajor(required)
+  if (requiredMajor === null) {
+    return { error: `Cannot read the major of the @angular/core peer range "${required}" of ${peerPackage}` }
+  }
+  const compatible = installedMajor >= requiredMajor
+  const angular = { installed, required, compatible }
+  if (compatible) return { angular }
+  return {
+    angular,
+    error: `${packageJsonPath} declares @angular/core ${installed}, but ${peerPackage} requires @angular/core ${required}. Upgrade the app to Angular ${requiredMajor} or later before running the migration; Angular ${installedMajor} is not supported.`,
+  }
+}
+
 export async function detectBaloise(rootDir, options = {}) {
   const found = scan(rootDir)
   if (!found) {
@@ -69,6 +121,22 @@ export async function detectBaloise(rootDir, options = {}) {
   }
 
   const framework = detectFramework(found.manifest)
+  let angular
+  if (framework === 'angular') {
+    const check = await checkAngular(
+      found.manifest,
+      found.packageJsonPath,
+      version,
+      options.readAngularPeers ?? readNpmAngularPeers,
+    )
+    if (check.error) {
+      return check.angular
+        ? { status: 'error', message: check.error, angular: check.angular }
+        : { status: 'error', message: check.error }
+    }
+    angular = check.angular
+  }
+
   const packageManager = detectPackageManager(rootDir)
   return {
     status: 'ready',
@@ -80,6 +148,7 @@ export async function detectBaloise(rootDir, options = {}) {
     imports: found.imports,
     version,
     aliases: aliasesFor(framework, version, found.dependencies),
+    ...(angular && { angular }),
   }
 }
 
@@ -185,7 +254,7 @@ function walk(rootDir, dir, packages, imports) {
   for (const entry of entries) {
     if (entry.isSymbolicLink()) continue
     if (entry.isDirectory()) {
-      if (SKIP_DIRS.has(entry.name)) continue
+      if (SKIPPED_DIRS.has(entry.name)) continue
       walk(rootDir, join(dir, entry.name), packages, imports)
       continue
     }

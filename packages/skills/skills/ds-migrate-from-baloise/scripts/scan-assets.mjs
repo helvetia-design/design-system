@@ -2,7 +2,7 @@
 import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { detectFramework, readJson, SOURCE_EXTENSIONS } from './detect-baloise.mjs'
+import { detectFramework, IMPORT_EXTENSIONS, readJson } from './detect-baloise.mjs'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
 const JSON_FILES = new Set(['angular.json', 'package.json', 'project.json'])
@@ -29,7 +29,7 @@ export function scanAssets(rootDir) {
       if (file.endsWith('.json') && !JSON_FILES.has(basename(file))) return
       collect(file, text, found)
     },
-    { extensions: SOURCE_EXTENSIONS },
+    { extensions: IMPORT_EXTENSIONS },
   )
   const { total, files } = group(found)
   return { total, project: describeProject(root), files }

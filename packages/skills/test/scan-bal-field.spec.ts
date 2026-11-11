@@ -268,7 +268,7 @@ describe('Detect', () => {
 
     const { suggested, notYet } = scanMigratable(root)
 
-    expect(suggested).toEqual([{ name: 'field', total: 10 }])
+    expect(suggested).toEqual([{ name: 'field', total: 5 }])
     expect(notYet).toEqual([])
   })
 
@@ -276,7 +276,7 @@ describe('Detect', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-form-grid></bal-form-grid>\n')
 
-    expect(scanMigratable(root).suggested).toEqual([{ name: 'field', total: 2 }])
+    expect(scanMigratable(root).suggested).toEqual([{ name: 'field', total: 1 }])
   })
 })
 
@@ -364,5 +364,79 @@ describe('shared/field.md wiring', () => {
     ]) {
       expect(rules, phrase).toContain(phrase)
     }
+  })
+})
+
+describe('required default rule', () => {
+  const read = (rel: string) => readFileSync(join(SKILL_DIR, rel), 'utf8')
+  const bullet = (text: string, label: string) => {
+    const start = text.indexOf(`- **${label}**`)
+    expect(start, label).toBeGreaterThan(-1)
+    return text.slice(start, text.indexOf('\n', start))
+  }
+  const covered = ['ds-input', 'ds-textarea', 'ds-datepicker', 'ds-number-input', 'ds-select']
+  const excluded = ['ds-counter', 'ds-radio-group', 'ds-checkbox-group', 'ds-segment', 'ds-slider']
+
+  it('lists the covered and the excluded controls in separate bullets of SKILL.md', () => {
+    const skill = read('SKILL.md')
+    const coveredBullet = bullet(skill, 'Covered controls')
+    const excludedBullet = bullet(skill, 'Excluded controls')
+
+    for (const control of covered) {
+      expect(coveredBullet, control).toContain(`\`${control}\``)
+      expect(excludedBullet, control).not.toContain(`\`${control}\``)
+    }
+    for (const control of excluded) {
+      expect(excludedBullet, control).toContain(`\`${control}\``)
+      expect(coveredBullet, control).not.toContain(`\`${control}\``)
+    }
+  })
+
+  it('states the order and adds the false for a bal-field left in place', () => {
+    const order = bullet(read('SKILL.md'), 'Order')
+
+    expect(order).toContain('read the enclosing field first')
+    expect(order).toContain('leaves the `bal-field` in place')
+  })
+
+  it('keeps the three syntaxes in SKILL.md only', () => {
+    expect(read('SKILL.md').match(/\[required\]="false"/g)).toHaveLength(1)
+  })
+
+  it.each(['input', 'textarea', 'date', 'number-input', 'select'])(
+    '%s migration.md references the rule instead of restating it',
+    component => {
+      const migration = read(`components/${component}/migration.md`)
+
+      expect(migration).toContain('required default rule in `SKILL.md`')
+      expect(migration).toContain('`required` omitted')
+      expect(migration).not.toContain('The default flipped')
+      expect(migration).not.toContain('[required]="false"')
+    },
+  )
+
+  it.each(['segment', 'input-slider', 'checkbox', 'radio', 'input-stepper'])(
+    '%s migration.md points at the exclusion and adds no required false',
+    component => {
+      const migration = read(`components/${component}/migration.md`)
+
+      expect(migration).toContain('excluded from the required default rule in `SKILL.md`')
+      expect(migration).not.toContain('validates as required')
+      expect(migration).not.toContain('`required` omitted')
+    },
+  )
+})
+
+describe('shared/field.md Angular form binding', () => {
+  it('moves a danger message into a conditional invalid-text slot and reports raw validator keys', () => {
+    const rules = readFileSync(join(SKILL_DIR, 'shared/field.md'), 'utf8')
+    const row = rules.split('\n').find(line => line.startsWith('| Angular control bound with'))
+
+    expect(row).toBeDefined()
+    expect(row).toContain('slot="invalid-text"')
+    expect(row).toContain('<control>.touched && <control>.invalid')
+    expect(row).toContain('autoInvalidOff')
+    expect(row).toContain('raw validator key')
+    expect(readFileSync(join(SKILL_DIR, 'SKILL.md'), 'utf8')).toContain('Angular form binding row')
   })
 })

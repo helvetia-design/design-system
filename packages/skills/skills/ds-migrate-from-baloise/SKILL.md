@@ -31,13 +31,15 @@ node <this-skill-directory>/scripts/detect-baloise.mjs <project-root>
 
 The script prints one JSON object. It resolves the current `latest` dist-tag with `npm view @helvetia-design/core dist-tags`. Use `version` and `aliases` from that JSON. Do not hardcode a version.
 
-The walk skips `node_modules`, `dist`, `build`, `out`, `.next`, `.angular`, `.git`, `.claude`, and `coverage` at any depth.
+For an Angular project the script also runs `npm view @helvetia-design/angular@<version> peerDependencies --json` with the resolved `version`. It compares the lowest major that the app's `@angular/core` spec allows with the lower bound of the `@angular/core` peer range. It adds `angular: { installed, required, compatible }`, where `installed` and `required` are the raw spec and range. It returns `status: error` when `compatible` is false. It also returns `status: error` when it cannot decide. That happens when the lookup fails, when the peer data has no `@angular/core` range, or when a value such as `*`, `latest`, a `||` range, `workspace:*` or `catalog:` has no readable major. The check runs for every package manager.
+
+The walk skips `node_modules`, `dist`, `build`, `out`, `.next`, `.angular`, `.git`, `.claude`, `coverage`, `.nx`, `.nuxt`, `.output` and `storybook-static` at any depth.
 
 If `status` is `nothing-to-migrate`, tell the user: no Baloise Design System installation detected, nothing to migrate. Stop. Do not edit files and do not install.
 
-If `status` is `error`, tell the user `message` and stop. Do not edit files and do not install.
+If `status` is `error`, tell the user `message` and stop. Do not edit files and do not install. For an Angular app below the required major, `message` says to upgrade Angular first. Never work around it with `--legacy-peer-deps` or `--force`.
 
-If `status` is `ready`, show the detected framework, package manager, version, aliases, and bootstrap files, then ask for one yes/no. On no, stop without editing. On yes:
+If `status` is `ready`, show the detected framework, package manager, version, aliases, the `angular` field for an Angular app, and bootstrap files, then ask for one yes/no. On no, stop without editing. On yes:
 
 1. Add each entry in `aliases` to the `dependencies` object of `packageJsonPath` (relative to `<project-root>`). Create `dependencies` if it is missing. Do not change or remove existing keys. If an `@helvetia-design/*` key is already present, leave its value unchanged and report both the existing value and the value from the JSON.
 2. From `<project-root>`, run `installCommand` exactly (`pnpm install`, `yarn install`, or `npm install`). Do not add extra package arguments.
@@ -114,8 +116,15 @@ Every Report step writes to `ds-migration-report.md` as `shared/report.md` descr
 
 Every form component migration also removes the legacy field wrapper around the controls it migrates. Follow `shared/field.md` alongside the chosen file:
 
-- In the Rewrite step, apply its rules to every migrated control that sits inside `bal-field` or `bal-field-control`, or that a `bal-field-message` directly follows, in the same pass.
+- In the Rewrite step, apply its rules to every migrated control that sits inside `bal-field` or `bal-field-control`, or that a `bal-field-message` directly follows, in the same pass. Apply its Angular form binding row to every migrated Angular control bound with `formControlName`, `[formControl]` or `ngModel`, also outside a `bal-field`.
 - In the Report step, append the `F1.`, `F2.`, ... items from the Report section of `shared/field.md` to the checklist, after the component items and before the icon items.
+
+Every migrated form control whose `required` default is `true` and reaches the native control follows the required default rule. The legacy controls defaulted `required` to false, and `ds-*` forwards `required` to the native control, so native validation would apply to a control that was optional before.
+
+- **Covered controls** — `ds-input`, `ds-textarea`, `ds-datepicker`, `ds-number-input` and `ds-select`. When the legacy control omitted `required` and no `required` sits on the enclosing `bal-field` or `bal-field-label`, the migrated control gets an explicit `required="false"` (HTML), `[required]="false"` (Angular) or `required={false}` (React). A `required` that the control sets itself is copied as-is.
+- **Excluded controls** — `ds-counter`, `ds-radio-group`, `ds-checkbox-group`, `ds-segment` and `ds-slider`. Their `required` default is `true`, but it only drives the "(optional)" suffix of the component's own `label`. No native control receives it. The control migration adds no `required="false"` there, and `shared/field.md` decides `required` for them.
+- **Order** — read the enclosing field first. When `shared/field.md` unwraps a field whose level sets `required`, it decides and the control never gets the added `false`. The control rule adds `false` when neither level carries `required`, and also when `shared/field.md` leaves the `bal-field` in place, because then nothing copies the field level onto the control.
+- **Batch and report** — the rule applies inside a batch too. Each component file reports every added `false` as a coverage item.
 
 Every component migration also decides about the legacy config call. Follow `shared/legacy-config.md` after the icon rules:
 
@@ -124,6 +133,28 @@ Every component migration also decides about the legacy config call. Follow `sha
 - In the Report step, append the `L1.`, `L2.`, ... items from the Report section of `shared/legacy-config.md` to the checklist, after the icon items.
 
 Inside a batch (see `shared/batch.md`), a `migration.md` runs only its Rewrite step, on the batch file list. It skips its Scan display, its Confirm step and its stop. It still applies `shared/field.md`. It skips the icon import and Registration rules and `shared/legacy-config.md`, which the batch runs once at the end. It hands the outcome of its Report items back to the batch instead of writing its own report section.
+
+Vue is not a supported target. The scanners read `.vue` files only so that `shared/legacy-config.md` and **Cleanup** see every `bal-*` tag that is left. A component migration or a batch never rewrites a `.vue` file. Show its findings with the others, marked as not migrated, and leave the file unchanged. In the Report step, list each such file under "Needs your attention" as a Vue file that this skill does not migrate, with its findings. The legacy config call and the legacy imports stay until the consumer migrates those files by hand.
+
+#### Unmapped props and handlers
+
+A `migration.md` row that says "Apply Unmapped props and handlers" names a prop, attribute, binding, event handler or method call with no `ds-*` counterpart. This rule covers only those rows. It does not cover structural rules, such as groups or items left in place, loops in tabs or steps, field wrappers or divider children.
+
+Decide the framework per file. A `.tsx` or `.jsx` file is React, and so is a `.ts` or `.js` file that holds JSX. An Angular template (`.component.html` or an inline `template:`) and its class file are Angular. A `.ts` or `.js` file without JSX follows the project framework, the `framework` value from `scripts/detect-baloise.mjs`: `react` or `angular` takes that branch. A `.vue` file, every other `.html` file and any other file type count as HTML.
+
+The rule depends on the framework. The React `Ds*` wrappers are typed, so an unknown prop fails `tsc` with TS2322 or TS2551. Angular with `strictTemplates` fails with NG8002. Plain HTML ignores unknown attributes.
+
+- HTML: leave the attribute, the `addEventListener` call or the method call unchanged. Report it.
+- React and Angular, prop or attribute: remove it from the element. When the value is not a literal (a binding, a variable or an expression), keep it in a comment on the line above. In React, put `// TODO(ds-migrate): <name> had no ds-* target: <expression>` between the JSX attributes, where a `//` comment is valid. In an Angular template, put `<!-- TODO(ds-migrate): <name> had no ds-* target: <expression> -->` on the line above the element. Remove a literal value (`textAlign="right"`, `scrollable`, `filter="starts-with"`) without a comment. The report still names it.
+- React and Angular, event handler: remove the binding (`onBalInput={...}`, `(balInput)="..."`). Keep the whole handler expression in the same TODO comment, so no logic is lost. Copy an inline arrow body into the comment verbatim. A multi-line body gets one `//` per line in React and one multi-line `<!-- -->` in Angular. When the handler calls a class method (`(balInput)="onInput($event)"`), keep the method in the class and name the call in the comment.
+- React, unused declarations: when the removed expression was the only use of a local function, variable or import, move that declaration into the same TODO comment and drop the import binding. This keeps `noUnusedLocals` and lint green. Angular keeps the class method, because a use in the template only does not trigger unused checks.
+- React and Angular, method call that is a standalone statement (`await ref.current?.getOptionByValue(v);`): replace the statement with `// TODO(ds-migrate): <method>() had no ds-* target: <statement>`. When the code uses the call's result (assigns, returns or passes it on), leave the call unchanged and report it as "will not compile, needs manual rework".
+
+Never invent a replacement. When the `migration.md` row gives a mapping, use it.
+
+Report every item this rule handles under Needs your attention. Name the file, the line, the name, and the removed expression or "literal `<value>`". Say whether it was left in place (HTML), removed (React, Angular), or left because its result is used. The `migration.md` checklist item that covers it gets one outcome line per occurrence.
+
+Inside a batch the rule applies the same way, because it is part of the Rewrite step.
 
 #### Manual
 
@@ -139,9 +170,11 @@ If that list is empty, report that no component migrations are available yet, th
 node <this-skill-directory>/scripts/scan-migratable.mjs <project-root>
 ```
 
-The script prints one JSON object. `suggested` contains used `bal-*` components that have a migration, with their usage total. `notYet` contains used components for which this skill has no migration.
+The script prints one JSON object. `suggested` contains used `bal-*` components that have a migration, with their usage total. `notYet` contains used components for which this skill has no migration. A total counts usages: opening tags, JSX elements and `Bal*` symbols, not closing tags. A component scanner's `total` also counts closing tags, so it is usually higher than the Detect total for the same component. Do not compare the two. `types` contains legacy type namespaces such as `BalEvents`, `BalProps` and `BalLanguage`. A member such as `BalEvents.BalSegmentCustomEvent` also counts for its component when that component has a migration. They are not components, are never offered, and do not count as left.
 
 Show `notYet`, if it is not empty, as used components that cannot be migrated by this version of the skill. Do not offer them as choices.
+
+If `types` is not empty, show it as a note: these legacy types stay until their code is rewritten by hand.
 
 If `suggested` is empty, report that none of the used components has an available migration, then stop.
 
@@ -203,7 +236,7 @@ Migrate every legacy icon left in the project, following `shared/icons.md`. Comp
 Delete what Init kept for the transition, once the migration is complete, following `shared/cleanup.md`. Run this step last, after **Components**, **CSS utils** and **Assets**.
 
 1. Run `scan-cleanup.mjs` from the Scan section of `shared/cleanup.md`. It runs `scan-migratable.mjs` first.
-   - When `status` is `incomplete`, do not edit files. List every entry in `outstanding.suggested` with its `total` and say to migrate it with **Components** first. List every entry in `outstanding.notYet` with its `total` as a component that this version of the skill cannot migrate, which the consumer must replace by hand. List every line in `outstanding.hidden` (path, line, snippet) as a `bal-*` tag that the scan cannot attribute to a component, which the consumer must migrate by hand. Stop.
+   - When `status` is `incomplete`, do not edit files. List every entry in `outstanding.suggested` with its `total` and say to migrate it with **Components** first. List every entry in `outstanding.notYet` with its `total` as a component that this version of the skill cannot migrate, which the consumer must replace by hand. List every entry in `outstanding.types` with its `total` as legacy types that the consumer must replace by hand, because removing the `@baloise/ds-*` dependency breaks every file that still imports them. List every line in `outstanding.hidden` (path, line, snippet) as a `bal-*` tag that the scan cannot attribute to a component, which the consumer must migrate by hand. Stop.
    - When `status` is `nothing-to-clean-up`, do not edit files. Say there is nothing to clean up. List every line in `keep.lines`, every entry in `keep.dependencies` and every file in `unreadable` as in step 2. Stop.
 2. When `status` is `ready`, show what the step deletes: every line in `remove.lines` (path, line, snippet) and every entry in `remove.dependencies` (manifest, field, name). Then show what stays: every line in `keep.lines` and every entry in `keep.dependencies` with the pointer that the Scan section of `shared/cleanup.md` gives for its `reason`, and every file in `unreadable`. Say that the scan skips build output such as `dist` and `build`, and ask the consumer to check build tooling outside the scanned files for legacy references. Ask one yes/no: delete every listed line and dependency? On no, stop with the files unchanged.
 3. Apply the Lines section of `shared/cleanup.md`.

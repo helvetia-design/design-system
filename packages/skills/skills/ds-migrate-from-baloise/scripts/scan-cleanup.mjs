@@ -7,14 +7,14 @@ import {
   DEPENDENCY_FIELDS,
   dependencyNames,
   detectPackageManager,
+  IMPORT_EXTENSIONS,
   installCommand,
   LOCKFILES,
-  SOURCE_EXTENSIONS,
 } from './detect-baloise.mjs'
 import { scanMigratable } from './scan-migratable.mjs'
 import { scanSourceFiles, toSnippet } from './source-scan.mjs'
 
-const GATE_EXTENSIONS = new Set([...SOURCE_EXTENSIONS, '.less'])
+const GATE_EXTENSIONS = new Set([...IMPORT_EXTENSIONS, '.less'])
 const TAG_EXTENSIONS = new Set([...GATE_EXTENSIONS].filter(ext => ext !== '.json'))
 const YAML_EXTENSIONS = new Set(['.yml', '.yaml'])
 const EXTENSIONS = new Set([...GATE_EXTENSIONS, ...YAML_EXTENSIONS])
@@ -43,7 +43,7 @@ const UTILITIES_RE = /@baloise\/ds-styles\/(?:dist\/)?css\/utilities\//
 
 export function scanCleanup(rootDir) {
   const root = realpathSync(resolve(rootDir))
-  const { suggested, notYet } = scanMigratable(root, [], { extensions: GATE_EXTENSIONS })
+  const { suggested, notYet, types } = scanMigratable(root, [], { extensions: GATE_EXTENSIONS })
 
   const hidden = []
   const lines = []
@@ -71,8 +71,8 @@ export function scanCleanup(rootDir) {
     { extensions: EXTENSIONS },
   )
 
-  if (suggested.length > 0 || notYet.length > 0 || hidden.length > 0) {
-    return { status: 'incomplete', outstanding: { suggested, notYet, hidden: hidden.sort(byPosition) } }
+  if (suggested.length > 0 || notYet.length > 0 || types.length > 0 || hidden.length > 0) {
+    return { status: 'incomplete', outstanding: { suggested, notYet, types, hidden: hidden.sort(byPosition) } }
   }
 
   const removeLines = lines

@@ -207,8 +207,9 @@ describe('Detect', () => {
     write(root, 'index.html', '<bal-shape></bal-shape>\n')
 
     expect(scanMigratable(root)).toEqual({
-      suggested: [{ name: 'shape', total: 2 }],
+      suggested: [{ name: 'shape', total: 1 }],
       notYet: [],
+      types: [],
     })
   })
 })

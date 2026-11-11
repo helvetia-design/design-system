@@ -4,7 +4,7 @@ Migrate every `bal-file-upload` usage to `ds-file-upload`. Init has already adde
 
 The legacy folder has no child elements. `components/file-list.tsx` is rendered inside the legacy shadow tree and is not a consumer tag. Rewrite `bal-file-upload` only. Leave slotted content in place.
 
-Legacy `label` is the text inside the drop zone. In `ds-file-upload`, `label` is the field label above the control and the drop-zone text is `dropZoneLabel`. A plain copy would silently change what the user sees, so `label` is renamed. `subTitle` and `getInputElement()` have no equivalent and are reported, not dropped.
+Legacy `label` is the text inside the drop zone. In `ds-file-upload`, `label` is the field label above the control and the drop-zone text is `dropZoneLabel`. A plain copy would silently change what the user sees, so `label` is renamed. `subTitle` and `getInputElement()` have no equivalent and follow Unmapped props and handlers (`SKILL.md`).
 
 A surrounding `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrapper is handled by `shared/field.md` in the Rewrite step, in the same pass. `components/field/migration.md` migrates `bal-form-grid` and `bal-form-col`.
 
@@ -42,7 +42,7 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `label`                                                                                                                                                                      | `dropZoneLabel`        | Rename the attribute and keep the value, including expressions and bindings (`[label]` becomes `[dropZoneLabel]`). Legacy `label` was the drop-zone text. `ds-file-upload` `label` is the field label. Mention each rename in the report, including a `label` that was only the legacy default text. |
 | `name`, `value`, `multiple`, `disabled`, `readonly`, `loading`, `required`, `accept`, `maxFiles`, `maxFileSize`, `maxBundleSize`, `hasFileList`, `invalid`, `autoInvalidOff` | same                   | Copy as-is, including bindings (`[value]`, `[maxFileSize]`, `value={files}`).                                                                                                                                                                                                                        |
-| `subTitle`                                                                                                                                                                   | _(no equivalent prop)_ | Leave the attribute in place, do not drop it. `ds-file-upload` has no way to override the file-size subtitle, so it has no effect after the migration. Flag every occurrence for manual review.                                                                                                      |
+| `subTitle`                                                                                                                                                                   | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). `ds-file-upload` has no way to override the file-size subtitle.                                                                                                                                                                                      |
 | _(none)_                                                                                                                                                                     | `dropZoneLabel`        | New prop, aside from the `label` row. Nothing else to migrate from.                                                                                                                                                                                                                                  |
 | _(none)_                                                                                                                                                                     | `description`          | New prop. Leave unset.                                                                                                                                                                                                                                                                               |
 | _(none)_                                                                                                                                                                     | `invalidText`          | New prop (and the `invalid-text` slot). Leave unset.                                                                                                                                                                                                                                                 |
@@ -70,11 +70,11 @@ In each file that has a finding, also rewrite these listeners when they are not 
 
 ### Methods
 
-`clear()` and `setFocus()` keep those names. `getInputElement()` does not exist on `ds-file-upload`. Leave each call in place and flag it for manual review. `setBlur()` was `@internal` and is also gone.
+`clear()` and `setFocus()` keep those names. `getInputElement()` does not exist on `ds-file-upload`. Apply Unmapped props and handlers (`SKILL.md`). `setBlur()` was `@internal` and is also gone.
 
 ### Types
 
-`FileUploadRejectionReason` was an `enum` in `@baloise/ds-core`. In `ds-file-upload` it is a string union (`'BAD_EXTENSION' | 'FILE_TOO_BIG' | 'FILE_SIZE_SUM_TOO_BIG' | 'TOO_MANY_FILES' | 'DUPLICATED_FILE'`), so `FileUploadRejectionReason.BAD_EXTENSION` no longer compiles. Do not rewrite these. Mention each file that uses the enum or a `BalEvents.BalFileUpload*Detail` type in the report.
+`FileUploadRejectionReason` was an `enum` in `@baloise/ds-core`. In `ds-file-upload` it is a string union (`'BAD_EXTENSION' | 'FILE_TOO_BIG' | 'FILE_SIZE_SUM_TOO_BIG' | 'TOO_MANY_FILES' | 'DUPLICATED_FILE'`), so `FileUploadRejectionReason.BAD_EXTENSION` no longer compiles. Leave these references unchanged. Mention each file that uses the enum or a `BalEvents.BalFileUpload*Detail` type in the report.
 
 ## 4. Report
 
@@ -82,8 +82,8 @@ Write the report as `shared/report.md` describes, with the per-file summary unde
 
 Needs your attention when found:
 
-1. Every `subTitle` left for manual review.
-2. Every `getInputElement()` call left for manual review.
+1. Every `subTitle`, with its Unmapped props and handlers outcome.
+2. Every `getInputElement()` call, with its Unmapped props and handlers outcome.
 3. Every file that uses the `FileUploadRejectionReason` enum or a `BalEvents.BalFileUpload*Detail` type.
 
 Coverage only, written to the file:

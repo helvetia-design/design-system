@@ -2,9 +2,8 @@
 import { realpathSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { lineAt, lineText, scanSourceFiles, toSnippet } from './source-scan.mjs'
+import { lineAt, lineText, scanSourceFiles, SOURCE_EXTENSIONS, toSnippet } from './source-scan.mjs'
 
-const EXTENSIONS = new Set(['.ts', '.tsx', '.mts', '.cts', '.js', '.jsx', '.mjs', '.cjs', '.vue', '.html'])
 const SPECIFIER_RE = /['"]@baloise\/ds-(?:brand-)?icons['"]/g
 const SYMBOL_RE = /\bbal(?:Brand)?Icon[A-Z]\w*/g
 const NAMESPACE_RE = /\bimport\s*\*\s*as\s+([A-Za-z_$][\w$]*)\s+from\s*['"]@baloise\/ds-(?:brand-)?icons['"]/g
@@ -15,7 +14,7 @@ const IMPORT_KEYWORD_RE = /\b(?:from|import|require)\b/
 export function scanIconImports(rootDir, files = []) {
   const found = []
   const unmatched = scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found), {
-    extensions: EXTENSIONS,
+    extensions: SOURCE_EXTENSIONS,
     paths: files,
   })
   const result = group(found)
