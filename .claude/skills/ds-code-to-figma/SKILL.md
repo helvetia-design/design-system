@@ -30,7 +30,9 @@ have produced, and closes with an explicit `Next:` pointer to the following file
 3. [`PHASE-3-BUILD.md`](PHASE-3-BUILD.md) — clone the component's category page (or just its documentation
    frame) from the `🗂️ Template / Category` Figma page and fill its header, then build the real
    Figma `COMPONENT_SET` inside that frame incrementally (the confirmed default variant first,
-   then the rest as a labeled, fixed-grid set the user approves).
+   then the rest as a labeled, fixed-grid set the user approves), then fill "🔀 Variations", the
+   last section of the left column (every `show <name>` layer turned on). Hard stop before Phase 4
+   until every variation has its visual test snapshot.
 4. [`PHASE-4-VALIDATE.md`](PHASE-4-VALIDATE.md) — read-only check of the built header, prop/state
    mapping, token bindings and set layout against the plan and template; writes
    `<name>.figma-validation.md` with a `pass` / `fail` / `blocked` verdict.
@@ -40,8 +42,8 @@ have produced, and closes with an explicit `Next:` pointer to the following file
    section of the left column.
 7. [`PHASE-7-DOCUMENT-ANATOMY.md`](PHASE-7-DOCUMENT-ANATOMY.md) — build "🏗️ Anatomy", the second
    section of the left column (the placeholder is deleted when the component has no `@part` tags).
-8. [`PHASE-8-DOCUMENT-MEASUREMENTS.md`](PHASE-8-DOCUMENT-MEASUREMENTS.md) — build "📏 Measurements", the last section of
-   the left column: a drawing, a sizes table and, for content-driven components, a behavior
+8. [`PHASE-8-DOCUMENT-MEASUREMENTS.md`](PHASE-8-DOCUMENT-MEASUREMENTS.md) — build "📏 Measurements", the third section of
+   the left column (above Variations): a drawing, a sizes table and, for content-driven components, a behavior
    card; this is the last phase.
 
 ### Graph
@@ -87,11 +89,14 @@ flowchart TD
         P3a --> P3b["Build the<br/>default variant"]:::figma
         P3b --> P3c{{"User confirms default variant<br/>in Figma"}}:::human
         P3c -->|approved| P3d["Fan out + build labeled<br/>component set(s)"]:::figma
-        P3d --> P3f{{"User approves header +<br/>component set in Figma"}}:::human
+        P3d --> P3v["Fill Variations<br/>(show layers on)"]:::figma
+        P3v --> P3f{{"User approves header,<br/>component set + Variations in Figma"}}:::human
         P3f -->|approved| P3e["Write the component key<br/>back to name.figma.md"]:::code
     end
 
-    P3G --> P4G
+    P3G --> P3s{{"Every variation<br/>snapshot exists?"}}:::human
+    P3s -->|no| P3sh(["Hard stop: user runs<br/>/update-screenshots"]):::human
+    P3s -->|yes| P4G
 
     subgraph P4G["Phase 4 — Validate"]
         direction LR

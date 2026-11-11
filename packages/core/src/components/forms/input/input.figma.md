@@ -4,6 +4,13 @@
 > set live on `Core / Forms`, with Copy me, Anatomy and Specs ("Measurements" in this template
 > version) all built and approved. `input.figma-validation.md` has the full Phase 4 check log and
 > Phase 5 repair.
+>
+> **11.11.2026 — text properties + Variations verified on throwaway Figma branch
+> `TMW8IfOY7LbN3IXvu3cI15` only (main unchanged).** On the branch the set has 120 variants (new
+> `filled` axis), text properties `label`, `value`, `placeholder`, `description`, `invalid text`,
+> booleans `show label` (true) and `show description` (false), and a Variations section. The
+> props below describe that branch build; `state` still holds `disabled` / `loading` (the
+> component-state migration is a separate TODO). Main still has the 60-variant build.
 
 ```yaml
 sets: # filled in by Phase 3 — one entry per component set (top-level split), default set first.
@@ -43,8 +50,9 @@ props:
   - name: value
     type: string | null
     default: null
-    figmaProperty: null
-    figmaPropertyType: instance-text-override # shown as the `input` part's text
+    figmaProperty: value
+    figmaPropertyType: text # node `value` in `control`, default `Value`
+    shownWhen: filled=true # one part, two props, different token → own node + `filled` axis (see placeholder)
   - name: name
     type: string
     default: '(generated id)'
@@ -53,13 +61,17 @@ props:
   - name: label
     type: string
     default: ''
-    figmaProperty: null
-    figmaPropertyType: instance-text-override # `label` part
+    figmaProperty: 'label (TEXT, default Label) + show label (BOOLEAN, default true)'
+    figmaPropertyType: text
+    node: text # inside the `label` wrapper frame (part `label`); guarded by `props.label &&` → `show label`
+    note: 'show label defaults to true, not the code default (label=""): every real input has a label — confirmed 11.11.2026. The " (optional)" span is generated i18n text: own node `optional` in the same wrapper, no property, only on required=false.'
   - name: description
     type: string
     default: ''
-    figmaProperty: null
-    figmaPropertyType: instance-text-override # `description` part
+    figmaProperty: 'description (TEXT, default Description) + show description (BOOLEAN, default false)'
+    figmaPropertyType: text
+    node: description
+    shownWhen: color != invalid # color=invalid shows `invalid text` instead, always (no boolean)
   - name: color
     type: enum
     options: [primary, danger, success, warning]
@@ -87,8 +99,9 @@ props:
   - name: invalidText
     type: string
     default: ''
-    figmaProperty: null
-    figmaPropertyType: instance-text-override # replaces `description` part text when invalid
+    figmaProperty: invalid text
+    figmaPropertyType: text # node `invalid text` in the `description` frame (with the alert icon), default `Invalid text`
+    shownWhen: color=invalid # always visible there: color=invalid stands for invalid + invalidText set (confirmed 11.11.2026)
   - name: type
     type: enum
     options:
@@ -150,9 +163,16 @@ props:
   - name: placeholder
     type: string
     default: ''
-    figmaProperty: null
-    figmaPropertyType: instance-text-override # `input` part text when value is empty, rendered
-    # with the already-resolved placeholder-color token
+    figmaProperty: placeholder
+    figmaPropertyType: text # node `placeholder` in `control`, default `Placeholder`, fill
+    # Form/Default/Control/Placeholder/Color (137:1513; disabled 137:1605)
+    shownWhen: filled=false
+  - name: filled # synthetic variant axis for value vs placeholder (text-properties plan, decision 6)
+    type: derived (value set)
+    default: 'false'
+    figmaProperty: filled
+    figmaPropertyType: variant
+    figmaOptions: ['false', 'true'] # rows, outermost (ties with required on 2 options; value is declared first)
   - name: max
     type: string
     default: ''
@@ -256,6 +276,13 @@ states:
     disabled: 'disabled prop → :host(.is-disabled) (input.host.scss)'
   # color/invalid (.is-danger/.is-success/.is-warning) are a separate axis — see props: color/invalid
 
+variations: # only show booleans that default to false; show label defaults to true → no entry. Node ids null: branch TMW8IfOY7LbN3IXvu3cI15 only
+  figmaSectionNodeId: null
+  sets:
+    - set: Input
+      previewNodeId: null
+      entries:
+        - { caption: 'show description', props: { show description: true }, snapshot: input-basic, nodeId: null } # "Label 2" case: placeholder + description
 nested:
   - childTag: ds-spinner
     childMappingFile: ../../indicators/spinner/spinner.figma.md

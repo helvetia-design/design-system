@@ -8,8 +8,9 @@ exceeds the variant threshold, and to Phase 3 when building wrapper sets. See `.
 ## Prop-to-variant mapping
 
 The prop-to-variant mapping rules (no-static-effect booleans excluded, conditional props keep their
-own axis, placeholder text on text-override props, paired `show <name>` boolean for conditionally
-rendered text) are canonical in `../PHASE-2-PROPOSE.md` step 1 — not duplicated here.
+own axis, a text property for every consumer-authored text, paired `show <name>` boolean for
+conditionally rendered text, two nodes when one part renders two props) are canonical in
+`../PHASE-2-PROPOSE.md` step 1 — not duplicated here.
 
 ## Open-ended content-selection props (current rule)
 

@@ -54,7 +54,8 @@ batch and grouping sign-off happen once for the whole family; Phases 6–8 run f
 ## Phase 2 — Propose grouping
 
 - 🛑 **Ambiguous prop-to-variant mapping** (step 1): anything that doesn't cleanly fit the
-  enum/boolean/free-text/state rules — flagged explicitly, never guessed.
+  enum/boolean/text/state rules — flagged explicitly, never guessed. This includes a text whose
+  source is unclear: consumer-authored (text property) or generated (none).
 - 🟡 **Variant-grid-layout confirmation** (step 2): state which case applies (2-axis / nested-matrix
   / top-level-split) before asking for approval, so the user confirms an actual layout, not just a
   property list.
@@ -63,7 +64,8 @@ batch and grouping sign-off happen once for the whole family; Phases 6–8 run f
   the count is ≤500 after the user picks.
 - 🟡 **Grouping sign-off** (step 5): stop and wait for the user to confirm or edit the mapping
   directly in `<name>.figma.md` before Phase 3 starts. Never proceed on assumed approval. For a
-  family: one sign-off covering every member, the `drivenBy` props and the slot default fills.
+  family: one sign-off covering every member, the `drivenBy` props and the slot default fills. It
+  also covers the variation list and the cases to add to `test/<name>.visual.html`.
 - 🟡 **New Phase 2 heuristic** (step 6): show the user the exact diff and get approval
   before writing it — never auto-append.
 
@@ -74,6 +76,11 @@ batch and grouping sign-off happen once for the whole family; Phases 6–8 run f
 - 🛑 **Template page or layer missing**: `🗂️ Template / Category` not found, or a layer in
   `PHASE-3-BUILD.md`'s layer-name contract is missing — stop and report which; never hand-build
   the shell as a fallback.
+- 🛑 **Variations placeholder missing**: no `kind=variations` `Section` in the cloned frame — stop
+  and report; never build the section chrome.
+- 🛑 **Variation snapshots missing** (before Phase 4): a variation's
+  `*-Desktop-Chrome-linux.png` doesn't exist yet — name the missing cases and wait until the user
+  has run `/update-screenshots`.
 - 🛑 **Category copy missing**: category not in `CONVENTIONS.md`'s table — stop and ask for
   title/lead text.
 - 🛑 **Storybook story ID unresolvable**: no `doc-config.ts` for the component — stop and ask

@@ -30,8 +30,8 @@ worst of all reports (`fail` > `blocked` > `pass`) and decides [Next Phase](#nex
    except the temporary instances in step 4c)
    and create a session against `figma.config.json`'s `componentLibraryFileKey`. **Locate the
    nodes** by the mapping-file fields Phase 3 wrote (`sets:` → each `figmaMasterNodeId`,
-   `figmaDocFrameNodeId`, `figmaPage`). If a node is missing, mark every check on it
-   `fail` (`node not found`).
+   `figmaDocFrameNodeId`, `figmaPage`, `variations:` → `figmaSectionNodeId` and each entry's
+   `nodeId`). If a node is missing, mark every check on it `fail` (`node not found`).
 2. **Check the documentation frame header** against `PHASE-3-BUILD.md` → "Documentation frame
    header": `kicker` reads `Core / <Category>` (breadcrumb only, no component name), `component`
    matches the component's real name, `lead` matches the component's JSDoc lead paragraph verbatim,
@@ -48,6 +48,11 @@ worst of all reports (`fail` > `blocked` > `pass`) and decides [Next Phase](#nex
    `COMPONENT_SET`, never a shared "style" variant. `state` holds interaction states only; every
    component-state prop (`disabled`, `loading`, `invalid`, …) is its own `false` / `true` variant, with `true`
    only on `state=default` variants — a `disabled` / `loading` option inside `state` is a `fail`.
+   **Text properties** (`PHASE-3-BUILD.md` → "Text properties"): every `figmaPropertyType: text`
+   prop exists as a `TEXT` property with the agreed name and sentence-case default, created in
+   render order, and is bound (`componentPropertyReferences.characters`) on every variant where
+   its node exists. No consumer-authored text node is left unbound; no generated text is bound.
+   Report found vs. expected bindings per property.
    b. **Top-level splits** — walk `PHASE-2-PROPOSE.md` → "Top-level splits" in order, per prop:
    1. Different layers/structure per option → one `COMPONENT_SET` per option, not a variant
       property.
@@ -68,7 +73,8 @@ worst of all reports (`fail` > `blocked` > `pass`) and decides [Next Phase](#nex
    b. Every nested instance except icon slots (see c) has a main component key matching the Phase 1 key for that DS component —
    no detached instance, no local copy. Sub-component instances match the key the
    sub-component's own mapping file recorded in Phase 3 (the `…Inverted` set inside an
-   `…Inverted` owner set).
+   `…Inverted` owner set). A nested non-slot instance whose text the parent passes in has
+   `isExposedInstance = true`; every other nested instance and every icon slot has `false`.
    d. **Family only:** every `slots:` entry is a native `SLOT` on every variant, with the recorded
    preferred instances and the confirmed default fill (count, non-default props, text); every
    `drivenBy` prop on every sub-component instance matches the owner variant it sits in (e.g.
@@ -125,6 +131,13 @@ Labels`, set, `Grid`). Below the set, the set's fill covers every divider.
      template's `Inverted` stack — same fill and variable binding as that template node (the dark
      `Alias/Surface/Primary`, per `conventions/page-structure.md`). A light or missing background is a
      `fail`.
+     e. **Variations structure** (`PHASE-3-BUILD.md` → "Variations"): the `kind=variations`
+     `Section` is the last in the `Documentation` column, with one `Preview` per covered set (none
+     for an `…Inverted` set) and one instance per expected variation. Each instance's
+     `componentProperties` match its caption (booleans and dependent-axis options) and everything
+     else stays at the default variant. A `width` / `height` override on a `HUG` instance is not a
+     change: Figma records it as soon as a boolean resizes the instance (seen on `ds-button`). Report found vs. expected per set. No `show` boolean defaulting to `false` in the
+     family → the placeholder is gone.
 6. **Compare against the visual test snapshots** — a quick look, not a pixel diff:
    a. Read `packages/core/src/components/<category>/<name>/test/<name>.visual.html` to see which
    attributes each test case renders, and the matching `*-Desktop-Chrome-linux.png` files in
@@ -140,6 +153,10 @@ Labels`, set, `Grid`). Below the set, the set's fill covers every divider.
    d. Skip, and don't list as checks: states the snapshots don't show (hover, focus, active,
    disabled) and snapshot cases for props the confirmed mapping file deliberately excludes (e.g. a
    `button` mode). No snapshot folder → mark this check `not verified`.
+   e. **Every variation**, one check each: take one `get_screenshot` per variations `Preview` and
+   compare each instance with its `snapshot` case — part present, its position relative to its
+   neighbor (right / bottom), gap, size relation, color. The skip in d doesn't apply here. A
+   variation whose snapshot doesn't exist is `not verified`.
 7. **Write the validation report** (see [Output](#output)).
 
 ## Rules

@@ -95,7 +95,8 @@ props:
     type: slot
     figmaProperty: label
     figmaPropertyType: text
-    placeholder: Button
+    node: label
+    default: Label # sentence case of the property name (was placeholder `Button`)
   - name: icon
     type: string
     default: "''"
@@ -178,6 +179,15 @@ figmaSets:
     key: '227d31d011d34dc7e4fc8505061be74339b77af9'
     note: 'In code, primary, brand-*, info, success, warning and danger all use the shared `inverted` tokens, so they look identical when inverted. The `primary` option stands for all of them; secondary/tertiary/ghost/link use their own inverted-* tokens.'
 
+variations: # no dependent axes; ButtonInverted not covered. Node ids null: verified on throwaway branch TMW8IfOY7LbN3IXvu3cI15 only (10.11.2026)
+  figmaSectionNodeId: null
+  sets:
+    - set: Button
+      previewNodeId: null
+      entries:
+        - { caption: 'show icon', props: { show icon: true }, snapshot: button-icon, nodeId: null }
+        - { caption: 'show icon right', props: { show icon right: true }, snapshot: button-icon, nodeId: null } # case added 10.11.2026, needs /update-screenshots
+        - { caption: 'all on', props: { show icon: true, show icon right: true }, snapshot: button-icon, nodeId: null } # case added 10.11.2026, needs /update-screenshots
 nested:
   - childTag: ds-icon
     childMappingFile: ../../media/icon/icon.figma.md

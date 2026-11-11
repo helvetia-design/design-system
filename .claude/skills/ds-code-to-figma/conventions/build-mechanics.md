@@ -116,6 +116,20 @@ imported.width)`, then move **all** `imported.children` (via `findAll`, not `fin
   component/master being documented. When in doubt which color a piece of skill-authored text
   should use, default to `Alias/Text/Color/Primary` rather than guessing a hex value.
 
+## Text properties
+
+How to bind a `TEXT` component property (`../PHASE-3-BUILD.md` → "Text properties"). Not yet
+proven on a real run: confirm each point on the first build and update this section.
+
+- **The key comes back suffixed** — `addComponentProperty('label', 'TEXT', 'Label')` returns
+  `label#123:4`. Store it; `componentPropertyReferences` and `setProperties` need the full key.
+- **Load the node's fonts before binding** (`getStyledTextSegments(['fontName'])`): binding writes
+  `characters`, and writing `characters` resets per-range styling. Re-check afterwards that the
+  token bindings (`fontFamily`, `fontSize`, `fills`, `letterSpacing`) survived. If they didn't,
+  bind the text property **before** the token bindings.
+- **A node can carry both references** — `{ characters: textKey, visible: showKey }` for a text
+  property guarded by a `show <name>` boolean.
+
 ## Focus states
 
 - **Every focus state is built as absolutely positioned ring frames with outside strokes — never

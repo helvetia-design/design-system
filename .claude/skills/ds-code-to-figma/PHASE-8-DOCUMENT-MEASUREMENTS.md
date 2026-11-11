@@ -2,7 +2,8 @@
 
 ## Objective
 
-Fill in the last section of the `Documentation` column: "📏 Measurements". It renders the measurements
+Fill in the third section of the `Documentation` column: "📏 Measurements", above the Variations
+section Phase 3 already filled. It renders the measurements
 triage confirmed in Phase 1 step 6 — no new analysis happens here.
 
 Build this right after Anatomy (or right after Copy me, if the Anatomy placeholder was deleted). This
@@ -65,7 +66,7 @@ tree explains it.
 ### 1. Structure
 
 Fill the `Section` placeholder whose `Title` is `kind=measurements` (`Flat`; 🛑 hard stop if missing) —
-don't create a new one. Inside its slot, stack up to three nested `Default` `Preview`s, in the
+don't create a new one, and never move it or append anything after the Variations section below it. Inside its slot, stack up to three nested `Default` `Preview`s, in the
 order from `conventions/measurements.md` → "Section layout": **Drawing**, **Sizes table**,
 **Behavior** (only when `measurements.behavior` exists).
 
