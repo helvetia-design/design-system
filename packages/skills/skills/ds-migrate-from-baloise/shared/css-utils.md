@@ -55,7 +55,7 @@ Show the findings grouped by file, with path, line, snippet and each `from` to `
 - `selector`: a string that selects a mapped class, such as `querySelector('.grid')`, `By.css('.container')` or `'class.grid'`.
 - `selector in a stylesheet`: a selector of a mapped class, such as `.grid > .col` or `.border-primary-hovered`, in a stylesheet or a `<style>` block. The step never edits stylesheets. An `@extend .grid` line can show up here too; rewriting `@extend` is out of scope.
 - `class input`: a static attribute whose name ends in `Class` or `-class`, such as `styleClass="shadow-small"` on a PrimeNG component or `body-class="container"`. The component places these classes itself, so check where they land before you rewrite them by hand.
-- `possibly commented`: a class context in a `.tsx`, `.jsx` or `.js` file behind a `//` on the same line or inside `/* … */`. It is a real comment, or JSX text such as `https://x.ch` or `/tmp/*`. Check which.
+- `possibly commented`: a class context in a `.tsx`, `.jsx` or `.js` file behind a `//` on the same line or inside `/* … */`. It is a real comment, or JSX text that the scan did not detect as JSX. Check which.
 
 Every `dynamic` place is listed for the consumer to review, and every one keeps the Baloise utilities line, as the next sections say.
 

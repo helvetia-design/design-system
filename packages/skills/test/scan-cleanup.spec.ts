@@ -759,7 +759,7 @@ describe('scanCleanup', () => {
     ])
   })
 
-  it('refuses while a bal-* tag hides behind an apostrophe, and counts a Vue tag after a glob as suggested', () => {
+  it('refuses while a bal-* tag follows an apostrophe or a glob in markup text', () => {
     const root = createScratchDir()
     writeManifest(root, { dependencies: { '@baloise/ds-styles': '19.0.0' } })
     write(root, 'src/styles.scss', "@import '@baloise/ds-styles/css/core';\n")
@@ -773,10 +773,30 @@ describe('scanCleanup', () => {
     expect(scanCleanup(root)).toEqual({
       status: 'incomplete',
       outstanding: {
-        suggested: [{ name: 'button', total: 1 }],
+        suggested: [
+          { name: 'button', total: 1 },
+          { name: 'tag', total: 1 },
+        ],
         notYet: [],
         types: [],
-        hidden: [{ file: 'src/index.html', line: 1, snippet: "<p>Ab CHF 1'000 <bal-tag>Neu</bal-tag></p>" }],
+        hidden: [],
+      },
+    })
+  })
+
+  it('refuses while a bal-* tag hides in a string literal', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { '@baloise/ds-styles': '19.0.0' } })
+    write(root, 'src/styles.scss', "@import '@baloise/ds-styles/css/core';\n")
+    write(root, 'src/banner.ts', "el.innerHTML = '<bal-tag>Neu</bal-tag>'\n")
+
+    expect(scanCleanup(root)).toEqual({
+      status: 'incomplete',
+      outstanding: {
+        suggested: [],
+        notYet: [],
+        types: [],
+        hidden: [{ file: 'src/banner.ts', line: 1, snippet: "el.innerHTML = '<bal-tag>Neu</bal-tag>'" }],
       },
     })
   })
