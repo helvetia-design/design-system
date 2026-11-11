@@ -179,15 +179,30 @@ figmaSets:
     key: '227d31d011d34dc7e4fc8505061be74339b77af9'
     note: 'In code, primary, brand-*, info, success, warning and danger all use the shared `inverted` tokens, so they look identical when inverted. The `primary` option stands for all of them; secondary/tertiary/ghost/link use their own inverted-* tokens.'
 
-variations: # no dependent axes; ButtonInverted not covered. Node ids null: verified on throwaway branch TMW8IfOY7LbN3IXvu3cI15 only (10.11.2026)
-  figmaSectionNodeId: null
+variations: # no dependent axes; ButtonInverted not covered. Built 11.11.2026 on branch TMW8IfOY7LbN3IXvu3cI15, merged into main
+  figmaSectionNodeId: '6005:964'
   sets:
     - set: Button
-      previewNodeId: null
+      previewNodeId: 'I6005:964;2192:7515;2192:5066;6005:967'
       entries:
-        - { caption: 'show icon', props: { show icon: true }, snapshot: button-icon, nodeId: null }
-        - { caption: 'show icon right', props: { show icon right: true }, snapshot: button-icon, nodeId: null } # case added 10.11.2026, needs /update-screenshots
-        - { caption: 'all on', props: { show icon: true, show icon right: true }, snapshot: button-icon, nodeId: null } # case added 10.11.2026, needs /update-screenshots
+        - {
+            caption: 'show icon',
+            props: { show icon: true },
+            snapshot: button-icon,
+            nodeId: 'I6005:964;2192:7515;2192:5066;6005:967;2192:7499;6005:1003',
+          }
+        - {
+            caption: 'show icon right',
+            props: { show icon right: true },
+            snapshot: button-icon,
+            nodeId: 'I6005:964;2192:7515;2192:5066;6005:967;2192:7499;6005:1023',
+          } # case added 10.11.2026, needs /update-screenshots
+        - {
+            caption: 'all on',
+            props: { show icon: true, show icon right: true },
+            snapshot: button-icon,
+            nodeId: 'I6005:964;2192:7515;2192:5066;6005:967;2192:7499;6005:1043',
+          } # case added 10.11.2026, needs /update-screenshots
 nested:
   - childTag: ds-icon
     childMappingFile: ../../media/icon/icon.figma.md
@@ -1377,25 +1392,7 @@ tokens:
       figmaVariableId: 'VariableID:137:1248',
       resolved: true,
     }
-  # color=disabled (base / hover / active)
-  - {
-      cssVar: --ds-button-color-disabled-active-background,
-      figmaVariable: 🧩 Component/Button/Color/Disabled/Active/Background,
-      figmaVariableId: 'VariableID:137:1164',
-      resolved: true,
-    }
-  - {
-      cssVar: --ds-button-color-disabled-active-border,
-      figmaVariable: 🧩 Component/Button/Color/Disabled/Active/Border,
-      figmaVariableId: { color: 'VariableID:137:1165', width: 'VariableID:137:1166', style: 'VariableID:137:1167' },
-      resolved: true,
-    }
-  - {
-      cssVar: --ds-button-color-disabled-active-text,
-      figmaVariable: 🧩 Component/Button/Color/Disabled/Active/Text,
-      figmaVariableId: 'VariableID:137:1163',
-      resolved: true,
-    }
+  # disabled=true (base only — the hover/active tokens were never used and were removed from Base.tokens.json 11.11.2026)
   - {
       cssVar: --ds-button-color-disabled-base-background,
       figmaVariable: 🧩 Component/Button/Color/Disabled/Base/Background,
@@ -1412,24 +1409,6 @@ tokens:
       cssVar: --ds-button-color-disabled-base-text,
       figmaVariable: 🧩 Component/Button/Color/Disabled/Base/Text,
       figmaVariableId: 'VariableID:137:1153',
-      resolved: true,
-    }
-  - {
-      cssVar: --ds-button-color-disabled-hover-background,
-      figmaVariable: 🧩 Component/Button/Color/Disabled/Hover/Background,
-      figmaVariableId: 'VariableID:137:1159',
-      resolved: true,
-    }
-  - {
-      cssVar: --ds-button-color-disabled-hover-border,
-      figmaVariable: 🧩 Component/Button/Color/Disabled/Hover/Border,
-      figmaVariableId: { color: 'VariableID:137:1160', width: 'VariableID:137:1161', style: 'VariableID:137:1162' },
-      resolved: true,
-    }
-  - {
-      cssVar: --ds-button-color-disabled-hover-text,
-      figmaVariable: 🧩 Component/Button/Color/Disabled/Hover/Text,
-      figmaVariableId: 'VariableID:137:1158',
       resolved: true,
     }
   # focus ring
@@ -1849,7 +1828,7 @@ set name.
     Exceptions (resolved, intentionally unbound — STRING variables the Plugin API can't bind):
     lineHeight `130%` from `…/Button/Size/Base/LineHeight` (`VariableID:2826:10051`) and
     textDecoration `NONE` from `Alias/Text/TextDecoration/None` (`VariableID:2826:9943`).
-  - Nested: `spinner` = `Spinner/Logo/Primary` `labelPosition=right, size=sm` instance, width/height
+  - Nested: `spinner` = `Spinner` (was `Spinner/Logo/Primary`, renamed and recreated 11.11.2026) `label position=right, size=sm` instance, width/height
     bound to `Space/24`, hidden (shown only in `state=loading`). `icon` = Icon `size=base` and
     `icon-right` = Icon `size=sm` instances, vector fill overridden to the button text token,
     hidden behind `Show icon` / `Show icon right` booleans.

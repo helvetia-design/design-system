@@ -68,9 +68,9 @@ props:
   options: [default, hover, focus, active] # interaction states only
   sources:
   hover: ":hover (spinner.host.scss)"
-  componentStates: # component-state props → own false/true variants, true only with state=default (PHASE-2-PROPOSE.md)
-  disabled: { figmaProperty: disabled, options: [false, true], source: "disabled prop" }
-  loading: { figmaProperty: loading, options: [false, true], source: "loading prop" }
+  componentStates: # component-state props → own false/true variants (PHASE-2-PROPOSE.md); interactive (Phase 1 step 3) decides the columns
+  disabled: { figmaProperty: disabled, options: [false, true], interactive: false, source: "disabled prop; hover gated by :not(.is-disabled) (button.style.scss:284)" } # true only with state=default
+  invalid: { figmaProperty: invalid, options: [false, true], interactive: true, source: "invalid prop; hover still applies (form.mixin.scss:67)" } # true crossed with every interaction state
   nested:
 - childTag: ds-icon
   childMappingFile: ../icon/icon.figma.md

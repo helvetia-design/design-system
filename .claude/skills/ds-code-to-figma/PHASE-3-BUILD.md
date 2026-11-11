@@ -234,7 +234,11 @@ values**; clone a prototype and change only text and positions.
    later (e.g. `Button` → `Label`) needs the variants re-centred (seen on `ds-button`: up to 6px).
    **Taller than the `Documentation` column:** the cloned `Component Sets` column is `FILL`
    height and clips anything below it. Set it to `layoutSizingVertical = 'HUG'` (seen on
-   `ds-input`, 120 variants: the lower 9 row dividers reported no render bounds).
+   `ds-input`, 120 variants: the lower 9 row dividers reported no render bounds). Only then:
+   on a frame whose `Documentation` column is taller, `HUG` cuts the column's background panel
+   short, so keep `FILL` (the template stays `FILL`). **Wider than the column** (fixed width): set
+   `Component Sets` and `body` to `layoutSizingHorizontal = 'HUG'`; the header follows (seen on
+   `ds-input`, 13 columns, 4780px).
 5. **Every set is labeled — no axis count is exempt, not even a single-axis set.** With no row axis
    (e.g. a lone `size` axis) there are just `Column Labels` and no `Row Labels`.
 6. **Labels and grid lines, cloned from template prototypes** — a `Column Labels` text, a
@@ -320,7 +324,8 @@ Every `figmaPropertyType: text` prop from the mapping file becomes a `TEXT` comp
 
 When the set has a `state` axis, wire the interaction states as prototype reactions on the
 variants (`setReactionsAsync`), so an instance reacts like the code in prototypes. Per row (every
-other axis fixed, every component state `false`):
+other axis fixed), once for the group with every component state `false` and once per
+interactive component state's group (its `true` variants, e.g. `invalid=true`):
 
 | From variant    | Trigger                     | To             |
 | --------------- | --------------------------- | -------------- |
@@ -334,8 +339,9 @@ transition: null }` (instant). Both triggers revert by themselves on mouse-leave
 - Only the options the component has: no `hover` → no hover reaction; no `active` → no press
   reaction.
 - **No reactions** on `state=focus` (Figma has no keyboard-focus trigger, and a click must not show
-  the `:focus-visible` ring), on `state=active`, and on every variant with a component state `true`
-  (`disabled`, `loading`, `invalid` don't react in code).
+  the `:focus-visible` ring), on `state=active`, and on every blocked component state's `true`
+  variant (`disabled` doesn't react in code). Reactions stay inside their group: `invalid=true`
+  hover goes to `invalid=true` active, never to the `invalid=false` one.
 - A CSS `transition` in code is not copied into Figma — note it in the mapping file.
 - Set reactions after the grid is final (variants recreated later lose them).
 

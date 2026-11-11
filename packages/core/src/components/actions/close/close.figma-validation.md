@@ -106,3 +106,19 @@ pseudo-states not present in static snapshots) — none represent an unresolved 
 - **Evidence:** screenshots of `3917:1055` and `3917:1119` show the white + purple / white + yellow
   ring on all three sizes; the Measurements focus marker (`3909:1136`) was re-placed on the new
   24px instance.
+
+## Re-check: component states + interactions (11.11.2026)
+
+Read-only after migrating both sets in place on main (`Close` `3917:1055`, `CloseInverted` `3917:1119`):
+every `state=disabled` variant renamed to `state=default, disabled=true`, every other one got
+`disabled=false`. Node ids, keys and instances kept.
+
+| #   | Check                          | Result | Evidence                                                                                                                                                                                                 |
+| --- | ------------------------------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2   | Header                         | pass   | `status=review`, `v0.0.6`, `11.11.2026`; links `components-actions-close-close--close` (doc-config), Toky `filter=close`, GitHub `actions/close`.                                                        |
+| 3a  | Interaction / component states | pass   | Both sets: `state` = default · hover · focus · active; `disabled` = false · true; `true` only with `state=default` (3 / 3 per set). 15 variants per set, unchanged.                                      |
+| 4e  | Interactions                   | pass   | 9 reactions per set: per size, `default` → `ON_HOVER` → hover and `ON_PRESS` → active, `hover` → `ON_PRESS` → active; `CHANGE_TO`, transition `null`, same size. 0 on focus, active and `disabled=true`. |
+| 5b  | Column labels                  | pass   | `state` centred on columns 1–4 (centre 144.5 of 4 × 72px); `disabled` labels column 5.                                                                                                                   |
+| 5c  | Ordering                       | pass   | First layer and top-left cell `size=base, state=default, disabled=false`.                                                                                                                                |
+| 6b  | Screenshot                     | pass   | `3909:1139`: both stacks, labels and dividers as expected.                                                                                                                                               |
+| —   | Instances                      | pass   | 8 / 8 instances (Close doc sections) keep their main component; none was on the old `state=disabled`.                                                                                                    |

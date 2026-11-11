@@ -67,6 +67,15 @@ true`, with visibility driven by a real `BOOLEAN` component property** —
   the real required height (sum of every child's height + every gap + top/bottom padding) before
   setting a fixed height on a `clipsContent: true` frame holding manually-positioned children.
 
+- **Recreating a set to fix option order keeps its instances** (`ds-spinner`, 11.11.2026: `size`
+  `sm, base` → `base, sm`, 360 instances): before deleting, record each instance's variant name and
+  component-property values; clone the variants in reading order into a temporary frame,
+  `combineAsVariants`, copy the old set's fills, stroke, dash and radius, re-add and re-bind the
+  properties (clones lose `componentPropertyReferences`), then per instance
+  `swapComponent(<same-named new variant>)` — overrides such as fills survive — and `setProperties`
+  with the new keys. Delete the old set only when it has 0 instances. Re-check doc instances that
+  must show the default variant (Copy me, Variations).
+
 ## Auto-layout and positioning
 
 - **`figma.createAutoLayout()` defaults every new frame to a solid white fill** — clear it
@@ -127,6 +136,10 @@ proven on a real run: confirm each point on the first build and update this sect
   `characters`, and writing `characters` resets per-range styling. Re-check afterwards that the
   token bindings (`fontFamily`, `fontSize`, `fills`, `letterSpacing`) survived. If they didn't,
   bind the text property **before** the token bindings.
+- **Renaming a property in place:** `set.editComponentProperty(key, { name })` renames boolean,
+  text **and variant** properties (`labelPosition` → `label position` on `ds-spinner`, 11.11.2026).
+  Node ids, keys and every instance's values are kept; axis label texts on the canvas are not
+  renamed with it.
 - **A node can carry both references** — `{ characters: textKey, visible: showKey }` for a text
   property guarded by a `show <name>` boolean.
 

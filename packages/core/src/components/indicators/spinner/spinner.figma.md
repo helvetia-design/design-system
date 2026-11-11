@@ -1,5 +1,7 @@
 # spinner → Figma mapping
 
+> **11.11.2026 — Variations verify run, done on Figma branch `TMW8IfOY7LbN3IXvu3cI15` and merged into main the same day: properties renamed to `show label`, `label`, `label position`, sets to `Spinner`, `SpinnerInverted`, `SpinnerCircle`, `SpinnerCircleInverted` (in place, keys and instances kept), Variations added. Default variant fixed (sets recreated with `size=base` first, 360 instances re-pointed). Phase 4 still `fail`: the label color token `--ds-spinner-label-color-primary` isn't in Figma yet — see `spinner.figma-validation.md`.**
+>
 > **Status: all phases done (rebuilt 04.11.2026 on the new template; legend, Anatomy spacing, sub-labels and label bindings updated to the revised rules the same day). Measurements accepted as is, pending the Measurements rework.**
 
 ```yaml
@@ -7,11 +9,45 @@ figmaComponentKey: null # four top-level sets, see figmaSets below
 figmaPage: Core / Indicators # page node 2804:322
 figmaMasterNodeId: null # see figmaSets
 figmaDocFrameNodeId: '2865:464' # "Spinner Documentation" (old frame 2804:326 and its sets deleted 04.11.2026)
-figmaSets:
-  logoPrimary: { nodeId: '2869:348', key: 'b3f18954b8066281a5ad73d72bfd1aa92d62241b' }
-  logoInverted: { nodeId: '2869:365', key: 'dc32950841a518257f4219569a518d332448bfac' }
-  circlePrimary: { nodeId: '2869:386', key: '4c2ae734d4f89e9f886c37396838dfbb3f460d00' }
-  circleInverted: { nodeId: '2869:407', key: '44e9d7628b35593988b4aeb80171e2a86254b3eb' }
+figmaSets: # recreated 11.11.2026 with `size=base` first (merged from branch TMW8IfOY7LbN3IXvu3cI15); old sets 2869:348/365/386/407 deleted
+  logoPrimary: { name: Spinner, nodeId: '6024:629', key: '1146e8197ca3637fcd1b636c3a1231fcb2c6562c' }
+  logoInverted: { name: SpinnerInverted, nodeId: '6024:2692', key: 'ee94d0f404a6225ccd22b376e4c13a305ab782da' }
+  circlePrimary: { name: SpinnerCircle, nodeId: '6024:2794', key: '934b454440ea10dbf007b22f710e8aac8f0ce0a5' }
+  circleInverted: { name: SpinnerCircleInverted, nodeId: '6024:2912', key: '21fb19ac67e933b48d9f780f17d0dabcb689d647' }
+
+variations: # Spinner + SpinnerCircle (rule-1 split); inverted sets not covered
+  figmaSectionNodeId: '6022:913'
+  sets:
+    - set: Spinner
+      previewNodeId: 'I6022:913;2192:7515;2192:5066;6022:916'
+      entries:
+        - {
+            caption: 'show label · right',
+            props: { show label: true, label position: right },
+            snapshot: spinner-label,
+            nodeId: 'I6022:913;2192:7515;2192:5066;6022:916;2192:7499;6022:951',
+          }
+        - {
+            caption: 'show label · bottom',
+            props: { show label: true, label position: bottom },
+            snapshot: spinner-label,
+            nodeId: 'I6022:913;2192:7515;2192:5066;6022:916;2192:7499;6022:965',
+          }
+    - set: SpinnerCircle
+      previewNodeId: 'I6022:913;2192:7515;2192:5066;6022:998'
+      entries:
+        - {
+            caption: 'show label · right',
+            props: { show label: true, label position: right },
+            snapshot: spinner-circle-variation,
+            nodeId: 'I6022:913;2192:7515;2192:5066;6022:998;2192:7499;6022:1010',
+          } # case added 11.11.2026, needs /update-screenshots
+        - {
+            caption: 'show label · bottom',
+            props: { show label: true, label position: bottom },
+            snapshot: spinner-circle-variation,
+            nodeId: 'I6022:913;2192:7515;2192:5066;6022:998;2192:7499;6022:1026',
+          } # case added 11.11.2026, needs /update-screenshots
 
 anatomy:
   - letter: A
@@ -45,14 +81,15 @@ props:
   - name: label
     type: string
     default: ''
-    figmaProperty: null
-    figmaPropertyType: instance-text-override (+ show/hide boolean)
+    figmaProperty: 'label (TEXT, default Label) + show label (BOOLEAN, default false)'
+    figmaPropertyType: text
+    node: label # guarded by hasValue(label) → show label
   - name: labelPosition
     type: enum
     options: [right, bottom]
     default: right
-    figmaProperty: labelPosition
-    figmaPropertyType: variant (only meaningful when a label is shown)
+    figmaProperty: label position
+    figmaPropertyType: variant (dependent axis of show label)
     figmaOptions: [right, bottom]
   - name: deactivated
     type: boolean

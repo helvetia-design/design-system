@@ -39,9 +39,8 @@ props:
   - name: disabled
     type: boolean
     default: false
-    figmaProperty: null
-    figmaPropertyType: 'folded into `state` below as its 5th option — pseudo-class/state-ish prop,
-      never a separate boolean axis (Phase 2 mapping table)'
+    figmaProperty: disabled
+    figmaPropertyType: 'variant false/true (component state; true only with state=default) — migrated in place 11.11.2026, was the 5th option of `state`'
 
   - name: button
     type: boolean
@@ -68,13 +67,19 @@ props:
 
 states:
   figmaProperty: state
-  options: [default, hover, focus, active, disabled] # code default first, disabled last per
-  # canonical order; disabled folds in here rather than being its own boolean (Phase 2 table)
+  options: [default, hover, focus, active] # interaction states only (PHASE-2-PROPOSE.md); disabled is its own variant
+  interactions: 'state=default → while hovering → hover; default / hover → while pressing → active; instant (9 reactions per set). CSS transition 0.2s cubic-bezier(0, 0, 0.2, 1) in close.mixin.scss not copied.'
   sources:
     hover: '&:hover, gated by :not(:disabled) (close.mixin.scss)'
     focus: '&:focus-visible / &.is-focused, gated by :not(:disabled) (close.mixin.scss)'
     active: '&:active, gated by :not(:disabled) (close.mixin.scss)'
-    disabled: 'disabled prop → :disabled attribute (close.tsx / close.mixin.scss)'
+componentStates:
+  disabled:
+    {
+      figmaProperty: disabled,
+      options: [false, true],
+      source: 'disabled prop → :disabled attribute (close.tsx / close.mixin.scss)',
+    }
 
 nested: [] # ds-close has no nested DS components. The "X" glyph is a hardcoded inline SVG
 # data-URI mask-image baked directly into close.mixin.scss (not a <ds-icon> usage, no icon prop

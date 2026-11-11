@@ -5,12 +5,12 @@
 > version) all built and approved. `input.figma-validation.md` has the full Phase 4 check log and
 > Phase 5 repair.
 >
-> **11.11.2026 — text properties + Variations verified on throwaway Figma branch
-> `TMW8IfOY7LbN3IXvu3cI15` only (main unchanged).** On the branch the set has 120 variants (new
+> **11.11.2026 — text properties + Variations, built on Figma branch `TMW8IfOY7LbN3IXvu3cI15` and
+> merged into main the same day.** The set now has 120 variants (new
 > `filled` axis), text properties `label`, `value`, `placeholder`, `description`, `invalid text`,
 > booleans `show label` (true) and `show description` (false), and a Variations section. The
-> props below describe that branch build; `state` still holds `disabled` / `loading` (the
-> component-state migration is a separate TODO). Main still has the 60-variant build.
+> props below describe that build; `state` still holds `disabled` / `loading` (the
+> component-state migration is a separate TODO). The 60-variant build is replaced.
 
 ```yaml
 sets: # filled in by Phase 3 — one entry per component set (top-level split), default set first.
@@ -78,24 +78,18 @@ props:
     default: primary
     figmaProperty: color
     figmaPropertyType: variant
-    figmaOptions: [primary, danger, success, warning, invalid] # code default first, then declared
-    # order, then the synthetic `invalid` option appended last — see Phase 2 "Collapse decision":
-    # `invalid` (below) was folded into this same property as a 5th option rather than crossed
-    # independently, since invalid=true always forces the identical danger visual in code.
+    figmaOptions: [primary, danger, success, warning] # `invalid` moved out into its own component state 11.11.2026
   - name: loading
     type: boolean
     default: false
     figmaProperty: loading
-    figmaPropertyType: variant
+    figmaPropertyType: 'variant false/true (component state, interactive — see componentStates)'
     figmaOptions: ['false', 'true']
-    # note: Phase 2 folds this into the `state` axis instead (table rule: pseudo-class/state-ish
-    # props always collapse into one `state` property) — not its own boolean in the final mapping.
   - name: invalid
     type: boolean
     default: false
-    figmaProperty: null
-    figmaPropertyType: none # Phase 2 "Collapse decision": folded into `color` as its 5th option
-    # (`invalid`) rather than crossed as its own boolean — see Phase 2 section below.
+    figmaProperty: invalid
+    figmaPropertyType: 'variant false/true (component state, interactive — see componentStates); was the 5th `color` option until 11.11.2026'
   - name: invalidText
     type: string
     default: ''
@@ -223,10 +217,8 @@ props:
     type: boolean
     default: false
     figmaProperty: disabled
-    figmaPropertyType: variant
+    figmaPropertyType: 'variant false/true (component state, blocked — see componentStates)'
     figmaOptions: ['false', 'true']
-    # note: Phase 2 folds this into the `state` axis instead (table rule: pseudo-class/state-ish
-    # props always collapse into one `state` property) — not its own boolean in the final mapping.
   - name: readonly
     type: boolean
     default: false
@@ -268,35 +260,69 @@ props:
 
 states:
   figmaProperty: state
-  options: [default, hover, active, focus, disabled]
+  options: [default, hover, focus, active] # interaction states only (migrated 11.11.2026)
   sources:
     hover: ':hover, .is-hovered (form.mixin.scss container())'
     active: ':active, .is-pressed (form.mixin.scss container())'
     focus: ':focus-within, .is-focused (form.mixin.scss container())'
-    disabled: 'disabled prop → :host(.is-disabled) (input.host.scss)'
-  # color/invalid (.is-danger/.is-success/.is-warning) are a separate axis — see props: color/invalid
+  interactions: 'per row and group (normal, loading=true, invalid=true): default → while hovering → hover; default / hover → while pressing → active; instant. 144 reactions. None on disabled=true.'
+componentStates: # 208 variants = 16 rows (filled × required × color) × 13 columns: state 4 · loading 4 · invalid 4 · disabled 1
+  loading:
+    {
+      figmaProperty: loading,
+      options: [false, true],
+      interactive: true,
+      source: 'loading prop only adds the ds-spinner in `control` (field.util.tsx); no hover/focus gating',
+    }
+  invalid:
+    {
+      figmaProperty: invalid,
+      options: [false, true],
+      interactive: true,
+      source: 'invalid prop → .is-danger (input.host.scss:76–80): border stays danger on hover/active, hover background still applies (form.mixin.scss:67–75)',
+    }
+  disabled:
+    {
+      figmaProperty: disabled,
+      options: [false, true],
+      interactive: false,
+      source: 'disabled prop → :host(.is-disabled) pointer-events: none (input.host.scss:106–111)',
+    }
+  combinations: none # two component states true at once are not built
 
-variations: # only show booleans that default to false; show label defaults to true → no entry. Node ids null: branch TMW8IfOY7LbN3IXvu3cI15 only
-  figmaSectionNodeId: null
+variations: # only show booleans that default to false; show label defaults to true → no entry
+  figmaSectionNodeId: '6013:685'
   sets:
     - set: Input
-      previewNodeId: null
+      previewNodeId: 'I6013:685;2192:7515;2192:5066;6013:688'
       entries:
-        - { caption: 'show description', props: { show description: true }, snapshot: input-basic, nodeId: null } # "Label 2" case: placeholder + description
+        - {
+            caption: 'show description',
+            props: { show description: true },
+            snapshot: input-basic,
+            nodeId: 'I6013:685;2192:7515;2192:5066;6013:688;2192:7499;6013:726',
+          } # "Label 2" case: placeholder + description
 nested:
   - childTag: ds-spinner
     childMappingFile: ../../indicators/spinner/spinner.figma.md
     usage: 'shown in `control` in place of the end slot when loading=true (field.util.tsx)'
     fixedProps: { variation: circle, size: sm, color: 'primary (or inverted when disabled)' }
     figmaComponentKey:
-      primary: 4c2ae734d4f89e9f886c37396838dfbb3f460d00 # spinner.figma.md sets.circlePrimary
-      inverted: 44e9d7628b35593988b4aeb80171e2a86254b3eb # spinner.figma.md sets.circleInverted
+      primary: 934b454440ea10dbf007b22f710e8aac8f0ce0a5 # spinner.figma.md figmaSets.circlePrimary (SpinnerCircle)
+      inverted: 21fb19ac67e933b48d9f780f17d0dabcb689d647 # spinner.figma.md figmaSets.circleInverted (SpinnerCircleInverted)
   - childTag: ds-icon
     childMappingFile: ../../media/icon/icon.figma.md
     usage: 'shown in `description` before the invalid-text message, only when invalid && invalidText (field.util.tsx)'
-    fixedProps: { name: alert } # hardcoded in field.util.tsx — not driven by any ds-input prop,
-    # so this is a fixed instance override, not an INSTANCE_SWAP icon slot
-    figmaComponentKey: '2056:8249' # icon.figma.md sets[0] — Icon wrapper COMPONENT_SET
+    fixedProps: { name: alert } # hardcoded in field.util.tsx — a fixed icon (conventions/content-selection-and-mitigations.md → "Fixed icons"), no INSTANCE_SWAP
+    fixedIcon: # since 11.11.2026: the `alert` glyph (2053:7) nested directly as `icon`, replacing the Icon wrapper (size=sm)
+      glyph: alert
+      size: 'base, 16px (measured on the dev server: host 16 × 16, drawn glyph 14 × 14) — width/height bound to 🧩 Component/Icon/Size/Base (137:1457); padding 1px literal, like Button (Icon/Padding/* not in Figma yet)'
+      colorSource:
+        {
+          default: '🧩 Component/Form/Danger/Description/Color (137:1590)',
+          disabled: '🧩 Component/Form/Disabled/Description/Color (137:1610)',
+        }
+      shownWhen: color=invalid # 24 variants
 
 tokens:
   - cssVar: --ds-form-container-radius

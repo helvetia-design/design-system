@@ -78,6 +78,13 @@ the measurements triage (6) are presented **once for the whole family** (`conven
    variant; component-state props (`disabled`, `loading`, `invalid`, …) become their own `false` /
    `true` variants (see `PHASE-2-PROPOSE.md` → mapping table, interaction-state and component-state
    rows).
+   - **Per component state, check whether code still lets the user interact** while it's `true`:
+     **blocked** when the hover / active / focus styles are gated off (`:not(.is-disabled)`,
+     `:not(:disabled)`, `pointer-events: none`) — e.g. `ds-button`'s `disabled` and `loading`;
+     **interactive** when they still apply — e.g. `ds-input`'s `invalid` (the hover background
+     still changes, the border stays danger) and `loading` (only adds the spinner). Decide from the
+     SCSS, never from the prop's name: the same prop can differ between components. Record it as
+     `interactive: true | false` per `componentStates:` entry, with the `file:line` that decides it.
    - Also scan **every text-bearing part for every attribute a Figma text node needs**: font
      family, font size, font weight, line-height, letter-spacing, color, text-decoration. A
      component's own SCSS commonly sets only some of these explicitly (e.g. a `::part(label)`
