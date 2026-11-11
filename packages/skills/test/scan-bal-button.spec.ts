@@ -431,3 +431,20 @@ describe('button migration.md', () => {
     }
   })
 })
+
+describe('scanBalButton after an emoji', () => {
+  it('finds a tag right after an emoji comment and reports its line and snippet', () => {
+    const root = createScratchDir()
+    write(root, 'a.html', '<p>\u{1F389}</p>\n<!-- \u{1F389} --><bal-button>x</bal-button>\n')
+
+    expect(scanBalButton(root).files).toEqual([
+      {
+        file: 'a.html',
+        findings: [
+          { line: 2, snippet: '<bal-button>' },
+          { line: 2, snippet: '</bal-button>' },
+        ],
+      },
+    ])
+  })
+})
