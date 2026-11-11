@@ -3,8 +3,7 @@
 ## Re-check: text properties + variations (11.11.2026)
 
 Verification run of the two new skill rules (`docs/plans/figma-text-properties-plan.md`,
-`docs/plans/figma-variations-section-plan.md`) on throwaway Figma branch `TMW8IfOY7LbN3IXvu3cI15`
-only — main is unchanged. Node ids below are the branch's. Only the checks the new rules touch; the
+`docs/plans/figma-variations-section-plan.md`) on Figma branch `TMW8IfOY7LbN3IXvu3cI15`, merged into main 11.11.2026 — node ids are the same on main. Only the checks the new rules touch; the
 earlier full runs (04.11.2026) wrote no report file.
 
 Before the checks, on the branch: properties renamed in place (`Show label` → `show label`,

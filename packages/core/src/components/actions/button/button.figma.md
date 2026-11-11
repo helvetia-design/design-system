@@ -179,15 +179,30 @@ figmaSets:
     key: '227d31d011d34dc7e4fc8505061be74339b77af9'
     note: 'In code, primary, brand-*, info, success, warning and danger all use the shared `inverted` tokens, so they look identical when inverted. The `primary` option stands for all of them; secondary/tertiary/ghost/link use their own inverted-* tokens.'
 
-variations: # no dependent axes; ButtonInverted not covered. Node ids null: verified on throwaway branch TMW8IfOY7LbN3IXvu3cI15 only (10.11.2026)
-  figmaSectionNodeId: null
+variations: # no dependent axes; ButtonInverted not covered. Built 11.11.2026 on branch TMW8IfOY7LbN3IXvu3cI15, merged into main
+  figmaSectionNodeId: '6005:964'
   sets:
     - set: Button
-      previewNodeId: null
+      previewNodeId: 'I6005:964;2192:7515;2192:5066;6005:967'
       entries:
-        - { caption: 'show icon', props: { show icon: true }, snapshot: button-icon, nodeId: null }
-        - { caption: 'show icon right', props: { show icon right: true }, snapshot: button-icon, nodeId: null } # case added 10.11.2026, needs /update-screenshots
-        - { caption: 'all on', props: { show icon: true, show icon right: true }, snapshot: button-icon, nodeId: null } # case added 10.11.2026, needs /update-screenshots
+        - {
+            caption: 'show icon',
+            props: { show icon: true },
+            snapshot: button-icon,
+            nodeId: 'I6005:964;2192:7515;2192:5066;6005:967;2192:7499;6005:1003',
+          }
+        - {
+            caption: 'show icon right',
+            props: { show icon right: true },
+            snapshot: button-icon,
+            nodeId: 'I6005:964;2192:7515;2192:5066;6005:967;2192:7499;6005:1023',
+          } # case added 10.11.2026, needs /update-screenshots
+        - {
+            caption: 'all on',
+            props: { show icon: true, show icon right: true },
+            snapshot: button-icon,
+            nodeId: 'I6005:964;2192:7515;2192:5066;6005:967;2192:7499;6005:1043',
+          } # case added 10.11.2026, needs /update-screenshots
 nested:
   - childTag: ds-icon
     childMappingFile: ../../media/icon/icon.figma.md
@@ -1849,7 +1864,7 @@ set name.
     Exceptions (resolved, intentionally unbound — STRING variables the Plugin API can't bind):
     lineHeight `130%` from `…/Button/Size/Base/LineHeight` (`VariableID:2826:10051`) and
     textDecoration `NONE` from `Alias/Text/TextDecoration/None` (`VariableID:2826:9943`).
-  - Nested: `spinner` = `Spinner/Logo/Primary` `labelPosition=right, size=sm` instance, width/height
+  - Nested: `spinner` = `Spinner` (was `Spinner/Logo/Primary`, renamed and recreated 11.11.2026) `label position=right, size=sm` instance, width/height
     bound to `Space/24`, hidden (shown only in `state=loading`). `icon` = Icon `size=base` and
     `icon-right` = Icon `size=sm` instances, vector fill overridden to the button text token,
     hidden behind `Show icon` / `Show icon right` booleans.

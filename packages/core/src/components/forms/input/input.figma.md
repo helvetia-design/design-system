@@ -5,12 +5,12 @@
 > version) all built and approved. `input.figma-validation.md` has the full Phase 4 check log and
 > Phase 5 repair.
 >
-> **11.11.2026 — text properties + Variations verified on throwaway Figma branch
-> `TMW8IfOY7LbN3IXvu3cI15` only (main unchanged).** On the branch the set has 120 variants (new
+> **11.11.2026 — text properties + Variations, built on Figma branch `TMW8IfOY7LbN3IXvu3cI15` and
+> merged into main the same day.** The set now has 120 variants (new
 > `filled` axis), text properties `label`, `value`, `placeholder`, `description`, `invalid text`,
 > booleans `show label` (true) and `show description` (false), and a Variations section. The
-> props below describe that branch build; `state` still holds `disabled` / `loading` (the
-> component-state migration is a separate TODO). Main still has the 60-variant build.
+> props below describe that build; `state` still holds `disabled` / `loading` (the
+> component-state migration is a separate TODO). The 60-variant build is replaced.
 
 ```yaml
 sets: # filled in by Phase 3 — one entry per component set (top-level split), default set first.
@@ -276,21 +276,26 @@ states:
     disabled: 'disabled prop → :host(.is-disabled) (input.host.scss)'
   # color/invalid (.is-danger/.is-success/.is-warning) are a separate axis — see props: color/invalid
 
-variations: # only show booleans that default to false; show label defaults to true → no entry. Node ids null: branch TMW8IfOY7LbN3IXvu3cI15 only
-  figmaSectionNodeId: null
+variations: # only show booleans that default to false; show label defaults to true → no entry
+  figmaSectionNodeId: '6013:685'
   sets:
     - set: Input
-      previewNodeId: null
+      previewNodeId: 'I6013:685;2192:7515;2192:5066;6013:688'
       entries:
-        - { caption: 'show description', props: { show description: true }, snapshot: input-basic, nodeId: null } # "Label 2" case: placeholder + description
+        - {
+            caption: 'show description',
+            props: { show description: true },
+            snapshot: input-basic,
+            nodeId: 'I6013:685;2192:7515;2192:5066;6013:688;2192:7499;6013:726',
+          } # "Label 2" case: placeholder + description
 nested:
   - childTag: ds-spinner
     childMappingFile: ../../indicators/spinner/spinner.figma.md
     usage: 'shown in `control` in place of the end slot when loading=true (field.util.tsx)'
     fixedProps: { variation: circle, size: sm, color: 'primary (or inverted when disabled)' }
     figmaComponentKey:
-      primary: 4c2ae734d4f89e9f886c37396838dfbb3f460d00 # spinner.figma.md sets.circlePrimary
-      inverted: 44e9d7628b35593988b4aeb80171e2a86254b3eb # spinner.figma.md sets.circleInverted
+      primary: 934b454440ea10dbf007b22f710e8aac8f0ce0a5 # spinner.figma.md figmaSets.circlePrimary (SpinnerCircle)
+      inverted: 21fb19ac67e933b48d9f780f17d0dabcb689d647 # spinner.figma.md figmaSets.circleInverted (SpinnerCircleInverted)
   - childTag: ds-icon
     childMappingFile: ../../media/icon/icon.figma.md
     usage: 'shown in `description` before the invalid-text message, only when invalid && invalidText (field.util.tsx)'
