@@ -351,6 +351,11 @@ export namespace Components {
          */
         "a11yControls": string;
         /**
+          * A11y attributes for the native button element. Maps to `aria-current`, e.g. `page` for the current navigation entry.
+          * @default ''
+         */
+        "a11yCurrent": string;
+        /**
           * A11y attributes for the native button element.
           * @default ''
          */
@@ -5448,6 +5453,11 @@ declare namespace LocalJSX {
          */
         "a11yControls"?: string;
         /**
+          * A11y attributes for the native button element. Maps to `aria-current`, e.g. `page` for the current navigation entry.
+          * @default ''
+         */
+        "a11yCurrent"?: string;
+        /**
           * A11y attributes for the native button element.
           * @default ''
          */
@@ -9258,6 +9268,7 @@ declare namespace LocalJSX {
         "name": string;
         "value": string;
         "a11yControls": string;
+        "a11yCurrent": string;
         "a11yTitle": string;
         "a11yLabel": string;
         "a11yHaspopup": string;
