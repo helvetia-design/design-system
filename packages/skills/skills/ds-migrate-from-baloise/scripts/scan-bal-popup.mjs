@@ -4,8 +4,18 @@ import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
-const USAGE_RE =
-  /<\/?bal-popup(?![\w-])|\bbal-popup(?:-(?:backdrop-dismiss|backdrop|variant|closable|placement|arrow|reference|offset))?(?![\w-])|<\/?BalPopup\b|\bBalPopup\b|\bbalPopupIs(?:Open|Closed)\b/g
+const TRIGGER_ATTRIBUTE = String.raw`bal-popup(?:-(?:backdrop-dismiss|backdrop|variant|closable|placement|arrow|reference|offset))?`
+
+const USAGE_RE = new RegExp(
+  String.raw`<\/?bal-popup(?![\w-])|\b${TRIGGER_ATTRIBUTE}(?![\w-])|<\/?BalPopup\b|\bBalPopup\b|\bbalPopupIs(?:Open|Closed)\b`,
+  'g',
+)
+
+const SET_ATTRIBUTE_CALL_RE = /\bsetAttribute\s*\(/g
+const TRIGGER_NAME_ARGUMENT_RE = new RegExp(
+  String.raw`\bsetAttribute\s*\(\s*(['"\x60])${TRIGGER_ATTRIBUTE}\1\s*[,)]`,
+  'y',
+)
 
 export function scanBalPopup(rootDir, paths = []) {
   const found = []
@@ -47,6 +57,12 @@ function collect(file, text, masked, found) {
     const index = match.index
     const raw = match[0].startsWith('<') ? readTag(text, index) : lineText(text, index)
     found.push({ file, index, line: lineAt(text, index), snippet: toSnippet(raw) })
+  }
+
+  for (const { index } of masked.matchAll(SET_ATTRIBUTE_CALL_RE)) {
+    TRIGGER_NAME_ARGUMENT_RE.lastIndex = index
+    if (!TRIGGER_NAME_ARGUMENT_RE.test(text)) continue
+    found.push({ file, index, line: lineAt(text, index), snippet: toSnippet(lineText(text, index)) })
   }
 }
 
