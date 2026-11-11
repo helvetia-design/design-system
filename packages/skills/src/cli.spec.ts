@@ -15,7 +15,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { run } from './cli'
 
 const SKILL_DIR = 'ds-migrate-from-baloise'
-const LOCK_FILES = ['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'npm-shrinkwrap.json']
+const LOCK_FILES = ['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'bun.lock', 'npm-shrinkwrap.json']
 const SKILL_RELATIVE_PATH = join('.claude', 'skills', SKILL_DIR)
 
 let scratch: string | undefined
@@ -484,6 +484,20 @@ describe('skills add safe install', () => {
     expect(code).toBe(0)
     expect(existsSync(join(cwd, SKILL_RELATIVE_PATH, 'SKILL.md'))).toBe(true)
     expect(existsSync(join(member, '.claude'))).toBe(false)
+  })
+
+  it('treats a bun.lock directory as the project root', async () => {
+    const cwd = createBareScratchDir()
+    writeFileSync(join(cwd, 'package.json'), '{}\n')
+    writeFileSync(join(cwd, 'bun.lock'), '')
+    const sub = join(cwd, 'src')
+    mkdirSync(sub)
+
+    const { code } = await install(sub)
+
+    expect(code).toBe(0)
+    expect(existsSync(join(cwd, SKILL_RELATIVE_PATH, 'SKILL.md'))).toBe(true)
+    expect(existsSync(join(sub, '.claude'))).toBe(false)
   })
 
   it('falls back to cwd when no project root is found', async ctx => {

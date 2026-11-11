@@ -2,7 +2,7 @@
 import { existsSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { basename, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { detectFramework, IMPORT_EXTENSIONS, readJson } from './detect-baloise.mjs'
+import { detectFramework, findBaloiseManifest, IMPORT_EXTENSIONS, readJson } from './detect-baloise.mjs'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
 const JSON_FILES = new Set(['angular.json', 'package.json', 'project.json'])
@@ -86,10 +86,15 @@ function group(found) {
 
 function describeProject(root) {
   return {
-    framework: detectFramework(readJson(join(root, 'package.json'))),
+    framework: detectFramework(baloiseManifest(root) ?? readJson(join(root, 'package.json'))),
     publicDir: servesPublicDir(root) ? 'public' : null,
     angularAssets: angularAssets(root),
   }
+}
+
+function baloiseManifest(root) {
+  const found = findBaloiseManifest(root)
+  return found && !found.error ? found.manifest : null
 }
 
 function angularAssets(root) {

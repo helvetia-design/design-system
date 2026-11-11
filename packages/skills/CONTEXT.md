@@ -4,7 +4,7 @@ This document captures domain language, architectural patterns, and key concepts
 
 ## Overview
 
-**packages/skills** (`@helvetia-design/skills`) ships Claude Code skills that consuming applications install into their own repo. It is not a design-system runtime package — there are no web components, tokens, or styles here. Consumers run `npx @helvetia-design/skills add`, which copies a skill folder into `<project root>/.claude/skills/`. The project root is the nearest directory above `cwd` (or `cwd` itself) that has a `package.json` and a lockfile (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock` or `npm-shrinkwrap.json`). It falls back to `cwd` when none is found.
+**packages/skills** (`@helvetia-design/skills`) ships Claude Code skills that consuming applications install into their own repo. It is not a design-system runtime package — there are no web components, tokens, or styles here. Consumers run `npx @helvetia-design/skills add`, which copies a skill folder into `<project root>/.claude/skills/`. The project root is the nearest directory above `cwd` (or `cwd` itself) that has a `package.json` and a lockfile (`package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lock` or `npm-shrinkwrap.json`). It falls back to `cwd` when none is found.
 
 The first (and currently only) skill is **ds-migrate-from-baloise**: a menu-driven helper for migrating an app from the Baloise Design System (`bal-*`, `@baloise/ds-*`) to the Helvetia Design System (`ds-*`, `@helvetia-design/*`). The menu itself lives in the copied `SKILL.md`; this file documents package conventions, not the menu copy.
 
@@ -85,6 +85,16 @@ A batch exists because parents style or query their children by tag across famil
 
 When you add a migration, place it in the order list in `shared/batch.md` when it restructures children or is a leaf that other migrations wrap. Otherwise the alphabetical middle group covers it.
 
+### Init detection
+
+`detect-baloise.mjs` picks the Baloise manifest from the candidates that declare an installable `@baloise/ds-*` package. A candidate at the scanned root wins. Otherwise one candidate wins, and several candidates give `status: error` that names them and asks for an app folder as `<project-root>`. `scan-assets.mjs` takes its `framework` from the same manifest through `findBaloiseManifest`, which skips import scanning. With several candidates it falls back to the root `package.json`.
+
+Package manager detection walks up from the scanned folder. Each folder decides by the `packageManager` field, then by `pnpm-lock.yaml`, `yarn.lock`, `bun.lock`, `package-lock.json` or `npm-shrinkwrap.json`, and the default is npm. An unsupported `packageManager` value such as `deno@1` falls through to the lockfile.
+
+Every `status: error` prints JSON and exits 1, including a failed or timed-out `npm view` (30 s, `shell: true` on Windows). `--version <x>` skips only the dist-tags lookup. The Angular peer check still needs the registry. The final version, from `--version` or from the `latest` tag, must match a plain version such as `1.2.3`, because it goes into `npm view` arguments.
+
+Import scanning masks comments with `maskComments` per file type, so a multi-line block comment hides its text, while a code line keeps its original `snippet`. A file without a `@baloise/ds-*` name is not masked. A `@baloise/ds-styles/sass/*` line is `reference` with a `note`, and a bare `@baloise/ds-styles/...` string in `angular.json` or `project.json` is `bootstrap`.
+
 ### Angular peer check in Init
 
 `detect-baloise.mjs` stops Init before any edit when the app's `@angular/core` major is below the lower bound of the `@angular/core` peer range of `@helvetia-design/angular@<version>`. It reads that range with `npm view` through the injectable `readAngularPeers`. It also stops when it cannot decide, for example when `npm view` fails or a spec has no readable major. `lowestMajor` reads one lower bound (`^`, `~`, `>=`, `=` or a bare version), optionally followed by `<` or `<=` upper bounds, so `>=22.0.0 <24.0.0` gives 22. A `||` range, a hyphen range, `*`, a dist-tag or a protocol such as `workspace:` gives `null`, and Init stops. It compares majors only, uses no semver dependency and does not parse lockfiles. The check runs for npm, pnpm and Yarn.
@@ -106,7 +116,7 @@ The legacy config call (`initializeBaloiseDesignSystem`, `useBaloiseDesignSystem
 
 The `A` items sit between the `I` items of `shared/icons.md` and the `L` items of `shared/legacy-config.md` in the Assets checklist.
 
-`scripts/scan-assets.mjs` prints `{ total, project: { framework, publicDir, angularAssets }, files }`. `files` keeps the flat `{ file, findings: [{ line, snippet }] }` shape of the component scanners. `project` is the one extra field, because the target folder depends on the project layout, not on any single line: whether `public/` exists or a Vite or Next config sits at the root, and which `angular.json` `assets` entries name `src/assets`, including the arrays under `configurations`. A component scanner never needs that, so it stays flat. `framework` comes from `detectFramework` in `detect-baloise.mjs`. The scanner imports it, `readJson` and `IMPORT_EXTENSIONS` (`SOURCE_EXTENSIONS` plus `.css`, `.scss`, `.sass` and `.json`) from there instead of copying them.
+`scripts/scan-assets.mjs` prints `{ total, project: { framework, publicDir, angularAssets }, files }`. `files` keeps the flat `{ file, findings: [{ line, snippet }] }` shape of the component scanners. `project` is the one extra field, because the target folder depends on the project layout, not on any single line: whether `public/` exists or a Vite or Next config sits at the root, and which `angular.json` `assets` entries name `src/assets`, including the arrays under `configurations`. A component scanner never needs that, so it stays flat. `framework` comes from `detectFramework` on the manifest that `findBaloiseManifest` in `detect-baloise.mjs` selects, with `<root>/package.json` as fallback. The scanner imports it, `readJson` and `IMPORT_EXTENSIONS` (`SOURCE_EXTENSIONS` plus `.css`, `.scss`, `.sass` and `.json`) from there instead of copying them.
 
 ### CSS utils: curated map, raw-text scanner, legacy utilities line
 

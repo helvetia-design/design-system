@@ -9,7 +9,7 @@ const PACKAGE_NAME = '@helvetia-design/skills'
 const SKILL_NAME = 'ds-migrate-from-baloise'
 const USAGE = 'Usage: skills add [--force]\n'
 const MARKER_FILE = '.installed.json'
-const LOCK_FILES = ['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'npm-shrinkwrap.json']
+const LOCK_FILES = ['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'bun.lock', 'npm-shrinkwrap.json']
 
 export type CliIo = {
   cwd: string

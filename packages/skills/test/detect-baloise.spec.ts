@@ -1,10 +1,13 @@
+import { spawnSync } from 'node:child_process'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   detectBaloise,
   lowestMajor,
+  parseArgs,
   readNpmAngularPeers,
   readNpmDistTags,
   run,
@@ -345,35 +348,112 @@ describe('detectBaloise', () => {
     })
   })
 
-  it('uses the shallowest package.json that depends on Baloise', async () => {
+  it('prefers a manifest at the project root over Baloise manifests in sub-folders', async () => {
     const root = createScratchDir()
     write(root, 'pnpm-lock.yaml', 'lockfileVersion: 9\n')
-    write(root, 'package.json', JSON.stringify({ name: 'workspace', dependencies: { react: '19.0.0' } }))
-    write(
-      root,
-      'apps/web/package.json',
-      JSON.stringify({
-        dependencies: { '@angular/core': '22.0.0', '@baloise/ds-angular': '19.10.2' },
-      }),
-    )
-    write(
-      root,
-      'apps/web/legacy/package.json',
-      JSON.stringify({ dependencies: { 'react': '18.0.0', '@baloise/ds-react': '19.10.2' } }),
-    )
+    write(root, 'package.json', JSON.stringify({ dependencies: { '@baloise/ds-react': '19.10.2' } }))
+    write(root, 'apps/web/package.json', JSON.stringify({ dependencies: { '@baloise/ds-angular': '19.10.2' } }))
+    write(root, 'src/main.tsx', "import '@baloise/ds-styles/css/all.css'\n")
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.1') })
+
+    expect(result).toMatchObject({ framework: 'html', packageJsonPath: 'package.json' })
+  })
+
+  it('stops with an error naming both manifests when two apps depend on Baloise and none sits at the root', async () => {
+    const root = createScratchDir()
+    write(root, 'package.json', JSON.stringify({ name: 'workspace' }))
+    write(root, 'apps/web/package.json', JSON.stringify({ dependencies: { '@baloise/ds-angular': '19.10.2' } }))
+    write(root, 'apps/admin/package.json', JSON.stringify({ dependencies: { '@baloise/ds-react': '19.10.2' } }))
     write(root, 'apps/web/src/styles.scss', "@import '@baloise/ds-styles/css/design-system';\n")
 
     const result = await detectBaloise(root, {
+      readDistTags: async () => {
+        throw new Error('npm view should not run when the manifest is ambiguous')
+      },
+    })
+
+    expect(result.status).toBe('error')
+    expect(result.message).toContain('apps/admin/package.json, apps/web/package.json')
+    expect(result.message).toContain('<project-root>')
+  })
+
+  it('scans a pnpm workspace from one app and keeps that app framework and the workspace package manager', async () => {
+    const root = createScratchDir()
+    write(root, 'pnpm-lock.yaml', 'lockfileVersion: 9\n')
+    write(root, 'package.json', JSON.stringify({ name: 'workspace' }))
+    write(
+      root,
+      'apps/web/package.json',
+      JSON.stringify({ dependencies: { '@angular/core': '22.0.0', '@baloise/ds-angular': '19.10.2' } }),
+    )
+    write(root, 'apps/admin/package.json', JSON.stringify({ dependencies: { '@baloise/ds-react': '19.10.2' } }))
+    write(root, 'apps/web/src/styles.scss', "@import '@baloise/ds-styles/css/design-system';\n")
+
+    const result = await detectBaloise(join(root, 'apps/web'), {
       readDistTags: distTags('20.0.1'),
       readAngularPeers: angularPeers(),
     })
 
-    expect(result).toMatchObject({
-      packageManager: 'pnpm',
-      framework: 'angular',
-      packageJsonPath: 'apps/web/package.json',
-      dependencies: ['@baloise/ds-angular'],
-    })
+    expect(result).toMatchObject({ status: 'ready', installCommand: 'pnpm install', framework: 'angular' })
+    expect(Object.keys(result.aliases)).toContain('@helvetia-design/angular')
+    expect(Object.keys(result.aliases)).not.toContain('@helvetia-design/react')
+  })
+
+  it('lets the packageManager field win over a lockfile', async () => {
+    const root = createScratchDir()
+    write(root, 'package-lock.json', '{}')
+    write(
+      root,
+      'package.json',
+      JSON.stringify({ packageManager: 'pnpm@9.1.0', dependencies: { '@baloise/ds-core': '19.10.2' } }),
+    )
+    write(root, 'src/styles.scss', "@import '@baloise/ds-styles/css/all';\n")
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.1') })
+
+    expect(result).toMatchObject({ packageManager: 'pnpm', installCommand: 'pnpm install' })
+  })
+
+  it('falls through an unsupported packageManager value to the lockfile', async () => {
+    const root = createScratchDir()
+    write(root, 'pnpm-lock.yaml', 'lockfileVersion: 9\n')
+    write(
+      root,
+      'package.json',
+      JSON.stringify({ packageManager: 'deno@1', dependencies: { '@baloise/ds-core': '19.10.2' } }),
+    )
+    write(root, 'src/styles.scss', "@import '@baloise/ds-styles/css/all';\n")
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.1') })
+
+    expect(result).toMatchObject({ packageManager: 'pnpm', installCommand: 'pnpm install' })
+  })
+
+  it('reads packageManager from a workspace root above the scanned app', async () => {
+    const root = createScratchDir()
+    write(root, 'package.json', JSON.stringify({ packageManager: 'yarn@4.1.0' }))
+    const app = join(root, 'apps', 'web')
+    write(app, 'package.json', JSON.stringify({ dependencies: { '@baloise/ds-core': '19.10.2' } }))
+    write(app, 'src/styles.scss', "@import '@baloise/ds-styles/css/all';\n")
+
+    const result = await detectBaloise(app, { readDistTags: distTags('20.0.1') })
+
+    expect(result).toMatchObject({ packageManager: 'yarn', installCommand: 'yarn install' })
+  })
+
+  it.each([
+    ['bun.lock', 'bun', 'bun install'],
+    ['npm-shrinkwrap.json', 'npm', 'npm install'],
+  ])('detects the package manager from %s', async (lockfile, packageManager, command) => {
+    const root = createScratchDir()
+    write(root, lockfile, '{}')
+    write(root, 'package.json', JSON.stringify({ dependencies: { '@baloise/ds-core': '19.10.2' } }))
+    write(root, 'src/styles.scss', "@import '@baloise/ds-styles/css/all';\n")
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.1') })
+
+    expect(result).toMatchObject({ packageManager, installCommand: command })
   })
 
   it('classifies the split utilities bundle (css/utilities/all) as bootstrap', async () => {
@@ -504,6 +584,270 @@ describe('detectBaloise', () => {
   })
 })
 
+function baloiseApp(root: string, files: Record<string, string>) {
+  write(root, 'package.json', JSON.stringify({ dependencies: { '@baloise/ds-core': '19.10.2' } }))
+  for (const [rel, contents] of Object.entries(files)) write(root, rel, contents)
+}
+
+describe('detectBaloise import classification', () => {
+  it('classifies a bare angular.json styles entry as bootstrap', async () => {
+    const root = createScratchDir()
+    baloiseApp(root, {
+      'angular.json': '{ "styles": ["@baloise/ds-styles/css/all.css", "src/styles.scss"] }\n',
+    })
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.1') })
+
+    expect(result.imports).toEqual([
+      {
+        file: 'angular.json',
+        line: 1,
+        snippet: '{ "styles": ["@baloise/ds-styles/css/all.css", "src/styles.scss"] }',
+        kind: 'bootstrap',
+      },
+    ])
+  })
+
+  it('classifies a bare project.json entry as bootstrap', async () => {
+    const root = createScratchDir()
+    baloiseApp(root, { 'project.json': '{ "styles": ["@baloise/ds-styles/css/all.css"] }\n' })
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.1') })
+
+    expect(result.imports).toMatchObject([{ file: 'project.json', kind: 'bootstrap' }])
+  })
+
+  it('keeps a bare styles string in tsconfig.json as reference', async () => {
+    const root = createScratchDir()
+    baloiseApp(root, { 'tsconfig.json': '{ "paths": ["@baloise/ds-styles/css/all.css"] }\n' })
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.1') })
+
+    expect(result.imports).toMatchObject([{ file: 'tsconfig.json', kind: 'reference' }])
+  })
+
+  it('classifies a sass entry in angular.json as reference with a note', async () => {
+    const root = createScratchDir()
+    baloiseApp(root, { 'angular.json': '{ "stylePreprocessorOptions": ["@baloise/ds-styles/sass/mixins"] }\n' })
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.1') })
+
+    expect(result.imports).toMatchObject([
+      { file: 'angular.json', kind: 'reference', note: expect.stringContaining('Migrate it by hand') },
+    ])
+  })
+
+  it('classifies a Sass entry as reference with a note', async () => {
+    const root = createScratchDir()
+    baloiseApp(root, { 'src/a.scss': "@use '@baloise/ds-styles/sass/mixins' as bal;\n" })
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.1') })
+
+    expect(result.imports).toHaveLength(1)
+    expect(result.imports[0]).toMatchObject({ kind: 'reference', note: expect.stringContaining('Migrate it by hand') })
+  })
+
+  it('does not report text inside a multi-line block comment without leading asterisks', async () => {
+    const root = createScratchDir()
+    baloiseApp(root, {
+      'src/a.ts': [
+        '/*',
+        '  uses @baloise/ds-icons for symbols',
+        '*/',
+        "import '@baloise/ds-styles/css/all.css'",
+        '',
+      ].join('\n'),
+    })
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.1') })
+
+    expect(result.imports.map((entry: { line: number }) => entry.line)).toEqual([4])
+  })
+
+  it('does not report text inside a multi-line HTML comment', async () => {
+    const root = createScratchDir()
+    baloiseApp(root, {
+      'index.html': [
+        '<!--',
+        '  <link href="node_modules/@baloise/ds-styles/css/all.css">',
+        '-->',
+        '<script src="node_modules/@baloise/ds-core/dist/core.js"></script>',
+        '',
+      ].join('\n'),
+    })
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.1') })
+
+    expect(result.imports.map((entry: { line: number }) => entry.line)).toEqual([4])
+  })
+
+  it('still reports code after the end of a block comment on the same line', async () => {
+    const root = createScratchDir()
+    baloiseApp(root, { 'src/a.ts': "/* legacy */ import '@baloise/ds-styles/css/all.css'\n" })
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.1') })
+
+    expect(result.imports).toHaveLength(1)
+  })
+
+  it('does not let a glob string hide the following import', async () => {
+    const root = createScratchDir()
+    baloiseApp(root, {
+      'src/a.ts': ["const accept = 'image/*'", "import '@baloise/ds-styles/css/all.css'", ''].join('\n'),
+    })
+
+    const result = await detectBaloise(root, { readDistTags: distTags('20.0.1') })
+
+    expect(result.imports.map((entry: { line: number }) => entry.line)).toEqual([2])
+  })
+})
+
+describe('parseArgs', () => {
+  it.each([
+    [['--version=1.2.3'], { root: undefined, version: '1.2.3' }],
+    [['/p', '--version', '1.2.3'], { root: '/p', version: '1.2.3' }],
+    [['--version', '1.2.3', '/p'], { root: '/p', version: '1.2.3' }],
+    [['--version'], { error: expect.stringContaining('--version needs a value') }],
+  ])('parses %j', (argv, expected) => {
+    expect(parseArgs(argv)).toEqual(expected)
+  })
+})
+
+describe('detectBaloise npm failures', () => {
+  it('rejects a latest dist-tag that is not a plain version', async () => {
+    const root = createScratchDir()
+    baloiseApp(root, { 'src/a.ts': "import '@baloise/ds-styles/css/all.css'\n" })
+
+    const result = await detectBaloise(root, { readDistTags: async () => ({ latest: '1.0.0 & calc' }) })
+
+    expect(result.status).toBe('error')
+    expect(result.message).toContain('1.0.0 & calc')
+  })
+
+  function appWithImport() {
+    const root = createScratchDir()
+    baloiseApp(root, { 'src/a.ts': "import '@baloise/ds-styles/css/all.css'\n" })
+    return root
+  }
+
+  it('returns an error that suggests --version when npm is missing', async () => {
+    const root = appWithImport()
+
+    const result = await detectBaloise(root, {
+      readDistTags: async () => {
+        throw Object.assign(new Error('spawn npm ENOENT'), { code: 'ENOENT' })
+      },
+    })
+
+    expect(result.status).toBe('error')
+    expect(result.message).toContain('npm view @helvetia-design/core dist-tags')
+    expect(result.message).toContain('spawn npm ENOENT')
+    expect(result.message).toContain('--version')
+  })
+
+  it('prefers the trimmed stderr text', async () => {
+    const root = appWithImport()
+
+    const result = await detectBaloise(root, {
+      readDistTags: async () => {
+        throw Object.assign(new Error('Command failed'), { stderr: 'npm error code ENOTFOUND\n' })
+      },
+    })
+
+    expect(result.message).toContain('npm error code ENOTFOUND')
+    expect(result.message).not.toContain('Command failed')
+  })
+
+  it('reports a timeout', async () => {
+    const root = appWithImport()
+
+    const result = await detectBaloise(root, {
+      readDistTags: async () => {
+        throw Object.assign(new Error('Command failed'), { killed: true, signal: 'SIGTERM' })
+      },
+    })
+
+    expect(result.status).toBe('error')
+    expect(result.message).toContain('timed out after 30 s')
+  })
+
+  it('skips the lookup when --version is given', async () => {
+    const root = appWithImport()
+
+    const result = await detectBaloise(root, {
+      version: '20.1.0',
+      readDistTags: async () => {
+        throw new Error('npm view should not run with an explicit version')
+      },
+    })
+
+    expect(result).toMatchObject({ status: 'ready', version: '20.1.0' })
+  })
+
+  it('rejects an invalid --version', async () => {
+    const root = appWithImport()
+
+    const result = await detectBaloise(root, { version: '1.0.0 && calc' })
+
+    expect(result.status).toBe('error')
+    expect(result.message).toContain('--version')
+  })
+
+  it('prints JSON and exits 1 for an error', async () => {
+    const root = appWithImport()
+    let output = ''
+
+    const code = await run(root, { write: (chunk: string) => (output += chunk) } as never, { version: 'latest' })
+
+    expect(code).toBe(1)
+    expect(JSON.parse(output).status).toBe('error')
+  })
+
+  it('prints error JSON on stdout and exits 1 when npm is not on PATH', () => {
+    const root = appWithImport()
+    const script = fileURLToPath(
+      new URL('../skills/ds-migrate-from-baloise/scripts/detect-baloise.mjs', import.meta.url),
+    )
+
+    const result = spawnSync(process.execPath, [script, root], { env: { PATH: '/nonexistent' }, encoding: 'utf8' })
+
+    expect(result.status).toBe(1)
+    expect(JSON.parse(result.stdout)).toMatchObject({ status: 'error', message: expect.stringContaining('--version') })
+  })
+
+  it('exits 1 with error JSON when --version has no value', () => {
+    const script = fileURLToPath(
+      new URL('../skills/ds-migrate-from-baloise/scripts/detect-baloise.mjs', import.meta.url),
+    )
+
+    const result = spawnSync(process.execPath, [script, createScratchDir(), '--version'], { encoding: 'utf8' })
+
+    expect(result.status).toBe(1)
+    expect(JSON.parse(result.stdout).status).toBe('error')
+  })
+})
+
+describe('npm spawn options', () => {
+  it('uses a shell and a 30 s timeout on Windows', async () => {
+    const exec = vi.fn(async () => ({ stdout: '{"latest":"1.0.0"}' }))
+
+    await readNpmDistTags(exec, 'win32')
+    await readNpmAngularPeers('1.0.0', exec, 'win32')
+
+    for (const call of exec.mock.calls) {
+      expect(call[2]).toEqual({ encoding: 'utf8', timeout: 30000, shell: true })
+    }
+  })
+
+  it('uses no shell elsewhere', async () => {
+    const exec = vi.fn(async () => ({ stdout: '{"latest":"1.0.0"}' }))
+
+    await readNpmDistTags(exec, 'linux')
+
+    expect(exec.mock.calls[0][2]).toEqual({ encoding: 'utf8', timeout: 30000, shell: false })
+  })
+})
+
 describe('readNpmDistTags', () => {
   it('asks npm view for the @helvetia-design/core dist-tags', async () => {
     const calls: unknown[][] = []
@@ -587,6 +931,19 @@ describe('Angular peer check', () => {
 
   const detectAngular = (root: string, readAngularPeers: (version: string) => Promise<unknown>) =>
     detectBaloise(root, { readDistTags: distTags('0.0.6'), readAngularPeers })
+
+  it('reports the peer lookup stderr without suggesting --version', async () => {
+    const result = (await detectBaloise(angularApp(), {
+      version: '1.2.3',
+      readAngularPeers: async () => {
+        throw Object.assign(new Error('Command failed'), { stderr: 'npm error code E404' })
+      },
+    })) as { status: string; message: string }
+
+    expect(result.status).toBe('error')
+    expect(result.message).toContain('npm error code E404')
+    expect(result.message).not.toContain('--version')
+  })
 
   it('stops on Angular ^19.2.0 against >=22.0.0 and names both values', async () => {
     const result = (await detectAngular(angularApp(), angularPeers())) as {

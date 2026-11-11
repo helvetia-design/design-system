@@ -23,7 +23,7 @@ Then follow only the matching section below. Stop when that section says to stop
 
 Bootstrap the Helvetia packages alongside the existing Baloise install. Do not remove or edit existing `@baloise/*` dependencies or imports.
 
-Scan `<project-root>`, the consumer project root that contains the app lockfile. When the skill is invoked from that root, use the current directory.
+Scan `<project-root>`, the consumer project root that contains the app lockfile. When the skill is invoked from that root, use the current directory. In a monorepo, `<project-root>` can also be the folder of one app. The script walks up from there to the workspace lockfile and honours the `packageManager` field of `package.json`.
 
 ```bash
 node <this-skill-directory>/scripts/detect-baloise.mjs <project-root>
@@ -31,18 +31,20 @@ node <this-skill-directory>/scripts/detect-baloise.mjs <project-root>
 
 The script prints one JSON object. It resolves the current `latest` dist-tag with `npm view @helvetia-design/core dist-tags`. Use `version` and `aliases` from that JSON. Do not hardcode a version.
 
-For an Angular project the script also runs `npm view @helvetia-design/angular@<version> peerDependencies --json` with the resolved `version`. It compares the lowest major that the app's `@angular/core` spec allows with the lower bound of the `@angular/core` peer range. It adds `angular: { installed, required, compatible }`, where `installed` and `required` are the raw spec and range. It returns `status: error` when `compatible` is false. It also returns `status: error` when it cannot decide. That happens when the lookup fails, when the peer data has no `@angular/core` range, or when a value such as `*`, `latest`, a `||` range, `workspace:*` or `catalog:` has no readable major. The check runs for every package manager.
+For an Angular project the script also runs `npm view @helvetia-design/angular@<version> peerDependencies --json` with the resolved `version`. It compares the lowest major that the app's `@angular/core` spec allows with the lower bound of the `@angular/core` peer range. It adds `angular: { installed, required, compatible }`, where `installed` and `required` are the raw spec and range. It returns `status: error` when `compatible` is false. It also returns `status: error` when it cannot decide. That happens when the lookup fails, when the peer data has no `@angular/core` range, or when a value such as `*`, `latest`, a `||` range, `workspace:*` or `catalog:` has no readable major. The check runs for every package manager. It needs the registry even with `--version`.
 
 The walk skips `node_modules`, `dist`, `build`, `out`, `.next`, `.angular`, `.git`, `.claude`, `coverage`, `.nx`, `.nuxt`, `.output` and `storybook-static` at any depth.
 
 If `status` is `nothing-to-migrate`, tell the user: no Baloise Design System installation detected, nothing to migrate. Stop. Do not edit files and do not install.
 
-If `status` is `error`, tell the user `message` and stop. Do not edit files and do not install. For an Angular app below the required major, `message` says to upgrade Angular first. Never work around it with `--legacy-peer-deps` or `--force`.
+If `status` is `error`, tell the user `message` and stop. Do not edit files and do not install. For an Angular app below the required major, `message` says to upgrade Angular first. Never work around it with `--legacy-peer-deps` or `--force`. The same status covers a failed or timed-out `npm view` lookup, several Baloise app manifests below `<project-root>` (rerun from the app folder that `message` names), and an invalid `--version`.
+
+When the dist-tags lookup failed, rerun `node <this-skill-directory>/scripts/detect-baloise.mjs <project-root> --version <version>`, but only with a version the user gives explicitly. Never guess a version. `--version` skips only the `@helvetia-design/core` dist-tags lookup. The Angular peer check still needs the registry.
 
 If `status` is `ready`, show the detected framework, package manager, version, aliases, the `angular` field for an Angular app, and bootstrap files, then ask for one yes/no. On no, stop without editing. On yes:
 
 1. Add each entry in `aliases` to the `dependencies` object of `packageJsonPath` (relative to `<project-root>`). Create `dependencies` if it is missing. Do not change or remove existing keys. If an `@helvetia-design/*` key is already present, leave its value unchanged and report both the existing value and the value from the JSON.
-2. From `<project-root>`, run `installCommand` exactly (`pnpm install`, `yarn install`, or `npm install`). Do not add extra package arguments.
+2. From `<project-root>`, run `installCommand` exactly (`pnpm install`, `yarn install`, `bun install`, or `npm install`). Do not add extra package arguments.
 3. Insert the new CSS/JS import next to the existing `@baloise/*` one:
    - When inserting or replacing a SCSS line, match the at-rule of the line it sits beside or replaces (`@import` or `@use`) — never hardcode `@import` for a project wired with `@use`.
    - First handle these `@baloise/ds-styles/css/*` forms (with or without the `.css` extension), per the rules below. Then apply the generic bootstrap rule to every remaining `bootstrap` import. The real top-level files in the v19 line are `normalize`, `font`, `structure`, `core`, `basic`, `mixins`, `baloise-design-system`, and `all` — there is no top-level `utilities` file.
@@ -84,9 +86,11 @@ If `status` is `ready`, show the detected framework, package manager, version, a
 
    - For every other `imports` entry with `kind` `bootstrap`, add the `@helvetia-design` equivalent immediately below that line. Leave the original line unchanged.
    - When the line is HTML, CSS, or a side-effect import, duplicate the line. In the duplicate only, apply this package map: `@baloise/ds-core` → `@helvetia-design/core`, `@baloise/ds-react` → `@helvetia-design/react`, `@baloise/ds-angular` → `@helvetia-design/angular`, and `@baloise/ds-styles` → `@helvetia-design/styles`.
+   - Write a mapped `@baloise/ds-styles` path only when it is one of the `@helvetia-design/styles` exports: `css/design-system`, `css/design-system.min`, `css/design-system.local`, `css/design-system.local.min`, `css/utilities`, `css/utilities.min`, `scss/design-system`, `scss/mixins` and `scss/utilities`. For `css/basic`, `css/mixins` and `css/baloise-design-system`, insert the local form once instead and list the line under **Needs your attention**.
    - When the line is JSON, such as an `angular.json` styles entry, insert a sibling string with that same package replacement. Keep the file valid JSON. Do not copy surrounding keys, and do not duplicate the whole file when the match is only one string.
    - If that duplicate would still be an `http://` or `https://` URL, do not write the URL. Insert the local form below instead.
    - Do not duplicate `kind` `reference` lines. Those are component and icon imports; **Components** migrates them.
+   - An import with a `note` is a Baloise Sass entry file (`@baloise/ds-styles/sass/*`). Do not duplicate it. List it under **Needs your attention** with file, line and `note`.
    - If there is no `bootstrap` import, insert the local form immediately after the first `reference` line, without editing that line.
    - Skip the insert when the same `@helvetia-design` line is already the next line.
    - Local form when `framework` is `html`:

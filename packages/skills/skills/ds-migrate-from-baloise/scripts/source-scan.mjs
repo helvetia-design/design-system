@@ -146,7 +146,7 @@ function readSource(rootDir, filePath, collect) {
 
 export const JSX_EXTENSIONS = new Set(['.tsx', '.jsx', '.js'])
 
-function sourceMode(extension) {
+export function sourceMode(extension) {
   if (MARKUP_EXTENSIONS.has(extension)) return 'markup'
   if (extension === '.css') return 'css'
   if (extension === '.scss' || extension === '.sass' || extension === '.less') return 'scss'
