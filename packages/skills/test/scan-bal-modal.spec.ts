@@ -283,6 +283,233 @@ describe('scanBalModal', () => {
     })
   })
 
+  it('lists open() and close() on a modal ref in a React effect and handler', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'Effect.tsx',
+      [
+        "import { BalModal } from '@baloise/ds-react'",
+        'export function Dialog({ open }: { open: boolean }) {',
+        '  const modal = useRef<HTMLDsModalElement>(null)',
+        '  useEffect(() => {',
+        '    if (open) modal.current?.open()',
+        '    else modal.current?.close()',
+        '  }, [open])',
+        '  const onClick = () => modalRef.current?.open()',
+        '  const onForce = () => modalRef.current!.open()',
+        '  window.open(url)',
+        '  dialog.close()',
+        "  const _s = 'modal.open()' // modal.close()",
+        '  return <BalModal ref={modal} />',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalModal(root).files[0].findings.map(finding => finding.snippet)).toEqual([
+      "import { BalModal } from '@baloise/ds-react'",
+      'if (open) modal.current?.open()',
+      'else modal.current?.close()',
+      'const onClick = () => modalRef.current?.open()',
+      'const onForce = () => modalRef.current!.open()',
+      '<BalModal ref={modal} />',
+    ])
+  })
+
+  it('lists open() and close() on an Angular modal ref, signal query and plain field', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'showcase.component.ts',
+      [
+        "import { BalModal } from '@baloise/ds-angular'",
+        'export class Showcase {',
+        '  show() {',
+        '    this.showcaseModal?.nativeElement.open()',
+        '    this.modal().nativeElement.close()',
+        '    this.modal.open()',
+        '    this.other.nativeElement.open()',
+        '  }',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalModal(root).files[0].findings.map(finding => finding.snippet)).toEqual([
+      "import { BalModal } from '@baloise/ds-angular'",
+      'this.showcaseModal?.nativeElement.open()',
+      'this.modal().nativeElement.close()',
+      'this.modal.open()',
+    ])
+  })
+
+  it('lists one finding per componentProps object and skips a commented-out one', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'claim.ts',
+      [
+        "import { BalModalService } from '@baloise/ds-angular'",
+        'export class Claim {',
+        '  async confirm() {',
+        '    await this.modalService.create({',
+        '      component: ClaimConfirmModal,',
+        '      componentProps: {',
+        '        contract: this.contract, // a, b',
+        '        fileCount: 1, size: 2, /* c: 3 */',
+        '        nested: { a: 1, b: 2 },',
+        '      },',
+        '    })',
+        '    // componentProps: { ghost: 1 }',
+        '    await this.modalService.create({ componentProps: { a: 1, b: 2 } })',
+        '  }',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalModal(root).files[0].findings.map(finding => finding.snippet)).toEqual([
+      "import { BalModalService } from '@baloise/ds-angular'",
+      'componentProps: {',
+      'await this.modalService.create({ componentProps: { a: 1, b: 2 } })',
+    ])
+  })
+
+  it('lists present() on the result of a modal create, for const, let, typed and this assignments', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'claim.ts',
+      [
+        "import { BalModalService } from '@baloise/ds-angular'",
+        'export class Claim {',
+        '  async confirm() {',
+        '    const modal = await this.modalService.create({ component: A })',
+        '    await modal.present()',
+        '    const { data } = await modal.onDidDismiss()',
+        '    const m: HTMLBalModalElement = await balModalController.create({ component: B })',
+        '    m.present()',
+        '    let l = await modalCtrl.create({ component: C })',
+        '    l.present()',
+        '    this.dlg = await this.modalService.create({ component: D })',
+        '  }',
+        '  reopen() {',
+        '    this.dlg.present()',
+        '    foo.dlg.present()',
+        '    other.present()',
+        '  }',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalModal(root).files[0].findings.map(finding => finding.snippet)).toEqual([
+      "import { BalModalService } from '@baloise/ds-angular'",
+      'await modal.present()',
+      'const m: HTMLBalModalElement = await balModalController.create({ component: B })',
+      'const m: HTMLBalModalElement = await balModalController.create({ component: B })',
+      'm.present()',
+      'l.present()',
+      'this.dlg.present()',
+    ])
+  })
+
+  it('ignores present() on the result of a create that is not a modal create', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'claim.ts',
+      [
+        "import { BalModalService } from '@baloise/ds-angular'",
+        'export class Claim {',
+        '  async confirm() {',
+        '    const user = await this.userService.create(x)',
+        '    user.present()',
+        '  }',
+        '}',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'nosemi.ts',
+      [
+        "import { BalModalService } from '@baloise/ds-angular'",
+        'async function f() {',
+        '  const user = await this.load()',
+        '  this.modalService.create(x)',
+        '  user.present()',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    const result = scanBalModal(root)
+    expect(result.total).toBe(2)
+    expect(result.files.flatMap(file => file.findings.map(finding => finding.snippet))).toEqual([
+      "import { BalModalService } from '@baloise/ds-angular'",
+      "import { BalModalService } from '@baloise/ds-angular'",
+    ])
+  })
+
+  it('lists HTMLBalModalElement and its header and body types in a ts file', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'ref.ts',
+      [
+        '@ViewChild("x") x!: ElementRef<HTMLBalModalElement>',
+        'let h: HTMLBalModalHeaderElement',
+        'let b: HTMLBalModalBodyElement',
+        'let n: HTMLBalModalishElement',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalModal(root).files[0].findings.map(finding => finding.snippet)).toEqual([
+      '@ViewChild("x") x!: ElementRef<HTMLBalModalElement>',
+      'let h: HTMLBalModalHeaderElement',
+      'let b: HTMLBalModalBodyElement',
+    ])
+  })
+
+  it('lists open() only in the file that has a modal finding', () => {
+    const root = createScratchDir()
+    write(root, 'a.ts', ["import { BalModal } from '@baloise/ds-angular'", 'modal.open()', ''].join('\n'))
+    write(root, 'b.ts', 'modal.open()\n')
+
+    const result = scanBalModal(root)
+    expect(result.files.map(file => file.file)).toEqual(['a.ts'])
+    expect(result.total).toBe(2)
+  })
+
+  it('scans a long modal-like identifier in linear time', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'long.ts',
+      ["import { BalModal } from '@baloise/ds-angular'", `${'modal$'.repeat(2000)}.open(`, ''].join('\n'),
+    )
+
+    const started = Date.now()
+    scanBalModal(root)
+    expect(Date.now() - started).toBeLessThan(1000)
+  })
+
+  it('lists none of the new kinds in a file without another modal finding', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'plain.ts',
+      ['modal.open()', 'const x = await service.create({ componentProps: { a: 1 } })', 'await x.present()', ''].join(
+        '\n',
+      ),
+    )
+
+    expect(scanBalModal(root)).toEqual({ total: 0, files: [] })
+  })
+
   it('skips usages that live only under dependency or build directory names', () => {
     const root = createScratchDir()
     write(root, 'page.html', '<bal-modal></bal-modal>\n')
