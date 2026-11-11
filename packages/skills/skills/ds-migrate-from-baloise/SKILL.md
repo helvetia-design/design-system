@@ -156,6 +156,32 @@ Report every item this rule handles under Needs your attention. Name the file, t
 
 Inside a batch the rule applies the same way, because it is part of the Rewrite step.
 
+#### Legacy types and bundles
+
+Every component migration applies these rules in its Rewrite step. They cover each file with a finding and the same-basename `.ts` beside every `.html` finding. The event type and element type rules also apply to React `.tsx` and `.ts` files. Inside a batch the rules apply the same way, because they are part of the Rewrite step.
+
+**Event types.** A handler parameter typed with a legacy event type no longer type-checks once its binding becomes `ds*`. Angular with `strictTemplates` fails with TS2345. Take the new type from the tag the handler is bound to after the rewrite, not from the old name. `ds-<tag>` gives `Ds<Tag>CustomEvent` in PascalCase. A former `BalInputStepperCustomEvent` on a `ds-counter` becomes `DsCounterCustomEvent`, and a former `BalDateCustomEvent` becomes `DsDatepickerCustomEvent`.
+
+- `BalEvents.Bal<X>CustomEvent<T>` and the bare `Bal<X>CustomEvent<T>` become `Ds<Y>CustomEvent<T>`, where `ds-<y>` is the new tag. Use the detail type that the Events table of that component's `migration.md` names for the event as the new `T`. Keep the legacy `T` only when that table names no detail, and report it. A legacy `T` that allows `undefined` where the new detail has `null` always becomes the new type.
+- An event alias such as `BalEvents.BalInputChange` becomes `Ds<Y>CustomEvent<detail>`, with the detail from that table.
+- A detail alias such as `BalEvents.BalInputChangeDetail` has no `Ds*` counterpart. Write the detail type out from that table.
+- `BalProps.*` types have no `Ds*` counterpart for form controls. Leave them unchanged.
+- A handler that stays bound to a legacy `bal-*` element keeps its legacy type.
+- Import the new types with `import type { … } from '@helvetia-design/core'`. Merge them into an existing import from that module.
+- A component `migration.md` that gives its own type rule wins. Tabs, steps and carousel use `CustomEvent<{ value: string }>`.
+
+**Element types.** Every `HTMLBal<X>Element` that names an element migrated in this run becomes `HTMLDs<Y>Element` of the new tag. This covers `ElementRef<HTMLBal<X>Element>`, `@ViewChild(...) x?: HTMLBal<X>Element`, `viewChild<...>` and every other use. These types are global, so they need no import. Then apply the Methods rules of that `migration.md` to the calls on the ref. The new type makes `tsc` show every call to a removed method.
+
+**Angular bundles.** In `imports: [...]` of a standalone component or an NgModule, replace a `...Bal<X>Bundle` spread with the `Ds*` standalone symbols that the migrated template uses. Import them from `@helvetia-design/angular`. The template is the `.html` beside the class or the inline `template:`. Without these symbols Angular fails with NG8001 on the `ds-*` tag, and `formControlName` finds no ControlValueAccessor. The "Tags and imports" section of each `migration.md` names its bundle and its symbols.
+
+- Keep the spread and its import while the template still uses a legacy tag from that bundle. Examples are `bal-check` and `bal-switch` (checkbox), `bal-radio-icon` (radio), a group left in place, or a `bal-field` left in place. Add the `Ds*` symbols next to the spread.
+- Delete the bundle symbol from the `@baloise/ds-angular` import once its last spread is gone.
+- A component migration never removes a multi-family bundle: `BalFormBundle`, `BalLayoutBundle`, `BalTypographyBundle` or `BalComponentBundle`. Add the `Ds*` symbols next to it.
+- `BalFieldBundle` and `BalFormGridBundle` have no `Ds*` symbols. Remove them once no tag of the bundle is left in that template. Add nothing.
+- When `shared/field.md` removes the last `bal-field*` tag of a template, the control migration also removes the `...BalFieldBundle` spread of that template.
+
+Report each `BalProps.*` left in place, each legacy `T` kept because the Events table names no detail, each detail alias written out, each multi-family bundle kept and each spread kept because a legacy tag is left. Name the file and the line. They go under Needs your attention. The `migration.md` checklist item that covers types or bundles gets one outcome line per occurrence.
+
 #### Manual
 
 List every file matching `components/*.md` or `components/*/migration.md` in this skill folder. Build a picker from each file's title (the first Markdown heading). Wait for one choice, then ask the cascade question below.
@@ -174,7 +200,7 @@ The script prints one JSON object. `suggested` contains used `bal-*` components 
 
 Show `notYet`, if it is not empty, as used components that cannot be migrated by this version of the skill. Do not offer them as choices.
 
-If `types` is not empty, show it as a note: these legacy types stay until their code is rewritten by hand.
+If `types` is not empty, show it as a note: a component migration rewrites the legacy types of the components it migrates (see Legacy types and bundles), and the other legacy types stay until their code is rewritten by hand.
 
 If `suggested` is empty, report that none of the used components has an available migration, then stop.
 
@@ -223,13 +249,14 @@ Rewrite the legacy Baloise utility classes in the project to their Helvetia name
 
 Migrate every legacy icon left in the project, following `shared/icons.md`. Component migrations already handle the icons in the files they touch. This step covers the rest, such as a constants file that imports `balBrandIcon*` symbols but has no `bal-*` tag. It also moves the fonts and favicons to `@helvetia-design/assets`, following `shared/fonts-favicons.md`, and deletes the legacy config call once no `bal-*` component is left, following `shared/legacy-config.md`.
 
-1. Run the icon scan from `shared/icons.md` without file arguments, so it covers the whole project. Show the findings grouped by file (path, line, snippet) and end with the total count. Then run `scan-assets.mjs` from the Scan section of `shared/fonts-favicons.md`, and show its findings grouped by file the same way, with its total count and the `project` values. Then run the Scan section of `shared/legacy-config.md`. No component is being migrated here, so every `bal-*` component that `scan-migratable.mjs` reports counts as left. List each call it marks for deletion after the icon and asset findings.
-2. When step 1 listed icon or asset findings, ask one yes/no: rewrite every listed usage and delete every listed call? This one answer covers the icons, the fonts and favicons, and the legacy config calls. When it listed only calls to delete, ask one yes/no: delete every listed call? On no, stop with the files unchanged. When it listed neither, say there are no legacy icons, fonts or favicons left to migrate and skip steps 3 and 4.
+1. Run the icon scan from `shared/icons.md` without file arguments, so it covers the whole project. Show the findings grouped by file (path, line, snippet) and end with the total count. Then run `scan-assets.mjs` from the Scan section of `shared/fonts-favicons.md`, and show its findings grouped by file the same way, with its total count and the `project` values. Then run the Scan section of `shared/legacy-config.md`. No component is being migrated here, so every `bal-*` component that `scan-migratable.mjs` reports counts as left. List each call it marks for deletion after the icon and asset findings. Then read the Vite config section of `shared/fonts-favicons.md` without editing anything, and list its lines last.
+2. When step 1 listed icon or asset findings, ask one yes/no: rewrite every listed usage and delete every listed call? This one answer covers the icons, the fonts and favicons, and the legacy config calls. When it listed only calls to delete, ask one yes/no: delete every listed call? On no, stop with the files unchanged. When it listed neither, say there are no legacy icons, fonts or favicons left to migrate and skip steps 3 and 4. The Vite config lines need no confirmation, because this step never edits a Vite config. They go into the report in every case, also when step 1 listed nothing else.
 3. When the icon scan found anything, apply every rule in `shared/icons.md` to the listed files.
 4. When `scan-assets.mjs` found anything, apply the sections of `shared/fonts-favicons.md` in this order: Dependencies, then Fonts, then Favicons.
-5. Apply the Decide section of `shared/legacy-config.md`.
-6. Append an `assets` section to `ds-migration-report.md` as `shared/report.md` describes. Its checklist holds the `I1.`, `I2.`, ... items from the Report section of `shared/icons.md`, then the `A1.`, `A2.`, ... items from the Report section of `shared/fonts-favicons.md`, then the `L1.`, `L2.`, ... items from the Report section of `shared/legacy-config.md`. Skip the final whole-project scan of `shared/icons.md`, which this step already is.
-7. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.
+5. Apply the Vite config section of `shared/fonts-favicons.md` in every case. It only lists lines and edits no file.
+6. Apply the Decide section of `shared/legacy-config.md`.
+7. Append an `assets` section to `ds-migration-report.md` as `shared/report.md` describes. Its checklist holds the `I1.`, `I2.`, ... items from the Report section of `shared/icons.md`, then the `A1.`, `A2.`, ... items from the Report section of `shared/fonts-favicons.md`, then the `L1.`, `L2.`, ... items from the Report section of `shared/legacy-config.md`. Skip the final whole-project scan of `shared/icons.md`, which this step already is.
+8. Stop. Do not run `git add` or `git commit`. Leave every change unstaged for the consumer to review.
 
 ### Cleanup
 

@@ -85,7 +85,6 @@ describe('scanBalRadio', () => {
       'types.ts',
       [
         'const el: HTMLBalRadioElement | null = null',
-        'type A = BalEvents.BalRadioChangeDetail',
         "const b: BalProps.BalRadioInterface = 'tile'",
         'type C = BalRadioOption',
       ].join('\n'),
@@ -381,6 +380,49 @@ describe('scanBalRadio', () => {
     )
 
     expect(scanBalRadio(root)).toEqual({ total: 0, files: [] })
+  })
+
+  it('lists the bundle and BalEvents types once per occurrence, but not BalProps or multi-family bundles', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        "import { BalFormBundle, BalRadioBundle } from '@baloise/ds-angular'",
+        '@Component({ imports: [...BalRadioBundle, ...BalFormBundle] })',
+        'export class ApplicationComponent {',
+        '  onSalutation(event: BalEvents.BalRadioCustomEvent<boolean>) {}',
+        '  onPlan(event: BalEvents.BalRadioGroupCustomEvent<string>) {}',
+        '  onBare(event: BalRadioGroupCustomEvent<string>) {}',
+        '  detail?: BalEvents.BalRadioChangeDetail',
+        '  both(a: BalEvents.BalRadioBlur, b: BalRadioCustomEvent<boolean>) {}',
+        '  look?: BalProps.BalRadioInterface',
+        '  el?: HTMLBalRadioElement',
+        '  onIcon(event: BalRadioIconCustomEvent<boolean>) {}',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalRadio(root)).toEqual({
+      total: 9,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            { line: 1, snippet: "import { BalFormBundle, BalRadioBundle } from '@baloise/ds-angular'" },
+            { line: 2, snippet: '@Component({ imports: [...BalRadioBundle, ...BalFormBundle] })' },
+            { line: 4, snippet: 'onSalutation(event: BalEvents.BalRadioCustomEvent<boolean>) {}' },
+            { line: 5, snippet: 'onPlan(event: BalEvents.BalRadioGroupCustomEvent<string>) {}' },
+            { line: 6, snippet: 'onBare(event: BalRadioGroupCustomEvent<string>) {}' },
+            { line: 7, snippet: 'detail?: BalEvents.BalRadioChangeDetail' },
+            { line: 8, snippet: 'both(a: BalEvents.BalRadioBlur, b: BalRadioCustomEvent<boolean>) {}' },
+            { line: 8, snippet: 'both(a: BalEvents.BalRadioBlur, b: BalRadioCustomEvent<boolean>) {}' },
+            { line: 11, snippet: 'onIcon(event: BalRadioIconCustomEvent<boolean>) {}' },
+          ],
+        },
+      ],
+    })
   })
 
   it('prints grouped findings as JSON and does not edit files', () => {

@@ -84,6 +84,13 @@ Apply this section before Fonts and Favicons.
 
    Otherwise copy nothing and report the folder and this script.
 
+## Vite config
+
+A Vite config often carries tooling that exists only for the Baloise packages: a plugin that strips `/* @vite-ignore */` from `@baloise/ds-core`, `optimizeDeps` `include` or `exclude` entries, or a sourcemap workaround for `@baloise/ds-styles`. Never edit a Vite config.
+
+1. Read every `vite.config.{js,mjs,cjs,ts,mts,cts}` at `<project-root>`.
+2. List each line that names `@baloise/` or `@vite-ignore`, with the note that it is removable once no `@baloise/*` import is left.
+
 ## Report
 
 These items follow the `I` items of `shared/icons.md` and come before the `L` items of `shared/legacy-config.md`. Each one gets its own line in `ds-migration-report.md`, as `shared/report.md` describes.
@@ -98,12 +105,13 @@ Needs your attention when found:
 - A6. The target folder to serve as `/assets/fonts` when nothing was copied.
 - A7. Every favicon path rewritten, and where.
 - A8. `@helvetia-design/assets` added to `package.json`, with its version and the install command.
+- A9. Every `vite.config.*` line that names `@baloise/` or `@vite-ignore`, with the note that it is removable once no `@baloise/*` import is left.
 
 Coverage only, written to the file:
 
-- A9. Every design-system import switched to `design-system.local`, and where.
-- A10. Every legacy `css/font` or `sass/font` line deleted.
-- A11. The Init TODO comment kept or deleted, and why.
-- A12. Every font file copied or `angular.json` glob entry added, with its path.
-- A13. Every favicon tag found, and where.
-- A14. Every `@baloise/ds-fonts` or `@baloise/ds-favicons` dependency that is removable once nothing references it.
+- A10. Every design-system import switched to `design-system.local`, and where.
+- A11. Every legacy `css/font` or `sass/font` line deleted.
+- A12. The Init TODO comment kept or deleted, and why.
+- A13. Every font file copied or `angular.json` glob entry added, with its path.
+- A14. Every favicon tag found, and where.
+- A15. Every `@baloise/ds-fonts` or `@baloise/ds-favicons` dependency that is removable once nothing references it.

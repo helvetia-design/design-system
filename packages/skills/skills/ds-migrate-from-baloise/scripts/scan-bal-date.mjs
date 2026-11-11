@@ -4,7 +4,8 @@ import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
-const USAGE_RE = /<\/?bal-date(?![\w-])|<\/?BalDate(?![\w-])|\bBalDate(?![\w-])/g
+const USAGE_RE =
+  /<\/?bal-date(?![\w-])|<\/?BalDate(?![\w-])|\bBalEvents\.BalDate(?!Calendar|Cell)[A-Z]\w*|\bBalDate(?:CustomEvent)?(?![\w-])/g
 
 export function scanBalDate(rootDir, paths = []) {
   const found = []

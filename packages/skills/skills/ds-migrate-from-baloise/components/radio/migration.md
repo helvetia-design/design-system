@@ -6,7 +6,7 @@ Both legacy tags are migrated together, not separately. `bal-radio-group` drives
 
 `bal-radio-icon` is the third tag in the legacy folder. It is an internal visual child that `bal-radio` renders itself, and `ds-radio` has no equivalent. The scan lists it so it is not missed, but it is **never rewritten**: leave every `bal-radio-icon` and `BalRadioIcon` exactly as it is and report each one by file and line as "no `ds-*` equivalent, needs manual rework". Do not add a comment to the consumer's code.
 
-The scan also lists `newBalRadioOption`, the helper that builds the dropped `options` array (see Props below), because a file can call it without ever naming a tag. The scan does not match the ambient `HTMLBalRadioElement`, `BalProps.BalRadio*` or `BalEvents.BalRadio*` types. Those are Report items, not rewrites. Search for them yourself in each file with a finding.
+The scan also lists `newBalRadioOption`, the helper that builds the dropped `options` array (see Props below), because a file can call it without ever naming a tag. The scan also lists `BalRadioBundle` and the `BalEvents.BalRadio*` and `BalRadio*CustomEvent` types. It does not match the ambient `HTMLBalRadioElement` or `BalProps.BalRadio*` types. Search for them yourself in each file with a finding. `SKILL.md` "Legacy types and bundles" says how to rewrite all of them.
 
 Apply `shared/field.md` in the Rewrite step to every migrated `ds-radio-group` that sits inside a `bal-field`, in the same pass. It moves the label, description and message of the wrapper onto the control and removes the wrapper tags. A `bal-field` around a control that is still a legacy `bal-*` tag stays unchanged. `components/field/migration.md` migrates `bal-form-grid`, `bal-form-col` and every `bal-field` that is left.
 
@@ -86,7 +86,7 @@ Rewrite anyway, as the closest available approximation: add `tile` and `hideTrig
 ### Tags and imports
 
 - **HTML**: `<bal-radio>` becomes `<ds-radio>`, including the closing tag. `<bal-radio-group>` becomes `<ds-radio-group>`, including the closing tag. Leave `<bal-radio-icon>` alone.
-- **Angular**: the same tag rewrites in `.html` templates and in inline `template:` strings. When a file imports `BalRadio` and/or `BalRadioGroup` from `@baloise/ds-angular`, replace only the ones used with `DsRadio`/`DsRadioGroup` from `@helvetia-design/angular`, keeping the rest on the `@baloise` import.
+- **Angular**: the same tag rewrites in `.html` templates and in inline `template:` strings. When a file imports `BalRadio` and/or `BalRadioGroup` from `@baloise/ds-angular`, replace only the ones used with `DsRadio`/`DsRadioGroup` from `@helvetia-design/angular`, keeping the rest on the `@baloise` import. A `...BalRadioBundle` spread in `imports: [...]` becomes `DsRadio` and `DsRadioGroup`. Keep the spread, and add the `Ds*` symbols next to it, while the template still has a `bal-radio-icon` or a group left in place. A multi-family bundle such as `BalFormBundle` stays, and the `Ds*` symbols are added next to it. `SKILL.md` "Legacy types and bundles" has the full bundle rule.
 - **React**: `<BalRadio>`/`</BalRadio>` becomes `<DsRadio>`/`</DsRadio>`, `<BalRadioGroup>`/`</BalRadioGroup>` becomes `<DsRadioGroup>`/`</DsRadioGroup>`. Import the renamed symbols from `@helvetia-design/react`, keeping only the ones actually used. When the existing `@baloise/ds-react` import also binds other symbols, move only `BalRadio` and `BalRadioGroup` and leave the rest on the `@baloise` import.
 
 ### Events
@@ -97,7 +97,7 @@ Rewrite anyway, as the closest available approximation: add `tile` and `hideTrig
 | `balFocus`  | `dsFocus`  | Same shapes as `balChange`: `addEventListener`, `(balFocus)`, `onBalFocus` become `dsFocus`, `(dsFocus)`, `onDsFocus`. Detail stays `FocusEvent`.                                                                                                                                                                                    |
 | `balBlur`   | `dsBlur`   | Same shapes as `balFocus`, targeting `blur`.                                                                                                                                                                                                                                                                                         |
 
-A handler parameter typed with a legacy event type, such as `BalEvents.BalRadioGroupCustomEvent<string>` or `BalRadioCustomEvent<boolean>`, no longer type-checks under Angular `strictTemplates`. Retype it to `DsRadioGroupCustomEvent` on a `ds-radio-group` and `DsRadioCustomEvent` on a `ds-radio`, and keep the type argument. Import the types with `import type { … } from '@helvetia-design/core/components'`.
+Retype handler parameters as `SKILL.md` "Legacy types and bundles" describes. A legacy type such as `BalEvents.BalRadioGroupCustomEvent<string>` or `BalRadioCustomEvent<boolean>` becomes `DsRadioGroupCustomEvent` on a `ds-radio-group` and `DsRadioCustomEvent` on a `ds-radio`. Keep the type argument.
 
 Rewrite only handlers that are attached to the element being migrated. `balChange`, `balFocus` and `balBlur` are emitted by many other legacy components, so never rewrite a handler on another element, and never rename them by search and replace across the file.
 
@@ -111,7 +111,7 @@ The scan does not list a file that only listens and never uses `bal-radio`/`bal-
 
 `getInputElement()` and `getOption()` do not exist on `ds-radio`. Apply Unmapped props and handlers (`SKILL.md`).
 
-`getOptionByValue()` does not exist on `ds-radio-group`. It is tied to the dropped `options` array — flag every call site alongside the `options` occurrence it belongs to.
+`getOptionByValue()` does not exist on `ds-radio-group`. Apply Unmapped props and handlers (`SKILL.md`). It is tied to the dropped `options` array, so report every call site alongside the `options` occurrence it belongs to.
 
 `setValue()` on `bal-radio-group` is never dropped silently. The legacy types declare it publicly as `setValue(value: number | string | boolean)`. Angular apps call it through a typed ref in the `.ts` beside the template, for example `this.planGroup?.nativeElement.setValue('basic')` with `@ViewChild('planGroup') planGroup?: ElementRef<HTMLBalRadioGroupElement>`. The scan flags these calls with `setValue: true`. `ds-radio-group` has no `setValue()`. Rewrite each call by how the group is bound, and report each rewrite:
 
@@ -137,11 +137,11 @@ Needs your attention when found:
 4. Every dropped `nonSubmit`. `ds-radio` is always submitted with the form.
 5. Every dropped `verticalOnMobile`.
 6. Every dropped `expanded`.
-7. Every dropped `options` or `newBalRadioOption`, flagged for manual conversion to slotted children, together with any `getOptionByValue()` call site tied to it.
+7. Every dropped `options` or `newBalRadioOption`, flagged for manual conversion to slotted children, together with any `getOptionByValue()` call site tied to it and its Unmapped props and handlers outcome.
 8. Every `getInputElement()` or `getOption()` call, with its Unmapped props and handlers outcome.
 9. Every `setValue()` call on a `bal-radio-group` ref, with the rewrite it got: the form control, the model property, or `el.value`. For `el.value`, note that no `dsChange` fires, so `dsChange` handlers do not run.
 10. Every `bal-radio-icon` or `BalRadioIcon` left in place because it has no `ds-*` equivalent. Name file and line for each.
-11. Every type reference that the scan cannot see, such as `HTMLBalRadioElement`, `BalProps.BalRadioInterface` or `BalEvents.BalRadioChange`. These resolve from the ambient namespaces and stop compiling once `@baloise/ds-core` is removed.
+11. Every legacy type left or written out and every bundle kept, as `SKILL.md` "Legacy types and bundles" describes: each `BalProps.BalRadio*` type such as `BalProps.BalRadioInterface` left in place, each detail alias such as `BalEvents.BalRadioChangeDetail` written out, each `BalRadioBundle` spread kept because a `bal-radio-icon` or a group is left, and each multi-family bundle kept.
 12. One-time note: files which only listen or only call a method, and have no scanned `.html` of the same name beside them, were not scanned.
 13. One-time note: the scan reports `setValue()` on a ref typed `HTMLBalRadioGroupElement` in every scanned file. It does not report other method calls or listeners in a file that has no finding and no scanned `.html` of the same name beside it.
 

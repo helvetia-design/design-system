@@ -31,19 +31,19 @@ function buckets(report: string) {
 }
 
 const expectedCounts: Record<string, { attention: number; coverage: number }> = {
-  'accordion': { attention: 12, coverage: 3 },
-  'app': { attention: 5, coverage: 4 },
+  'accordion': { attention: 13, coverage: 3 },
+  'app': { attention: 8, coverage: 5 },
   'badge': { attention: 3, coverage: 3 },
-  'button': { attention: 12, coverage: 4 },
+  'button': { attention: 13, coverage: 4 },
   'card': { attention: 9, coverage: 3 },
   'carousel': { attention: 21, coverage: 6 },
-  'checkbox': { attention: 15, coverage: 2 },
+  'checkbox': { attention: 16, coverage: 2 },
   'close': { attention: 2, coverage: 1 },
   'content': { attention: 4, coverage: 2 },
   'data': { attention: 6, coverage: 1 },
-  'date': { attention: 10, coverage: 4 },
+  'date': { attention: 11, coverage: 4 },
   'divider': { attention: 4, coverage: 2 },
-  'field': { attention: 1, coverage: 2 },
+  'field': { attention: 2, coverage: 2 },
   'file-upload': { attention: 3, coverage: 1 },
   'footer': { attention: 8, coverage: 4 },
   'heading': { attention: 6, coverage: 4 },
@@ -55,7 +55,7 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'label': { attention: 5, coverage: 2 },
   'list': { attention: 26, coverage: 7 },
   'logo': { attention: 5, coverage: 0 },
-  'modal': { attention: 18, coverage: 3 },
+  'modal': { attention: 23, coverage: 6 },
   'navbar': { attention: 12, coverage: 0 },
   'notification': { attention: 6, coverage: 2 },
   'number-input': { attention: 8, coverage: 2 },
@@ -67,7 +67,7 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'select': { attention: 12, coverage: 1 },
   'shape': { attention: 4, coverage: 1 },
   'sheet': { attention: 6, coverage: 0 },
-  'snackbar': { attention: 20, coverage: 6 },
+  'snackbar': { attention: 21, coverage: 7 },
   'spinner': { attention: 0, coverage: 1 },
   'stack': { attention: 4, coverage: 1 },
   'steps': { attention: 19, coverage: 9 },
@@ -75,7 +75,7 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'tag': { attention: 5, coverage: 6 },
   'text': { attention: 5, coverage: 1 },
   'textarea': { attention: 7, coverage: 2 },
-  'toast': { attention: 15, coverage: 7 },
+  'toast': { attention: 16, coverage: 8 },
   'tooltip': { attention: 5, coverage: 2 },
 }
 
@@ -162,6 +162,36 @@ describe('Report items the issue requires by name', () => {
     expect(new Set(numbers).size).toBe(numbers.length)
   })
 
+  it('accordion checks every single-icon trigger on its own line', () => {
+    const { attention } = bucketsOf('accordion')
+
+    expect(attention.filter(item => item.text.includes('single-icon trigger'))).toHaveLength(1)
+  })
+
+  it('accordion maps legacy open labels and icons to the ds-accordion close props', () => {
+    const migration = read('components/accordion/migration.md')
+    const lineOf = (start: string) => {
+      const lines = migration.split('\n').filter(line => line.startsWith(start))
+      expect(lines, start).toHaveLength(1)
+      return lines[0]
+    }
+    const targetOf = (start: string) => lineOf(start).split('|')[2]
+    const shape1After = lineOf('<ds-accordion button ')
+
+    expect(shape1After).toContain('button-label-close="Show more"')
+    expect(shape1After).toContain('button-label-open="Show less"')
+    expect(targetOf('| `bal-accordion` `openLabel`')).toContain('`buttonLabelClose`')
+    expect(targetOf('| `bal-accordion` `closeLabel`')).toContain('`buttonLabelOpen`')
+    expect(targetOf('| `bal-accordion` `openIcon`')).toContain('`buttonIconClose`')
+    expect(targetOf('| `bal-accordion` `closeIcon`')).toContain('`buttonIconOpen`')
+    expect(targetOf('| `bal-accordion-trigger` `openLabel`')).toMatch(/^\s*`button-label-close` \/ `button-label-open`/)
+    expect(targetOf('| `bal-accordion-trigger` `openIcon`')).toMatch(/^\s*`button-icon-close` \/ `button-icon-open`/)
+    expect(lineOf('- **Trigger, `openIcon` set and `closeIcon` empty or absent.**')).toMatch(
+      /both `button-icon-close` and `button-icon-open`/,
+    )
+    expect(lineOf('| `bal-accordion` bound `active`')).toContain('`[open]="x"`')
+  })
+
   it('button checks each of the four colour collisions on its own line', () => {
     const numbers = itemNumbers('button', buttonCollisions)
 
@@ -220,6 +250,59 @@ describe('Report items the issue requires by name', () => {
       expect(migration()).toContain(`import \`${controller}\` from \`@helvetia-design/core\``)
       expect(migration()).toContain('`@helvetia-design/core/components/ds-alert-container.js`')
       expect(migration()).toContain(`\`@helvetia-design/core/components/ds-${name}.js\``)
+    })
+  })
+
+  it('app writes the legacy brand default, reports forms and adds the ds-* language call', () => {
+    const migration = read('components/app/migration.md')
+    const { attention, coverage } = bucketsOf('app')
+
+    expect(migration).toContain('Write `brand="baloise"`')
+    expect(migration).toContain('add `provideDesignSystem()` with no arguments')
+    expect(migration).toContain('call `updateDsLanguage(language)` from `@helvetia-design/core`')
+    expect(migration).toContain('call `setLanguage(language)` on an injected `DsConfigService`')
+    expect(migration).not.toContain('write no config attributes')
+    expect(migration).toContain(
+      'Skip an `updateBalLanguage` call that already has a `setLanguage(` or `updateDsLanguage(` call with the same argument directly after it.',
+    )
+    expect(migration).toContain(
+      'call `updateDsLanguage(language)` from `@helvetia-design/core` instead of `DsConfigService`',
+    )
+    expect(migration).toContain('throws `NG0203`')
+    expect(
+      migration.match(
+        /unless `ds-root`, `DsRootProvider` or an existing `initializeDesignSystem` call already sets `brand`/g,
+      ),
+    ).toHaveLength(2)
+    expect(migration.match(/needs no replacement/g)).toHaveLength(1)
+    expect(attention.filter(item => item.text.includes('`brand="baloise"`'))).toHaveLength(1)
+    expect(
+      attention.filter(item => item.text.includes('the note from the `forms.*` row of the Config table')),
+    ).toHaveLength(1)
+    expect(attention.filter(item => item.text.includes('because the legacy call set no `brand` key'))).toHaveLength(1)
+    expect(attention.filter(item => item.text.includes('Every `forms` key left in the legacy call'))).toHaveLength(1)
+    expect(attention.filter(item => item.text.includes('`provideDesignSystem()` added'))).toHaveLength(1)
+    expect(coverage.filter(item => item.text.includes('Every `updateBalLanguage` call'))).toHaveLength(1)
+  })
+
+  describe.each([
+    ['toast', 'snackbar'],
+    ['snackbar', 'toast'],
+  ])('%s bal-notices rule', (name, other) => {
+    it('deletes its own interface and defers the shared container to the other migration', () => {
+      const migration = read(`components/${name}/migration.md`)
+      const { attention, coverage } = bucketsOf(name)
+
+      expect(migration).toContain(`Delete a \`<bal-notices>\` element whose static \`interface\` is \`${name}\``)
+      expect(migration).toContain(`go only when no ${other} is left`)
+      expect(migration).toContain(
+        `A \`<bal-notices>\` with a static \`interface="${other}"\` follows the next bullet, so it goes only when no ${other} is left.`,
+      )
+      expect(migration).not.toContain(`stays until the ${other} migration runs`)
+      expect(migration).toContain(`scripts/scan-bal-${other}.mjs <project-root>`)
+      expect(migration).not.toContain('`bal-notices` is not this component and stays unchanged.')
+      expect(attention.filter(item => item.text.includes(`kept because a ${other} is left`))).toHaveLength(1)
+      expect(coverage.filter(item => item.text.includes('`bal-notices` comment block deleted'))).toHaveLength(1)
     })
   })
 
@@ -308,6 +391,15 @@ describe('SKILL.md', () => {
 
     expect(assets).toContain('`scan-assets.mjs`')
     expect(assets).toContain('`shared/fonts-favicons.md`')
+  })
+
+  it('lists the Vite config lines in every Assets run, also when nothing else was found', () => {
+    const assets = section(skill, '### Assets')
+
+    expect(assets).toContain('Then read the Vite config section of `shared/fonts-favicons.md` without editing anything')
+    expect(assets).toContain('The Vite config lines need no confirmation')
+    expect(assets).toMatch(/^\d+\. Apply the Vite config section of `shared\/fonts-favicons\.md` in every case\./m)
+    expect(assets).not.toContain('Apply its Vite config section')
   })
 
   it('orders the Assets checklist as I items, then A items, then L items', () => {
@@ -527,6 +619,13 @@ describe('shared/fonts-favicons.md', () => {
     expect(report).not.toContain('summary')
     expect(numbers.length).toBeGreaterThan(0)
     expect(numbers).toEqual(numbers.map((_, index) => index + 1))
+  })
+
+  it('lists Baloise-only Vite config lines as removable and never edits the config', () => {
+    const report = section(rules, '## Report')
+
+    expect(section(rules, '## Vite config')).toContain('Never edit a Vite config.')
+    expect(report).toContain('removable once no `@baloise/*` import is left')
   })
 
   it('forbids fonts.css and fonts.cdn.css and never instructs writing them', () => {

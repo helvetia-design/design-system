@@ -4,7 +4,8 @@ import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
-const USAGE_RE = /<\/?bal-textarea(?![\w-])|<\/?BalTextarea\b|\bBalTextarea\b/g
+const USAGE_RE =
+  /<\/?bal-textarea(?![\w-])|<\/?BalTextarea\b|\bBalEvents\.BalTextarea[A-Z]\w*|\bBalTextarea(?:CustomEvent)?\b/g
 
 export function scanBalTextarea(rootDir, paths = []) {
   const found = []

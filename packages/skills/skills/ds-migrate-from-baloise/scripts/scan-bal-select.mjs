@@ -4,7 +4,8 @@ import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
-const USAGE_RE = /<\/?bal-select(?:-option)?(?![\w-])|<\/?BalSelect(?:Option)?\b|\bBalSelect(?:Option)?\b/g
+const USAGE_RE =
+  /<\/?bal-select(?:-option)?(?![\w-])|<\/?BalSelect(?:Option)?\b|\bBalEvents\.BalSelect[A-Z]\w*|\bBalSelect(?:Option)?(?:CustomEvent)?\b|\bBalSelectBundle\b/g
 
 export function scanBalSelect(rootDir, paths = []) {
   const found = []

@@ -395,7 +395,7 @@ describe('markup, bindings and comments', () => {
     ])
   })
 
-  it('does not take a URL in Vue template text for a comment, and reports a JSX context behind `//`', () => {
+  it('does not take a URL in Vue or JSX text for a comment, and reports a JSX context behind `//`', () => {
     const root = createScratchDir()
     write(
       root,
@@ -416,12 +416,10 @@ describe('markup, bindings and comments', () => {
     const result = scanCssUtils(root)
 
     expect(moves(result).map(({ file, from }) => ({ file, from }))).toEqual([
+      { file: 'src/App.tsx', from: 'radius-normal' },
       { file: 'src/Comp.vue', from: 'radius-normal' },
     ])
-    expect(dynamicPlaces(result)).toEqual([
-      { file: 'src/App.tsx', line: 1, reason: 'possibly commented' },
-      { file: 'src/App.tsx', line: 2, reason: 'possibly commented' },
-    ])
+    expect(dynamicPlaces(result)).toEqual([{ file: 'src/App.tsx', line: 2, reason: 'possibly commented' }])
   })
 
   it('reads bare and computed ngClass keys, also in an inline template', () => {
@@ -787,9 +785,26 @@ describe('places a rewrite would break', () => {
     ])
   })
 
-  it('reports a JSX class context inside a block comment', () => {
+  it('reads `/*` in JSX text as text and reports a JSX class context inside a block comment', () => {
     const root = createScratchDir()
-    write(root, 'a.tsx', ['export const A = () => <p>From /tmp/* <span className="grid" /> to */x</p>', ''].join('\n'))
+    write(
+      root,
+      'a.tsx',
+      [
+        'export const A = () => <p>From /tmp/* <span className="grid" /> to */x</p>',
+        'export const B = () => <p>{/* <span className="container" /> */}</p>',
+        '',
+      ].join('\n'),
+    )
+
+    const result = scanCssUtils(root)
+    expect(moves(result).map(({ line, from }) => ({ line, from }))).toEqual([{ line: 1, from: 'grid' }])
+    expect(dynamicPlaces(result)).toEqual([{ file: 'a.tsx', line: 2, reason: 'possibly commented' }])
+  })
+
+  it('reports a class after `//` in an unclosed JSX element instead of dropping it', () => {
+    const root = createScratchDir()
+    write(root, 'a.tsx', 'export const A = () => <p>see http://x <span className="grid" />\n')
 
     const result = scanCssUtils(root)
     expect(moves(result)).toEqual([])

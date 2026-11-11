@@ -110,7 +110,7 @@ function byPosition(a, b) {
   return a.file.localeCompare(b.file) || a.line - b.line
 }
 
-// The completeness gate reads masked source, where an apostrophe in markup text hides the rest of the line.
+// The completeness gate reads masked source, where a tag inside a string literal is blanked.
 function collectHiddenTags(file, text, source, found) {
   if (!TAG_RE.test(source.comments)) return
   const raw = text.split('\n')

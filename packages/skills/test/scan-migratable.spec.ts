@@ -322,6 +322,26 @@ describe('scanMigratable', () => {
     })
   })
 
+  it('counts bal-notices for toast instead of listing it as notYet', () => {
+    const root = createScratchDir()
+    write(root, 'index.html', '<bal-notices interface="toast"></bal-notices>\n')
+    write(
+      root,
+      'App.tsx',
+      [
+        "import { BalNotices } from '@baloise/ds-react'",
+        'defineBalNotices()',
+        'export const App = () => <BalNotices />',
+      ].join('\n'),
+    )
+
+    expect(scanMigratable(root)).toEqual({
+      suggested: [{ name: 'toast', total: 3 }],
+      notYet: [],
+      types: [],
+    })
+  })
+
   it('does not fold a bal-check-list lookalike into checkbox', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-check-list></bal-check-list>\n')
@@ -637,6 +657,29 @@ describe('scanMigratable', () => {
       notYet: [],
       types: [],
     })
+  })
+
+  it('finds tags after an apostrophe, a URL or a regex literal on the same line', () => {
+    const root = createScratchDir()
+    write(root, 'a.html', "<p>Don't panic <bal-button>x</bal-button></p>\n")
+    write(root, 'b.ts', "@Component({ template: `<p>Don't forget</p> <bal-button>Save</bal-button>` })\n")
+    write(root, 'c.tsx', 'const A = () => <p>see http://x <BalButton/></p>\n')
+    write(root, 'd.tsx', 'const r = /"/; const B = () => <BalButton/>\n')
+    write(root, 'e.html', "<p>l'assurance <bal-tag>a</bal-tag> dell'anno <bal-card></bal-card></p>\n")
+
+    expect(scanMigratable(root, ['.']).files).toEqual([
+      { file: 'a.html', components: [{ name: 'button', total: 1 }] },
+      { file: 'b.ts', components: [{ name: 'button', total: 1 }] },
+      { file: 'c.tsx', components: [{ name: 'button', total: 1 }] },
+      { file: 'd.tsx', components: [{ name: 'button', total: 1 }] },
+      {
+        file: 'e.html',
+        components: [
+          { name: 'card', total: 1 },
+          { name: 'tag', total: 1 },
+        ],
+      },
+    ])
   })
 
   it('prints the detection result as JSON', () => {

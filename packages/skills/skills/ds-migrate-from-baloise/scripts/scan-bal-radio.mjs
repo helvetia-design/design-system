@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFilesWithSetValue, toSnippet } from './source-scan.mjs'
 
 const USAGE_RE =
-  /<\/?bal-radio(?:-group|-icon)?(?![\w-])|<\/?BalRadio(?:Group|Icon)?\b|\bBalRadio(?:Group|Icon)?\b|\bnewBalRadioOption\b/g
+  /<\/?bal-radio(?:-group|-icon)?(?![\w-])|<\/?BalRadio(?:Group|Icon)?\b|\bBalEvents\.BalRadio[A-Z]\w*|\bBalRadio(?:Group|Icon)?(?:CustomEvent)?\b|\bBalRadioBundle\b|\bnewBalRadioOption\b/g
 
 export function scanBalRadio(rootDir, paths = []) {
   const found = []

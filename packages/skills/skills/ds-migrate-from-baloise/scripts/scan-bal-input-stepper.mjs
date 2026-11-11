@@ -4,7 +4,8 @@ import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
-const USAGE_RE = /<\/?bal-input-stepper(?![\w-])|<\/?BalInputStepper\b|\bBalInputStepper\b/g
+const USAGE_RE =
+  /<\/?bal-input-stepper(?![\w-])|<\/?BalInputStepper\b|\bBalEvents\.BalInputStepper[A-Z]\w*|\bBalInputStepper(?:CustomEvent)?\b/g
 
 export function scanBalInputStepper(rootDir, paths = []) {
   const found = []
