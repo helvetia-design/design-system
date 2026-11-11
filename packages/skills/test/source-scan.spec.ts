@@ -2,7 +2,13 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, extname, join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import { endOfString, maskComments, scanSourceFiles } from '../skills/ds-migrate-from-baloise/scripts/source-scan.mjs'
+import {
+  endOfString,
+  lineAt,
+  lineIndex,
+  maskComments,
+  scanSourceFiles,
+} from '../skills/ds-migrate-from-baloise/scripts/source-scan.mjs'
 
 const scratches: string[] = []
 
@@ -304,5 +310,38 @@ describe('scanSourceFiles masked text', () => {
     write(root, 'a.mjs', '// <bal-button>\nexport const a = 1\n')
 
     expect(maskedFiles(root)['a.mjs']).toBe(`${' '.repeat(15)}\nexport const a = 1\n`)
+  })
+})
+
+describe('lineAt and lineIndex', () => {
+  const text = 'ab\ncd\n\nef'
+
+  it('numbers lines from 1 and counts a newline character as part of its own line', () => {
+    expect(lineAt(text, 0)).toBe(1)
+    expect(lineAt(text, 2)).toBe(1)
+    expect(lineAt(text, 3)).toBe(2)
+    expect(lineAt(text, 5)).toBe(2)
+    expect(lineAt(text, 6)).toBe(3)
+    expect(lineAt(text, 7)).toBe(4)
+    expect(lineAt(text, text.length)).toBe(4)
+  })
+
+  it('counts an emoji as two UTF-16 units', () => {
+    const emoji = 'a\u{1F600}\nb'
+    expect(lineAt(emoji, emoji.indexOf('b'))).toBe(2)
+    expect(lineAt(emoji, 3)).toBe(1)
+    expect(lineAt(emoji, 4)).toBe(2)
+  })
+
+  it('rebuilds the index when the text changes', () => {
+    const other = 'x\ny\nz\n'
+    expect(lineAt(text, 7)).toBe(4)
+    expect(lineAt(other, 4)).toBe(3)
+    expect(lineAt(text, 7)).toBe(4)
+  })
+
+  it('returns the same lines from lineIndex', () => {
+    const lookup = lineIndex(text)
+    expect([0, 2, 3, 6, 7].map(lookup)).toEqual([1, 1, 2, 3, 4])
   })
 })
