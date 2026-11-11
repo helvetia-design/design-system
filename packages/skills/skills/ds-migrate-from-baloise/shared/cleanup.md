@@ -10,7 +10,7 @@ Once no `bal-*` component is left, no `ds-*` component uses the legacy `structur
 node <this-skill-directory>/scripts/scan-cleanup.mjs <project-root>
 ```
 
-The script prints one JSON object and does not edit files. It first runs `scan-migratable.mjs` on the whole project, including `.vue`, `.js`, `.mjs` and `.htm` files. It also lists under `hidden` every line with a `bal-*` tag that `scan-migratable.mjs` cannot see, such as a tag after an apostrophe in markup text (`CHF 1'000`), with `file`, `line` and `snippet`. When `suggested`, `notYet`, `types` or `hidden` lists anything, it prints `status` `incomplete` and the four lists under `outstanding`, and nothing else. `types` are the legacy type namespaces such as `BalEvents` that `scan-migratable.mjs` lists. They block Cleanup, because the dependency removal would break every file that still imports them.
+The script prints one JSON object and does not edit files. It first runs `scan-migratable.mjs` on the whole project, including `.vue`, `.js`, `.mjs` and `.htm` files. It also lists under `hidden` every line with a `bal-*` tag that `scan-migratable.mjs` cannot see, such as a tag inside a string literal (`el.innerHTML = '<bal-tag>'`), with `file`, `line` and `snippet`. When `suggested`, `notYet`, `types` or `hidden` lists anything, it prints `status` `incomplete` and the four lists under `outstanding`, and nothing else. `types` are the legacy type namespaces such as `BalEvents` that `scan-migratable.mjs` lists. They block Cleanup, because the dependency removal would break every file that still imports them.
 
 Otherwise `status` is `ready`, or `nothing-to-clean-up` when both `remove` lists are empty. `packageManager` and `installCommand` come from the lockfile at `<project-root>`, as in Init.
 

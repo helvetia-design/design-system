@@ -61,24 +61,24 @@ Same rules as `components/date/migration.md`, which documents `ds-datepicker` in
 ### Tags and imports
 
 - **HTML**: `<bal-input>` becomes `<ds-input>` and `<bal-input-date>` becomes `<ds-datepicker>`, including the closing tags.
-- **Angular**: the same tag renames in `.html` templates and in inline `template:` strings, including the closing tags. When a file imports `BalInput` or `BalInputDate` from `@baloise/ds-angular`, move only those symbols to `import { DsInput, DsDatepicker } from '@helvetia-design/angular'` (only the ones the file used) and leave the other symbols on the `@baloise` import. Rename them in `imports: [...]` as well. `DsInput` and `DsDatepicker` bring their own `ControlValueAccessor`, so `ngModel` and reactive forms keep working.
+- **Angular**: the same tag renames in `.html` templates and in inline `template:` strings, including the closing tags. When a file imports `BalInput` or `BalInputDate` from `@baloise/ds-angular`, move only those symbols to `import { DsInput, DsDatepicker } from '@helvetia-design/angular'` (only the ones the file used) and leave the other symbols on the `@baloise` import. Rename them in `imports: [...]` as well. `DsInput` and `DsDatepicker` bring their own `ControlValueAccessor`, so `ngModel` and reactive forms keep working. Neither tag has its own bundle. Only multi-family bundles such as `BalFormBundle` or `BalComponentBundle` hold them. They stay, and `DsInput` and `DsDatepicker` are added next to them, as `SKILL.md` "Legacy types and bundles" describes.
 - **React**: `<BalInput>` becomes `<DsInput>` and `<BalInputDate>` becomes `<DsDatepicker>`, including the closing tags. Import them from `@helvetia-design/react`. When the existing `@baloise/ds-react` import also binds other symbols, move only `BalInput` and `BalInputDate` and leave the others on the `@baloise` import. If the file already imports `DsDatepicker` from `@helvetia-design/react`, add to that import instead of creating a second one.
 
 ### Events
 
 Both tags emit the same five events, and both new components add `dsClick`.
 
-| old           | new          | handling                                                                                                                                                            |
-| ------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balChange`   | `dsChange`   | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. |
-| `balInput`    | `dsInput`    | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms.                                                                   |
-| `balBlur`     | `dsBlur`     | Same shapes.                                                                                                                                                        |
-| `balFocus`    | `dsFocus`    | Same shapes.                                                                                                                                                        |
-| `balKeyPress` | `dsKeyPress` | Same shapes.                                                                                                                                                        |
+| old           | new          | handling                                                                                                                                                                                                                    |
+| ------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `balChange`   | `dsChange`   | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `string \| null`, legacy `string \| undefined`. |
+| `balInput`    | `dsInput`    | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `string \| null`.                                                                                                 |
+| `balBlur`     | `dsBlur`     | Same shapes.                                                                                                                                                                                                                |
+| `balFocus`    | `dsFocus`    | Same shapes.                                                                                                                                                                                                                |
+| `balKeyPress` | `dsKeyPress` | Same shapes.                                                                                                                                                                                                                |
 
 Rewrite only handlers that are attached to the element being migrated. `balChange`, `balInput`, `balBlur`, and `balFocus` are emitted by many other legacy components, so never rewrite a handler on another element, and never rename them by search and replace across the file.
 
-The detail types `BalEvents.BalInput*Detail` and `BalEvents.BalInputDate*Detail` are not rewritten. List each use as "type needs manual rework".
+Retype handler parameters and refs as `SKILL.md` "Legacy types and bundles" describes. On a `ds-input`, `BalEvents.BalInput*` and `BalInputCustomEvent` become `DsInputCustomEvent`. On a `ds-datepicker`, `BalEvents.BalInputDate*` and `BalInputDateCustomEvent` become `DsDatepickerCustomEvent`. Write a detail alias such as `BalEvents.BalInputChangeDetail` out as the new detail type, `string | null` for `dsChange` and `dsInput`. `HTMLBalInputElement` becomes `HTMLDsInputElement`, and `HTMLBalInputDateElement` becomes `HTMLDsDatepickerElement`. The scan lists the `BalEvents.*` and `Bal*CustomEvent` types. It does not list `BalProps.*` or `HTMLBal*Element`, so search for them yourself in each file with a finding.
 
 When the value in `balChange` or `balInput` is read, note that it is `string | undefined` in legacy and `string | null` in the new components. A cleared field now yields `null`. Do not edit the handler, report it.
 
@@ -100,7 +100,7 @@ Needs your attention when found:
 4. Every unsupported `textAlign`, with its Unmapped props and handlers outcome.
 5. Every unsupported `clickable`, with its Unmapped props and handlers outcome. The new `dsClick` event reports the click, so the consumer can replace the pattern.
 6. Every unsupported `hasIconRight`, with its Unmapped props and handlers outcome.
-7. Every use of a `BalEvents.BalInput*Detail` or `BalEvents.BalInputDate*Detail` type, listed as "type needs manual rework".
+7. Every legacy type left or written out, as `SKILL.md` "Legacy types and bundles" describes: each `BalProps.BalInput*` type left in place, each detail alias such as `BalEvents.BalInputChangeDetail` written out, and each multi-family bundle such as `BalFormBundle` or `BalComponentBundle` kept with `Ds*` symbols added next to it.
 8. Every handler or form binding that reads the value. A cleared field now yields `null` where legacy yielded `undefined`, so code that checks `=== undefined` needs review.
 9. Every place that compares against the string `INVALID_VALUE`. Search the consumer code for it.
 10. Every file where `allowInvalidValue` was dropped, reviewed for logic that relies on `INVALID_VALUE`.

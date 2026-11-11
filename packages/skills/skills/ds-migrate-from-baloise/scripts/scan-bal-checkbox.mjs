@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFilesWithSetValue, toSnippet } from './source-scan.mjs'
 
 const USAGE_RE =
-  /<\/?bal-(?:checkbox(?:-group)?|check|switch)(?![\w-])|<\/?Bal(?:Checkbox(?:Group)?|Check|Switch)\b|\bBal(?:Checkbox(?:Group)?|Check|Switch)\b|\bnewBalCheckboxOption\b/g
+  /<\/?bal-(?:checkbox(?:-group)?|check|switch)(?![\w-])|<\/?Bal(?:Checkbox(?:Group)?|Check|Switch)\b|\bBalEvents\.BalCheckbox[A-Z]\w*|\bBalCheckbox(?:Group)?CustomEvent\b|\bBal(?:Checkbox(?:Group)?|Check|Switch)\b|\bBalCheckboxBundle\b|\bnewBalCheckboxOption\b/g
 const GROUP_OPEN_RE = /^<(bal-checkbox-group|BalCheckboxGroup)(?![\w-])/
 const CHECKBOX_OPEN_RE = /^<(?:bal-checkbox|BalCheckbox)(?![\w-])/
 const CHILD_CHECKBOX_RE = /<(?:bal-checkbox|BalCheckbox)(?![\w-])/g

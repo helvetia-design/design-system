@@ -208,6 +208,49 @@ describe('scanBalInputStepper', () => {
     expect(scanBalInputStepper(root).total).toBe(2)
   })
 
+  it('lists BalEvents types and the bare CustomEvent once per occurrence, but not input types', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        "import { BalFormBundle } from '@baloise/ds-angular'",
+        '@Component({ imports: [...BalFormBundle] })',
+        'export class ApplicationComponent {',
+        '  onChange(event: BalEvents.BalInputStepperCustomEvent<number>) {}',
+        '  onBare(event: BalInputStepperCustomEvent<number>) {}',
+        '  detail?: BalEvents.BalInputStepperChangeDetail',
+        '  both(a: BalEvents.BalInputStepperIncrease, b: BalInputStepperCustomEvent<number>) {}',
+        '  onInput(event: BalEvents.BalInputCustomEvent<string>) {}',
+        '  el?: HTMLBalInputStepperElement',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalInputStepper(root)).toEqual({
+      total: 5,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            { line: 4, snippet: 'onChange(event: BalEvents.BalInputStepperCustomEvent<number>) {}' },
+            { line: 5, snippet: 'onBare(event: BalInputStepperCustomEvent<number>) {}' },
+            { line: 6, snippet: 'detail?: BalEvents.BalInputStepperChangeDetail' },
+            {
+              line: 7,
+              snippet: 'both(a: BalEvents.BalInputStepperIncrease, b: BalInputStepperCustomEvent<number>) {}',
+            },
+            {
+              line: 7,
+              snippet: 'both(a: BalEvents.BalInputStepperIncrease, b: BalInputStepperCustomEvent<number>) {}',
+            },
+          ],
+        },
+      ],
+    })
+  })
+
   it('prints grouped findings as JSON and does not edit files', () => {
     const root = createScratchDir()
     const contents = '<bal-input-stepper></bal-input-stepper>\n'

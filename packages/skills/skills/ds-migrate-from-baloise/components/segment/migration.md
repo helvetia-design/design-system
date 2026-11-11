@@ -6,7 +6,7 @@ Both legacy tags are migrated together, not separately. `bal-segment-item` finds
 
 Apply `shared/field.md` in the Rewrite step to every migrated `ds-segment` that sits inside a `bal-field`, in the same pass. It moves the label, description and message of the wrapper onto the control and removes the wrapper tags. A `bal-field` around a control that is still a legacy `bal-*` tag stays unchanged. `components/field/migration.md` migrates `bal-form-grid`, `bal-form-col` and every `bal-field` that is left.
 
-The scan does not match the ambient `HTMLBalSegmentElement`, `HTMLBalSegmentItemElement`, `BalProps.BalSegment*` or `BalEvents.BalSegment*` types. Those are Report items, not rewrites. Search for them yourself in each file with a finding.
+The scan also lists `BalSegmentBundle` and the `BalEvents.BalSegment*` and `BalSegment*CustomEvent` types. It does not match the ambient `HTMLBalSegmentElement`, `HTMLBalSegmentItemElement` or `BalProps.BalSegment*` types. Search for them yourself in each file with a finding. `SKILL.md` "Legacy types and bundles" says how to rewrite all of them.
 
 ## 1. Scan
 
@@ -61,22 +61,24 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 ### Tags and imports
 
 - **HTML**: `<bal-segment>` becomes `<ds-segment>`, including the closing tag. `<bal-segment-item>` becomes `<ds-segment-item>`, including the closing tag.
-- **Angular**: the same tag rewrites in `.html` templates and in inline `template:` strings. When a file imports `BalSegment` and/or `BalSegmentItem` from `@baloise/ds-angular`, replace only the ones used with `DsSegment`/`DsSegmentItem` from `@helvetia-design/angular`, keeping the rest on the `@baloise` import.
+- **Angular**: the same tag rewrites in `.html` templates and in inline `template:` strings. When a file imports `BalSegment` and/or `BalSegmentItem` from `@baloise/ds-angular`, replace only the ones used with `DsSegment`/`DsSegmentItem` from `@helvetia-design/angular`, keeping the rest on the `@baloise` import. A `...BalSegmentBundle` spread in `imports: [...]` becomes `DsSegment` and `DsSegmentItem`. A multi-family bundle such as `BalFormBundle` stays, and the `Ds*` symbols are added next to it. `SKILL.md` "Legacy types and bundles" has the full bundle rule.
 - **React**: `<BalSegment>`/`</BalSegment>` becomes `<DsSegment>`/`</DsSegment>`, `<BalSegmentItem>`/`</BalSegmentItem>` becomes `<DsSegmentItem>`/`</DsSegmentItem>`. Import the renamed symbols from `@helvetia-design/react`, keeping only the ones actually used. When the existing `@baloise/ds-react` import also binds other symbols, move only `BalSegment` and `BalSegmentItem` and leave the rest on the `@baloise` import.
 
 ### Events
 
 Only `bal-segment` emits events; `bal-segment-item` has none.
 
-| old         | new        | handling                                                                                                                                                                                                  |
-| ----------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balChange` | `dsChange` | Rewrite `addEventListener('balChange'` to `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. The detail is the segment value in both. |
-| `balFocus`  | `dsFocus`  | Same shapes as `balChange`: `addEventListener`, `(balFocus)`, `onBalFocus` become `dsFocus`, `(dsFocus)`, `onDsFocus`. Detail stays `FocusEvent`.                                                         |
-| `balBlur`   | `dsBlur`   | Same shapes as `balFocus`, targeting `blur`.                                                                                                                                                              |
+| old         | new        | handling                                                                                                                                                                                                               |
+| ----------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `balChange` | `dsChange` | Rewrite `addEventListener('balChange'` to `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. The detail is the segment value in both, typed `any`. |
+| `balFocus`  | `dsFocus`  | Same shapes as `balChange`: `addEventListener`, `(balFocus)`, `onBalFocus` become `dsFocus`, `(dsFocus)`, `onDsFocus`. Detail stays `FocusEvent`.                                                                      |
+| `balBlur`   | `dsBlur`   | Same shapes as `balFocus`, targeting `blur`.                                                                                                                                                                           |
 
 `balSelect` and `balVertical` were `@internal` and never part of the public API. Drop any reference silently, without a mention in the report.
 
 Rewrite only handlers that are attached to the element being migrated. `balChange`, `balFocus` and `balBlur` are emitted by many other legacy components, so never rewrite a handler on another element, and never rename them by search and replace across the file.
+
+Retype handler parameters and refs as `SKILL.md` "Legacy types and bundles" describes. `BalEvents.BalSegment*` and `BalSegmentCustomEvent` become `DsSegmentCustomEvent`. Write a detail alias such as `BalEvents.BalSegmentChangeDetail` out as `any`. `HTMLBalSegmentElement` becomes `HTMLDsSegmentElement`, and `HTMLBalSegmentItemElement` becomes `HTMLDsSegmentItemElement`.
 
 For every finding in a `.html` file, also open the same-basename `.ts` file beside it and apply these rules there — the Angular case where the template holds the tag and the class file handles the event without ever naming `bal-segment`.
 
@@ -97,7 +99,7 @@ Needs your attention when found:
 3. Every dropped item `disabled`, as lost. A single item can no longer be disabled, only the whole `ds-segment`.
 4. Every dropped item `invalid`, as lost. Validity is only set on the `ds-segment`.
 5. Every `bal-segment-item` without a `value`.
-6. Every type reference that the scan cannot see, such as `HTMLBalSegmentElement` or `BalEvents.BalSegmentChange`. These resolve from the ambient namespaces and stop compiling once `@baloise/ds-core` is removed.
+6. Every legacy type left or written out and every bundle kept, as `SKILL.md` "Legacy types and bundles" describes: each `BalProps.BalSegment*` type left in place, each detail alias such as `BalEvents.BalSegmentChangeDetail` written out, each `BalSegmentBundle` spread kept because a legacy tag is left, and each multi-family bundle kept.
 7. One-time note, for segments outside a `bal-field` only: `ds-segment` has a new `required` prop that defaults to `true`, and the migration left it unset. It is inert unless the consumer later sets the segment's own `label` prop.
 8. One-time note: files which only listen, and have no scanned `.html` of the same name beside them, were not scanned.
 

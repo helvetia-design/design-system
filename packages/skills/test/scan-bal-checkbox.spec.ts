@@ -784,6 +784,50 @@ describe('scanBalCheckbox', () => {
     })
   })
 
+  it('lists the bundle spread in application.component.ts and BalEvents types once per occurrence, but not the bal-check and bal-switch types that stay legacy', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        "import { BalCheckboxBundle, BalFormBundle } from '@baloise/ds-angular'",
+        '@Component({ imports: [...BalCheckboxBundle, ...BalFormBundle] })',
+        'export class ApplicationComponent {',
+        '  onTerms(event: BalEvents.BalCheckboxCustomEvent<boolean>) {}',
+        '  onTopics(event: BalEvents.BalCheckboxGroupCustomEvent<string[]>) {}',
+        '  onBare(event: BalCheckboxCustomEvent<boolean>) {}',
+        '  detail?: BalEvents.BalCheckboxChangeDetail',
+        '  both(a: BalEvents.BalCheckboxBlur, b: BalCheckboxGroupCustomEvent<string[]>) {}',
+        '  onCheck(event: BalEvents.BalCheckCustomEvent<boolean>) {}',
+        '  onSwitch(event: BalEvents.BalSwitchCustomEvent<boolean>) {}',
+        '  onBareCheck(event: BalCheckCustomEvent<boolean>) {}',
+        '  onBareSwitch(event: BalSwitchCustomEvent<boolean>) {}',
+        '  look?: BalProps.BalCheckboxInterface',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalCheckbox(root)).toEqual({
+      total: 8,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            { line: 1, snippet: "import { BalCheckboxBundle, BalFormBundle } from '@baloise/ds-angular'" },
+            { line: 2, snippet: '@Component({ imports: [...BalCheckboxBundle, ...BalFormBundle] })' },
+            { line: 4, snippet: 'onTerms(event: BalEvents.BalCheckboxCustomEvent<boolean>) {}' },
+            { line: 5, snippet: 'onTopics(event: BalEvents.BalCheckboxGroupCustomEvent<string[]>) {}' },
+            { line: 6, snippet: 'onBare(event: BalCheckboxCustomEvent<boolean>) {}' },
+            { line: 7, snippet: 'detail?: BalEvents.BalCheckboxChangeDetail' },
+            { line: 8, snippet: 'both(a: BalEvents.BalCheckboxBlur, b: BalCheckboxGroupCustomEvent<string[]>) {}' },
+            { line: 8, snippet: 'both(a: BalEvents.BalCheckboxBlur, b: BalCheckboxGroupCustomEvent<string[]>) {}' },
+          ],
+        },
+      ],
+    })
+  })
+
   it('prints grouped findings as JSON and does not edit files', () => {
     const root = createScratchDir()
     const contents = '<bal-checkbox value="1"></bal-checkbox>\n'

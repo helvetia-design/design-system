@@ -126,6 +126,8 @@ Leave the slotted label content in place. Both components project their children
 
 No handler body needs rewriting beyond the event name — every detail shape is unchanged.
 
+Retype handler parameters and refs as `SKILL.md` "Legacy types and bundles" describes. `BalEvents.BalButtonCustomEvent` and the bare `BalButtonCustomEvent` become `DsButtonCustomEvent`, and `HTMLBalButtonElement` becomes `HTMLDsButtonElement`. The scan lists the `BalEvents.BalButton*` and `BalButton*CustomEvent` types. It does not list `BalProps.*` or `HTMLBalButtonElement`, so search for them yourself in each file with a finding.
+
 In each file that has a finding, also rewrite these five listeners where they are not on the element itself, including `addEventListener`. For every finding in a `.html` file, also open the same-basename `.ts` file beside it and apply these rules there — the Angular case where the template holds the tag and the class file handles the event without ever naming `bal-button`.
 
 The scan does not list a file that only listens and never uses `bal-button`/`bal-button-group`/`BalButton`/`BalButtonGroup`/`BalButtonBundle`, and that has no scanned `.html` of the same name beside it. Say so in the report.
@@ -151,13 +153,14 @@ Needs your attention when found:
 9. Every `href=""` that is now a `<button>` instead of an `<a>`.
 10. One-time note: `loading` now also disables the button.
 11. One-time note: files which only listen, and have no scanned `.html` of the same name beside them, were not scanned.
+12. Every legacy type left and every bundle kept, as `SKILL.md` "Legacy types and bundles" describes: each `BalProps.BalButton*` type left in place, each legacy type argument kept because the Events table names no detail, and each multi-family bundle kept with `DsButton` or `DsButtonGroup` added next to it.
 
 Coverage only, written to the file:
 
-12. Every dropped `[balPopup]` or `balPopup={…}` binding.
-13. Every numeric `value` written as a string.
-14. Every `BalButtonBundle` expanded into `DsButton` and `DsButtonGroup`.
-15. One-time note: `outlined` is inert on both sides.
+13. Every dropped `[balPopup]` or `balPopup={…}` binding.
+14. Every numeric `value` written as a string.
+15. Every `BalButtonBundle` expanded into `DsButton` and `DsButtonGroup`.
+16. One-time note: `outlined` is inert on both sides.
 
 Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 
