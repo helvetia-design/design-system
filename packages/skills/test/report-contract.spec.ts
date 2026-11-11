@@ -62,7 +62,7 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'pagination': { attention: 6, coverage: 4 },
   'popup': { attention: 18, coverage: 5 },
   'progress-bar': { attention: 6, coverage: 3 },
-  'radio': { attention: 13, coverage: 2 },
+  'radio': { attention: 14, coverage: 2 },
   'segment': { attention: 8, coverage: 0 },
   'select': { attention: 12, coverage: 1 },
   'shape': { attention: 4, coverage: 1 },
@@ -128,6 +128,12 @@ describe.each(components)('components/%s/migration.md Report', name => {
 })
 
 describe('Report items the issue requires by name', () => {
+  function singleLine(text: string, start: string) {
+    const lines = text.split('\n').filter(line => line.startsWith(start))
+    expect(lines, start).toHaveLength(1)
+    return lines[0]
+  }
+
   function bucketsOf(name: string) {
     return buckets(section(read(`components/${name}/migration.md`), '## 4. Report'))
   }
@@ -170,11 +176,7 @@ describe('Report items the issue requires by name', () => {
 
   it('accordion maps legacy open labels and icons to the ds-accordion close props', () => {
     const migration = read('components/accordion/migration.md')
-    const lineOf = (start: string) => {
-      const lines = migration.split('\n').filter(line => line.startsWith(start))
-      expect(lines, start).toHaveLength(1)
-      return lines[0]
-    }
+    const lineOf = (start: string) => singleLine(migration, start)
     const targetOf = (start: string) => lineOf(start).split('|')[2]
     const shape1After = lineOf('<ds-accordion button ')
 
@@ -190,6 +192,29 @@ describe('Report items the issue requires by name', () => {
       /both `button-icon-close` and `button-icon-open`/,
     )
     expect(lineOf('| `bal-accordion` bound `active`')).toContain('`[open]="x"`')
+  })
+
+  it('radio writes tile layout on the group, tile colour as attribute, and removes bal-radio-icon from tiles', () => {
+    const migration = read('components/radio/migration.md')
+    const lineOf = (start: string) => singleLine(migration, start)
+    const colorRow = lineOf('| `color`')
+    const colSizeRow = lineOf('| `colSize`')
+
+    expect(colorRow.split('|')[2]).toContain('`tile-color`')
+    expect(colorRow).toContain('[attr.tile-color]="x"')
+    expect(colSizeRow).toContain('Drop from the child')
+    expect(colSizeRow).toContain('`[attr.col-size*]`')
+    expect(colorRow).toContain('Never write the `tileColor` property')
+    expect(lineOf('| `"tile"`')).toContain('`tile` on `ds-radio-group`')
+    expect(lineOf('| `"button"`')).toContain('`tile` + `hideTrigger` on `ds-radio-group`')
+    expect(migration).toContain('add `tile` and `hideTrigger` to the group only')
+    expect(migration).toContain('Delete every `<bal-radio-icon>` inside a migrated `<ds-radio>`')
+    expect(migration).toContain('Remove `BalRadioIcon` from the `@baloise/ds-react` import')
+    expect(migration).not.toContain('exactly as it is')
+
+    const numbers = itemNumbers('radio', ['removed from a tile', 'differs from its siblings or from the group'])
+
+    expect(new Set(numbers).size).toBe(numbers.length)
   })
 
   it('button checks each of the four colour collisions on its own line', () => {
