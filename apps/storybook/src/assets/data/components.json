@@ -7465,6 +7465,35 @@
           "setter": false
         },
         {
+          "name": "a11yCurrent",
+          "type": "string",
+          "complexType": {
+            "original": "string",
+            "resolved": "string",
+            "references": {}
+          },
+          "mutable": true,
+          "attr": "a-1-1y-current",
+          "reflectToAttr": false,
+          "docs": "A11y attributes for the native button element. Maps to `aria-current`, e.g. `page` for the current navigation entry.",
+          "docsTags": [
+            {
+              "name": "default",
+              "text": "''"
+            }
+          ],
+          "default": "''",
+          "values": [
+            {
+              "type": "string"
+            }
+          ],
+          "optional": false,
+          "required": false,
+          "getter": false,
+          "setter": false
+        },
+        {
           "name": "a11yHaspopup",
           "type": "string",
           "complexType": {

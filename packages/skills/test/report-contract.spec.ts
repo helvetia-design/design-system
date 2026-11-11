@@ -479,6 +479,71 @@ describe('Unmapped props and handlers', () => {
     expect(rowCells[1]).toBe('`color="outline-default"`')
     expect(rowCells.at(-1)).toMatch(/approximation/)
   })
+
+  describe('cleanup after row-prescribed drops (issue #185)', () => {
+    function attentionItems(name: string) {
+      return buckets(section(read(`components/${name}/migration.md`), '## 4. Report')).attention
+    }
+
+    it('SKILL.md widens the cleanup to drops and deletions a row prescribes on its own', () => {
+      expect(rule).toContain(
+        'also apply after every drop or deletion that a `migration.md` row prescribes on its own, without "Apply Unmapped props and handlers"',
+      )
+      expect(rule).toContain('`// TODO(ds-migrate): unused after <name> was removed: <declaration>`')
+      expect(rule).toContain('Drop the whole import line when no binding is left.')
+      expect(rule).toContain('Never touch an exported symbol.')
+      expect(rule).toContain('Structural rules stay excluded from both.')
+    })
+
+    it('SKILL.md scopes the row-prescribed cleanup per framework', () => {
+      expect(rule).toContain(
+        'In an Angular class file, unused imports, module-level declarations and private members that only the removed code used get the same treatment.',
+      )
+      expect(rule).toContain('Public methods stay')
+      expect(rule).toContain('A multi-line declaration gets one `//` per line, with the TODO text on the first line.')
+    })
+
+    it('SKILL.md keeps an emptied method or function and reports its callers', () => {
+      expect(rule).toContain('- React and Angular, emptied method or function:')
+      expect(rule).toContain('`// TODO(ds-migrate): <method>() had no ds-* target: <statement>`')
+      expect(rule).toContain('"now does nothing"')
+      expect(rule).toContain('`.component.html`')
+      expect(rule).toContain('calls in the same class or module file (`this.<method>(` in Angular, `<fn>(` in React)')
+    })
+
+    it('button maps isActive to a11yCurrent', () => {
+      const [, target, handling] = row('button', '`isActive`')
+
+      expect(target).toBe('`a11yCurrent` on a navigation entry, otherwise _(no equivalent)_')
+      expect(handling).toContain('Rewrite it only when the button is a navigation entry.')
+      expect(handling).toContain("`el.a11yCurrent = cond ? 'page' : ''`")
+      expect(handling).toContain('When the button is not a navigation entry, drop `isActive`.')
+      expect(handling).toContain('`aria-current="page"` in HTML')
+      expect(handling).toContain("`a11yCurrent={cond ? 'page' : undefined}`")
+      expect(handling).toContain("`[a11yCurrent]=\"cond ? 'page' : ''\"`")
+      expect(handling).toContain('`aria-current`')
+    })
+
+    it('button reports every isActive rewrite and drop with the lost pressed look', () => {
+      const items = attentionItems('button').filter(item => item.text.includes('`isActive`'))
+
+      expect(items).toHaveLength(1)
+      expect(items[0].text).toContain('"the forced pressed look is gone"')
+      expect(items[0].text).toContain('"pressed look lost, check whether it was a toggle"')
+    })
+
+    describe.each(['toast', 'snackbar'])('%s', name => {
+      it.each([
+        ['`closeIn(duration)`', '`closeIn`'],
+        ['`setQueue()`', '`setQueue`'],
+      ])('%s row applies the cleanup and its report names emptied methods', (cell, method) => {
+        expect(row(name, cell).at(-1)).toContain('"Unmapped props and handlers" in `SKILL.md`')
+        expect(
+          attentionItems(name).filter(item => item.text.includes(method) && item.text.includes('"now does nothing"')),
+        ).toHaveLength(1)
+      })
+    })
+  })
 })
 
 describe('shared/icons.md Report', () => {

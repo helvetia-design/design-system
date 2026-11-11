@@ -56,6 +56,15 @@ import { BUTTON_DOC_CONFIG, getButtonTabs } from './button.doc-config'
       ),
     },
     {
+      type: 'do',
+      title: 'Current Navigation Entry',
+      content: (
+        <p style={{ margin: '0.5rem 0 0 0' }}>
+          When buttons form a navigation, give each entry an <code>href</code> so <code>ds-button</code> renders a link. Set <code>a11yCurrent="page"</code> on the entry for the current route. <code>ds-button</code> forwards it as <code>aria-current</code> to the native element, so screen readers announce the current page. A host <code>aria-current</code> attribute is read once on load, so use it only in static markup. For a value that changes, set the <code>a11yCurrent</code> property or the <code>a-1-1y-current</code> attribute. Inside <code>ds-tabs</code> or <code>ds-steps</code> in navigation mode, put <code>aria-current</code> on the slotted <code>&lt;a&gt;</code> instead, because <code>ds-button</code> moves it into its shadow DOM where those components cannot see it.
+        </p>
+      ),
+    },
+    {
       type: 'dont',
       title: 'Color as the Only Cue',
       content: (
@@ -80,6 +89,7 @@ import { BUTTON_DOC_CONFIG, getButtonTabs } from './button.doc-config'
 
 - [MDN: `<button>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button) — Semantics and type attribute usage.
 - [MDN: aria-label](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-label) — Provides an accessible name for elements without visible text.
+- [MDN: aria-current](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-current) — Marks the current item within a set, such as the current page in a navigation.
 - [MDN: aria-disabled](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-disabled) — Communicates disabled state to assistive technology.
 - [WCAG 2.1 — Name, Role, Value (4.1.2)](https://www.w3.org/WAI/WCAG21/Understanding/name-role-value.html) — All interactive controls must have an accessible name.
 
