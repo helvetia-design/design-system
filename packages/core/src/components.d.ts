@@ -3379,11 +3379,6 @@ export namespace Components {
          */
         "disabled": boolean;
         /**
-          * Overwrites the default color to invalid style
-          * @default false
-         */
-        "invalid": boolean;
-        /**
           * Choosing left or center the tag is aligned to that side in the ds-card.
          */
         "position"?: TagPlacement;
@@ -3741,10 +3736,10 @@ export namespace Components {
          */
         "dismiss": () => Promise<boolean>;
         /**
-          * Offset in pixels from the trigger element to the tooltip.
-          * @default 8
+          * Offset in pixels from the trigger element to the tooltip. Defaults to the `--ds-tooltip-offset` token when not set.
+          * @default undefined
          */
-        "offset": number;
+        "offset": number | undefined;
         /**
           * When true, the tooltip is shown immediately on load without user interaction.
           * @default false
@@ -8785,11 +8780,6 @@ declare namespace LocalJSX {
          */
         "disabled"?: boolean;
         /**
-          * Overwrites the default color to invalid style
-          * @default false
-         */
-        "invalid"?: boolean;
-        /**
           * Emitted when the input got clicked.
          */
         "onDsCloseClick"?: (event: DsTagCustomEvent<TagCloseClickDetail>) => void;
@@ -9184,10 +9174,10 @@ declare namespace LocalJSX {
          */
         "contentWidth"?: number | undefined;
         /**
-          * Offset in pixels from the trigger element to the tooltip.
-          * @default 8
+          * Offset in pixels from the trigger element to the tooltip. Defaults to the `--ds-tooltip-offset` token when not set.
+          * @default undefined
          */
-        "offset"?: number;
+        "offset"?: number | undefined;
         /**
           * Emitted after the animation has finished.
          */
@@ -9884,7 +9874,6 @@ declare namespace LocalJSX {
         "closable": boolean;
         "color": TagColor;
         "disabled": boolean;
-        "invalid": boolean;
         "position": TagPlacement;
         "size": TagSize;
     }
@@ -9959,7 +9948,7 @@ declare namespace LocalJSX {
     interface DsTooltipAttributes {
         "reference": string;
         "placement": TooltipPlacement;
-        "offset": number;
+        "offset": number | undefined;
         "contentWidth": number | undefined;
         "open": boolean;
     }

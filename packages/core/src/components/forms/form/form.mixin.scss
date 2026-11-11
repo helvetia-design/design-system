@@ -157,10 +157,11 @@
     overflow-wrap: break-word;
     text-wrap: balance;
     min-width: 0;
-    gap: 0.25rem;
+    gap: var(--ds-form-description-gap);
 
     // this is needed to prevent screen flimmering when the descriptions is only shown on error
-    min-height: 1.125rem;
+    // reserve exactly one line of description text: font-size × unitless line-height
+    min-height: calc(var(--_form-description-size) * var(--_form-description-line-height));
 
     color: var(--_form-description-color);
     font-family: var(--_form-description-family);

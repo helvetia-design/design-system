@@ -26,7 +26,7 @@ $host-selector: ('#tag');
   @include vars.local(tag-font-family, var(--ds-tag-font-family));
   @include vars.local(tag-font-size, var(--ds-tag-size-base-font-size));
   @include vars.local(tag-font-weight, var(--ds-tag-size-base-font-weight));
-  @include vars.local(tag-close-mr, calc(0.25rem * -1));
+  @include vars.local(tag-close-mr, calc(var(--ds-tag-close-gap) * -1));
 }
 
 /**
