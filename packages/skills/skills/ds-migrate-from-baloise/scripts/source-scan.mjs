@@ -176,6 +176,8 @@ function maskText(text, mode, blankStrings) {
     failedJsx: new Set(),
     jsxSteps: 0,
     jsxBudget: JSX_STEPS_PER_CHAR * text.length + 10_000,
+    htmlCommentFrom: -1,
+    htmlCommentAt: -1,
   }
   if (mode === 'markup') scanMarkup(ctx, 0, text.length)
   else if (mode === 'css' || mode === 'scss') scanStyle(ctx, 0, text.length, mode === 'scss')
@@ -297,13 +299,22 @@ function skipString(ctx, start, end) {
   if (blankStrings) return blank(ctx, start, end)
   let i = start + 1
   while (i < end) {
-    const open = text.indexOf('<!--', i)
+    const open = nextHtmlComment(ctx, i)
     if (open === -1 || open >= end) break
     const close = closeAt(text, '-->', open + 4)
     if (close > end) break
     i = blank(ctx, open, close)
   }
   return end
+}
+
+// Caches the last search so a file with many strings and no `<!--` is not rescanned to its end per string.
+function nextHtmlComment(ctx, from) {
+  const cached = ctx.htmlCommentFrom !== -1 && ctx.htmlCommentFrom <= from
+  if (cached && (ctx.htmlCommentAt === -1 || ctx.htmlCommentAt >= from)) return ctx.htmlCommentAt
+  ctx.htmlCommentFrom = from
+  ctx.htmlCommentAt = ctx.text.indexOf('<!--', from)
+  return ctx.htmlCommentAt
 }
 
 function isTemplatePropertyString(text, quoteIndex) {
@@ -611,8 +622,12 @@ export function tagEnd(text, start) {
   return text.length
 }
 
+export function lineStart(text, index) {
+  return text.lastIndexOf('\n', index - 1) + 1
+}
+
 export function lineText(text, index) {
-  const start = text.lastIndexOf('\n', index - 1) + 1
+  const start = lineStart(text, index)
   const end = text.indexOf('\n', index)
   return text.slice(start, end === -1 ? text.length : end)
 }

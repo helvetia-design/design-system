@@ -65,6 +65,8 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 | `colorHovered`, `colorPressed`                                                                                                  | _(no equivalent prop)_ | Drop both, including every value. Mention each drop in the report.                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `hovered`, `pressed`                                                                                                            | _(no equivalent prop)_ | Internal legacy props. Drop both.                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
+When `size` or `color` is an expression whose branches are all string literals, such as `size={cond ? 'large' : 'medium'}` or `[size]="x ? 'small' : 'large'"`, map each branch with the rows above: `'large'` becomes `'xl'` and `'medium'` becomes `'md'`. A branch that the rows drop, such as a `color` of `'blue'`, becomes `undefined`, because a ternary needs a value in every branch. A `color` branch of `'white'` has no single prop form here, so leave that expression and report it. Leave every other expression and report it too.
+
 ### Tags and imports
 
 - **HTML**: `<bal-icon>` becomes `<ds-icon>`, including the closing tag.
@@ -89,6 +91,7 @@ Needs your attention when found:
 4. Every dropped `colorPressed`.
 5. Every dropped `light-blue`.
 6. Every `x-large` or `xx-large` clamped to `xl`.
+7. Every `size` or `color` expression left unchanged, including a ternary with a `'white'` branch.
 
 Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 

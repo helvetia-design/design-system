@@ -232,6 +232,220 @@ describe('scanIconImports', () => {
   })
 })
 
+describe('scanIconImports bindings', () => {
+  it('does not report the bal-date balIconClick event', () => {
+    const root = createScratchDir()
+    write(root, 'src/a.html', '<bal-date (balIconClick)="open()"></bal-date>\n')
+    write(root, 'src/a.ts', 'const handler = balIconClick\n')
+
+    expect(scanIconImports(root)).toEqual({ total: 0, files: [] })
+  })
+
+  it('reports icon symbols in template bindings and skips quoted names and comments', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/a.html',
+      [
+        '<bal-card [svg]="balBrandIconCar"></bal-card>',
+        '<bal-button [icon]="flag ? balIconPlus : balIconMinus"></bal-button>',
+        '<bal-button [icon]="\'balIconX\'"></bal-button>',
+        '<!-- <bal-card [svg]="balBrandIconOld"></bal-card> -->',
+        '<bal-card icon="balIconPlain"></bal-card>',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanIconImports(root)).toEqual({
+      total: 2,
+      files: [
+        {
+          file: 'src/a.html',
+          findings: [
+            { line: 1, snippet: '<bal-card [svg]="balBrandIconCar"></bal-card>' },
+            { line: 2, snippet: '<bal-button [icon]="flag ? balIconPlus : balIconMinus"></bal-button>' },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('reports bindings in an inline Angular template', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/a.component.ts',
+      [
+        '@Component({',
+        '  template: `<bal-card [svg]="balBrandIconCar"></bal-card>`,',
+        '})',
+        'export class A {}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanIconImports(root).files).toEqual([
+      {
+        file: 'src/a.component.ts',
+        findings: [{ line: 2, snippet: 'template: `<bal-card [svg]="balBrandIconCar"></bal-card>`,' }],
+      },
+    ])
+  })
+  it('reports icon symbols in every binding form', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/a.html',
+      [
+        '<x bind-svg="balIconC"></x>',
+        '<x *ngIf="a ? balIconD : null"></x>',
+        '<x [attr.data-i]="balIconE"></x>',
+        `<x [icon]='cond ? "balIconF" : balIconG'></x>`,
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'src/b.vue',
+      ['<template>', '  <x :icon="balIconA"></x>', '  <x v-bind:icon="balIconB"></x>', '</template>', ''].join('\n'),
+    )
+
+    expect(scanIconImports(root).files.map(entry => [entry.file, entry.findings.map(finding => finding.line)])).toEqual(
+      [
+        ['src/a.html', [1, 2, 3, 4]],
+        ['src/b.vue', [2, 3]],
+      ],
+    )
+  })
+})
+
+describe('scanIconImports candidates', () => {
+  const data = [
+    'export const items = [',
+    "  { icon: 'account' },",
+    "  { icon: 'message' },",
+    "  { icon: 'alert-circle' },",
+    "  { icon: 'alert-triangle' },",
+    "  { color: 'info' },",
+    "  { label: 'hello world' },",
+    "  { to: 'route-name' },",
+    "  // { icon: 'delete' },",
+    '  { icon: "reply" },',
+    ']',
+    '',
+  ].join('\n')
+
+  it('lists icon name literals of script files and keeps total and files unchanged', () => {
+    const root = createScratchDir()
+    write(root, 'src/data.ts', data)
+
+    expect(scanIconImports(root)).toEqual({
+      total: 0,
+      files: [],
+      candidates: {
+        total: 4,
+        files: [
+          {
+            file: 'src/data.ts',
+            findings: [
+              { line: 2, snippet: "{ icon: 'account' },", name: 'account', group: 'renamed' },
+              { line: 3, snippet: "{ icon: 'message' },", name: 'message', group: 'changed', renameTarget: true },
+              { line: 4, snippet: "{ icon: 'alert-circle' },", name: 'alert-circle', group: 'shim' },
+              { line: 10, snippet: '{ icon: "reply" },', name: 'reply', group: 'lost' },
+            ],
+          },
+        ],
+      },
+    })
+  })
+
+  it('ignores markup, JSX and minified files', () => {
+    const root = createScratchDir()
+    write(root, 'src/View.tsx', "export const View = () => <ds-icon name={'account'} />\n")
+    write(root, 'src/view.html', '<bal-icon name="account"></bal-icon>\n')
+    write(root, 'public/vendor.min.js', "var a={icon:'account'}\n")
+
+    expect(scanIconImports(root)).not.toHaveProperty('candidates')
+  })
+
+  it('skips module specifiers and covers every group, quote and script extension', () => {
+    const root = createScratchDir()
+    const approximated = Object.keys(
+      JSON.parse(
+        readFileSync(
+          fileURLToPath(new URL('../skills/ds-migrate-from-baloise/shared/icon-name-map.json', import.meta.url)),
+          'utf8',
+        ),
+      ).approximated,
+    )[0]
+    write(
+      root,
+      'src/a.ts',
+      [
+        "import a from 'account'",
+        "const b = require('account')",
+        "const c = import('account')",
+        'const d = { icon: `account` }',
+        `const e = { icon: '${approximated}' }`,
+        "const f = { icon: 'info-foo' }",
+        '',
+      ].join('\n'),
+    )
+    write(root, 'src/b.mjs', "export const g = { icon: 'account' }\n")
+
+    const findings = scanIconImports(root).candidates?.files.map(entry => [
+      entry.file,
+      entry.findings.map(({ line, group }) => [line, group]),
+    ])
+    expect(findings).toEqual([
+      [
+        'src/a.ts',
+        [
+          [4, 'renamed'],
+          [5, 'approximated'],
+          [6, 'shim'],
+        ],
+      ],
+      ['src/b.mjs', [[1, 'renamed']]],
+    ])
+  })
+
+  it('does not let a visible quote swallow the next string', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/a.js',
+      [
+        "export const A = () => <p>Don't</p>; const items = [{ icon: 'account' }]",
+        "export const re = s => s.replace(/'/g, ''); const b = { icon: 'delete' }",
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanIconImports(root).candidates?.files[0].findings.map(finding => finding.name)).toEqual([
+      'account',
+      'delete',
+    ])
+  })
+
+  it('lists candidates and unmatched paths together', () => {
+    const root = createScratchDir()
+    write(root, 'src/a.ts', "export const a = { icon: 'account' }\n")
+
+    const result = scanIconImports(root, ['src/a.ts', 'missing.ts'])
+    expect(result.candidates?.total).toBe(1)
+    expect(result.unmatched).toEqual(['missing.ts'])
+  })
+
+  it('limits candidates to the files it is given', () => {
+    const root = createScratchDir()
+    write(root, 'src/a.ts', "export const a = 'account'\n")
+    write(root, 'src/b.ts', "export const b = 'account'\n")
+
+    expect(scanIconImports(root, ['src/a.ts']).candidates?.files.map(entry => entry.file)).toEqual(['src/a.ts'])
+  })
+})
+
 describe('shared/icons.md', () => {
   it('documents the name shim, the name map groups, and the registration rules', () => {
     const rules = readFileSync(
@@ -253,6 +467,8 @@ describe('shared/icons.md', () => {
       'initializeDesignSystem',
       'DsRootProvider',
       'shared/legacy-config.md',
+      'candidates',
+      'renameTargets',
     ]) {
       expect(rules, phrase).toContain(phrase)
     }
@@ -267,6 +483,7 @@ describe('icon-name-map.json', () => {
     approximated: Record<string, string>
     lost: string[]
     changed: string[]
+    renameTargets: string[]
   }
   const exists = (name: string) =>
     `Icon${name
@@ -288,5 +505,17 @@ describe('icon-name-map.json', () => {
   it('maps every legacy name onto an icon the new set has', () => {
     const targets = [...Object.values(map.renamed), ...Object.values(map.approximated)]
     expect(targets.filter(name => !exists(name))).toEqual([])
+  })
+
+  it('marks every rename target that is also a changed name, and only those', () => {
+    const values = [...Object.values(map.renamed), ...Object.values(map.approximated)]
+    const expected = [...new Set(values.filter(name => map.changed.includes(name)))].sort()
+    expect([...map.renameTargets].sort()).toEqual(expected)
+  })
+
+  it('never maps onto a name that the map itself rewrites', () => {
+    const rewritten = new Set([...Object.keys(map.renamed), ...Object.keys(map.approximated), ...map.lost])
+    const values = [...Object.values(map.renamed), ...Object.values(map.approximated)]
+    expect(values.filter(name => rewritten.has(name))).toEqual([])
   })
 })

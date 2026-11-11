@@ -48,7 +48,7 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'footer': { attention: 8, coverage: 4 },
   'heading': { attention: 6, coverage: 4 },
   'hint': { attention: 1, coverage: 0 },
-  'icon': { attention: 6, coverage: 0 },
+  'icon': { attention: 7, coverage: 0 },
   'input-slider': { attention: 9, coverage: 4 },
   'input-stepper': { attention: 8, coverage: 2 },
   'input': { attention: 13, coverage: 2 },

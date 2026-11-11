@@ -17,5 +17,6 @@
     "arrow-down": "caret-down"
   },
   "lost": ["arrow-right-down", "arrow-right-up", "reply", "star-shape"],
-  "changed": ["message"]
+  "changed": ["message"],
+  "renameTargets": ["message"]
 }
