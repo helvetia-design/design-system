@@ -1392,25 +1392,7 @@ tokens:
       figmaVariableId: 'VariableID:137:1248',
       resolved: true,
     }
-  # color=disabled (base / hover / active)
-  - {
-      cssVar: --ds-button-color-disabled-active-background,
-      figmaVariable: 🧩 Component/Button/Color/Disabled/Active/Background,
-      figmaVariableId: 'VariableID:137:1164',
-      resolved: true,
-    }
-  - {
-      cssVar: --ds-button-color-disabled-active-border,
-      figmaVariable: 🧩 Component/Button/Color/Disabled/Active/Border,
-      figmaVariableId: { color: 'VariableID:137:1165', width: 'VariableID:137:1166', style: 'VariableID:137:1167' },
-      resolved: true,
-    }
-  - {
-      cssVar: --ds-button-color-disabled-active-text,
-      figmaVariable: 🧩 Component/Button/Color/Disabled/Active/Text,
-      figmaVariableId: 'VariableID:137:1163',
-      resolved: true,
-    }
+  # disabled=true (base only — the hover/active tokens were never used and were removed from Base.tokens.json 11.11.2026)
   - {
       cssVar: --ds-button-color-disabled-base-background,
       figmaVariable: 🧩 Component/Button/Color/Disabled/Base/Background,
@@ -1427,24 +1409,6 @@ tokens:
       cssVar: --ds-button-color-disabled-base-text,
       figmaVariable: 🧩 Component/Button/Color/Disabled/Base/Text,
       figmaVariableId: 'VariableID:137:1153',
-      resolved: true,
-    }
-  - {
-      cssVar: --ds-button-color-disabled-hover-background,
-      figmaVariable: 🧩 Component/Button/Color/Disabled/Hover/Background,
-      figmaVariableId: 'VariableID:137:1159',
-      resolved: true,
-    }
-  - {
-      cssVar: --ds-button-color-disabled-hover-border,
-      figmaVariable: 🧩 Component/Button/Color/Disabled/Hover/Border,
-      figmaVariableId: { color: 'VariableID:137:1160', width: 'VariableID:137:1161', style: 'VariableID:137:1162' },
-      resolved: true,
-    }
-  - {
-      cssVar: --ds-button-color-disabled-hover-text,
-      figmaVariable: 🧩 Component/Button/Color/Disabled/Hover/Text,
-      figmaVariableId: 'VariableID:137:1158',
       resolved: true,
     }
   # focus ring
