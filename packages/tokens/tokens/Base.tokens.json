@@ -1536,6 +1536,28 @@
           "$type": "dimension",
           "$value": "{🌐 Global.📏 Dimension.Space.48}",
           "$description": "Minimum height of a standard form control box (48px at 16px root)."
+        },
+        "XS": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Space.28}",
+          "$description": "Minimum height of a compact (flat) control (28px at 16px root)."
+        },
+        "SM": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Space.32}",
+          "$description": "Minimum height of a small control (32px at 16px root)."
+        },
+        "LG": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Space.56}",
+          "$description": "Minimum height of a large control (56px at 16px root)."
+        }
+      },
+      "Icon": {
+        "Base": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Space.24}",
+          "$description": "Default inline icon/spinner size (24px at 16px root)."
         }
       }
     },
@@ -1912,6 +1934,11 @@
             ]
           }
         }
+      },
+      "UnderlineOffset": {
+        "$type": "dimension",
+        "$value": "{🌐 Global.📏 Dimension.Space.4}",
+        "$description": "Offset of text underlines (4px at 16px root)."
       },
       "TextDecoration": {
         "None": {
@@ -8604,78 +8631,11 @@
                   "style": "VariableID:137:1157"
                 }
               }
-            }
-          },
-          "Hover": {
-            "Text": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🎬 Action.Disabled.OnSurface.Hover}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1158"
-              }
             },
-            "Background": {
+            "SpinnerBackground": {
               "$type": "color",
-              "$value": "{🔗 Alias.🎬 Action.Disabled.Surface.Hover}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1159"
-              }
-            },
-            "Border": {
-              "$type": "border",
-              "$value": "{🔗 Alias.🎬 Action.Disabled.Border.Hover}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": {
-                  "color": "VariableID:137:1160",
-                  "width": "VariableID:137:1161",
-                  "style": "VariableID:137:1162"
-                }
-              }
-            }
-          },
-          "Active": {
-            "Text": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🎬 Action.Disabled.OnSurface.Active}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1163"
-              }
-            },
-            "Background": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🎬 Action.Disabled.Surface.Active}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1164"
-              }
-            },
-            "Border": {
-              "$type": "border",
-              "$value": "{🔗 Alias.🎬 Action.Disabled.Border.Active}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": {
-                  "color": "VariableID:137:1165",
-                  "width": "VariableID:137:1166",
-                  "style": "VariableID:137:1167"
-                }
-              }
+              "$value": "{🔗 Alias.▭ Border.Color.GreyDark}",
+              "$description": "Background color of the loading spinner's circle track inside a disabled button."
             }
           }
         },
@@ -9410,7 +9370,7 @@
           },
           "MinHeight": {
             "$type": "dimension",
-            "$value": "{🌐 Global.📏 Dimension.Size.48}",
+            "$value": "{🔗 Alias.📏 Size.Control.Base}",
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
@@ -9420,7 +9380,7 @@
           },
           "MinWidth": {
             "$type": "dimension",
-            "$value": "{🌐 Global.📏 Dimension.Size.48}",
+            "$value": "{🔗 Alias.📏 Size.Control.Base}",
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
@@ -9512,7 +9472,7 @@
           },
           "MinHeight": {
             "$type": "dimension",
-            "$value": "{🌐 Global.📏 Dimension.Size.32}",
+            "$value": "{🔗 Alias.📏 Size.Control.SM}",
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
@@ -9522,7 +9482,7 @@
           },
           "MinWidth": {
             "$type": "dimension",
-            "$value": "{🌐 Global.📏 Dimension.Size.32}",
+            "$value": "{🔗 Alias.📏 Size.Control.SM}",
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
@@ -9604,7 +9564,7 @@
           },
           "MinHeight": {
             "$type": "dimension",
-            "$value": "{🌐 Global.📏 Dimension.Size.56}",
+            "$value": "{🔗 Alias.📏 Size.Control.LG}",
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
@@ -9614,7 +9574,7 @@
           },
           "MinWidth": {
             "$type": "dimension",
-            "$value": "{🌐 Global.📏 Dimension.Size.56}",
+            "$value": "{🔗 Alias.📏 Size.Control.LG}",
             "$extensions": {
               "com.figma.scopes": [
                 "ALL_SCOPES"
@@ -9632,6 +9592,48 @@
               "com.figma.variableId": "VariableID:137:1284"
             }
           }
+        }
+      },
+      "Spinner": {
+        "Size": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.📏 Size.Icon.Base}",
+          "$description": "Size of the loading spinner inside the button."
+        }
+      },
+      "BrandIcon": {
+        "Padding": {
+          "Mobile": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.↔️ Space.Padding.SM}",
+            "$description": "Padding of a brand-icon button on mobile."
+          },
+          "Tablet": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.↔️ Space.Padding.MD}",
+            "$description": "Padding of a brand-icon button from tablet up."
+          }
+        }
+      },
+      "Link": {
+        "UnderlineOffset": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.🔤 Text.UnderlineOffset}",
+          "$description": "Underline offset of the link-colored button."
+        }
+      },
+      "Flat": {
+        "MinHeight": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.📏 Size.Control.XS}",
+          "$description": "Minimum height of a flat button."
+        }
+      },
+      "Group": {
+        "Gap": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.2XS}",
+          "$description": "Gap between buttons in a button group."
         }
       }
     },
@@ -11666,6 +11668,10 @@
           "$value": "{🔗 Alias.↔️ Space.Gap.2XS}"
         },
         "PaddingX": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Padding.XS}"
+        },
+        "PaddingY": {
           "$type": "dimension",
           "$value": "{🔗 Alias.↔️ Space.Padding.XS}"
         },
@@ -22002,6 +22008,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": "VariableID:137:2662"
+          }
+        },
+        "28": {
+          "$type": "dimension",
+          "$value": {
+            "value": 1.75,
+            "unit": "rem"
           }
         },
         "32": {
