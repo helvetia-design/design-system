@@ -632,10 +632,30 @@ export function lineText(text, index) {
   return text.slice(start, end === -1 ? text.length : end)
 }
 
+export function lineIndex(text) {
+  const starts = [0]
+  for (let i = 0; i < text.length; i++) if (text[i] === '\n') starts.push(i + 1)
+  return offset => {
+    let low = 0
+    let high = starts.length - 1
+    while (low < high) {
+      const mid = (low + high + 1) >> 1
+      if (starts[mid] <= offset) low = mid
+      else high = mid - 1
+    }
+    return low + 1
+  }
+}
+
+// Holds one file's index; callers must not alternate texts, or every call rebuilds it.
+let cachedText
+let cachedLookup
+
 export function lineAt(text, index) {
-  let line = 1
-  for (let i = 0; i < index; i++) if (text[i] === '\n') line++
-  return line
+  if (text !== cachedText) cachedLookup = lineIndex(text)
+  // An equal-content copy left in the cache would cost a full string compare on every call.
+  cachedText = text
+  return cachedLookup(index)
 }
 
 export function toSnippet(raw) {

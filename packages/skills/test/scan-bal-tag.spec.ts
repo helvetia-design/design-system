@@ -272,3 +272,20 @@ describe('scanBalTag', () => {
     })
   })
 })
+
+describe('scanBalTag after an emoji', () => {
+  it('reports the line and snippet of a tag after an emoji attribute value', () => {
+    const root = createScratchDir()
+    write(root, 'a.html', '<p>\u{1F389}</p>\n<span title="\u{1F389}">a</span><bal-tag color="info">y</bal-tag>\n')
+
+    expect(scanBalTag(root).files).toEqual([
+      {
+        file: 'a.html',
+        findings: [
+          { line: 2, snippet: '<bal-tag color="info">' },
+          { line: 2, snippet: '</bal-tag>' },
+        ],
+      },
+    ])
+  })
+})
