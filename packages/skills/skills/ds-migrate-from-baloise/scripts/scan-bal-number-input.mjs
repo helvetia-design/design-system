@@ -4,7 +4,8 @@ import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
-const USAGE_RE = /<\/?bal-number-input(?![\w-])|<\/?BalNumberInput\b|\bBalNumberInput\b/g
+const USAGE_RE =
+  /<\/?bal-number-input(?![\w-])|<\/?BalNumberInput\b|\bBalEvents\.BalNumberInput[A-Z]\w*|\bBalNumberInput(?:CustomEvent)?\b/g
 
 export function scanBalNumberInput(rootDir, paths = []) {
   const found = []

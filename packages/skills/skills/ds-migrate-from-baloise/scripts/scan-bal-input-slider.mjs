@@ -4,7 +4,8 @@ import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
-const USAGE_RE = /<\/?bal-input-slider(?![\w-])|<\/?BalInputSlider\b|\bBalInputSlider\b/g
+const USAGE_RE =
+  /<\/?bal-input-slider(?![\w-])|<\/?BalInputSlider\b|\bBalEvents\.BalInputSlider[A-Z]\w*|\bBalInputSlider(?:CustomEvent)?\b/g
 
 export function scanBalInputSlider(rootDir, paths = []) {
   const found = []

@@ -325,6 +325,41 @@ describe('scanBalButton', () => {
     expect(scanBalButton(root)).toEqual({ total: 0, files: [] })
   })
 
+  it('lists BalEvents types and the bare CustomEvent once per occurrence, but not BalProps', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        'export class ApplicationComponent {',
+        '  onSave(event: BalEvents.BalButtonCustomEvent<MouseEvent>) {}',
+        '  onBare(event: BalButtonCustomEvent<MouseEvent>) {}',
+        '  onGroup(event: BalButtonGroupCustomEvent<void>) {}',
+        '  both(a: BalEvents.BalButtonNavigate, b: BalButtonCustomEvent<MouseEvent>) {}',
+        '  color?: BalProps.BalButtonColor',
+        '  el?: HTMLBalButtonElement',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalButton(root)).toEqual({
+      total: 5,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            { line: 2, snippet: 'onSave(event: BalEvents.BalButtonCustomEvent<MouseEvent>) {}' },
+            { line: 3, snippet: 'onBare(event: BalButtonCustomEvent<MouseEvent>) {}' },
+            { line: 4, snippet: 'onGroup(event: BalButtonGroupCustomEvent<void>) {}' },
+            { line: 5, snippet: 'both(a: BalEvents.BalButtonNavigate, b: BalButtonCustomEvent<MouseEvent>) {}' },
+            { line: 5, snippet: 'both(a: BalEvents.BalButtonNavigate, b: BalButtonCustomEvent<MouseEvent>) {}' },
+          ],
+        },
+      ],
+    })
+  })
+
   it('prints grouped findings as JSON and does not edit files', () => {
     const root = createScratchDir()
     const contents = '<bal-button color="primary"></bal-button>\n'
