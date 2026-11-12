@@ -67,9 +67,9 @@
 | ⬜     | Stack        | Structure  | -                                     | ✅  | ⬜    |
 | ⬜     | Content      | Structure  | -                                     | ✅  | ⬜    |
 | ⬜     | Data         | Structure  | -                                     | ✅  | ⬜    |
-| ⬜     | List         | Structure  | -                                     | ⬜  | ⬜    |
+| ⬜     | List         | Structure  | -                                     | ✅  | ⬜    |
 | ⬜     | Root         | Structure  | -                                     | ✅  | ⬜    |
-| ⬜     | Card         | Structure  | -                                     | ⬜  | ⬜    |
+| ⬜     | Card         | Structure  | -                                     | ✅  | ⬜    |
 | ⬜     | Button       | Actions    | Brand Icon, Icon, Spinner             | ✅  | ⬜    |
 | ⬜     | Badge        | Indicators | Icon                                  | ✅  | ⬜    |
 | ⬜     | Segment      | Forms      | Icon                                  | ⬜  | ⬜    |

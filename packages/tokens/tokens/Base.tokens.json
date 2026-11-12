@@ -10270,6 +10270,21 @@
               }
             }
           }
+        },
+        "Selected": {
+          "Border": {
+            "$type": "border",
+            "$value": {
+              "color": "{🔗 Alias.▭ Border.Color.Primary}",
+              "width": "{🔗 Alias.▭ Border.Width.Base}",
+              "style": "{🔗 Alias.▭ Border.Style.Solid}"
+            },
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          }
         }
       },
       "Radius": {
@@ -10301,16 +10316,6 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": "VariableID:137:1368"
-          }
-        },
-        "MD": {
-          "$type": "dimension",
-          "$value": "{📱 Device.↔️ Space.MD}",
-          "$extensions": {
-            "com.figma.scopes": [
-              "ALL_SCOPES"
-            ],
-            "com.figma.variableId": "VariableID:137:1369"
           }
         },
         "LG": {
@@ -10353,6 +10358,18 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": "VariableID:137:1373"
+          }
+        }
+      },
+      "Header": {
+        "Tags": {
+          "MarginTop": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.↔️ Space.Gap.2XS}"
+          },
+          "MarginBottom": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.↔️ Space.Gap.Base}"
           }
         }
       }

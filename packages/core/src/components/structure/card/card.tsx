@@ -164,6 +164,8 @@ export class Card implements DsComponentInterface {
           [`is-fullheight`]: this.fullheight,
           [`is-flat`]: !!this.flat,
           [`is-tile`]: !!this.tile,
+          [`is-clickable`]: !!this.clickable,
+          [`is-selected`]: !!this.selected,
         }}
       >
         <slot name="picture"></slot>
