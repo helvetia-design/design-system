@@ -2,7 +2,7 @@
 
 A batch migrates every `bal-*` component in a set of files in one run, with one confirmation. **Scope** and the cascade question in **Manual** and **Detect** start it. Both hand over a file set and the `scan-migratable.mjs` JSON for it.
 
-A batch exists because a parent and its children must change together. `ds-button-group` styles `::slotted(ds-button)` and `ds-checkbox-group` queries `ds-checkbox`. A migrated parent around a legacy child loses layout or wiring without an error.
+A batch exists because a parent and its nested children must change together. Migrating only the parent leaves its nested `bal-*` children in place inside the new `ds-*` parent — a mixed `bal-`/`ds-` tree, not an error, so nothing fails loudly. `ds-button-group` styles `::slotted(ds-button)` and `ds-checkbox-group` queries `ds-checkbox`: a migrated parent around a legacy, un-migrated nested child loses layout or wiring silently. A batch migrates the parent and every nested and sibling `bal-*` component in the same files together, so none of them is left stranded inside an already-migrated parent.
 
 `<project-root>` is the consumer project root that contains the app lockfile. Every path in this file is relative to it.
 

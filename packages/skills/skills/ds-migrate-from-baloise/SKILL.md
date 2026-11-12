@@ -236,7 +236,7 @@ node <this-skill-directory>/scripts/scan-migratable.mjs <project-root> <file> [<
 
 When `suggested` lists no component besides the chosen one, dispatch to `components/<name>/migration.md`.
 
-Otherwise ask one yes/no, naming the other components with their `total`: also migrate the other `bal-*` components in these files? On yes, follow `shared/batch.md` with those files and that JSON. On no, dispatch to `components/<name>/migration.md`, as without the question.
+Otherwise ask one yes/no, naming the other components with their `total`, and explain what the yes answer actually does: these files contain other `bal-*` components too, some of them nested inside `<name>` (its children or slotted content), some elsewhere in the same file. A plain `<name>`-only migration leaves those nested components as `bal-*`, so the new `ds-<name>` ends up with unmigrated `bal-*` children inside it — a mixed `bal-`/`ds-` tree. Answering yes instead migrates `<name>` and every nested and sibling `bal-*` component in these same files together, in one batch, so no mixed tree is left behind. On yes, follow `shared/batch.md` with those files and that JSON. On no, migrate only `<name>`: dispatch to `components/<name>/migration.md`, as without the question, and leave the other `bal-*` components, nested or not, unmigrated for a later run.
 
 #### Scope
 
