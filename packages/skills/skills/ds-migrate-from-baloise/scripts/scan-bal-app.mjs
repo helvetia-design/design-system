@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
 const USAGE_RE =
-  /<\/?bal-app\b|<\/?BalApp\b|\bBalApp(?:CustomEvent)?\b|\bbalAppReady\b|\b(?:initialize|use|provide)BaloiseDesignSystem\b|\bupdateBalLanguage\b/g
+  /<\/?bal-app\b|<\/?BalApp\b|\bBalApp(?:CustomEvent)?\b|\bbalAppReady\b|\b(?:initialize|use|provide)BaloiseDesignSystem\b|\bBaloiseDesignSystemModule\b|\bupdateBalLanguage\b/g
 
 export function scanBalApp(rootDir, paths = []) {
   const found = []

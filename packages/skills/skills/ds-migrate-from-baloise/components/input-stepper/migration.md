@@ -34,11 +34,11 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-input-stepper`)                                                                      | new (`ds-counter`)                                         | handling                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`, `invalid`, `min`, `max`, `debounce`, `disabled`, `readonly`, `value`, `autoInvalidOff` | same                                                       | Copy as-is, in every form (`disabled`, `disabled="true"`, `[disabled]="x"`, `disabled={x}`). Keep form bindings such as `[(ngModel)]`, `formControlName`, and `[formControl]` unchanged.                                                                                                                                                                                                                                     |
-| `steps`                                                                                        | `step`                                                     | Renamed, still a number. HTML `steps="2"` becomes `step="2"`, Angular `[steps]="x"` becomes `[step]="x"`, React `steps={2}` becomes `step={2}`. Keep the value. `ds-counter` needs a positive number and falls back to `1` otherwise.                                                                                                                                                                                        |
-| _(none)_                                                                                       | `label`, `description`, `color`, `invalidText`, `required` | New props. Nothing to migrate from. Outside a `bal-field`, leave them unset. `required` defaults to `true` but only affects the "optional" suffix of `label`, so it has no visible effect until a `label` is set. Inside a `bal-field` with a label, `shared/field.md` sets `label` and decides `required`, including an explicit `required="false"`. `ds-counter` is excluded from the required default rule in `SKILL.md`. |
+| old (`bal-input-stepper`) | new (`ds-counter`) | handling |
+| --- | --- | --- |
+| `name`, `invalid`, `min`, `max`, `debounce`, `disabled`, `readonly`, `value`, `autoInvalidOff` | same | Copy as-is, in every form (`disabled`, `disabled="true"`, `[disabled]="x"`, `disabled={x}`). Keep form bindings such as `[(ngModel)]`, `formControlName`, and `[formControl]` unchanged. |
+| `steps` | `step` | Renamed, still a number. HTML `steps="2"` becomes `step="2"`, Angular `[steps]="x"` becomes `[step]="x"`, React `steps={2}` becomes `step={2}`. Keep the value. `ds-counter` needs a positive number and falls back to `1` otherwise. |
+| _(none)_ | `label`, `description`, `color`, `invalidText`, `required` | New props. Nothing to migrate from. Outside a `bal-field`, leave them unset. `required` defaults to `true` but only affects the "optional" suffix of `label`, so it has no visible effect until a `label` is set. Inside a `bal-field` with a label, `shared/field.md` sets `label` and decides `required`, including an explicit `required="false"`. `ds-counter` is excluded from the required default rule in `SKILL.md`. |
 
 ### Tags and imports
 
@@ -48,14 +48,14 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Events
 
-| old           | new          | handling                                                                                                                                                                                                            |
-| ------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balChange`   | `dsChange`   | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `number`, legacy `number \| undefined`. |
-| `balInput`    | `dsInput`    | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `number`.                                                                                                 |
-| `balIncrease` | `dsIncrease` | Same shapes.                                                                                                                                                                                                        |
-| `balDecrease` | `dsDecrease` | Same shapes.                                                                                                                                                                                                        |
-| `balFocus`    | `dsFocus`    | Same shapes.                                                                                                                                                                                                        |
-| `balBlur`     | `dsBlur`     | Same shapes.                                                                                                                                                                                                        |
+| old | new | handling |
+| --- | --- | --- |
+| `balChange` | `dsChange` | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `number`, legacy `number \| undefined`. |
+| `balInput` | `dsInput` | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `number`. |
+| `balIncrease` | `dsIncrease` | Same shapes. |
+| `balDecrease` | `dsDecrease` | Same shapes. |
+| `balFocus` | `dsFocus` | Same shapes. |
+| `balBlur` | `dsBlur` | Same shapes. |
 
 Rewrite only handlers that are attached to the element being migrated. `balChange`, `balInput`, `balBlur`, and `balFocus` are emitted by many other legacy components, so never rewrite a handler on another element, and never rename them by search and replace across the file.
 

@@ -690,6 +690,24 @@ describe('places a rewrite would break', () => {
     ])
   })
 
+  it('lists the mapped classes of an object key inside a className call, and only there', () => {
+    const root = createScratchDir()
+    write(root, 'src/a.tsx', 'export const A = () => <div className={cx({ grid: on, table: t })} />\n')
+    write(root, 'src/b.html', '<div [ngClass]="classes"></div>\n')
+
+    expect(scanCssUtils(root).dynamic.map(({ file, line, classes }) => ({ file, line, classes }))).toEqual([
+      {
+        file: 'src/a.tsx',
+        line: 1,
+        classes: [
+          { from: 'grid', to: 'ds-grid', group: 'structure' },
+          { from: 'table', to: 'ds-table', group: 'core' },
+        ],
+      },
+      { file: 'src/b.html', line: 1, classes: undefined },
+    ])
+  })
+
   it('skips line comments in a Vue SCSS style block', () => {
     const root = createScratchDir()
     write(root, 'a.vue', ['<style lang="scss">', '// old: .grid was used here', '.y {}', '</style>', ''].join('\n'))

@@ -34,16 +34,16 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-input-slider`)                                                                       | new (`ds-slider`)                                            | handling                                                                                                                                                                                                                                                                        |
-| ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`, `invalid`, `min`, `max`, `debounce`, `disabled`, `readonly`, `value`, `autoInvalidOff` | same                                                         | Copy as-is, in every form (`disabled`, `disabled="true"`, `[disabled]="x"`, `disabled={x}`). Keep form bindings such as `[(ngModel)]`, `formControlName`, and `[formControl]` unchanged.                                                                                        |
-| `required` set                                                                                 | `required`                                                   | Copy as-is. `ds-slider` `required` only drives the "(optional)" suffix of its `label`, so the migration does not add `required="false"`. `ds-slider` is excluded from the required default rule in `SKILL.md`. Inside a `bal-field` with a label, `shared/field.md` decides it. |
-| `step` omitted or `0`                                                                          | `step="any"`                                                 | The meaning of `0` was "no steps", which is continuous. `ds-slider` defaults to `'1'`, so an omitted `step` would silently snap to whole numbers. Replace `0` with `any`, or add `step="any"` when it was omitted. Report each file where this was added.                       |
-| `step` with a numeric literal                                                                  | `step` as a string                                           | `step` is a string on `ds-slider`. `step="5"` stays. Angular `[step]="5"` becomes `step="5"`, React `step={5}` becomes `step="5"`, otherwise strictly typed templates no longer compile.                                                                                        |
-| `step` bound to an expression                                                                  | `step`                                                       | Leave the binding and flag it for manual review: the value must now be a string, or `"any"`.                                                                                                                                                                                    |
-| `balTabindex`                                                                                  | `tabindex`                                                   | `ds-slider` takes a native `tabindex` from the host. HTML `balTabindex="1"` becomes `tabindex="1"`, Angular `[balTabindex]="x"` becomes `[attr.tabindex]="x"`, React `balTabindex={1}` becomes `tabIndex={1}`.                                                                  |
-| `hasTicks`                                                                                     | _(no equivalent prop)_                                       | Apply Unmapped props and handlers (`SKILL.md`). It has no effect after the migration.                                                                                                                                                                                           |
-| _(none)_                                                                                       | `label`, `description`, `color`, `brandColor`, `invalidText` | New props. Nothing to migrate from. Leave them unset.                                                                                                                                                                                                                           |
+| old (`bal-input-slider`) | new (`ds-slider`) | handling |
+| --- | --- | --- |
+| `name`, `invalid`, `min`, `max`, `debounce`, `disabled`, `readonly`, `value`, `autoInvalidOff` | same | Copy as-is, in every form (`disabled`, `disabled="true"`, `[disabled]="x"`, `disabled={x}`). Keep form bindings such as `[(ngModel)]`, `formControlName`, and `[formControl]` unchanged. |
+| `required` set | `required` | Copy as-is. `ds-slider` `required` only drives the "(optional)" suffix of its `label`, so the migration does not add `required="false"`. `ds-slider` is excluded from the required default rule in `SKILL.md`. Inside a `bal-field` with a label, `shared/field.md` decides it. |
+| `step` omitted or `0` | `step="any"` | The meaning of `0` was "no steps", which is continuous. `ds-slider` defaults to `'1'`, so an omitted `step` would silently snap to whole numbers. Replace `0` with `any`, or add `step="any"` when it was omitted. Report each file where this was added. |
+| `step` with a numeric literal | `step` as a string | `step` is a string on `ds-slider`. `step="5"` stays. Angular `[step]="5"` becomes `step="5"`, React `step={5}` becomes `step="5"`, otherwise strictly typed templates no longer compile. |
+| `step` bound to an expression | `step` | `step` is now a string. HTML: copy the binding unchanged and flag it for manual review. React and Angular: copy it when the expression's type only admits strings. Otherwise apply Unmapped props and handlers (`SKILL.md`). The report says that the value must now be a string, or `"any"` where the legacy value was `0`. |
+| `balTabindex` | `tabindex` | `ds-slider` takes a native `tabindex` from the host. HTML `balTabindex="1"` becomes `tabindex="1"`, Angular `[balTabindex]="x"` becomes `[attr.tabindex]="x"`, React `balTabindex={1}` becomes `tabIndex={1}`. |
+| `hasTicks` | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). It has no effect after the migration. |
+| _(none)_ | `label`, `description`, `color`, `brandColor`, `invalidText` | New props. Nothing to migrate from. Leave them unset. |
 
 ### Tags and imports
 
@@ -53,13 +53,13 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Events
 
-| old           | new        | handling                                                                                                                                                                                                                 |
-| ------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `balChange`   | `dsChange` | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `number`, legacy `string \| number \| null`. |
-| `balInput`    | `dsInput`  | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `number`.                                                                                                      |
-| `balBlur`     | `dsBlur`   | Same shapes.                                                                                                                                                                                                             |
-| `balFocus`    | `dsFocus`  | Same shapes.                                                                                                                                                                                                             |
-| `balKeyPress` | _(none)_   | No equivalent. Apply Unmapped props and handlers (`SKILL.md`).                                                                                                                                                           |
+| old | new | handling |
+| --- | --- | --- |
+| `balChange` | `dsChange` | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `number`, legacy `string \| number \| null`. |
+| `balInput` | `dsInput` | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `number`. |
+| `balBlur` | `dsBlur` | Same shapes. |
+| `balFocus` | `dsFocus` | Same shapes. |
+| `balKeyPress` | _(none)_ | No equivalent. Apply Unmapped props and handlers (`SKILL.md`). |
 
 `ds-slider` adds `dsClick`. There is nothing to migrate from.
 
@@ -83,7 +83,7 @@ Needs your attention when found:
 
 1. Every unsupported `hasTicks`, with its Unmapped props and handlers outcome.
 2. Every `balKeyPress` handler, with its Unmapped props and handlers outcome.
-3. Every dynamic `step` binding. The value must now be a string, or `"any"`.
+3. Every dynamic `step` binding, with the framework outcome (copied in HTML, copied or removed (Unmapped) in React and Angular). The value must now be a string, or `"any"`.
 4. Every `getInputElement()` call, listed as "return type changed, check the caller".
 5. Every `setAriaForm()` call, with its Unmapped props and handlers outcome.
 6. Every legacy type left or written out and every bundle kept, as `SKILL.md` "Legacy types and bundles" describes: each `BalProps.BalInputSlider*` type left in place, each detail alias such as `BalEvents.BalInputSliderChangeDetail` written out, and each multi-family bundle such as `BalFormBundle` or `BalComponentBundle` kept with `DsSlider` added next to it.

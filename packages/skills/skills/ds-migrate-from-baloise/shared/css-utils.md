@@ -8,15 +8,15 @@ Init loads the Helvetia utilities directly below the Baloise utilities line. Bot
 
 `css-utils-map.json` in this folder lists the legacy classes that differ in Helvetia. Its `core` block lists the classes of the Baloise `css/core` stylesheet. Every other class of the Baloise utilities and of `css/core` has the same name in Helvetia and stays unchanged. That includes the spacing aliases such as `mb-small` and `p-normal`, and `has-buttons` and `is-striped`.
 
-| group          | meaning                                                                       | handling                           |
-| -------------- | ----------------------------------------------------------------------------- | ---------------------------------- |
-| `variant`      | renamed variant prefix, same breakpoint (`widescreen:` is now `desktop-lg:`)  | Write the mapped token.            |
-| `structure`    | grid and container classes (`grid` is now `ds-grid`, `col` is now `ds-col`)   | Write the mapped token.            |
-| `renamed`      | same value, new name (`border-primary-hovered` is now `border-primary-hover`) | Write the mapped token.            |
-| `approximated` | closest class, visibly different value (`shadow-small` to `shadow`)           | Write the mapped token. Report it. |
-| `lost`         | no counterpart, `to` is `null`                                                | Leave the token. Report it.        |
-| `core`         | `css/core` class with a `ds-*` counterpart (`table` is now `ds-table`)        | Write the mapped token.            |
-| `core-lost`    | `css/core` class without counterpart (`file`, `select`), `to` is `null`       | Leave the token. Report it.        |
+| group | meaning | handling |
+| --- | --- | --- |
+| `variant` | renamed variant prefix, same breakpoint (`widescreen:` is now `desktop-lg:`) | Write the mapped token. |
+| `structure` | grid and container classes (`grid` is now `ds-grid`, `col` is now `ds-col`) | Write the mapped token. |
+| `renamed` | same value, new name (`border-primary-hovered` is now `border-primary-hover`) | Write the mapped token. |
+| `approximated` | closest class, visibly different value (`shadow-small` to `shadow`) | Write the mapped token. Report it. |
+| `lost` | no counterpart, `to` is `null` | Leave the token. Report it. |
+| `core` | `css/core` class with a `ds-*` counterpart (`table` is now `ds-table`) | Write the mapped token. |
+| `core-lost` | `css/core` class without counterpart (`file`, `select`), `to` is `null` | Leave the token. Report it. |
 
 A token can carry a variant prefix and a base class. The scan maps both and prints one move with the whole token, such as `widescreen:shadow-small` to `desktop-lg:shadow`, under the stronger group: `lost`, then `core-lost`, `approximated`, `renamed`, `core`, `structure` and `variant`. A `css/core` class has no variant, so only a token without a variant prefix is `core` or `core-lost`. A token is `lost` when its variant prefix is lost (`widescreen-only:`, `high-definition-only:`), when its base class is lost, or when Helvetia has the base class but not that variant of it, such as `desktop:w-full`.
 
@@ -56,7 +56,7 @@ Show the findings grouped by file, with path, line, snippet and each `from` to `
 
 - `template substitution` or `interpolation`: a class context with `${…}` or `{{ … }}`, such as ``className={`mb-small ${extra}`}`` or `class="mb-{{ size }}"`. The static parts are still in `files`. The substituted value may hold a legacy class. A template literal outside a class context, such as ``cx(`shadow-small ${x}`)``, is listed with this reason when its static text holds a mapped class.
 - `string concatenation`: a class context built with `+`, such as `className={'mb-small ' + extra}`.
-- `non-literal class binding`: a variable, a computed key (`[key]: cond`) or a spread inside `[ngClass]`, `[class]` or `:class`, such as `:class="classes"`, or a mapped object key inside a call in `className`, such as `className={cx({ grid: on })}`.
+- `non-literal class binding`: a variable, a computed key (`[key]: cond`) or a spread inside `[ngClass]`, `[class]` or `:class`, such as `:class="classes"`, or a mapped object key inside a call in `className`, such as `className={cx({ grid: on })}`. Only a mapped object key adds a `classes` field to the place, with the same `from`, `to` and `group` entries as a finding. Such a place provably holds a Baloise class.
 - `string literal outside a class context`: a string that contains a mapped class, in code or in a bound attribute such as `:title="'radius-large'"`, `[attr.class]` or Vue `v-bind="{ class: 'grid' }"`. Examples are `const round = 'radius-normal p-small'` and the arguments of `cx(…)`. A literal that holds only unchanged classes, such as `'mt-normal'`, is not listed. A literal whose only mapped classes are `css/core` classes, such as `type: 'button'` or `color="'link'"`, is not listed either, for this reason and for `template substitution`. These words are common code values.
 - `selector`: a string that selects a mapped class, such as `querySelector('.grid')`, `By.css('.container')` or `'class.grid'`. A `css/core` class counts only in a compound that starts with a class, such as `'.table td'`, because a string like `'header.title'` is usually a translation key.
 - `selector in a stylesheet`: a selector of a mapped class, such as `.grid > .col` or `.border-primary-hovered`, in a stylesheet or a `<style>` block. The step never edits stylesheets. An `@extend .grid` line can show up here too; rewriting `@extend` is out of scope.
@@ -65,7 +65,7 @@ Show the findings grouped by file, with path, line, snippet and each `from` to `
 
 The scan does not see a `css/core` class in a plain code string, such as `cx('table', x)` or a variable that holds `'table'`. This gap is on purpose, because words like `button` and `link` are common code values. The consumer checks such places by hand before **Cleanup** removes the `css/core` line.
 
-Every `dynamic` place is listed for the consumer to review. Every place without `group` keeps the Baloise utilities line, as the next sections say. A place with `group: 'core'` keeps the legacy `css/core` line instead, which **Cleanup** removes.
+Every `dynamic` place is listed for the consumer to review. Every place without `group` keeps the Baloise utilities line, as the next sections say. The exception is a `non-literal class binding` place without `classes` that the user confirmed in **CSS utils** step 1 of `SKILL.md`. A place with `group: 'core'` keeps the legacy `css/core` line instead, which **Cleanup** removes.
 
 ## Rewrite
 
@@ -83,9 +83,11 @@ After the rewrite, run the scan again without file arguments, so it covers the w
 
 This decision ignores every `core` and `core-lost` move and every `dynamic` place with `group: 'core'`. Those classes depend on the legacy `css/core` line, not on the Baloise utilities line. **Cleanup** keeps that line while one of them is left.
 
-**A class move, a `lost` move or a `dynamic` place is left**: keep the Baloise utilities line. Report why, with the number of remaining moves, lost moves and dynamic places. A remaining move with a `to` sits in a file outside the scanned paths or was not rewritten. A `dynamic` place that is clearly not a class, such as `role="grid"` or `display: 'grid'`, still counts, and so does a `selector in a stylesheet`. List each one so the consumer can review it. The line goes only after the consumer has fixed or removed every such place and a new scan is clean.
+A `dynamic` place with reason `non-literal class binding` that the user confirmed in **CSS utils** step 1 of `SKILL.md` does not count here. Match it by file, line and reason, not by snippet, because the rewrite may change static classes on the same line. Every other `dynamic` place counts, whatever its reason.
 
-**No class move, no `lost` move and no `dynamic` place is left**: delete the Baloise utilities lines that the confirmation in `SKILL.md` covered. Do not delete a line that the confirmation did not cover; report it instead. Find them in `imports` of:
+**A class move, a `lost` move or a `dynamic` place is left**, apart from the confirmed places: keep the Baloise utilities line. Report why, with the number of remaining moves, lost moves and dynamic places. A remaining move with a `to` sits in a file outside the scanned paths or was not rewritten. A `dynamic` place that is clearly not a class, such as `role="grid"` or `display: 'grid'`, still counts, and so does a `selector in a stylesheet`. List each one so the consumer can review it. The line goes only after the consumer has fixed or removed every such place and a new scan is clean.
+
+**No class move, no `lost` move and no `dynamic` place is left**, apart from the confirmed places: delete the Baloise utilities lines that the confirmation in `SKILL.md` covered. Do not delete a line that the confirmation did not cover; report it instead. Find them in `imports` of:
 
 ```bash
 node <this-skill-directory>/scripts/detect-baloise.mjs <project-root>
@@ -109,7 +111,7 @@ Needs your attention when found:
 
 - U1. Every class rewritten from `approximated`, and where.
 - U2. Every `lost` move left unchanged, and where, including `container` pairs with `is-detail-page` or `is-blog-page`.
-- U3. Every `dynamic` place, with its reason, and where.
+- U3. Every `dynamic` place, with its reason, and where. Mark each `non-literal class binding` place that the user confirmed as free of Baloise classes as "confirmed by the user", with file and line.
 - U4. When the Baloise utilities line stays, the reason, with the number of lost moves and dynamic places.
 - U5. Every uncommented bundled `@baloise/ds-styles/css/all` line, with the note that it still loads the legacy utilities.
 - U6. Every Baloise utilities line deleted, with file and line, and every utilities TODO comment deleted with it.

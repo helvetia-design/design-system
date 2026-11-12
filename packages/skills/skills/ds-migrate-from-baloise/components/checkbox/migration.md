@@ -49,12 +49,12 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 Legacy `interface` (`'checkbox' | 'switch' | 'button' | 'tile'`) lived on `bal-checkbox` and, when set on `bal-checkbox-group`, cascaded to every child. Neither `ds-checkbox` nor `ds-checkbox-group` has an `interface` prop. Each value becomes a different change:
 
-| old `interface`       | new                     | handling                                                                                                                   |
-| --------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| omitted, `"checkbox"` | omit `tile`             | Default on both sides. Copy every other prop as-is.                                                                        |
-| `"tile"`              | `tile`                  | Boolean attribute, same meaning: a bordered card layout. A child's `color` becomes `tileColor`; see the Props table below. |
-| `"switch"`            | tag becomes `ds-toggle` | See Shape: switch below. This is a tag change, not a prop rewrite.                                                         |
-| `"button"`            | `tile` + `hideTrigger`  | See Shape: button below. This is a visual approximation, not an exact match.                                               |
+| old `interface` | new | handling |
+| --- | --- | --- |
+| omitted, `"checkbox"` | omit `tile` | Default on both sides. Copy every other prop as-is. |
+| `"tile"` | `tile` | Boolean attribute, same meaning: a bordered card layout. A child's `color` becomes `tileColor`; see the Props table below. |
+| `"switch"` | tag becomes `ds-toggle` | See Shape: switch below. This is a tag change, not a prop rewrite. |
+| `"button"` | `tile` + `hideTrigger` | See Shape: button below. This is a visual approximation, not an exact match. |
 
 ### Shape: `interface="switch"` becomes a `ds-toggle`
 
@@ -191,27 +191,27 @@ Until `DsCheckbox` has a value accessor, this is the only path that works. A sin
 
 ### Props: `bal-checkbox` → `ds-checkbox`
 
-| old                                                                                         | new (`ds-checkbox`)                                | handling                                                                                                               |
-| ------------------------------------------------------------------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `name`, `value`, `checked`, `disabled`, `readonly`, `required`, `autoInvalidOff`, `invalid` | same                                               | Copy as-is.                                                                                                            |
-| `color`                                                                                     | `tileColor`                                        | Rename. Only meaningful when `tile` is set.                                                                            |
-| `colSize` / `colSizeTablet` / `colSizeMobile` (`@internal`)                                 | `cols` / `colsTablet` / `colsMobile` (`@internal`) | Rename. Internal layout props set by a parent group; rewrite if found directly on a child.                             |
-| `labelHidden`                                                                               | _(no equivalent)_                                  | Drop it. `ds-checkbox` always renders its label slot. Mention each dropped occurrence.                                 |
-| `flat`                                                                                      | _(no equivalent)_                                  | Drop it. Mention each dropped occurrence.                                                                              |
-| `nonSubmit`                                                                                 | _(no equivalent)_                                  | Drop it. `ds-checkbox` is always `formAssociated` and always submitted with the form. Mention each dropped occurrence. |
-| `hovered`, `pressed` (`@internal`)                                                          | _(no equivalent)_                                  | Drop silently. These were never public API.                                                                            |
+| old | new (`ds-checkbox`) | handling |
+| --- | --- | --- |
+| `name`, `value`, `checked`, `disabled`, `readonly`, `required`, `autoInvalidOff`, `invalid` | same | Copy as-is. |
+| `color` | `tileColor` | Rename. Only meaningful when `tile` is set. |
+| `colSize` / `colSizeTablet` / `colSizeMobile` (`@internal`) | `cols` / `colsTablet` / `colsMobile` (`@internal`) | Rename. Internal layout props set by a parent group; rewrite if found directly on a child. |
+| `labelHidden` | _(no equivalent)_ | Drop it. `ds-checkbox` always renders its label slot. Mention each dropped occurrence. |
+| `flat` | _(no equivalent)_ | Drop it. Mention each dropped occurrence. |
+| `nonSubmit` | _(no equivalent)_ | Drop it. `ds-checkbox` is always `formAssociated` and always submitted with the form. Mention each dropped occurrence. |
+| `hovered`, `pressed` (`@internal`) | _(no equivalent)_ | Drop silently. These were never public API. |
 
 ### Props: `bal-checkbox-group` → `ds-checkbox-group`
 
-| old                                                                                         | new (`ds-checkbox-group`)                                 | handling                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| ------------------------------------------------------------------------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `control`, `name`, `vertical`, `disabled`, `readonly`, `invalid`, `value`, `autoInvalidOff` | same                                                      | Copy as-is. Add `control` when the group has a forms binding or a bound `value`; see Bound groups need `control`.                                                                                                                                                                                                                                                                                                                             |
-| `columns` / `columnsTablet` / `columnsMobile`                                               | `cols` / `colsTablet` / `colsMobile`                      | Rename.                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `options` (array of `newBalCheckboxOption(...)`)                                            | _(no equivalent)_                                         | Drop it. `ds-checkbox-group` only supports slotted `ds-checkbox`/`ds-toggle` children, not a declarative array. This cannot be auto-generated from an arbitrary JS array at scan time — flag every `options`/`newBalCheckboxOption` occurrence for manual conversion into slotted children.                                                                                                                                                   |
-| `verticalOnMobile`                                                                          | _(no equivalent)_                                         | Drop it. Mention each dropped occurrence.                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `expanded`                                                                                  | _(no equivalent)_                                         | Drop it. Mention each dropped occurrence.                                                                                                                                                                                                                                                                                                                                                                                                     |
-| _(none — new prop)_                                                                         | `required` (defaults `true`)                              | Do not set this on a group without a label. Its only effect is an "(optional)" suffix next to the group's own `label` prop. When the group sits inside a `bal-field` with a label, `shared/field.md` sets `label` and `required` on the group. Outside a `bal-field`, leave the new default alone. `ds-checkbox-group` is excluded from the required default rule in `SKILL.md`. Mention once, not per-occurrence, that this new prop exists. |
-| _(none — new props)_                                                                        | `label`, `description`, `invalidText`, `loading`, `color` | New capabilities, nothing to migrate from legacy. `bal-checkbox-group` had neither `label` nor `color`. Leave them unset, and do not carry a child's `color` onto the group.                                                                                                                                                                                                                                                                  |
+| old | new (`ds-checkbox-group`) | handling |
+| --- | --- | --- |
+| `control`, `name`, `vertical`, `disabled`, `readonly`, `invalid`, `value`, `autoInvalidOff` | same | Copy as-is. Add `control` when the group has a forms binding or a bound `value`; see Bound groups need `control`. |
+| `columns` / `columnsTablet` / `columnsMobile` | `cols` / `colsTablet` / `colsMobile` | Rename. |
+| `options` (array of `newBalCheckboxOption(...)`) | _(no equivalent)_ | Drop it. `ds-checkbox-group` only supports slotted `ds-checkbox`/`ds-toggle` children, not a declarative array. This cannot be auto-generated from an arbitrary JS array at scan time — flag every `options`/`newBalCheckboxOption` occurrence for manual conversion into slotted children. |
+| `verticalOnMobile` | _(no equivalent)_ | Drop it. Mention each dropped occurrence. |
+| `expanded` | _(no equivalent)_ | Drop it. Mention each dropped occurrence. |
+| _(none — new prop)_ | `required` (defaults `true`) | Do not set this on a group without a label. Its only effect is an "(optional)" suffix next to the group's own `label` prop. When the group sits inside a `bal-field` with a label, `shared/field.md` sets `label` and `required` on the group. Outside a `bal-field`, leave the new default alone. `ds-checkbox-group` is excluded from the required default rule in `SKILL.md`. Mention once, not per-occurrence, that this new prop exists. |
+| _(none — new props)_ | `label`, `description`, `invalidText`, `loading`, `color` | New capabilities, nothing to migrate from legacy. `bal-checkbox-group` had neither `label` nor `color`. Leave them unset, and do not carry a child's `color` onto the group. |
 
 ### Tags and imports
 
@@ -222,11 +222,11 @@ Until `DsCheckbox` has a value accessor, this is the only path that works. A sin
 
 ### Events
 
-| old         | new        | handling                                                                                                                                                                                                                                                                                                                                                                                 |
-| ----------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| old | new | handling |
+| --- | --- | --- |
 | `balChange` | `dsChange` | Rewrite `addEventListener('balChange'` to `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Same detail shape on both sides: boolean for `bal-checkbox`/`ds-checkbox`/`ds-toggle`, `any[]` for `bal-checkbox-group`/`ds-checkbox-group`. The handler body stays; retype its parameter as described below the table. |
-| `balFocus`  | `dsFocus`  | Same shapes as `balChange`: `addEventListener`, `(balFocus)`, `onBalFocus` become `dsFocus`, `(dsFocus)`, `onDsFocus`. Detail stays `FocusEvent`.                                                                                                                                                                                                                                        |
-| `balBlur`   | `dsBlur`   | Same shapes as `balFocus`, targeting `blur`.                                                                                                                                                                                                                                                                                                                                             |
+| `balFocus` | `dsFocus` | Same shapes as `balChange`: `addEventListener`, `(balFocus)`, `onBalFocus` become `dsFocus`, `(dsFocus)`, `onDsFocus`. Detail stays `FocusEvent`. |
+| `balBlur` | `dsBlur` | Same shapes as `balFocus`, targeting `blur`. |
 
 Retype handler parameters as `SKILL.md` "Legacy types and bundles" describes. A legacy type such as `BalEvents.BalCheckboxCustomEvent<boolean>` or `BalCheckboxGroupCustomEvent<any[]>` takes its new type from the element the handler is bound to after the rewrite: `DsCheckboxCustomEvent` on a `ds-checkbox`, `DsToggleCustomEvent` on a `ds-toggle`, and `DsCheckboxGroupCustomEvent` on a `ds-checkbox-group`. Keep the type argument when it still matches the detail, and use `any[]` for a group.
 

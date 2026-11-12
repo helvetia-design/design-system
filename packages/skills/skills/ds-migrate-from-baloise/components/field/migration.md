@@ -38,15 +38,15 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 `bal-form-grid` has no props. `bal-form-col` has one prop, `size`. Legacy rendered `touch:is-12` plus `is-N`, and `touch` means below the desktop breakpoint in both systems. A column therefore stacks to full width below desktop and takes its legacy width from desktop up.
 
-| old                                                 | new                                      |
-| --------------------------------------------------- | ---------------------------------------- |
-| `bal-form-grid`                                     | `<div class="ds-form">`                  |
-| `bal-form-col`, `size` omitted, `full`, `fullwidth` | `<div class="ds-form-col">`              |
-| `size="half"`                                       | `<div class="ds-form-col desktop:is-6">` |
-| `size="one-third"`                                  | `<div class="ds-form-col desktop:is-4">` |
-| `size="two-thirds"`                                 | `<div class="ds-form-col desktop:is-8">` |
-| `size="one-quarter"`                                | `<div class="ds-form-col desktop:is-3">` |
-| `size="three-quarters"`                             | `<div class="ds-form-col desktop:is-9">` |
+| old | new |
+| --- | --- |
+| `bal-form-grid` | `<div class="ds-form">` |
+| `bal-form-col`, `size` omitted, `full`, `fullwidth` | `<div class="ds-form-col">` |
+| `size="half"` | `<div class="ds-form-col desktop:is-6">` |
+| `size="one-third"` | `<div class="ds-form-col desktop:is-4">` |
+| `size="two-thirds"` | `<div class="ds-form-col desktop:is-8">` |
+| `size="one-quarter"` | `<div class="ds-form-col desktop:is-3">` |
+| `size="three-quarters"` | `<div class="ds-form-col desktop:is-9">` |
 
 - Use `className` in React and `class` in Angular and HTML. Keep any `class` or `className` the element already has and add the new classes to it.
 - Rename the closing tags too.

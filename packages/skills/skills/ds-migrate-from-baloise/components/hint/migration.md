@@ -36,13 +36,13 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-hint`) | new (`ds-hint`)        | handling                                                                                                                         |
-| ---------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `closeLabel`     | `closeLabel`           | Copy as-is, including bindings (`[closeLabel]`, `closeLabel={label}`). The button is now shown in the drawer on touch viewports. |
-| `small`          | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). `ds-hint` has no way to hide the close button on larger viewports.               |
-| _(none)_         | `label`                | New prop (title text). Leave unset, keep `bal-hint-title` as `ds-hint-title`.                                                    |
-| _(none)_         | `placement`            | New prop (desktop popup placement, default `right`). Leave unset.                                                                |
-| _(none)_         | `triggerLabel`         | New prop (accessible label of the trigger button). Leave unset.                                                                  |
+| old (`bal-hint`) | new (`ds-hint`) | handling |
+| --- | --- | --- |
+| `closeLabel` | `closeLabel` | Copy as-is, including bindings (`[closeLabel]`, `closeLabel={label}`). The button is now shown in the drawer on touch viewports. |
+| `small` | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). `ds-hint` has no way to hide the close button on larger viewports. |
+| _(none)_ | `label` | New prop (title text). Leave unset, keep `bal-hint-title` as `ds-hint-title`. |
+| _(none)_ | `placement` | New prop (desktop popup placement, default `right`). Leave unset. |
+| _(none)_ | `triggerLabel` | New prop (accessible label of the trigger button). Leave unset. |
 
 ### Tags and imports
 

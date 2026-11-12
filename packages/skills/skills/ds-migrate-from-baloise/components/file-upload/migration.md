@@ -38,15 +38,15 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-file-upload`)                                                                                                                                                      | new (`ds-file-upload`) | handling                                                                                                                                                                                                                                                                                             |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `label`                                                                                                                                                                      | `dropZoneLabel`        | Rename the attribute and keep the value, including expressions and bindings (`[label]` becomes `[dropZoneLabel]`). Legacy `label` was the drop-zone text. `ds-file-upload` `label` is the field label. Mention each rename in the report, including a `label` that was only the legacy default text. |
-| `name`, `value`, `multiple`, `disabled`, `readonly`, `loading`, `required`, `accept`, `maxFiles`, `maxFileSize`, `maxBundleSize`, `hasFileList`, `invalid`, `autoInvalidOff` | same                   | Copy as-is, including bindings (`[value]`, `[maxFileSize]`, `value={files}`).                                                                                                                                                                                                                        |
-| `subTitle`                                                                                                                                                                   | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). `ds-file-upload` has no way to override the file-size subtitle.                                                                                                                                                                                      |
-| _(none)_                                                                                                                                                                     | `dropZoneLabel`        | New prop, aside from the `label` row. Nothing else to migrate from.                                                                                                                                                                                                                                  |
-| _(none)_                                                                                                                                                                     | `description`          | New prop. Leave unset.                                                                                                                                                                                                                                                                               |
-| _(none)_                                                                                                                                                                     | `invalidText`          | New prop (and the `invalid-text` slot). Leave unset.                                                                                                                                                                                                                                                 |
-| _(none)_                                                                                                                                                                     | `color`                | New prop. Leave unset.                                                                                                                                                                                                                                                                               |
+| old (`bal-file-upload`) | new (`ds-file-upload`) | handling |
+| --- | --- | --- |
+| `label` | `dropZoneLabel` | Rename the attribute and keep the value, including expressions and bindings (`[label]` becomes `[dropZoneLabel]`). Legacy `label` was the drop-zone text. `ds-file-upload` `label` is the field label. Mention each rename in the report, including a `label` that was only the legacy default text. |
+| `name`, `value`, `multiple`, `disabled`, `readonly`, `loading`, `required`, `accept`, `maxFiles`, `maxFileSize`, `maxBundleSize`, `hasFileList`, `invalid`, `autoInvalidOff` | same | Copy as-is, including bindings (`[value]`, `[maxFileSize]`, `value={files}`). |
+| `subTitle` | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). `ds-file-upload` has no way to override the file-size subtitle. |
+| _(none)_ | `dropZoneLabel` | New prop, aside from the `label` row. Nothing else to migrate from. |
+| _(none)_ | `description` | New prop. Leave unset. |
+| _(none)_ | `invalidText` | New prop (and the `invalid-text` slot). Leave unset. |
+| _(none)_ | `color` | New prop. Leave unset. |
 
 ### Tags and imports
 
@@ -56,15 +56,15 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Events
 
-| old               | new              | handling                                                                                                                                                                                                |
-| ----------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balChange`       | `dsChange`       | Rewrite `addEventListener('balChange'` to `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. The detail is still the full `File[]`. |
-| `balFilesAdded`   | `dsFilesAdded`   | Same shapes: `addEventListener('balFilesAdded'`, `(balFilesAdded)`, and `onBalFilesAdded` become `dsFilesAdded`, `(dsFilesAdded)`, and `onDsFilesAdded`.                                                |
-| `balFilesRemoved` | `dsFilesRemoved` | Same shapes with `balFilesRemoved`, `(balFilesRemoved)`, and `onBalFilesRemoved`.                                                                                                                       |
-| `balRejectedFile` | `dsRejectedFile` | Same shapes with `balRejectedFile`, `(balRejectedFile)`, and `onBalRejectedFile`. The detail is still `{ file, reasons }`.                                                                              |
-| `balInputClick`   | `dsInputClick`   | Same shapes with `balInputClick`, `(balInputClick)`, and `onBalInputClick`.                                                                                                                             |
-| `balBlur`         | `dsBlur`         | Same shapes with `balBlur`, `(balBlur)`, and `onBalBlur`.                                                                                                                                               |
-| `balFocus`        | `dsFocus`        | Same shapes with `balFocus`, `(balFocus)`, and `onBalFocus`.                                                                                                                                            |
+| old | new | handling |
+| --- | --- | --- |
+| `balChange` | `dsChange` | Rewrite `addEventListener('balChange'` to `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. The detail is still the full `File[]`. |
+| `balFilesAdded` | `dsFilesAdded` | Same shapes: `addEventListener('balFilesAdded'`, `(balFilesAdded)`, and `onBalFilesAdded` become `dsFilesAdded`, `(dsFilesAdded)`, and `onDsFilesAdded`. |
+| `balFilesRemoved` | `dsFilesRemoved` | Same shapes with `balFilesRemoved`, `(balFilesRemoved)`, and `onBalFilesRemoved`. |
+| `balRejectedFile` | `dsRejectedFile` | Same shapes with `balRejectedFile`, `(balRejectedFile)`, and `onBalRejectedFile`. The detail is still `{ file, reasons }`. |
+| `balInputClick` | `dsInputClick` | Same shapes with `balInputClick`, `(balInputClick)`, and `onBalInputClick`. |
+| `balBlur` | `dsBlur` | Same shapes with `balBlur`, `(balBlur)`, and `onBalBlur`. |
+| `balFocus` | `dsFocus` | Same shapes with `balFocus`, `(balFocus)`, and `onBalFocus`. |
 
 In each file that has a finding, also rewrite these listeners when they are not on the element, including `addEventListener`. The scan does not list a file that only listens and never uses `bal-file-upload` or `BalFileUpload`.
 

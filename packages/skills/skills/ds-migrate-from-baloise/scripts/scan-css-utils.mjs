@@ -184,8 +184,12 @@ function sortDynamic(dynamic) {
   for (const entry of dynamic) {
     const key = `${entry.file}:${entry.line}:${entry.reason}`
     const first = seen.get(key)
-    if (!first) seen.set(key, { ...entry })
-    else if (!entry.group) delete first.group
+    if (!first) {
+      seen.set(key, { ...entry })
+      continue
+    }
+    if (!entry.group) delete first.group
+    if (entry.classes) first.classes = [...(first.classes ?? []), ...entry.classes]
   }
   return [...seen.values()].sort((a, b) => a.file.localeCompare(b.file) || a.line - b.line)
 }
@@ -207,13 +211,14 @@ function collect({ file, text, comments }, index, found, dynamic) {
     if (!snippets.has(line)) snippets.set(line, toSnippet(lineText(text, offset)))
     return snippets.get(line)
   }
-  const report = (offset, reason, moves = []) =>
+  const report = (offset, reason, moves = [], extra = {}) =>
     dynamic.push({
       file,
       line: lineOf(offset),
       snippet: snippetAt(offset),
       reason,
       ...(moves.length > 0 && coreOnly(moves) ? { group: 'core' } : {}),
+      ...extra,
     })
   const inComment = offset => comments[offset] !== text[offset]
 
@@ -233,7 +238,10 @@ function collect({ file, text, comments }, index, found, dynamic) {
     // Object keys inside a call such as `cx({ grid: x })` cannot be rewritten in place, and the call's strings stay uncovered.
     if (context.keys) {
       const keyMoves = mappedMoves(context.keys, index)
-      if (!inComment(context.start) && keyMoves.length > 0) report(context.start, 'non-literal class binding', keyMoves)
+      if (!inComment(context.start) && keyMoves.length > 0) {
+        const classes = keyMoves.map(({ from, to, group }) => ({ from, to, group }))
+        report(context.start, 'non-literal class binding', keyMoves, { classes })
+      }
       continue
     }
     if (inComment(context.start)) {

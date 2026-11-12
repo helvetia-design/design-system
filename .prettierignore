@@ -17,6 +17,8 @@ packages/assets/**/svg.ts
 .changeset
 CHANGELOG.md
 
+packages/skills/skills/**/*.md
+
 .angular
 generated
 

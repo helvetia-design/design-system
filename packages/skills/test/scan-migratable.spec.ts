@@ -63,6 +63,22 @@ describe('scanMigratable', () => {
     })
   })
 
+  it('does not count the BaloiseDesignSystemModule config call as a component', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'app.module.ts',
+      [
+        "import { BaloiseDesignSystemModule } from '@baloise/ds-angular-legacy'",
+        '@NgModule({ imports: [BaloiseDesignSystemModule.forRoot({ defaults: { region: "BE" } })] })',
+        'export class AppModule {}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanMigratable(root)).toEqual({ suggested: [], notYet: [], types: [] })
+  })
+
   it('suggests app when the project uses bal-app', () => {
     const root = createScratchDir()
     write(

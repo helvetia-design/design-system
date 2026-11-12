@@ -139,6 +139,39 @@ describe('scanBalApp', () => {
     })
   })
 
+  it('finds the NgModule BaloiseDesignSystemModule.forRoot config call', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/app/app.module.ts',
+      [
+        "import { BaloiseDesignSystemModule } from '@baloise/ds-angular-legacy'",
+        '@NgModule({',
+        "  imports: [BrowserModule, BaloiseDesignSystemModule.forRoot({ defaults: { region: 'BE' } })],",
+        '})',
+        'export class AppModule {}',
+        'const BaloiseDesignSystemModuleFoo = 1',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalApp(root)).toEqual({
+      total: 2,
+      files: [
+        {
+          file: 'src/app/app.module.ts',
+          findings: [
+            { line: 1, snippet: "import { BaloiseDesignSystemModule } from '@baloise/ds-angular-legacy'" },
+            {
+              line: 3,
+              snippet: "imports: [BrowserModule, BaloiseDesignSystemModule.forRoot({ defaults: { region: 'BE' } })],",
+            },
+          ],
+        },
+      ],
+    })
+  })
+
   it('finds updateBalLanguage calls and imports in a class that never names the component', () => {
     const root = createScratchDir()
     write(
@@ -400,6 +433,8 @@ describe('app migration.md', () => {
       'per-file summary',
       'git commit',
       'provideBaloiseDesignSystem',
+      'BaloiseDesignSystemModule.forRoot(config)',
+      'add it to the `providers` of the NgModule whose `imports` hold that call',
       'unchanged, in every framework',
       'shared/legacy-config.md',
       'Keep the `useBaloiseDesignSystem()` call and its import specifier unchanged',

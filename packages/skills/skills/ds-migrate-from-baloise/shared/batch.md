@@ -41,9 +41,9 @@ Show, in this order:
 4. The shared files, each with its importers.
 5. The legacy config calls to delete, when the batch will leave no `bal-*` component. Run the Scan section of `shared/legacy-config.md`. Its `scan-migratable.mjs` call runs without path arguments. A component in the migration list does not count as left when its `total` there equals its `total` in the batch scan, because then every usage lies in the file set. Every other component counts as left.
 
-When the migration list has more than eight entries, say that the batch is large, suggest splitting the scope into smaller folders, and continue only on an explicit yes.
+When the migration list has more than eight entries, the batch is too large. Do not ask whether to continue. Split the file set into parts by folder, so that the files of each part use at most eight migrations. Split a folder that still uses more than eight by file. A part that is a single file, together with the sibling files that step 1.1 adds, cannot be split further. It is exempt from the limit. Show the parts, each with its folders or files and its migrations. Then run the first part as its own batch, from step 1 with its paths and with its own confirmation. The user starts each next part with **Scope**.
 
-Then ask for one yes/no: migrate every listed component in every listed file? Before the answer, the user may exclude files or components. Remove them from the file set or the migration list. On no, stop with the files unchanged.
+Then ask for one yes/no for this batch or part: migrate every listed component in every listed file? Before the answer, the user may exclude files or components. Remove them from the file set or the migration list. On no, stop with the files unchanged.
 
 Editing starts only after the yes. Done when the user has answered.
 
