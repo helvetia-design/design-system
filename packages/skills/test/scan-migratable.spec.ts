@@ -370,7 +370,7 @@ describe('scanMigratable', () => {
     })
   })
 
-  it('suggests input, folding bal-input-date into it and leaving sibling components in notYet', () => {
+  it('suggests input, folding bal-input-date and bal-input-group into it', () => {
     const root = createScratchDir()
     write(
       root,
@@ -384,8 +384,27 @@ describe('scanMigratable', () => {
     )
 
     expect(scanMigratable(root)).toEqual({
+      suggested: [{ name: 'input', total: 3 }],
+      notYet: [],
+      types: [],
+    })
+  })
+
+  it('counts the React BalInputGroup import and tag for input', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'Search.tsx',
+      [
+        "import { BalInputGroup } from '@baloise/ds-react'",
+        'export const Search = () => <BalInputGroup></BalInputGroup>',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanMigratable(root)).toEqual({
       suggested: [{ name: 'input', total: 2 }],
-      notYet: [{ name: 'input-group', total: 1 }],
+      notYet: [],
       types: [],
     })
   })
