@@ -322,6 +322,27 @@ describe('scanMigratable', () => {
     })
   })
 
+  it('folds bal-ng-error and BalNgErrorComponent into field instead of listing them as notYet', () => {
+    const root = createScratchDir()
+    write(root, 'app.component.html', '<bal-ng-error controlName="email">Required</bal-ng-error>\n')
+    write(
+      root,
+      'app.component.ts',
+      [
+        "import { BalNgErrorComponent } from '@baloise/ds-angular'",
+        '@Component({ imports: [BalNgErrorComponent] })',
+        'export class AppComponent {}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanMigratable(root)).toEqual({
+      suggested: [{ name: 'field', total: 3 }],
+      notYet: [],
+      types: [],
+    })
+  })
+
   it('counts bal-notices for toast instead of listing it as notYet', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-notices interface="toast"></bal-notices>\n')

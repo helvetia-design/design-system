@@ -27,6 +27,56 @@ function write(root: string, rel: string, contents: string) {
   writeFileSync(file, contents)
 }
 
+function fieldRow(start: string) {
+  const row = readFileSync(join(SKILL_DIR, 'shared/field.md'), 'utf8')
+    .split('\n')
+    .find(line => line.startsWith(start))
+
+  expect(row, start).toBeDefined()
+  return row as string
+}
+
+function writeNgErrorApp(root: string) {
+  write(
+    root,
+    'src/app/app.component.html',
+    [
+      '<form [formGroup]="form">',
+      '  <bal-field>',
+      '    <bal-field-message>',
+      '      <bal-ng-error controlName="email" error="required">Please enter an email</bal-ng-error>',
+      '      <bal-ng-error controlName="email" error="email">Please enter a valid email</bal-ng-error>',
+      '    </bal-field-message>',
+      '  </bal-field>',
+      '</form>',
+      '',
+    ].join('\n'),
+  )
+  write(
+    root,
+    'src/app/app.component.ts',
+    [
+      "import { BalNgErrorComponent } from '@baloise/ds-angular'",
+      '@Component({',
+      '  imports: [BalNgErrorComponent],',
+      "  templateUrl: './app.component.html',",
+      '})',
+      'export class AppComponent {}',
+      '',
+    ].join('\n'),
+  )
+  write(
+    root,
+    'src/app/app.config.ts',
+    [
+      'export const appConfig = {',
+      "  providers: [provideBaloiseDesignSystem({ forms: { invalidateOn: 'dirty' } })],",
+      '}',
+      '',
+    ].join('\n'),
+  )
+}
+
 describe('scanBalField', () => {
   it('lists React tags and import symbols and skips comments, strings, and dist', () => {
     const root = createScratchDir()
@@ -279,6 +329,63 @@ describe('scanBalField', () => {
     })
   })
 
+  it('lists bal-ng-error tags, BalNgError symbols and the invalidateOn config key', () => {
+    const root = createScratchDir()
+    writeNgErrorApp(root)
+
+    expect(scanBalField(root)).toEqual({
+      total: 11,
+      files: [
+        {
+          file: 'src/app/app.component.html',
+          findings: [
+            { line: 2, snippet: '<bal-field>' },
+            { line: 3, snippet: '<bal-field-message>' },
+            { line: 4, snippet: '<bal-ng-error controlName="email" error="required">' },
+            { line: 4, snippet: '</bal-ng-error>' },
+            { line: 5, snippet: '<bal-ng-error controlName="email" error="email">' },
+            { line: 5, snippet: '</bal-ng-error>' },
+            { line: 6, snippet: '</bal-field-message>' },
+            { line: 7, snippet: '</bal-field>' },
+          ],
+        },
+        {
+          file: 'src/app/app.component.ts',
+          findings: [
+            { line: 1, snippet: "import { BalNgErrorComponent } from '@baloise/ds-angular'" },
+            { line: 3, snippet: 'imports: [BalNgErrorComponent],' },
+          ],
+        },
+        {
+          file: 'src/app/app.config.ts',
+          findings: [
+            { line: 2, snippet: "providers: [provideBaloiseDesignSystem({ forms: { invalidateOn: 'dirty' } })]," },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('lists only the invalidateOn object key and not a property access or a longer tag name', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/app/app.config.ts',
+      ['const mode = opts.invalidateOn', "export const config = { forms: { invalidateOn: 'dirty' } }", ''].join('\n'),
+    )
+    write(root, 'src/app/app.component.html', '<bal-ng-error-wrapper></bal-ng-error-wrapper>\n')
+
+    expect(scanBalField(root)).toEqual({
+      total: 1,
+      files: [
+        {
+          file: 'src/app/app.config.ts',
+          findings: [{ line: 2, snippet: "export const config = { forms: { invalidateOn: 'dirty' } }" }],
+        },
+      ],
+    })
+  })
+
   it('prints grouped findings as JSON and does not edit files', () => {
     const root = createScratchDir()
     const contents = '<bal-form-grid></bal-form-grid>\n'
@@ -485,14 +592,53 @@ describe('required default rule', () => {
 
 describe('shared/field.md Angular form binding', () => {
   it('moves a danger message into a conditional invalid-text slot and reports raw validator keys', () => {
-    const rules = readFileSync(join(SKILL_DIR, 'shared/field.md'), 'utf8')
-    const row = rules.split('\n').find(line => line.startsWith('| Angular control bound with'))
+    const row = fieldRow('| Angular control bound with')
 
-    expect(row).toBeDefined()
     expect(row).toContain('slot="invalid-text"')
     expect(row).toContain('<control>.touched && <control>.invalid')
     expect(row).toContain('autoInvalidOff')
     expect(row).toContain('raw validator key')
     expect(readFileSync(join(SKILL_DIR, 'SKILL.md'), 'utf8')).toContain('Angular form binding row')
+  })
+})
+
+describe('shared/field.md bal-ng-error', () => {
+  it('moves every bal-ng-error of a control into one invalid-text chain', () => {
+    const rules = readFileSync(join(SKILL_DIR, 'shared/field.md'), 'utf8')
+    const row = fieldRow('| `bal-ng-error`')
+
+    for (const phrase of [
+      'slot="invalid-text"',
+      '@else if',
+      "hasError('<error>')",
+      'invalidateOn',
+      'dirty',
+      '*ngIf',
+      'formGroupName',
+      'formArrayName',
+      "form.get(['items', i, 'name'])",
+      'leave the whole `bal-field` in place',
+      'BalFormBundle',
+    ]) {
+      expect(row, phrase).toContain(phrase)
+    }
+    expect(rules).toContain('`BalNgErrorComponent`')
+    expect(rules).toContain("form.get('email')?.touched && form.get('email')?.hasError('required')")
+    expect(readFileSync(join(SKILL_DIR, 'SKILL.md'), 'utf8')).toContain('`bal-ng-error` row')
+  })
+
+  it('sends every bal-field-message that contains bal-ng-error to the bal-ng-error row', () => {
+    for (const start of [
+      '| `bal-field-message` with `color="danger"`',
+      '| `bal-field-message` with `color="success"`',
+      '| `bal-field-message` with `color=""`',
+      '| message with markup content',
+    ]) {
+      expect(fieldRow(start), start).toContain('contains `bal-ng-error` follows the `bal-ng-error` row')
+    }
+    for (const start of ['| Angular control bound with', '| more than one `bal-field-message`']) {
+      expect(fieldRow(start), start).toContain('`bal-ng-error`')
+    }
+    expect(fieldRow('| Angular control bound with')).toContain('the whole `bal-field` stays in place')
   })
 })

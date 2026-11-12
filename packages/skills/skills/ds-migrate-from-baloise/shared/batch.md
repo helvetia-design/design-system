@@ -59,7 +59,7 @@ Run the migrations in this order. Structural parents first, because their `migra
 
 Skip every name the migration list does not contain.
 
-`field` runs after every form control migration. Each control migration removes the `bal-field` around its own controls, following `shared/field.md`. The `field` migration then handles the grid and every `bal-field` that is left.
+`field` runs after every form control migration. Each control migration removes the `bal-field` around its own controls, following `shared/field.md`. The `field` migration then handles the grid, every `bal-field` that is left and every `bal-ng-error` whose target is a `ds-*` control, also outside a `bal-field`.
 
 ### Per migration
 
