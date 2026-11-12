@@ -36,14 +36,14 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props of `bal-textarea` → `ds-textarea`
 
-| old (`bal-textarea`)                                                                                                                                                                                          | new (`ds-textarea`)                            | handling                                                                                                                                                                                                                                         |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `name`, `invalid`, `autocapitalize`, `autocomplete`, `autofocus`, `debounce`, `placeholder`, `maxLength`, `minLength`, `disabled`, `readonly`, `cols`, `rows`, `wrap`, `inputmode`, `value`, `autoInvalidOff` | same                                           | Copy as-is, in every form (`disabled`, `disabled="true"`, `[disabled]="x"`, `disabled={x}`). Keep form bindings such as `[(ngModel)]`, `formControlName`, and `[formControl]` unchanged. The `wrap` values (`hard`, `soft`, `off`) are the same. |
-| `required` set                                                                                                                                                                                                | `required`                                     | Copy as-is.                                                                                                                                                                                                                                      |
-| `required` omitted                                                                                                                                                                                            | `required` set to false                        | Follow the required default rule in `SKILL.md`. Report each file where this was added.                                                                                                                                                           |
-| `clickable`                                                                                                                                                                                                   | _(no equivalent prop)_                         | Apply Unmapped props and handlers (`SKILL.md`). It has no effect after the migration. The click is now reported by the new `dsClick` event, so the consumer can replace the pattern, but do not do it yourself.                                  |
-| _(none)_                                                                                                                                                                                                      | `label`, `description`, `color`, `invalidText` | New props. Nothing to migrate from. Leave them unset.                                                                                                                                                                                            |
-| The default of `autocapitalize` changed from `none` to `off`. Both are valid HTML values with the same effect, so copy a set value as-is and do not add one.                                                  |
+| old (`bal-textarea`) | new (`ds-textarea`) | handling |
+| --- | --- | --- |
+| `name`, `invalid`, `autocapitalize`, `autocomplete`, `autofocus`, `debounce`, `placeholder`, `maxLength`, `minLength`, `disabled`, `readonly`, `cols`, `rows`, `wrap`, `inputmode`, `value`, `autoInvalidOff` | same | Copy as-is, in every form (`disabled`, `disabled="true"`, `[disabled]="x"`, `disabled={x}`). Keep form bindings such as `[(ngModel)]`, `formControlName`, and `[formControl]` unchanged. The `wrap` values (`hard`, `soft`, `off`) are the same. |
+| `required` set | `required` | Copy as-is. |
+| `required` omitted | `required` set to false | Follow the required default rule in `SKILL.md`. Report each file where this was added. |
+| `clickable` | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). It has no effect after the migration. The click is now reported by the new `dsClick` event, so the consumer can replace the pattern, but do not do it yourself. |
+| _(none)_ | `label`, `description`, `color`, `invalidText` | New props. Nothing to migrate from. Leave them unset. |
+| The default of `autocapitalize` changed from `none` to `off`. Both are valid HTML values with the same effect, so copy a set value as-is and do not add one. |
 
 ### Slots
 
@@ -61,13 +61,13 @@ The legacy default slot was rendered as the text content of the native `<textare
 
 `ds-textarea` emits the same five events, and adds `dsClick`.
 
-| old           | new          | handling                                                                                                                                                                                                                    |
-| ------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balChange`   | `dsChange`   | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `string \| null`, legacy `string \| undefined`. |
-| `balInput`    | `dsInput`    | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `string \| null`.                                                                                                 |
-| `balBlur`     | `dsBlur`     | Same shapes.                                                                                                                                                                                                                |
-| `balFocus`    | `dsFocus`    | Same shapes.                                                                                                                                                                                                                |
-| `balKeyPress` | `dsKeyPress` | Same shapes.                                                                                                                                                                                                                |
+| old | new | handling |
+| --- | --- | --- |
+| `balChange` | `dsChange` | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `string \| null`, legacy `string \| undefined`. |
+| `balInput` | `dsInput` | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `string \| null`. |
+| `balBlur` | `dsBlur` | Same shapes. |
+| `balFocus` | `dsFocus` | Same shapes. |
+| `balKeyPress` | `dsKeyPress` | Same shapes. |
 
 Rewrite only handlers that are attached to the element being migrated. `balChange`, `balInput`, `balBlur`, and `balFocus` are emitted by many other legacy components, so never rewrite a handler on another element, and never rename them by search and replace across the file.
 

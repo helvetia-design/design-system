@@ -32,17 +32,17 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-spinner`)                       | new (`ds-spinner`)                                 | handling                                                                                                                                                                                                                   |
-| ----------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `deactivated`                             | `deactivated`                                      | Copy as-is, including `deactivated="false"` and `deactivated={false}`.                                                                                                                                                     |
-| `variation="logo"` / `variation="circle"` | same                                               | Copy as-is.                                                                                                                                                                                                                |
-| `inverted`                                | `inverted`                                         | Copy as-is.                                                                                                                                                                                                                |
-| `small`, `small="true"`, `small={true}`   | `size="sm"`                                        | Rewrite to `size="sm"`.                                                                                                                                                                                                    |
-| `small="false"`, `small={false}`          | omit `size`                                        | Drop `small`. Leave `size` unset.                                                                                                                                                                                          |
-| `color="blue"`                            | _(no equivalent prop)_                             | Drop `color`. Default rendering already matches blue. Also drop `color='blue'`, `color={"blue"}`, and `color={'blue'}`.                                                                                                    |
-| `color="white"`                           | `inverted`                                         | HTML and Angular: write `inverted="true"`. React: write `inverted`. Also rewrite `color='white'`, `color={"white"}`, and `color={'white'}`. When `inverted` is already present, drop `color` and keep a single `inverted`. |
-| _(none)_                                  | `label`                                            | New prop. Nothing to migrate from. Leave it unset.                                                                                                                                                                         |
-| _(none)_                                  | `labelPosition="right"` / `labelPosition="bottom"` | New prop. Nothing to migrate from. Leave `labelPosition` unset.                                                                                                                                                            |
+| old (`bal-spinner`) | new (`ds-spinner`) | handling |
+| --- | --- | --- |
+| `deactivated` | `deactivated` | Copy as-is, including `deactivated="false"` and `deactivated={false}`. |
+| `variation="logo"` / `variation="circle"` | same | Copy as-is. |
+| `inverted` | `inverted` | Copy as-is. |
+| `small`, `small="true"`, `small={true}` | `size="sm"` | Rewrite to `size="sm"`. |
+| `small="false"`, `small={false}` | omit `size` | Drop `small`. Leave `size` unset. |
+| `color="blue"` | _(no equivalent prop)_ | Drop `color`. Default rendering already matches blue. Also drop `color='blue'`, `color={"blue"}`, and `color={'blue'}`. |
+| `color="white"` | `inverted` | HTML and Angular: write `inverted="true"`. React: write `inverted`. Also rewrite `color='white'`, `color={"white"}`, and `color={'white'}`. When `inverted` is already present, drop `color` and keep a single `inverted`. |
+| _(none)_ | `label` | New prop. Nothing to migrate from. Leave it unset. |
+| _(none)_ | `labelPosition="right"` / `labelPosition="bottom"` | New prop. Nothing to migrate from. Leave `labelPosition` unset. |
 
 ### Tags and imports
 

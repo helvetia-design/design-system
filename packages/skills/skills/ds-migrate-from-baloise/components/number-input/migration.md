@@ -38,12 +38,13 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-number-input`)                                                                                                                                                     | new (`ds-number-input`)                        | handling                                                                                                                                                                                 |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`, `invalid`, `decimal`, `onlyPositive`, `suffix`, `pattern`, `placeholder`, `disabled`, `readonly`, `exactNumber`, `min`, `max`, `debounce`, `value`, `autoInvalidOff` | same                                           | Copy as-is, in every form (`disabled`, `disabled="true"`, `[disabled]="x"`, `disabled={x}`). Keep form bindings such as `[(ngModel)]`, `formControlName`, and `[formControl]` unchanged. |
-| `required` set                                                                                                                                                               | `required`                                     | Copy as-is.                                                                                                                                                                              |
-| `required` omitted                                                                                                                                                           | `required` set to false                        | Follow the required default rule in `SKILL.md`. Report each file where this was added.                                                                                                   |
-| _(none)_                                                                                                                                                                     | `label`, `description`, `color`, `invalidText` | New props. Nothing to migrate from. Leave them unset.                                                                                                                                    |
+| old (`bal-number-input`) | new (`ds-number-input`) | handling |
+| --- | --- | --- |
+| `name`, `invalid`, `decimal`, `onlyPositive`, `suffix`, `pattern`, `placeholder`, `disabled`, `readonly`, `exactNumber`, `min`, `max`, `debounce`, `autoInvalidOff` | same | Copy as-is, in every form (`disabled`, `disabled="true"`, `[disabled]="x"`, `disabled={x}`). Keep form bindings such as `[(ngModel)]`, `formControlName`, and `[formControl]` unchanged. |
+| `value` | `value` | `value` is now `number \| null`. The legacy type was `number \| string`. Keep form bindings such as `[(ngModel)]`, `formControlName`, and `[formControl]` unchanged. Copy an HTML attribute as-is. In React, rewrite a numeric string literal to a number, so `value="5"` becomes `value={5}`. In Angular, `value="5"` becomes `[value]="5"`. A non-literal binding: HTML copies it unchanged. React and Angular copy it when the expression's type only admits numbers or `null`. Otherwise apply Unmapped props and handlers (`SKILL.md`). |
+| `required` set | `required` | Copy as-is. |
+| `required` omitted | `required` set to false | Follow the required default rule in `SKILL.md`. Report each file where this was added. |
+| _(none)_ | `label`, `description`, `color`, `invalidText` | New props. Nothing to migrate from. Leave them unset. |
 
 ### Tags and imports
 
@@ -53,14 +54,14 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Events
 
-| old           | new          | handling                                                                                                                                                                                                                    |
-| ------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balChange`   | `dsChange`   | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `number \| null`, legacy `number \| undefined`. |
-| `balInput`    | `dsInput`    | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `number \| null`.                                                                                                 |
-| `balBlur`     | `dsBlur`     | Same shapes.                                                                                                                                                                                                                |
-| `balFocus`    | `dsFocus`    | Same shapes.                                                                                                                                                                                                                |
-| `balKeyPress` | `dsKeyPress` | Same shapes.                                                                                                                                                                                                                |
-| _(none)_      | `dsClick`    | New event. Nothing to migrate from.                                                                                                                                                                                         |
+| old | new | handling |
+| --- | --- | --- |
+| `balChange` | `dsChange` | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `number \| null`, legacy `number \| undefined`. |
+| `balInput` | `dsInput` | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `number \| null`. |
+| `balBlur` | `dsBlur` | Same shapes. |
+| `balFocus` | `dsFocus` | Same shapes. |
+| `balKeyPress` | `dsKeyPress` | Same shapes. |
+| _(none)_ | `dsClick` | New event. Nothing to migrate from. |
 
 Rewrite only handlers that are attached to the element being migrated. `balChange`, `balInput`, `balBlur`, `balFocus`, and `balKeyPress` are emitted by many other legacy components, so never rewrite a handler on another element, and never rename them by search and replace across the file.
 
@@ -86,7 +87,7 @@ Needs your attention when found:
 2. Every `getInputElement()` call that needs a check, and every `setAriaForm()` call with its Unmapped props and handlers outcome.
 3. Every handler that needs manual rework.
 4. Every legacy type left or written out and every bundle kept, as `SKILL.md` "Legacy types and bundles" describes: each `BalProps.BalNumberInput*` type left in place, each detail alias such as `BalEvents.BalNumberInputChangeDetail` written out, and each multi-family bundle such as `BalFormBundle` or `BalComponentBundle` kept with `DsNumberInput` added next to it.
-5. Every bound `value` that is a string or that can be `undefined`. `value` is now `number | null`. The legacy type was `number | string | undefined`.
+5. Every bound `value`, with its outcome: copied, or removed (Unmapped). Name each copied binding that can be `undefined`. `value` is now `number | null`. The legacy type was `number | string | undefined`.
 6. Every usage without its own `pattern`. The legacy input always set an auto-generated `pattern` (thousand separators, decimals, `suffix`). `ds-number-input` only sets a `pattern` the consumer passes, so native pattern validation is gone for these usages.
 7. Every selector that targeted the legacy element or its input and that the scan cannot see (`bal-number-input` classes, `data-testid="bal-number-input"`, `.input`, `.is-danger`, `.is-disabled`). The legacy input was in the light DOM, so tests and styles that query them break. The native input is reachable with `::part(input)` for styles, and the parts `prefix`, `suffix`, `decrement` and `increment` are reachable the same way. Do not rewrite those selectors yourself. Report them.
 8. One-time note: `ds-number-input` renders increment and decrement buttons (`::part(increment)`, `::part(decrement)`). The legacy component had none. The field looks different, and layouts around it may need a check.

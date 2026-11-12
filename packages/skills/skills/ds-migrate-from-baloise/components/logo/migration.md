@@ -34,12 +34,12 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-logo`) | new (`ds-logo`)   | handling                                                                                                                                                                                                              |
-| ---------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `color="blue"`   | `color="primary"` | Rewrite static values: `blue` to `primary`, `white` to `inverted`. Keep the attribute even when it was the default. Leave bindings (`[color]`, `color={x}`) unchanged and flag them, the value set is different.      |
-| `size="small"`   | `size="sm"`       | Rewrite the static value `small` to `sm`. Drop `size=""`, since an omitted `size` is the responsive default on both sides. Leave bindings (`[size]`, `size={x}`) unchanged and flag them, the value set is different. |
-| `brand`          | `brand`           | Copy `baloise`, `helvetia` and bindings as-is. Drop `brand=""`, since an omitted `brand` follows the app config on both sides.                                                                                        |
-| `animated`       | `animated`        | Copy as-is, including bindings.                                                                                                                                                                                       |
+| old (`bal-logo`) | new (`ds-logo`) | handling |
+| --- | --- | --- |
+| `color="blue"` | `color="primary"` | Rewrite static values: `blue` to `primary`, `white` to `inverted`. Keep the attribute even when it was the default. A binding (`[color]`, `color={x}`): HTML keeps it and flags it, because the value set is different. React and Angular keep it when the expression's type only admits `primary` or `inverted`. Otherwise apply Unmapped props and handlers (`SKILL.md`). |
+| `size="small"` | `size="sm"` | Rewrite the static value `small` to `sm`. Drop `size=""`, since an omitted `size` is the responsive default on both sides. A binding (`[size]`, `size={x}`): HTML keeps it and flags it, because the value set is different. React and Angular keep it when the expression's type only admits `sm` or `lg`. Otherwise apply Unmapped props and handlers (`SKILL.md`). |
+| `brand` | `brand` | Copy `baloise`, `helvetia` and bindings as-is. Drop `brand=""`, since an omitted `brand` follows the app config on both sides. |
+| `animated` | `animated` | Copy as-is, including bindings. |
 
 `ds-logo` also has `size="lg"`. The legacy component had no equivalent, so nothing maps to it.
 
@@ -67,8 +67,8 @@ Write the report as `shared/report.md` describes, with the per-file summary unde
 
 Needs your attention when found:
 
-1. Every dynamic `color` binding left unchanged. Name file and line.
-2. Every dynamic `size` binding left unchanged. Name file and line.
+1. Every dynamic `color` binding, kept or removed (Unmapped). Name file and line.
+2. Every dynamic `size` binding, kept or removed (Unmapped). Name file and line.
 3. Every `BalProps.BalLogo*` type reference that needs a manual check.
 4. Every legacy selector that no longer applies, such as `.bal-logo--white`, `.bal-logo--size-small`, `.bal-logo--animated` and `.bal-logo__animated-wrapper`. `ds-logo` renders in shadow DOM, so these are lost. The animated container is styleable through `part="animated"`, and the logo takes `--logo-color`, `--logo-height`, `--logo-width`, `--logo-animation-duration` and `--logo-animation-easing`.
 5. One-time note: `ds-logo` sets its height from tokens, 24 px on mobile and 32 px on desktop by default, 24 px for `sm` and 32 px for `lg`. The legacy small logo was 22 px, so a small logo can render 2 px taller.

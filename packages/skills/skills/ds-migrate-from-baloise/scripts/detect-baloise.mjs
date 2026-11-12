@@ -9,7 +9,7 @@ import { maskComments, SKIPPED_DIRS, SOURCE_EXTENSIONS, sourceMode } from './sou
 const LEGACY_SCOPE = '@baloise'
 const TARGET_SCOPE = '@helvetia-design'
 const STYLES_NAME = 'styles'
-const INSTALL_NAMES = ['angular', 'core', 'react', STYLES_NAME]
+const INSTALL_NAMES = ['angular', 'angular-legacy', 'core', 'react', STYLES_NAME]
 const ICON_NAMES = ['icons', 'brand-icons']
 const FONT_FAVICON_NAMES = ['fonts', 'favicons']
 const SHORT_NAMES = [...INSTALL_NAMES, ...ICON_NAMES]
@@ -30,6 +30,7 @@ const CONFIG_FILES = new Set(['angular.json', 'project.json'])
 const PACKAGE_MANAGERS = new Set(['npm', 'pnpm', 'yarn', 'bun'])
 const NPM_TIMEOUT_MS = 30_000
 const VERSION_RE = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/
+export const MIN_CORE_VERSION = '0.0.7'
 const SASS_NOTE =
   'Baloise Sass entry file. @helvetia-design/styles exports no matching Sass path and its mixins differ, so Init does not duplicate it. Migrate it by hand.'
 export const IMPORT_EXTENSIONS = new Set([...SOURCE_EXTENSIONS, '.css', '.scss', '.sass', '.json'])
@@ -169,6 +170,14 @@ export async function detectBaloise(rootDir, options = {}) {
     }
   }
 
+  if (isBelowMinimum(version)) {
+    const source = options.version === undefined ? `the latest dist-tag of ${targetPackageName('core')}` : '--version'
+    return {
+      status: 'error',
+      message: `This skill needs ${targetPackageName('core')} ${MIN_CORE_VERSION} or later, but ${source} is ${version}. Rerun with --version ${MIN_CORE_VERSION} or a later version once it is published, or update the skill.`,
+    }
+  }
+
   const framework = detectFramework(found.manifest)
   let angular
   if (framework === 'angular') {
@@ -199,6 +208,13 @@ export async function detectBaloise(rootDir, options = {}) {
     aliases: aliasesFor(framework, version, found.dependencies),
     ...(angular && { angular }),
   }
+}
+
+function isBelowMinimum(version) {
+  const actual = version.split('-')[0].split('.').map(Number)
+  const minimum = MIN_CORE_VERSION.split('.').map(Number)
+  const index = actual.findIndex((part, i) => part !== minimum[i])
+  return index !== -1 && actual[index] < minimum[index]
 }
 
 export async function run(rootDir, stdout, options = {}) {

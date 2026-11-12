@@ -608,6 +608,8 @@ describe('modal migration.md', () => {
       'modal-close',
       'BalProps.BalModal',
       'part="dialog"',
+      'set `<el>.id = <id>` on the line right after the awaited `create`',
+      'flagged "closes nothing"',
       'per-file summary',
       'git commit',
     ]) {

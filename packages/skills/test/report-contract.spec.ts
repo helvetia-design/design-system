@@ -55,7 +55,7 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'label': { attention: 5, coverage: 2 },
   'list': { attention: 26, coverage: 7 },
   'logo': { attention: 5, coverage: 0 },
-  'modal': { attention: 23, coverage: 6 },
+  'modal': { attention: 24, coverage: 7 },
   'navbar': { attention: 12, coverage: 0 },
   'notification': { attention: 6, coverage: 2 },
   'number-input': { attention: 8, coverage: 2 },
@@ -70,13 +70,13 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'snackbar': { attention: 21, coverage: 7 },
   'spinner': { attention: 0, coverage: 1 },
   'stack': { attention: 4, coverage: 1 },
-  'steps': { attention: 19, coverage: 9 },
+  'steps': { attention: 20, coverage: 9 },
   'tabs': { attention: 28, coverage: 8 },
   'tag': { attention: 5, coverage: 6 },
   'text': { attention: 5, coverage: 1 },
   'textarea': { attention: 7, coverage: 2 },
   'toast': { attention: 16, coverage: 8 },
-  'tooltip': { attention: 5, coverage: 2 },
+  'tooltip': { attention: 6, coverage: 2 },
 }
 
 const components = readdirSync(`${skillDir}components`, { withFileTypes: true })
@@ -442,6 +442,60 @@ describe('SKILL.md', () => {
     expect(skill).toContain('leaves every change unstaged, including the report file `ds-migration-report.md`')
     expect(skill).toContain('never runs `git add` or `git commit`')
   })
+
+  it('keeps scratch files inside the project and deletes them', () => {
+    const intro = skill.slice(0, skill.indexOf('## Menu'))
+
+    expect(intro).toContain('Read script output from stdout. Do not write scratch files.')
+    expect(intro).toContain('`<project-root>/.claude/ds-migrate-scratch/`')
+    expect(intro).toContain('Never write outside `<project-root>`.')
+  })
+
+  it('tells the user what to do when Init refuses a version below the minimum', () => {
+    const init = section(skill, '### Init')
+
+    expect(init).toContain('Do not hardcode a version.')
+    expect(init).toContain('a resolved version below the minimum `@helvetia-design/core` version of this skill')
+    expect(init).toContain('rerun with `--version` and the minimum or a later version once that version is published')
+  })
+
+  it('chooses the Init local form by the target file type', () => {
+    const init = section(skill, '### Init')
+
+    expect(init).toContain('The target file type decides the local form, not `framework`.')
+    expect(init).toContain('Local form in an `.html` file:')
+    expect(init).toContain('relative from that HTML file to the `node_modules` folder of `<project-root>`')
+    expect(init).toContain('the path must resolve from where the server serves the page')
+    expect(init).toContain('the `ds-*` components still need to be registered. Do not invent a loader call.')
+    expect(init).not.toContain('Local form when `framework` is `html`')
+  })
+
+  it('lets the user confirm non-literal class bindings in CSS utils', () => {
+    const cssUtils = section(skill, '### CSS utils')
+    const rules = read('shared/css-utils.md')
+
+    expect(cssUtils).toContain('which of these places can hold a Baloise class?')
+    expect(cssUtils).toContain('A `dynamic` place with any other reason always keeps the line')
+    expect(cssUtils).toContain('skips the places the user confirmed in step 1')
+    expect(section(rules, '## Legacy utilities line')).toContain(
+      'A `dynamic` place with reason `non-literal class binding` that the user confirmed',
+    )
+    expect(section(rules, '## Report')).toContain('"confirmed by the user", with file and line')
+  })
+})
+
+describe('shared/batch.md', () => {
+  it('stops a batch with more than eight migrations and splits it by folder', () => {
+    const batch = read('shared/batch.md')
+
+    expect(batch).toContain('When the migration list has more than eight entries, the batch is too large.')
+    expect(batch).toContain('Do not ask whether to continue.')
+    expect(batch).toContain('Split a folder that still uses more than eight by file.')
+    expect(batch).toContain('It is exempt from the limit.')
+    expect(batch).toContain('Then ask for one yes/no for this batch or part:')
+    expect(batch).toContain('The user starts each next part with **Scope**.')
+    expect(batch).not.toContain('continue only on an explicit yes')
+  })
 })
 
 describe('Unmapped props and handlers', () => {
@@ -482,7 +536,7 @@ describe('Unmapped props and handlers', () => {
 
   function cells(line: string) {
     return line
-      .split('|')
+      .split(/(?<!\\)\|/)
       .slice(1, -1)
       .map(cell => cell.trim())
   }
@@ -518,7 +572,10 @@ describe('Unmapped props and handlers', () => {
     '- React and Angular, event handler: remove',
     'standalone statement',
     'Report every item this rule handles under Needs your attention.',
-    '"will not compile, needs manual rework"',
+    '`undefined as unknown as <Type>`',
+    '`Promise.resolve(undefined as unknown as <Type>)`',
+    'receives `undefined` at runtime',
+    'replaced by a typed placeholder because its result is used',
   ])('SKILL.md rule states %s', phrase => {
     expect(rule).toContain(phrase)
   })

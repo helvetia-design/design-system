@@ -34,35 +34,35 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props (`bal-data`)
 
-| old (`bal-data`) | new (`ds-data`)   | handling                                                                                                                                                                                         |
-| ---------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `horizontal`     | `horizontal`      | Copy as-is, including `horizontal="true"` and `horizontal={true}`.                                                                                                                               |
-| `border`         | _(no equivalent)_ | Drop it in every form (bare, `="true"`, `{true}`, `[border]="x"`, `border={x}`). `ds-data` always shows dividers in the vertical layout. Report each dropped `border` as a rendering difference. |
+| old (`bal-data`) | new (`ds-data`) | handling |
+| --- | --- | --- |
+| `horizontal` | `horizontal` | Copy as-is, including `horizontal="true"` and `horizontal={true}`. |
+| `border` | _(no equivalent)_ | Drop it in every form (bare, `="true"`, `{true}`, `[border]="x"`, `border={x}`). `ds-data` always shows dividers in the vertical layout. Report each dropped `border` as a rendering difference. |
 
 ### Props (`bal-data-item`)
 
-| old (`bal-data-item`) | new (`ds-data-item`) | handling                                                                                                         |
-| --------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `disabled`            | `disabled`           | Copy as-is.                                                                                                      |
-| `border`              | _(no equivalent)_    | Drop it in every form. Report each dropped `border` as a rendering difference.                                   |
-| _(none)_              | `editLabel`          | New prop. The label is localised from the language config when omitted. Nothing to migrate from. Leave it unset. |
+| old (`bal-data-item`) | new (`ds-data-item`) | handling |
+| --- | --- | --- |
+| `disabled` | `disabled` | Copy as-is. |
+| `border` | _(no equivalent)_ | Drop it in every form. Report each dropped `border` as a rendering difference. |
+| _(none)_ | `editLabel` | New prop. The label is localised from the language config when omitted. Nothing to migrate from. Leave it unset. |
 
 ### Props (`bal-data-label`)
 
-| old (`bal-data-label`) | new (`ds-data-label`) | handling    |
-| ---------------------- | --------------------- | ----------- |
-| `required`             | `required`            | Copy as-is. |
+| old (`bal-data-label`) | new (`ds-data-label`) | handling |
+| --- | --- | --- |
+| `required` | `required` | Copy as-is. |
 
 ### Props (`bal-data-value`)
 
 `ds-data-value` has no props. The legacy props are handled as follows:
 
-| old (`bal-data-value`)                                               | new                                         | handling                                                                                                                                                                               |
-| -------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `editable`, `editable="true"`, `editable={true}`                     | `editable` on the enclosing `ds-data-item`  | Hoist. Remove it from the value and add it to the `bal-data-item` that contains the value. If the item already has `editable`, do not duplicate it.                                    |
-| `multiline`, `multiline="true"`, `multiline={true}`                  | `multiline` on the enclosing `ds-data-item` | Hoist the same way.                                                                                                                                                                    |
-| `[editable]="x"`, `editable={x}`, `[multiline]="x"`, `multiline={x}` | `editable` / `multiline` on the item        | Dynamic value. Do not guess. Leave the binding unchanged and list the file and line in the report for manual review: both props now belong on `ds-data-item`.                          |
-| `disabled`                                                           | _(no equivalent)_                           | Drop it. The legacy prop only disabled the edit button. `ds-data-item` `disabled` greys out the whole item and means something else, so do not map it. Report each dropped `disabled`. |
+| old (`bal-data-value`) | new | handling |
+| --- | --- | --- |
+| `editable`, `editable="true"`, `editable={true}` | `editable` on the enclosing `ds-data-item` | Hoist. Remove it from the value and add it to the `bal-data-item` that contains the value. If the item already has `editable`, do not duplicate it. |
+| `multiline`, `multiline="true"`, `multiline={true}` | `multiline` on the enclosing `ds-data-item` | Hoist the same way. |
+| `[editable]="x"`, `editable={x}`, `[multiline]="x"`, `multiline={x}` | see handling | Dynamic value. Do not guess. Both props now belong on `ds-data-item`, and `ds-data-value` has neither. HTML: leave the binding unchanged and list the file and line in the report for manual review. React and Angular: apply Unmapped props and handlers (`SKILL.md`). The report says that the consumer moves the expression onto `ds-data-item` by hand. |
+| `disabled` | _(no equivalent)_ | Drop it. The legacy prop only disabled the edit button. `ds-data-item` `disabled` greys out the whole item and means something else, so do not map it. Report each dropped `disabled`. |
 
 ### Tags and imports
 
@@ -85,7 +85,7 @@ Write the report as `shared/report.md` describes, with the per-file summary unde
 Needs your attention when found:
 
 1. Every dropped `disabled`. The legacy prop only disabled the edit button.
-2. Every dynamic `editable` or `multiline` binding left for manual review.
+2. Every dynamic `editable` or `multiline` binding, with the framework outcome (left in HTML, removed (Unmapped) in React and Angular). Both props now belong on `ds-data-item`.
 3. Every `balClick`, `balFocus` and `balBlur` handler, which no longer fires, with its Unmapped props and handlers outcome.
 4. Every file where `border` was dropped. `ds-data` always shows dividers in the vertical layout and has no `border` prop. Do not add attributes to compensate.
 5. Every `horizontal` data list, since the horizontal layout may look different.

@@ -36,36 +36,36 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-heading`)                                                                            | new (`ds-heading`)      | handling                                                                                                                                                                                                                                                                                      |
-| ---------------------------------------------------------------------------------------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `level="display"`, `"display-2"`, `"h1"`–`"h5"`, `"span"`, `"p"`                               | same                    | Copy as-is. These are the only values `ds-heading` still accepts for `level`.                                                                                                                                                                                                                 |
-| `level` holding a size token                                                                   | `level` + `visualLevel` | Legacy `level` also accepted size tokens, and decoupled the tag from the size. Split it per the table below so both the rendered tag and the font size stay the same. Report each split.                                                                                                      |
-| `visualLevel="display"`, `"display-2"`, `"h1"`–`"h5"`                                          | same                    | Copy as-is.                                                                                                                                                                                                                                                                                   |
-| `visualLevel` holding a size token                                                             | renamed size token      | Rename the value per the size-token table below. The tag is unaffected.                                                                                                                                                                                                                       |
-| `autoLevel`                                                                                    | `autoLevel`             | Same handling as `visualLevel`: semantic values copy as-is, size tokens are renamed.                                                                                                                                                                                                          |
-| `noWrap`                                                                                       | `noWrap`                | Copy as-is, in every form (`no-wrap`, `[noWrap]="x"`, `noWrap={x}`).                                                                                                                                                                                                                          |
-| `subtitle`                                                                                     | `subtitle`              | Copy as-is.                                                                                                                                                                                                                                                                                   |
-| `shadow`                                                                                       | `shadow`                | Copy as-is.                                                                                                                                                                                                                                                                                   |
-| `inverted`                                                                                     | `inverted`              | Copy as-is.                                                                                                                                                                                                                                                                                   |
-| `space="none"`, `"bottom"`, `"top"`, `"all"`                                                   | same                    | Copy as-is. Both components use the same four values. See the Report about the legacy default margin when `space` is unset.                                                                                                                                                                   |
-| `color` omitted, `color=""`, `color="primary"`, `color="info"` or `color="blue"`               | omit `color`            | `ds-heading` has no `color` prop. These legacy values all resolved to the default colour, so the visible colour does not change. Drop `color`, also in the `'…'`, `{"…"}`, and `{'…'}` forms.                                                                                                 |
-| `color="white"`                                                                                | `inverted`              | HTML and Angular: write `inverted="true"`. React: write `inverted`. When `inverted` is already true, drop `color` and keep it. When `inverted` is false, replace that false value with the true form and drop `color`. Do **not** write `color="inverted"`: `ds-heading` has no `color` prop. |
-| `color="success"` / `color="warning"` / `color="danger"`                                       | _(no equivalent value)_ | Drop `color`. The heading renders in the default colour. Do not pick a substitute. Report each one by file, line, and old value. Also drop the `'…'`, `{"…"}`, and `{'…'}` forms.                                                                                                             |
-| `[level]="x"`, `[attr.level]="x"`, `level={x}`, and the same for `visualLevel` and `autoLevel` | leave the binding       | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line in the report, saying which values the caller must now pass.                                                                                                                                  |
-| `[color]="x"`, `[attr.color]="x"`, `color={x}`                                                 | remove the binding      | `ds-heading` has no `color` prop and the value cannot be mapped statically. Remove the binding and list the file and line in the report, so the caller can switch to `inverted` where the value was `white`.                                                                                  |
+| old (`bal-heading`) | new (`ds-heading`) | handling |
+| --- | --- | --- |
+| `level="display"`, `"display-2"`, `"h1"`–`"h5"`, `"span"`, `"p"` | same | Copy as-is. These are the only values `ds-heading` still accepts for `level`. |
+| `level` holding a size token | `level` + `visualLevel` | Legacy `level` also accepted size tokens, and decoupled the tag from the size. Split it per the table below so both the rendered tag and the font size stay the same. Report each split. |
+| `visualLevel="display"`, `"display-2"`, `"h1"`–`"h5"` | same | Copy as-is. |
+| `visualLevel` holding a size token | renamed size token | Rename the value per the size-token table below. The tag is unaffected. |
+| `autoLevel` | `autoLevel` | Same handling as `visualLevel`: semantic values copy as-is, size tokens are renamed. |
+| `noWrap` | `noWrap` | Copy as-is, in every form (`no-wrap`, `[noWrap]="x"`, `noWrap={x}`). |
+| `subtitle` | `subtitle` | Copy as-is. |
+| `shadow` | `shadow` | Copy as-is. |
+| `inverted` | `inverted` | Copy as-is. |
+| `space="none"`, `"bottom"`, `"top"`, `"all"` | same | Copy as-is. Both components use the same four values. See the Report about the legacy default margin when `space` is unset. |
+| `color` omitted, `color=""`, `color="primary"`, `color="info"` or `color="blue"` | omit `color` | `ds-heading` has no `color` prop. These legacy values all resolved to the default colour, so the visible colour does not change. Drop `color`, also in the `'…'`, `{"…"}`, and `{'…'}` forms. |
+| `color="white"` | `inverted` | HTML and Angular: write `inverted="true"`. React: write `inverted`. When `inverted` is already true, drop `color` and keep it. When `inverted` is false, replace that false value with the true form and drop `color`. Do **not** write `color="inverted"`: `ds-heading` has no `color` prop. |
+| `color="success"` / `color="warning"` / `color="danger"` | _(no equivalent value)_ | Drop `color`. The heading renders in the default colour. Do not pick a substitute. Report each one by file, line, and old value. Also drop the `'…'`, `{"…"}`, and `{'…'}` forms. |
+| `[level]="x"`, `[attr.level]="x"`, `level={x}`, and the same for `visualLevel` and `autoLevel` | same | Dynamic value. Do not guess the mapping. HTML: copy the binding unchanged and list the file and line in the report, saying which values the caller must now pass. React and Angular: copy it when the expression's type only admits the new values. `level` takes `display`, `display-2`, `h1` to `h5`, `span` and `p`. `visualLevel` and `autoLevel` take `display`, `display-2`, `h1` to `h5`, `5xl`, `4xl`, `3xl`, `2xl`, `xl`, `lg`, `md` and `base`. Otherwise apply Unmapped props and handlers (`SKILL.md`). |
+| `[color]="x"`, `[attr.color]="x"`, `color={x}` | remove the binding | `ds-heading` has no `color` prop and the value cannot be mapped statically. Remove the binding and list the file and line in the report, so the caller can switch to `inverted` where the value was `white`. |
 
 Size tokens in `level` split across two props, because legacy `HEADING_TAGS` and `HEADING_SIZES` disagreed. `level="x-large"` rendered an `h2` at the size `h3` normally gets, so `level="h2"` alone would enlarge the text.
 
 | legacy `level` | new `level` | new `visualLevel` |
-| -------------- | ----------- | ----------------- |
-| `xxxxx-large`  | `h1`        | `5xl`             |
-| `xxxx-large`   | `h1`        | `4xl`             |
-| `xxx-large`    | `h1`        | `3xl`             |
-| `xx-large`     | `h1`        | `2xl`             |
-| `x-large`      | `h2`        | `xl`              |
-| `large`        | `h3`        | `lg`              |
-| `medium`       | `h4`        | `md`              |
-| `normal`       | `h5`        | `base`            |
+| --- | --- | --- |
+| `xxxxx-large` | `h1` | `5xl` |
+| `xxxx-large` | `h1` | `4xl` |
+| `xxx-large` | `h1` | `3xl` |
+| `xx-large` | `h1` | `2xl` |
+| `x-large` | `h2` | `xl` |
+| `large` | `h3` | `lg` |
+| `medium` | `h4` | `md` |
+| `normal` | `h5` | `base` |
 
 In `visualLevel` and `autoLevel` the same tokens are only renamed, never split: `xxxxx-large` to `5xl`, `xxxx-large` to `4xl`, `xxx-large` to `3xl`, `xx-large` to `2xl`, `x-large` to `xl`, `large` to `lg`, `medium` to `md`, and `normal` to `base`.
 
@@ -87,7 +87,7 @@ Write the report as `shared/report.md` describes, with the per-file summary unde
 
 Needs your attention when found:
 
-1. Every dynamic `level`, `visualLevel` or `autoLevel` binding left for the caller, with the values the caller must now pass.
+1. Every dynamic `level`, `visualLevel` or `autoLevel` binding, with the framework outcome (copied in HTML, copied or removed (Unmapped) in React and Angular), with the values the caller must now pass.
 2. Every dynamic `color` binding removed, so the caller can switch to `inverted` where the value was `white`.
 3. Every dropped `color="success"`, `color="warning"`, or `color="danger"`, with its file, line, and old value. It now renders in the default colour.
 4. Every type reference such as `BalProps.BalHeadingLevel` that the scan cannot see. These resolve from the ambient `BalProps` namespace and stop compiling once `@baloise/ds-core` is removed from the project.

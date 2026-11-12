@@ -38,25 +38,25 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props of `bal-input` → `ds-input`
 
-| old (`bal-input`)                                                                                                                                                                                                                                                                                              | new (`ds-input`)                                          | handling                                                                                                                                                                                                                             |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `name`, `invalid`, `type`, `accept`, `autocapitalize`, `autocomplete`, `autocorrect`, `autofocus`, `debounce`, `placeholder`, `max`, `maxLength`, `min`, `minLength`, `multiple`, `pattern`, `allowedKeyPress`, `spellcheck`, `disabled`, `readonly`, `suffix`, `inputmode`, `mask`, `value`, `autoInvalidOff` | same                                                      | Copy as-is, in every form (`disabled`, `disabled="true"`, `[disabled]="x"`, `disabled={x}`). Keep form bindings such as `[(ngModel)]`, `formControlName`, and `[formControl]` unchanged. The `mask` values are the same seven names. |
-| `required` set                                                                                                                                                                                                                                                                                                 | `required`                                                | Copy as-is.                                                                                                                                                                                                                          |
-| `required` omitted                                                                                                                                                                                                                                                                                             | `required` set to false                                   | Follow the required default rule in `SKILL.md`. Report each file where this was added.                                                                                                                                               |
-| `textAlign`, `hasIconRight`                                                                                                                                                                                                                                                                                    | _(no equivalent prop)_                                    | Apply Unmapped props and handlers (`SKILL.md`). It has no effect after the migration.                                                                                                                                                |
-| `clickable`                                                                                                                                                                                                                                                                                                    | _(no equivalent prop)_                                    | Apply Unmapped props and handlers (`SKILL.md`). The click is now reported by the new `dsClick` event, so the consumer can replace the pattern, but do not do it yourself.                                                            |
-| _(none)_                                                                                                                                                                                                                                                                                                       | `label`, `description`, `color`, `loading`, `invalidText` | New props. Nothing to migrate from. Leave them unset.                                                                                                                                                                                |
+| old (`bal-input`) | new (`ds-input`) | handling |
+| --- | --- | --- |
+| `name`, `invalid`, `type`, `accept`, `autocapitalize`, `autocomplete`, `autocorrect`, `autofocus`, `debounce`, `placeholder`, `max`, `maxLength`, `min`, `minLength`, `multiple`, `pattern`, `allowedKeyPress`, `spellcheck`, `disabled`, `readonly`, `suffix`, `inputmode`, `mask`, `value`, `autoInvalidOff` | same | Copy as-is, in every form (`disabled`, `disabled="true"`, `[disabled]="x"`, `disabled={x}`). Keep form bindings such as `[(ngModel)]`, `formControlName`, and `[formControl]` unchanged. The `mask` values are the same seven names. |
+| `required` set | `required` | Copy as-is. |
+| `required` omitted | `required` set to false | Follow the required default rule in `SKILL.md`. Report each file where this was added. |
+| `textAlign`, `hasIconRight` | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). It has no effect after the migration. |
+| `clickable` | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). The click is now reported by the new `dsClick` event, so the consumer can replace the pattern, but do not do it yourself. |
+| _(none)_ | `label`, `description`, `color`, `loading`, `invalidText` | New props. Nothing to migrate from. Leave them unset. |
 
 ### Props of `bal-input-date` → `ds-datepicker`
 
 Same rules as `components/date/migration.md`, which documents `ds-datepicker` in full.
 
-| old (`bal-input-date`)                                                                                            | new (`ds-datepicker`)                | handling                                                                                                                                       |
-| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`, `invalid`, `disabled`, `readonly`, `placeholder`, `autocomplete`, `min`, `max`, `value`, `autoInvalidOff` | same                                 | Copy as-is. Keep form bindings unchanged.                                                                                                      |
-| `required` set / omitted                                                                                          | `required` / `required` set to false | Same as for `ds-input`. Follow the required default rule in `SKILL.md`. Report each file where this was added.                                 |
-| `clickable`, `hasIconRight`                                                                                       | _(no equivalent prop)_               | Apply Unmapped props and handlers (`SKILL.md`).                                                                                                |
-| `allowInvalidValue`                                                                                               | _(no equivalent)_                    | Drop it in every form and report it as a logic change: legacy emitted the string `INVALID_VALUE` from `balChange`, `ds-datepicker` never does. |
+| old (`bal-input-date`) | new (`ds-datepicker`) | handling |
+| --- | --- | --- |
+| `name`, `invalid`, `disabled`, `readonly`, `placeholder`, `autocomplete`, `min`, `max`, `value`, `autoInvalidOff` | same | Copy as-is. Keep form bindings unchanged. |
+| `required` set / omitted | `required` / `required` set to false | Same as for `ds-input`. Follow the required default rule in `SKILL.md`. Report each file where this was added. |
+| `clickable`, `hasIconRight` | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). |
+| `allowInvalidValue` | _(no equivalent)_ | Drop it in every form and report it as a logic change: legacy emitted the string `INVALID_VALUE` from `balChange`, `ds-datepicker` never does. |
 
 ### Tags and imports
 
@@ -68,13 +68,13 @@ Same rules as `components/date/migration.md`, which documents `ds-datepicker` in
 
 Both tags emit the same five events, and both new components add `dsClick`.
 
-| old           | new          | handling                                                                                                                                                                                                                    |
-| ------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balChange`   | `dsChange`   | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `string \| null`, legacy `string \| undefined`. |
-| `balInput`    | `dsInput`    | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `string \| null`.                                                                                                 |
-| `balBlur`     | `dsBlur`     | Same shapes.                                                                                                                                                                                                                |
-| `balFocus`    | `dsFocus`    | Same shapes.                                                                                                                                                                                                                |
-| `balKeyPress` | `dsKeyPress` | Same shapes.                                                                                                                                                                                                                |
+| old | new | handling |
+| --- | --- | --- |
+| `balChange` | `dsChange` | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `string \| null`, legacy `string \| undefined`. |
+| `balInput` | `dsInput` | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `string \| null`. |
+| `balBlur` | `dsBlur` | Same shapes. |
+| `balFocus` | `dsFocus` | Same shapes. |
+| `balKeyPress` | `dsKeyPress` | Same shapes. |
 
 Rewrite only handlers that are attached to the element being migrated. `balChange`, `balInput`, `balBlur`, and `balFocus` are emitted by many other legacy components, so never rewrite a handler on another element, and never rename them by search and replace across the file.
 

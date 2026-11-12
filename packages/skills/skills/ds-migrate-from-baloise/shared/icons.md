@@ -25,12 +25,12 @@ If `package.json` declares `@baloise/ds-icons` or `@baloise/ds-brand-icons` but 
 
 `icon-name-map.json` in this folder lists the legacy UI icon names that differ in the new set. Every name not listed stays unchanged.
 
-| group          | meaning                                                         | handling                                            |
-| -------------- | --------------------------------------------------------------- | --------------------------------------------------- |
-| `renamed`      | same glyph, new name (`nav-go-down` is now `caret-down`)        | Write the mapped name.                              |
-| `approximated` | closest glyph, visibly different (`arrow-down` to `caret-down`) | Write the mapped name. Report it.                   |
-| `lost`         | no counterpart                                                  | Leave the name. Report it.                          |
-| `changed`      | same name, different meaning (`message` was an envelope)        | Leave the name. Report every use for manual review. |
+| group | meaning | handling |
+| --- | --- | --- |
+| `renamed` | same glyph, new name (`nav-go-down` is now `caret-down`) | Write the mapped name. |
+| `approximated` | closest glyph, visibly different (`arrow-down` to `caret-down`) | Write the mapped name. Report it. |
+| `lost` | no counterpart | Leave the name. Report it. |
+| `changed` | same name, different meaning (`message` was an envelope) | Leave the name. Report every use for manual review. |
 
 Apply the name rule to `name` on `ds-icon` and to every prop that holds an icon name and that the component's migration file copies, such as `icon`, `iconRight` and `buttonIconOpen`:
 
@@ -85,12 +85,12 @@ For `import * as <ns> from '@baloise/ds-brand-icons'`, turn each `<ns>.balBrandI
 
 The legacy registration is the `icons` value in the legacy config call, such as `initializeBaloiseDesignSystem({ icons })`, `useBaloiseDesignSystem({ defaults: { icons: balIcons } })`, or `provideBaloiseDesignSystem({ defaults: { icons } })`. It usually sits in the startup file that the `app` migration scans. The **Assets** step reads it even when the icon scan does not list that file. The legacy-config scan finds the call. When the value is an identifier, such as `icons: portalIcons`, follow it to its declaration, also in another file, and sort the parts of that object. Sort every part of that value into one of four cases:
 
-| part of the legacy `icons` value                                                                                                                   | case          | handling                                                                                                                                                   |
-| -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| the namespace itself: `icons: balIcons`, `{ icons }` bound to the namespace, or `...balIcons`                                                      | standard set  | Already registered by `@helvetia-design/core`. Nothing to carry over.                                                                                      |
-| a key equal to its own symbol, when the symbol is imported from `@baloise/ds-icons`                                                                | standard icon | Already registered. Nothing to carry over. When the name is `lost` in `icon-name-map.json`, report it.                                                     |
-| a `balIcon<Name>` key with any other value, such as `balIconMyLogo: logoSvg`, or a shorthand or `key: key` whose symbol is declared in the project | custom icon   | Carry it over as `Icon<Name>: <value>`. When the value is a `balIcon*` symbol from `@baloise/ds-icons`, rewrite it by the UI icon import rules. Report it. |
-| a key without the `balIcon` prefix, such as `myLogo: logoSvg`                                                                                      | unreachable   | Legacy never resolved it by name. Do not carry it over. Report it.                                                                                         |
+| part of the legacy `icons` value | case | handling |
+| --- | --- | --- |
+| the namespace itself: `icons: balIcons`, `{ icons }` bound to the namespace, or `...balIcons` | standard set | Already registered by `@helvetia-design/core`. Nothing to carry over. |
+| a key equal to its own symbol, when the symbol is imported from `@baloise/ds-icons` | standard icon | Already registered. Nothing to carry over. When the name is `lost` in `icon-name-map.json`, report it. |
+| a `balIcon<Name>` key with any other value, such as `balIconMyLogo: logoSvg`, or a shorthand or `key: key` whose symbol is declared in the project | custom icon | Carry it over as `Icon<Name>: <value>`. When the value is a `balIcon*` symbol from `@baloise/ds-icons`, rewrite it by the UI icon import rules. Report it. |
+| a key without the `balIcon` prefix, such as `myLogo: logoSvg` | unreachable | Legacy never resolved it by name. Do not carry it over. Report it. |
 
 A shorthand key such as `balIconStarFull` or `balIconStarFull: balIconStarFull` is a standard icon only when the symbol is a named import from `@baloise/ds-icons`, or a member of a namespace imported from it. Check where the symbol comes from. A symbol declared in the project or imported from any other module is a custom icon. Keep its own import or declaration. For example, `balIconPortalShield` declared in `data/icons.ts` as an SVG string becomes `IconPortalShield: balIconPortalShield`.
 

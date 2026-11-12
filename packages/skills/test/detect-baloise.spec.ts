@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   detectBaloise,
   lowestMajor,
+  MIN_CORE_VERSION,
   parseArgs,
   readNpmAngularPeers,
   readNpmDistTags,
@@ -793,6 +794,77 @@ describe('detectBaloise npm failures', () => {
     expect(result.message).toContain('--version')
   })
 
+  it('stops when the latest dist-tag is below the minimum core version', async () => {
+    const result = await detectBaloise(appWithImport(), { readDistTags: distTags('0.0.6') })
+
+    expect(result).toEqual({
+      status: 'error',
+      message: `This skill needs @helvetia-design/core ${MIN_CORE_VERSION} or later, but the latest dist-tag of @helvetia-design/core is 0.0.6. Rerun with --version ${MIN_CORE_VERSION} or a later version once it is published, or update the skill.`,
+    })
+  })
+
+  it('stops when --version is below the minimum core version', async () => {
+    const result = (await detectBaloise(appWithImport(), {
+      version: '0.0.6',
+      readDistTags: async () => {
+        throw new Error('npm view should not run with an explicit version')
+      },
+    })) as { status: string; message: string }
+
+    expect(result.status).toBe('error')
+    expect(result.message).toContain('but --version is 0.0.6')
+    expect(result.message).toContain(`--version ${MIN_CORE_VERSION}`)
+  })
+
+  it('detects an app that only declares @baloise/ds-angular-legacy', async () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'package.json',
+      JSON.stringify({ dependencies: { '@angular/core': '^22.0.0', '@baloise/ds-angular-legacy': '17.4.1' } }),
+    )
+    write(root, 'src/app/app.module.ts', "import { BaloiseDesignSystemModule } from '@baloise/ds-angular-legacy'\n")
+
+    const result = await detectBaloise(root, {
+      version: MIN_CORE_VERSION,
+      readAngularPeers: async () => ({ '@angular/core': '>=22.0.0' }),
+    })
+
+    expect(result).toMatchObject({ status: 'ready', framework: 'angular' })
+    expect(result).toHaveProperty(['aliases', '@helvetia-design/angular'], MIN_CORE_VERSION)
+  })
+
+  it('checks the minimum before the Angular peer lookup', async () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'package.json',
+      JSON.stringify({ dependencies: { '@angular/core': '^22.0.0', '@baloise/ds-angular': '19.10.2' } }),
+    )
+    write(root, 'src/main.ts', "import { BaloiseDesignSystemModule } from '@baloise/ds-angular'\n")
+
+    const result = await detectBaloise(root, {
+      version: '0.0.6',
+      readAngularPeers: async () => {
+        throw new Error('the peer lookup should not run below the minimum')
+      },
+    })
+
+    expect(result).toMatchObject({ status: 'error', message: expect.stringContaining('but --version is 0.0.6') })
+  })
+
+  it.each([MIN_CORE_VERSION, '0.0.7-rc.1', '0.0.10', '0.1.0', '1.0.0'])('accepts %s numerically', async version => {
+    const result = await detectBaloise(appWithImport(), { readDistTags: distTags(version) })
+
+    expect(result).toMatchObject({ status: 'ready', version })
+  })
+
+  it('compares the release part of a prerelease version', async () => {
+    const result = await detectBaloise(appWithImport(), { readDistTags: distTags('0.0.6-rc.1') })
+
+    expect(result).toMatchObject({ status: 'error' })
+  })
+
   it('prints JSON and exits 1 for an error', async () => {
     const root = appWithImport()
     let output = ''
@@ -930,7 +1002,7 @@ describe('Angular peer check', () => {
   }
 
   const detectAngular = (root: string, readAngularPeers: (version: string) => Promise<unknown>) =>
-    detectBaloise(root, { readDistTags: distTags('0.0.6'), readAngularPeers })
+    detectBaloise(root, { readDistTags: distTags('0.0.7'), readAngularPeers })
 
   it('reports the peer lookup stderr without suggesting --version', async () => {
     const result = (await detectBaloise(angularApp(), {
@@ -1009,7 +1081,7 @@ describe('Angular peer check', () => {
       versions.push(version)
       return { '@angular/core': '>=22.0.0' }
     })
-    expect(versions).toEqual(['0.0.6'])
+    expect(versions).toEqual(['0.0.7'])
   })
 
   it('returns error when the peer lookup fails', async () => {
@@ -1017,7 +1089,7 @@ describe('Angular peer check', () => {
       throw new Error('npm view failed')
     })
     expect(result).toMatchObject({ status: 'error' })
-    expect((result as { message: string }).message).toContain('@helvetia-design/angular@0.0.6')
+    expect((result as { message: string }).message).toContain('@helvetia-design/angular@0.0.7')
     expect(result).not.toHaveProperty('angular')
   })
 
