@@ -14371,6 +14371,57 @@
           ],
           "com.figma.variableId": "VariableID:137:1699"
         }
+      },
+      "Padding": {
+        "SM": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.Base}",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        },
+        "Base": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.MD}",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        }
+      },
+      "Gap": {
+        "$type": "dimension",
+        "$value": "{🔗 Alias.↔️ Space.Gap.3XS}",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "Icon": {
+        "Size": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.📏 Size.Icon.Base}",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        }
+      },
+      "Close": {
+        "Size": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.📏 Size.Icon.Base}",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        }
       }
     },
     "Label": {
