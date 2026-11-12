@@ -49,6 +49,7 @@ const CHILD_SLUGS = new Map([
   ['hint-title', 'hint'],
   ['hint-text', 'hint'],
   ['input-date', 'input'],
+  ['input-group', 'input'],
   ['list-item', 'list'],
   ['list-item-title', 'list'],
   ['list-item-subtitle', 'list'],
