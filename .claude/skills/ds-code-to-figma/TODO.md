@@ -64,9 +64,9 @@
 | ⬜     | Divider      | Structure  | -                                     | ✅  | ⬜    |
 | ⬜     | Text         | Structure  | -                                     | ✅  | ⬜    |
 | ⬜     | Heading      | Structure  | -                                     | ✅  | ⬜    |
-| ⬜     | Stack        | Structure  | -                                     | ⬜  | ⬜    |
-| ⬜     | Content      | Structure  | -                                     | ⬜  | ⬜    |
-| ⬜     | Data         | Structure  | -                                     | ⬜  | ⬜    |
+| ⬜     | Stack        | Structure  | -                                     | ✅  | ⬜    |
+| ⬜     | Content      | Structure  | -                                     | ✅  | ⬜    |
+| ⬜     | Data         | Structure  | -                                     | ✅  | ⬜    |
 | ⬜     | List         | Structure  | -                                     | ⬜  | ⬜    |
 | ⬜     | Root         | Structure  | -                                     | ✅  | ⬜    |
 | ⬜     | Card         | Structure  | -                                     | ⬜  | ⬜    |
