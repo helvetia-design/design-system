@@ -225,3 +225,25 @@ Text"` and both `boundVariables.fontFamily`/`boundVariables.letterSpacing` point
 variable ids. No other check's nodes were touched.
 
 Re-running Phase 4 in full next.
+
+## Re-check: component states (11.11.2026, on main)
+
+Migrated in place: the `state` axis (`default`, `disabled`) is gone — Pagination has no interaction
+states of its own — and `disabled` is its own `false` / `true` variant. Grid per the ordering rule
+without a `state` axis: `size` on the columns, `disabled` on the rows (Dots / DotsRow: `disabled` on
+the columns). Sets renamed `Pagination/Default` → `Pagination`, `Pagination/Dots` → `PaginationDots`,
+`Pagination/DotsRow` → `PaginationDotsRow` (`sub-label`s already matched).
+
+| #   | Check           | Result | Evidence                                                                                                                                                                                       |
+| --- | --------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2   | Header          | pass   | `status=review`, `v0.0.6`, `11.11.2026`; links `components-navigation-pagination-pagination--pagination` (doc-config), Toky `filter=pagination`, GitHub `navigation/pagination`.               |
+| 3a  | States / naming | pass   | `Pagination`: `size` base · sm, `disabled` false · true (4 variants); `PaginationDots`, `PaginationDotsRow`: `disabled` false · true (2 each). No `state` property. Set names flat PascalCase. |
+| 4e  | Interactions    | pass   | 0 reactions on all three sets (no interaction states); nested Button instances keep theirs.                                                                                                    |
+| 5b  | Labels          | pass   | Column labels `size` / `base`, `sm` (Dots: `disabled` / `false`, `true`); row lane `disabled` / `false`, `true`, auto-width (51px).                                                            |
+| 5c  | Ordering        | pass   | First layer and top-left cell `size=base, disabled=false` / `disabled=false`.                                                                                                                  |
+| 6b  | Screenshot      | pass   | `4401:15`: all three stacks complete after `Component Sets` went from fixed 850px to `FILL` (it clipped `PaginationDotsRow`).                                                                  |
+| —   | Instances       | pass   | 6 / 6 instances on `size=base, disabled=false`.                                                                                                                                                |
+
+Not ours, flagged: a second component set **`Bubu`** (`4563:6887`, published key `91543c36…`) sits in
+`Pagination`'s `Column + Box` under the real set — a copy of the old Pagination set (`size` ×
+`state` default / disabled), no instances, no description. Deleted 11.11.2026 at the user's request (0 instances re-checked first).

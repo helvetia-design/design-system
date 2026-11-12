@@ -2,13 +2,13 @@
 
 ```yaml
 sets: # filled in by Phase 3 — one entry per component set (top-level split), default set first.
-  - name: Pagination # default set — numbered pages + ellipsis; axes: size(2) x state(2) = 4 variants
+  - name: Pagination # default set — numbered pages + ellipsis; axes: size(2) x disabled(2) = 4 variants (renamed from Pagination/Default 11.11.2026)
     figmaComponentKey: 'c799bf8d0a3f4d922d5cce3af824119689f6c079'
     figmaMasterNodeId: '4407:292'
-  - name: PaginationDots # dots variant — counter badge ("value / totalPages"); axis: state(2) = 2 variants
+  - name: PaginationDots # dots variant — counter badge ("value / totalPages"); axis: disabled(2) = 2 variants (renamed from Pagination/Dots)
     figmaComponentKey: '0d72810c3321cf62bedc8193ed4a00011c6e8d80'
     figmaMasterNodeId: '4407:293'
-  - name: PaginationDotsRow # dots variant — ≤5-page circular dot markers; axis: state(2) = 2 variants
+  - name: PaginationDotsRow # dots variant — ≤5-page circular dot markers; axis: disabled(2) = 2 variants (renamed from Pagination/DotsRow)
     figmaComponentKey: '87210f2e1237e766bde4c5024ce9c88321046962'
     figmaMasterNodeId: '4430:1316'
 figmaPage: Core / Navigation # page id 4401:2
@@ -48,8 +48,8 @@ props:
   - name: disabled
     type: boolean
     default: false
-    figmaProperty: state
-    figmaPropertyType: 'folded into a shared `state` axis, not its own boolean — see states: below'
+    figmaProperty: disabled
+    figmaPropertyType: 'variant false/true (component state, blocked — :host(.is-disabled) pointer-events: none, pagination.host.scss:89); migrated 11.11.2026, was an option of `state`'
     note: 'Removes previous/next buttons entirely (not just disables them) and routes :host(.is-disabled) color to the ellipsis. See anatomy note on structural removal in Phase 2.'
   - name: label
     type: string
@@ -110,12 +110,10 @@ props:
     figmaPropertyType: top-level-split (structural — different child shapes, not just token swaps)
     figmaOptions: [base, dots]
 
-states:
-  figmaProperty: state
-  options: [default, active, disabled]
-  sources:
-    active: 'value === pageNumber (is-active / is-primary vs. is-ghost class toggle)'
-    disabled: 'disabled prop — removes previous/next buttons; ellipsis text recolors via :host(.is-disabled) #ellipsis { color: var(--_pagination-disabled-color); }'
+states: none # the pagination has no interaction states of its own — hover / active live on its nested Button instances, which carry their own reactions. No `state` axis since 11.11.2026; no reactions on Pagination.
+componentStates:
+  disabled: { figmaProperty: disabled, options: [false, true], interactive: false, source: 'disabled prop — removes previous/next buttons; :host(.is-disabled) pointer-events: none, ellipsis recolored (pagination.host.scss:89–94)' }
+# The current page (value === pageNumber) is shown by the nested Button's color (primary vs ghost), not a Pagination state.
 
 nested:
   - childTag: ds-icon
