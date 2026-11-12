@@ -495,6 +495,7 @@ describe('shared/field.md wiring', () => {
       'radio',
       'segment',
       'select',
+      'dropdown',
       'input',
       'textarea',
       'number-input',

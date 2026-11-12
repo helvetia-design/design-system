@@ -430,6 +430,42 @@ describe('scanMigratable', () => {
     })
   })
 
+  it('suggests dropdown, form, table and time-input and folds bal-option and bal-option-list into dropdown', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'index.html',
+      [
+        '<bal-form novalidate>',
+        '  <bal-dropdown name="d">',
+        '    <bal-option-list>',
+        '      <bal-option value="a" label="A"></bal-option>',
+        '    </bal-option-list>',
+        '  </bal-dropdown>',
+        '  <bal-time-input name="t"></bal-time-input>',
+        '  <bal-table><table></table></bal-table>',
+        '</bal-form>',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'src/options.ts',
+      "import { BalOption } from '@baloise/ds-core'\nexport const options: BalOption[] = []\n",
+    )
+
+    expect(scanMigratable(root)).toEqual({
+      suggested: [
+        { name: 'dropdown', total: 5 },
+        { name: 'form', total: 1 },
+        { name: 'table', total: 1 },
+        { name: 'time-input', total: 1 },
+      ],
+      notYet: [],
+      types: [],
+    })
+  })
+
   it('suggests file-upload when the project uses bal-file-upload', () => {
     const root = createScratchDir()
     write(

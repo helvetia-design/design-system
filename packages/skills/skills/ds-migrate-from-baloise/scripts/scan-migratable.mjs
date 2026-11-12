@@ -66,6 +66,8 @@ const CHILD_SLUGS = new Map([
   ['ng-error', 'field'],
   ['ng-error-component', 'field'],
   ['notices', 'toast'],
+  ['option', 'dropdown'],
+  ['option-list', 'dropdown'],
   ['radio-group', 'radio'],
   ['radio-icon', 'radio'],
   ['segment-item', 'segment'],
