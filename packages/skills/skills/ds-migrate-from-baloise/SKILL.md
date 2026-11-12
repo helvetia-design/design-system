@@ -188,7 +188,7 @@ Every component migration applies these rules in its Rewrite step. They cover ea
 - `BalProps.*` types have no `Ds*` counterpart for form controls. Leave them unchanged.
 - A handler that stays bound to a legacy `bal-*` element keeps its legacy type.
 - Import the new types with `import type { … } from '@helvetia-design/core'`. Merge them into an existing import from that module.
-- A component `migration.md` that gives its own type rule wins. Tabs, steps and carousel use `CustomEvent<{ value: string }>`.
+- A component `migration.md` that gives its own type rule wins. Tabs, steps and carousel use `CustomEvent<{ value: string }>`, and time-input, whose target is a native input, uses the native event types.
 
 **Element types.** Every `HTMLBal<X>Element` that names an element migrated in this run becomes `HTMLDs<Y>Element` of the new tag. This covers `ElementRef<HTMLBal<X>Element>`, `@ViewChild(...) x?: HTMLBal<X>Element`, `viewChild<...>` and every other use. These types are global, so they need no import. Then apply the Methods rules of that `migration.md` to the calls on the ref. The new type makes `tsc` show every call to a removed method.
 

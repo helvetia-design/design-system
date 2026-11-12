@@ -24,7 +24,6 @@ function migration(name: string) {
 
 const writtenSelectors: Record<string, string[]> = {
   'table': ['.ds-table', '.ds-table.is-wide'],
-  'form': [],
   'time-input': [
     '.ds-field',
     '.ds-label',
@@ -38,7 +37,13 @@ const writtenSelectors: Record<string, string[]> = {
   ],
 }
 
-const elementsAndPackages = new Set(['ds-angular', 'ds-core', 'ds-form', 'ds-hint', 'ds-migration-report', 'ds-react'])
+const packagesAndReport = ['ds-angular', 'ds-core', 'ds-migration-report', 'ds-react']
+
+const mentionedOnly: Record<string, string[]> = {
+  'table': [],
+  'form': ['ds-form'],
+  'time-input': ['ds-hint'],
+}
 
 function escape(text: string) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -60,12 +65,18 @@ describe.each(Object.entries(writtenSelectors))('components/%s/migration.md CSS 
       }
     }
   })
+})
 
-  it('writes no other ds-* class', () => {
-    const written = new Set(selectors.flatMap(selector => selector.split('.').filter(Boolean)))
+describe.each(Object.entries(mentionedOnly))('components/%s/migration.md ds-* names', (name, mentioned) => {
+  it('writes no ds-* class beyond its CSS targets', () => {
+    const text = migration(name)
+    const allowed = new Set([
+      ...(writtenSelectors[name] ?? []).flatMap(selector => selector.split('.').filter(Boolean)),
+      ...mentioned,
+      ...packagesAndReport,
+    ])
     const tokens = new Set(text.match(/(?<![\w-])ds-[a-z0-9]+(?:-[a-z0-9]+)*/g) ?? [])
-    const unknown = [...tokens].filter(token => !written.has(token) && !elementsAndPackages.has(token))
 
-    expect(unknown).toEqual([])
+    expect([...tokens].filter(token => !allowed.has(token))).toEqual([])
   })
 })

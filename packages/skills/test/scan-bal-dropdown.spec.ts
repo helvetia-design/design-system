@@ -117,6 +117,44 @@ describe('scanBalDropdown', () => {
     })
   })
 
+  it('lists a self-closing bal-option, a React BalOptionList and the BalOptionChange event alias', () => {
+    const root = createScratchDir()
+    write(root, 'index.html', '<bal-dropdown><bal-option value="a" label="A" /></bal-dropdown>\n')
+    write(
+      root,
+      'List.tsx',
+      [
+        '<BalOptionList>',
+        '  <BalOption value="a" label="A" />',
+        '</BalOptionList>',
+        'function onOption(e: BalEvents.BalOptionChange) {}',
+      ].join('\n'),
+    )
+
+    expect(scanBalDropdown(root)).toEqual({
+      total: 7,
+      files: [
+        {
+          file: 'index.html',
+          findings: [
+            { line: 1, snippet: '<bal-dropdown>' },
+            { line: 1, snippet: '<bal-option value="a" label="A" />' },
+            { line: 1, snippet: '</bal-dropdown>' },
+          ],
+        },
+        {
+          file: 'List.tsx',
+          findings: [
+            { line: 1, snippet: '<BalOptionList>' },
+            { line: 2, snippet: '<BalOption value="a" label="A" />' },
+            { line: 3, snippet: '</BalOptionList>' },
+            { line: 4, snippet: 'function onOption(e: BalEvents.BalOptionChange) {}' },
+          ],
+        },
+      ],
+    })
+  })
+
   it('lists Angular inline template tags and skips comments and non-template strings', () => {
     const root = createScratchDir()
     write(
