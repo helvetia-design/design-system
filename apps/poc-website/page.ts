@@ -13,7 +13,12 @@
  *
  * Three layers, deliberately kept apart:
  *
- *   1. AEM component — these functions. The website team owns this layer.
+ *   1. AEM component — these functions. The website team owns this layer. Each one
+ *                      carries `data-cmp-is`/`data-cmp-data-layer` on its outermost
+ *                      element (see `aemComponent()` below) — that is the actual
+ *                      "wrapper" a CMS needs to manage an instance of this block:
+ *                      move it, duplicate it across pages, read it from analytics.
+ *                      It is plain markup, never a custom element.
  *   2. DS wrapper    — a `ds-*` custom element, one per thing that genuinely needs
  *                      behaviour. Never stacked inside another one.
  *   3. Native HTML   — everything inside the slots, styled by the global DS
@@ -22,10 +27,40 @@
  *
  * Layer 3 is the point. Native markup is in AEM's output for free; anything a
  * component generates inside its own shadow root is not. The more of the page that
- * is native, the more of it exists before any JavaScript runs.
+ * is native, the more of it exists before any JavaScript runs. The stats strip at
+ * the foot of the page counts this for real, from the markup below — not a quote
+ * someone has to remember to update.
+ *
+ * Deliberately tiered after the four-tier model in `docs/AEM-with-DS.md`: header,
+ * hero, richtext, teaser grid and footer are plain markup styled by
+ * `@helvetia-design/styles` (Style tier, zero JavaScript from the design system).
+ * Only two things on this page are real components — `<ds-button>` and
+ * `<ds-carousel>` (with the `<ds-carousel-item>` children its own API requires).
+ * The FAQ accordion is deliberately NOT `<ds-accordion>`: it needs nothing `details`
+ * does not already do natively — exclusive open-one-close-others grouping is the
+ * native `name` attribute on `<details>` (baseline-supported since 2023), and
+ * `accordion.style.scss` already ships the matching `.ds-accordion` CSS-only look,
+ * including the animated open/close, for exactly this case. Reach for the
+ * component only once real behaviour is needed that `details` cannot provide.
+ *
+ * Keep the number of `ds-*` instances low on purpose: Stencil cannot share a
+ * stylesheet across declarative shadow roots, so every instance carries its own
+ * full `<style>` copy into `view-source:` (see ADR-0034, reverted in b19ede325).
  */
 
 const IMAGE_HOST = 'https://picsum.photos'
+
+/**
+ * The AEM Core Components instrumentation pair every real AEM component carries on
+ * its outermost element: `data-cmp-is` names the resource type for the edit-mode
+ * component grid and the JS component API, `data-cmp-data-layer` registers this
+ * instance with the Adobe Client Data Layer under its own id. Neither is a `ds-*`
+ * concern — this is pure AEM authoring plumbing, present on every section below
+ * regardless of whether that section also happens to contain a `ds-*` component.
+ */
+function aemComponent(type: string): string {
+  return `data-cmp-is="${type}" data-cmp-data-layer='{"${type}":{"@type":"helvetia/components/${type}"}}'`
+}
 
 /* ============================================================================
  * AEM component: Seiten-Header
@@ -37,7 +72,7 @@ type PageHeader = {
 }
 
 const pageHeader = ({ brand, links }: PageHeader): string => `
-  <header class="demo-header">
+  <header class="demo-header" ${aemComponent('header')}>
     <div class="ds-container demo-header__inner">
       <a class="demo-header__brand" href="/" aria-label="${brand} — zur Startseite">${brand}</a>
       <nav class="demo-header__nav" aria-label="Hauptnavigation">
@@ -67,7 +102,7 @@ type Hero = {
 }
 
 const hero = ({ eyebrow, title, lead, actions, image }: Hero): string => `
-    <section class="demo-hero">
+    <section class="demo-hero" ${aemComponent('hero')}>
       <div class="ds-container">
         <div class="ds-grid is-multiline is-vcentered gap-xl">
           <div class="ds-col">
@@ -110,7 +145,7 @@ type Richtext = {
 }
 
 const richtext = ({ title, paragraphs, listTitle, listItems }: Richtext): string => `
-    <section class="demo-section">
+    <section class="demo-section" ${aemComponent('text')}>
       <div class="ds-container">
         <div class="demo-prose ds-content">
           <h2 class="ds-heading">${title}</h2>
@@ -135,7 +170,7 @@ type TeaserGrid = {
 }
 
 const teaserGrid = ({ heading, teasers }: TeaserGrid): string => `
-    <section class="demo-section demo-section--muted">
+    <section class="demo-section demo-section--muted" ${aemComponent('teasergrid')}>
       <div class="ds-container">
         <h2 class="ds-heading demo-section__heading">${heading}</h2>
         <div class="ds-grid is-multiline gap-lg">
@@ -173,7 +208,7 @@ type Gallery = {
 }
 
 const gallery = ({ heading, label, slides }: Gallery): string => `
-    <section class="demo-section">
+    <section class="demo-section" ${aemComponent('carousel')}>
       <div class="ds-container">
         <h2 class="ds-heading demo-section__heading">${heading}</h2>
         <ds-carousel label="${label}" controls="dots" value="${slides[0].name}">
@@ -184,96 +219,38 @@ ${slides.map(s => `          <ds-carousel-item name="${s.name}" src="${s.src}"><
 
 /* ============================================================================
  * AEM component: FAQ-Sektion
- * One ds-accordion per entry, grouped via the `group` attribute. There is
- * deliberately no <ds-accordion-group> element — grouping is a property, not a
- * layer. Everything inside the slots is native markup.
+ * One <details class="ds-accordion"> per entry, grouped via the native `name`
+ * attribute — the browser itself closes the others when one opens, no JavaScript
+ * involved. `accordion.style.scss` ships the matching CSS-only look (marker,
+ * animated open/close) for this exact element shape. Not `<ds-accordion>`: that
+ * component earns its JS cost on open()/close() control or events neither this
+ * page nor the brief needs here. Everything inside is native markup either way.
  * ========================================================================== */
 
 type FaqSection = {
   heading: string
-  group: string
+  name: string
   entries: { question: string; answer: string; open?: boolean }[]
 }
 
-const faqSection = ({ heading, group, entries }: FaqSection): string => `
-    <section class="demo-section demo-section--muted">
+const faqSection = ({ heading, name, entries }: FaqSection): string => `
+    <section class="demo-section demo-section--muted" ${aemComponent('faq')}>
       <div class="ds-container">
         <div class="demo-prose">
           <h2 class="ds-heading demo-section__heading">${heading}</h2>
 ${entries
   .map(
-    entry => `          <ds-accordion group="${group}" summary-title marker="plus-minus"${entry.open ? ' open' : ''}>
-            <span slot="summary">${entry.question}</span>
-            <div slot="content" class="py-base">
+    entry => `          <details class="ds-accordion has-marker-plus-minus" name="${name}"${entry.open ? ' open' : ''}>
+            <summary><h3 class="ds-title">${entry.question}</h3></summary>
+            <div class="ds-content py-base">
               <p class="ds-text mb-none">${entry.answer.replace(/\s+/g, ' ').trim()}</p>
             </div>
-          </ds-accordion>`,
+          </details>`,
   )
   .join('\n          <hr class="ds-divider" />\n')}
         </div>
       </div>
     </section>`
-
-/* ============================================================================
- * AEM component: Stresstest  (diagnostic section, not a page pattern)
- *
- * The question the CMS team actually asked: if AEM renders a large, deep tree of
- * native HTML *inside* a web component, does anything resolve the styles away or
- * pull the markup into the shadow DOM?
- *
- * This is the Baloise link-accordion rebuilt the way we would build it: one
- * ds-accordion wrapper, and inside it plain <ul>/<li>/<a> — not a custom element
- * per row. Compare with
- * https://www.baloise.be/nl/contact-service/schadegevallen-NEW.html, where every
- * item is a bal-list-item with its own shadow root.
- * ========================================================================== */
-
-type StressTest = {
-  heading: string
-  note: string
-  question: string
-  rows: number
-}
-
-const stressTest = ({ heading, note, question, rows }: StressTest): string => {
-  // ds-list / ds-item work here because the <ul> itself carries .ds-list — the
-  // compiled selector is `ul.ds-list li.ds-item`. Mixing a custom-element parent
-  // with CSS-class children (e.g. <ds-card> + .ds-card-header) is what does NOT
-  // work, because <ds-card> carries no .ds-card class for the descendant
-  // selector to match.
-  const items = Array.from(
-    { length: rows },
-    (_, i) => `              <li class="ds-item">
-                <div class="ds-item-content">
-                  <h5 class="ds-item-title"><a class="ds-link" href="/schaden/${i}">Schadenfall ${i + 1} melden</a></h5>
-                  <span class="ds-item-text">Formular, Checkliste und Kontakt für diesen Fall.</span>
-                </div>
-              </li>`,
-  ).join('\n')
-
-  // 5 native elements per row (li, div, h5, a, span) plus the <ul>, the <p> and
-  // the slot wrapper — printed on the page so the number is verifiable.
-  const elementCount = rows * 5 + 3
-
-  return `
-    <section class="demo-section">
-      <div class="ds-container">
-        <div class="demo-prose">
-          <h2 class="ds-heading demo-section__heading">${heading}</h2>
-          <p class="ds-text is-sm">${note}</p>
-          <ds-accordion group="stress" summary-title marker="plus-minus" open data-native-elements="${elementCount}">
-            <span slot="summary">${question}</span>
-            <div slot="content" class="py-base">
-              <p class="ds-text">${elementCount} native Elemente, von AEM geliefert, in einem einzigen Web Component.</p>
-              <ul class="ds-list">
-${items}
-              </ul>
-            </div>
-          </ds-accordion>
-        </div>
-      </div>
-    </section>`
-}
 
 /* ============================================================================
  * AEM component: Kontakt-Aufruf
@@ -285,7 +262,7 @@ ${items}
 type Cta = { title: string; lead: string; label: string }
 
 const cta = ({ title, lead, label }: Cta): string => `
-    <section class="demo-section demo-cta">
+    <section class="demo-section demo-cta" ${aemComponent('cta')}>
       <div class="ds-container">
         <h2 class="ds-heading">${title}</h2>
         <p class="ds-text is-lead mt-base mb-xl">${lead}</p>
@@ -306,7 +283,7 @@ type PageFooter = {
 }
 
 const pageFooter = ({ columns, legal }: PageFooter): string => `
-  <footer class="demo-footer">
+  <footer class="demo-footer" ${aemComponent('footer')}>
     <div class="ds-container">
       <div class="ds-grid is-multiline gap-lg">
 ${columns
@@ -325,11 +302,62 @@ ${col.links.map(l => `            <li><a href="${l.href}">${l.label}</a></li>`).
   </footer>`
 
 /* ============================================================================
+ * Stats strip — not an AEM component, a fact check.
+ *
+ * Counted from the actual page markup above, not typed by hand: a hand-typed
+ * number goes stale the moment someone edits a section and forgets the footnote.
+ * Counting tags is enough here — this is demo markup assembled by the functions
+ * above, not arbitrary HTML, so a plain regex over the authored fragment (before
+ * `renderToString` expands any shadow root) reliably tells component tags from
+ * native ones.
+ * ========================================================================== */
+
+const REAL_COMPONENTS = ['ds-button', 'ds-carousel'] as const
+
+function countTag(html: string, tag: string): number {
+  return (html.match(new RegExp(`<${tag}(?=[\\s/>])`, 'g')) ?? []).length
+}
+
+function pageStats(authoredHtml: string): string {
+  const instancesByComponent = REAL_COMPONENTS.map(tag => ({ tag, count: countTag(authoredHtml, tag) }))
+  const componentInstances = instancesByComponent.reduce((sum, c) => sum + c.count, 0)
+  const allTags = (authoredHtml.match(/<[a-z][a-z0-9-]*(?=[\s/>])/g) ?? []).length
+  // ds-carousel-item is a real custom element too (the slide child of ds-carousel), not a
+  // "native" one — excluded from the native count the same way ds-button/ds-carousel are.
+  const componentTags = (authoredHtml.match(/<ds-[a-z0-9-]*(?=[\s/>])/g) ?? []).length
+  const nativeTags = allTags - componentTags
+  const nativeShare = Math.round((nativeTags / allTags) * 100)
+
+  return `
+  <section class="demo-stats" aria-label="Seitenstatistik">
+    <div class="ds-container">
+      <div class="ds-grid is-multiline gap-lg demo-stats__grid">
+        <div class="ds-col demo-stats__item">
+          <span class="demo-stats__number">${REAL_COMPONENTS.length}</span>
+          <span class="demo-stats__label">echte Web Components<br />(${REAL_COMPONENTS.join(', ')})</span>
+        </div>
+        <div class="ds-col demo-stats__item">
+          <span class="demo-stats__number">${componentInstances}</span>
+          <span class="demo-stats__label">Komponenten-Instanzen auf dieser Seite</span>
+        </div>
+        <div class="ds-col demo-stats__item">
+          <span class="demo-stats__number">${nativeTags}</span>
+          <span class="demo-stats__label">native HTML-Elemente ohne eigenes Shadow&nbsp;DOM</span>
+        </div>
+        <div class="ds-col demo-stats__item">
+          <span class="demo-stats__number">${nativeShare}&nbsp;%</span>
+          <span class="demo-stats__label">der Seite kommt ohne Web-Component-JavaScript aus</span>
+        </div>
+      </div>
+    </div>
+  </section>`
+}
+
+/* ============================================================================
  * The authored page — what a content author typed into the dialogs above.
  * ========================================================================== */
 
-export const fragment = `
-<ds-root>
+const content = `
   <a class="demo-skip-link" href="#inhalt">Direkt zum Inhalt</a>
 ${pageHeader({
   brand: 'helvetia',
@@ -401,7 +429,7 @@ ${gallery({
 })}
 ${faqSection({
   heading: 'Häufige Fragen',
-  group: 'faq',
+  name: 'faq',
   entries: [
     {
       question: 'Wie melde ich einen Schaden?',
@@ -429,12 +457,6 @@ ${faqSection({
         aus Ihrem im Kundenportal hinterlegten Konto stammt.`,
     },
   ],
-})}
-${stressTest({
-  heading: 'Stresstest: natives Markup in einer Web Component',
-  note: 'Diese Sektion ist kein Seitenmuster, sondern ein Nachweis. Sie beantwortet die Frage des CMS-Teams: Was passiert mit von AEM geliefertem Markup, wenn es tief in einer Web Component liegt?',
-  question: 'Schadenfälle — welche Formulare brauche ich?',
-  rows: 12,
 })}
 ${cta({
   title: 'Bereit für den nächsten Schritt?',
@@ -471,6 +493,10 @@ ${pageFooter({
     },
   ],
   legal: 'Demoseite des Helvetia Design System — keine echten Produkte, keine echten Preise.',
-})}
+})}`
+
+export const fragment = `
+<ds-root>${content}
+${pageStats(content)}
 </ds-root>
 `
