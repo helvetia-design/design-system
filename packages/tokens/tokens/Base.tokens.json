@@ -1551,6 +1551,11 @@
           "$type": "dimension",
           "$value": "{🌐 Global.📏 Dimension.Space.56}",
           "$description": "Minimum height of a large control (56px at 16px root)."
+        },
+        "Indicator": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Space.24}",
+          "$description": "Size of a small grabbable/indicator control such as a slider thumb (24px at 16px root, meets WCAG 2.5.8 target size)."
         }
       },
       "Icon": {
@@ -1558,6 +1563,13 @@
           "$type": "dimension",
           "$value": "{🌐 Global.📏 Dimension.Space.24}",
           "$description": "Default inline icon/spinner size (24px at 16px root)."
+        }
+      },
+      "Track": {
+        "Base": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Space.12}",
+          "$description": "Thickness of a track/rail such as a slider track (12px at 16px root)."
         }
       }
     },
@@ -6705,6 +6717,18 @@
             }
           }
         },
+        "Md": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
+            "fontSize": "{📱 Device.🔤 Text.Size.MD}",
+            "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Heading}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
+          }
+        },
         "Light1": {
           "$type": "typography",
           "$value": {
@@ -6902,6 +6926,16 @@
             "spread": "VariableID:137:888",
             "color": "VariableID:137:889"
           }
+        }
+      },
+      "Space": {
+        "$type": "dimension",
+        "$value": "{📱 Device.↔️ Space.XS}"
+      },
+      "Emphasis": {
+        "FontWeight": {
+          "$type": "fontWeight",
+          "$value": "{🔗 Alias.🔤 Text.Weight.Bold}"
         }
       }
     },
@@ -11077,6 +11111,48 @@
           ],
           "com.figma.variableId": "VariableID:137:1442"
         }
+      },
+      "Space": {
+        "None": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.None}"
+        },
+        "2XS": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.2XS}"
+        },
+        "XS": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.XS}"
+        },
+        "SM": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.SM}"
+        },
+        "Base": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.Base}"
+        },
+        "MD": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.MD}"
+        },
+        "LG": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.LG}"
+        },
+        "XL": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.XL}"
+        },
+        "2XL": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.2XL}"
+        },
+        "3XL": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.3XL}"
+        }
       }
     },
     "Icon": {
@@ -11647,6 +11723,12 @@
     },
     "Form": {
       "Field": {
+        "Gap": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.2XS}"
+        }
+      },
+      "Description": {
         "Gap": {
           "$type": "dimension",
           "$value": "{🔗 Alias.↔️ Space.Gap.2XS}"
@@ -15854,6 +15936,32 @@
             "com.figma.variableId": "VariableID:137:2051"
           }
         }
+      },
+      "ZIndex": {
+        "$type": "number",
+        "$value": "{🔗 Alias.🗂️ ZIndex.Sticky}"
+      },
+      "MarginInline": {
+        "$type": "dimension",
+        "$value": "{📱 Device.🗃️ Container.Space}"
+      },
+      "Padding": {
+        "$type": "dimension",
+        "$value": "{📱 Device.↔️ Space.MD}"
+      },
+      "Width": {
+        "Default": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.🗃️ Container.Width.Default}"
+        },
+        "Fluid": {
+          "$type": "string",
+          "$value": "{🔗 Alias.🗃️ Container.Width.Fluid}"
+        },
+        "Compact": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.🗃️ Container.Width.Compact}"
+        }
       }
     },
     "Snackbar": {
@@ -16817,6 +16925,18 @@
       }
     },
     "Tag": {
+      "Group": {
+        "Gap": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.2XS}"
+        }
+      },
+      "Close": {
+        "Gap": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.2XS}"
+        }
+      },
       "Size": {
         "Base": {
           "Gap": {
@@ -18769,6 +18889,276 @@
         }
       }
     },
+    "Slider": {
+      "Track": {
+        "Size": {
+          "Height": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.📏 Size.Track.Base}"
+          }
+        },
+        "Radius": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.🔵 Radius.Rounded}"
+        }
+      },
+      "Thumb": {
+        "Size": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.📏 Size.Control.Indicator}"
+        },
+        "Radius": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.🔵 Radius.Rounded}"
+        },
+        "Border": {
+          "Width": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.▭ Border.Width.Base}"
+          }
+        },
+        "Color": {
+          "Ring": {
+            "$type": "color",
+            "$value": "{🔗 Alias.▭ Border.Color.White}"
+          }
+        }
+      },
+      "Tooltip": {
+        "Typo": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
+            "fontSize": "{🔗 Alias.🔤 Text.Size.SM}",
+            "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Single}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
+          }
+        },
+        "Radius": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.🔵 Radius.Rounded}"
+        },
+        "Color": {
+          "Background": {
+            "$type": "color",
+            "$value": "{🔗 Alias.🎨 Surface.Primary}"
+          },
+          "Text": {
+            "$type": "color",
+            "$value": "{🔗 Alias.🔤 Text.Color.White}"
+          }
+        }
+      },
+      "Default": {
+        "Track": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.Grey}"
+            }
+          }
+        },
+        "Connect": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.Primary}"
+            }
+          }
+        },
+        "Thumb": {
+          "Color": {
+            "Background": {
+              "Base": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.White}"
+              },
+              "Hover": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎬 Action.Secondary.Background.Hover}"
+              },
+              "Active": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎬 Action.Secondary.Background.Active}"
+              }
+            },
+            "Border": {
+              "Base": {
+                "$type": "color",
+                "$value": "{🔗 Alias.▭ Border.Color.Primary}"
+              },
+              "Hover": {
+                "$type": "color",
+                "$value": "{🔗 Alias.▭ Border.Color.PrimaryHover}"
+              },
+              "Active": {
+                "$type": "color",
+                "$value": "{🔗 Alias.▭ Border.Color.PrimaryActive}"
+              }
+            }
+          }
+        }
+      },
+      "Danger": {
+        "Connect": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.DangerDarker}"
+            }
+          }
+        },
+        "Thumb": {
+          "Color": {
+            "Border": {
+              "$type": "color",
+              "$value": "{🔗 Alias.▭ Border.Color.DangerHover}"
+            }
+          }
+        }
+      },
+      "Success": {
+        "Connect": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.SuccessDarker}"
+            }
+          }
+        },
+        "Thumb": {
+          "Color": {
+            "Border": {
+              "$type": "color",
+              "$value": "{🔗 Alias.▭ Border.Color.SuccessHover}"
+            }
+          }
+        }
+      },
+      "Warning": {
+        "Connect": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🔤 Text.Color.Warning}"
+            }
+          }
+        },
+        "Thumb": {
+          "Color": {
+            "Border": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🔤 Text.Color.Warning}"
+            }
+          }
+        }
+      },
+      "Yellow": {
+        "Track": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.YellowLight}"
+            }
+          }
+        },
+        "Connect": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.▭ Border.Color.Yellow}"
+            }
+          }
+        }
+      },
+      "Purple": {
+        "Track": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.PurpleLight}"
+            }
+          }
+        },
+        "Connect": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.▭ Border.Color.Purple}"
+            }
+          }
+        }
+      },
+      "Red": {
+        "Track": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.RedLight}"
+            }
+          }
+        },
+        "Connect": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.▭ Border.Color.Red}"
+            }
+          }
+        }
+      },
+      "Green": {
+        "Track": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.GreenLight}"
+            }
+          }
+        },
+        "Connect": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.▭ Border.Color.Green}"
+            }
+          }
+        }
+      },
+      "Disabled": {
+        "Track": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.GreyLight}"
+            }
+          }
+        },
+        "Connect": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.GreyDark}"
+            }
+          }
+        },
+        "Thumb": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.GreyDark}"
+            },
+            "Border": {
+              "$type": "color",
+              "$value": "{🔗 Alias.▭ Border.Color.Disabled}"
+            }
+          }
+        }
+      }
+    },
     "Pagination": {
       "Dots": {
         "Radius": {
@@ -20357,6 +20747,11 @@
           ],
           "com.figma.variableId": "VariableID:137:2505"
         }
+      },
+      "Offset": {
+        "$type": "dimension",
+        "$value": "{🔗 Alias.↔️ Space.Gap.XS}",
+        "$description": "Distance between the trigger element and the tooltip container."
       }
     },
     "Table": {
@@ -21404,6 +21799,127 @@
               "textTransform": "VariableID:2826:10490"
             }
           }
+        },
+        "XS": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
+            "fontSize": "{📱 Device.🔤 Text.Size.XS}",
+            "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
+          },
+          "$description": "Body text at the `xs` size step (`.is-xs`, `.is-x-small`)."
+        },
+        "XL": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
+            "fontSize": "{📱 Device.🔤 Text.Size.XL}",
+            "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
+          },
+          "$description": "Body text at the `xl` size step (`.is-xl`, `.is-x-large`)."
+        },
+        "2XL": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
+            "fontSize": "{📱 Device.🔤 Text.Size.2XL}",
+            "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
+          },
+          "$description": "Body text at the `2xl` size step (`.is-2xl`, `.is-xx-large`)."
+        },
+        "3XL": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
+            "fontSize": "{📱 Device.🔤 Text.Size.3XL}",
+            "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
+          },
+          "$description": "Body text at the `3xl` size step (`.is-3xl`, `.is-xxx-large`)."
+        },
+        "4XL": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
+            "fontSize": "{📱 Device.🔤 Text.Size.4XL}",
+            "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
+          },
+          "$description": "Body text at the `4xl` size step (`.is-4xl`, `.is-xxxx-large`)."
+        },
+        "5XL": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
+            "fontSize": "{📱 Device.🔤 Text.Size.5XL}",
+            "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
+          },
+          "$description": "Body text at the `5xl` size step (`.is-5xl`, `.is-xxxxx-large`)."
+        },
+        "Heading": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
+            "fontSize": "{📱 Device.🔤 Text.Size.Base}",
+            "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Heading}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
+          },
+          "$description": "Heading-styled body text — the `heading` prop (`.is-heading`, `.is-title`). Only `fontFamily`, `fontWeight` and `lineHeight` are applied; the font size stays owned by the `size` prop."
+        },
+        "Subtitle": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "{🔗 Alias.🔤 Text.Family.Heading}",
+            "fontSize": "{📱 Device.🔤 Text.Size.Base}",
+            "fontWeight": "{🔗 Alias.🔤 Text.Weight.Light}",
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Heading}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Heading}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
+          },
+          "$description": "Subtitle-styled body text — the `subtitle` prop (`.is-subtitle`). Only `fontFamily`, `fontWeight` and `lineHeight` are applied; the font size stays owned by the `size` prop."
+        }
+      },
+      "Weight": {
+        "Light": {
+          "$type": "fontWeight",
+          "$value": "{🔗 Alias.🔤 Text.Weight.Light}",
+          "$description": "Font weight of de-emphasised text (`.is-light`)."
+        },
+        "Regular": {
+          "$type": "fontWeight",
+          "$value": "{🔗 Alias.🔤 Text.Weight.Regular}",
+          "$description": "Default font weight of body text (`.is-regular`)."
+        },
+        "Bold": {
+          "$type": "fontWeight",
+          "$value": "{🔗 Alias.🔤 Text.Weight.Bold}",
+          "$description": "Font weight of emphasised text — the `bold` prop, `.is-bold`, and nested `<b>`/`<strong>`."
         }
       }
     },

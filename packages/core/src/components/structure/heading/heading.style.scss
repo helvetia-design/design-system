@@ -1,3 +1,4 @@
+@use 'sass:list';
 @use 'sass:string';
 @use '@helvetia-design/styles/dist/scss/mixins' as *;
 @use '../../../hybrid' as hybrid;
@@ -26,7 +27,7 @@ $vars-selector: ('.ds-heading', '.ds-title');
   @include vars.local(heading-size, var(--ds-heading-level-1-font-size));
 
   @include vars.local(heading-color, var(--ds-heading-color-primary));
-  @include vars.local(heading-margin, var(--ds-device-space-xs));
+  @include vars.local(heading-margin, var(--ds-heading-space));
   @include vars.local(heading-shadow, none);
   @include vars.local(heading-text-align, inherit);
 }
@@ -38,7 +39,7 @@ $vars-selector: ('.ds-heading', '.ds-title');
   @include vars.local(heading-size, var(--ds-heading-level-light1-font-size));
 
   @include vars.local(heading-color, var(--ds-heading-color-primary));
-  @include vars.local(heading-margin, var(--ds-device-space-xs));
+  @include vars.local(heading-margin, var(--ds-heading-space));
   @include vars.local(heading-shadow, none);
   @include vars.local(heading-text-align, inherit);
 }
@@ -75,12 +76,12 @@ $vars-selector: ('.ds-heading', '.ds-title');
   b,
   strong,
   .is-bold {
-    font-weight: var(--ds-alias-text-weight-bold);
+    font-weight: var(--ds-heading-emphasis-font-weight);
   }
 
   @include hybrid.styles-only($use-host) {
     &.is-bold {
-      font-weight: var(--ds-alias-text-weight-bold);
+      font-weight: var(--ds-heading-emphasis-font-weight);
     }
 
     // alignments
@@ -179,10 +180,17 @@ $colors: ('primary', 'inverted');
   --mod-heading-size: var(--ds-heading-level-#{$level}-font-size);
 }
 
+// Levels without a subtitle (light) variant keep their regular token.
+$levels-without-light: ('4', '5', 'md');
+
 // Display levels (e.g. `display1`) use a hyphenated light token
 // (`light-display1`), while numeric levels don't (`light1`).
 @function light-level($level) {
   $level: '#{$level}';
+
+  @if list.index($levels-without-light, $level) {
+    @return string.unquote($level);
+  }
 
   @if string.index($level, 'display') {
     @return string.unquote('light-' + $level);
@@ -197,6 +205,7 @@ $size-aliases: (
   (is-3, is-level-3, is-xl): 3,
   (is-4, is-level-4, is-lg): 4,
   (is-5, is-level-5, is-base): 5,
+  (is-md): md,
   (is-display-1, is-5xl): display1,
   (is-display-2, is-4xl): display2,
 );
@@ -238,7 +247,7 @@ $size-aliases: (
         @include size($i);
       }
       &.is-subtitle {
-        @include size('light' + $i);
+        @include size(light-level($i));
       }
     }
   }
@@ -248,7 +257,7 @@ $size-aliases: (
     h#{$i} .ds-subtitle,
     [role='heading'][aria-level='#{$i}'].ds-subtitle,
     [role='heading'][aria-level='#{$i}'] .ds-subtitle {
-      @include size('light' + $i);
+      @include size(light-level($i));
     }
   }
 }
@@ -260,6 +269,7 @@ $size-host-aliases: (
   is-2xl: 2,
   is-xl: 3,
   is-lg: 4,
+  is-md: md,
   is-base: 5,
 );
 

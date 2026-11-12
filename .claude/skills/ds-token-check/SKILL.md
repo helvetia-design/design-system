@@ -1,6 +1,6 @@
 ---
 name: ds-token-check
-description: Audit a component family's SCSS/TSX for design-token layer violations (raw Global/Alias/Device usage instead of a Component token), cross-component token borrows, Figma-readiness gaps (hardcoded literals, missing/typo tokens), naming-anatomy drift in the Component-layer tokens it actually uses, and an explicit Figma Property Checklist (Border/Background/Radius/Typography/Text-Color/Opacity/Padding/Gap/Margin, crossed per @Prop() variant×state) proving every Figma-bindable property has a Component token behind it. Writes a single persisted Markdown report (<family>.token-check.md) for a later agent/session to fix from — never edits Base.tokens.json or any component source file itself. Use when the user asks to check/audit/review/lint a component's tokens, or before running ds-code-to-figma to make sure there's no token gap.
+description: Audit a component family's SCSS/TSX for design-token layer violations (raw Global/Alias/Device usage instead of a Component token), cross-component token borrows, Figma-readiness gaps (hardcoded literals, missing/typo tokens), naming-anatomy drift in the Component-layer tokens it actually uses, and an explicit Figma Property Checklist (Border/Background/Radius/Typography/Text-Color/Opacity/Padding/Gap/Margin, crossed per @Prop() variant×state) proving every Figma-bindable property has a Component token behind it. Findings are split into visual (breaking) changes first, then non-visual ones. Writes a single persisted Markdown report (<family>.token-check.md) for a later agent/session to fix from — never edits Base.tokens.json or any component source file itself. Use when the user asks to check/audit/review/lint a component's tokens, or before running ds-code-to-figma to make sure there's no token gap.
 ---
 
 # ds-token-check
@@ -21,8 +21,13 @@ to go fix the issues, and something to work from before running `ds-code-to-figm
 gaps this skill surfaces).
 
 This skill absorbs what used to be a separate `ds-token-lint` skill (naming-anatomy
-checks against `Base.tokens.json`) — that skill is retired; its five naming rules now
-run here, scoped to whichever Component-layer keys the family's code actually touches.
+checks against `Base.tokens.json`) — that skill is retired; four of its five naming rules
+now run here (the `font-` prefix rule was dropped — see Rules), scoped to whichever
+Component-layer keys the family's code actually touches.
+
+Every finding is also tagged with its **Impact** — `VISUAL` (applying the fix changes
+what renders) or `NON-VISUAL` (pure token plumbing, identical pixels) — and the report
+lists all `VISUAL` findings first, so breaking changes are never buried among refactors.
 
 ## Workflow
 
@@ -40,7 +45,7 @@ flowchart TD
 
     R3["scan.js: derive which 🧩 Component<br/>JSON key(s) the component-own tokens<br/>belong to (longest-kebab-prefix match,<br/>not folder-name guessing)"]:::code --> R4
 
-    R4["scan.js: run the 5 ported naming rules<br/>against each derived key's subtree"]:::code --> R5
+    R4["scan.js: run the 4 ported naming rules<br/>against each derived key's subtree"]:::code --> R5
 
     R5["Agent reads the same files directly<br/>for hardcoded literals scan.js can't see<br/>(colors, rem/px sizes, bare radii, etc.)"]:::code --> R5b
 
@@ -51,21 +56,27 @@ flowchart TD
     R6 -->|component-foreign<br/>(another component's own token)| G["REVIEW —<br/>confirm intentional reuse"]:::code
     R6 -->|component-shared<br/>(forms family using --ds-form-*)| OK["Treated as own —<br/>no finding"]:::code
     R6 -->|hardcoded literal,<br/>or missing/typo token| P["GAP —<br/>blocks a clean Figma bind"]:::code
-    R6 -->|existing Component token,<br/>anatomy rule failed| N["NAMING —<br/>wrong segment order, casing,<br/>typo, abbreviation, font- prefix"]:::code
+    R6 -->|existing Component token,<br/>anatomy rule failed| N["NAMING —<br/>wrong segment order, casing,<br/>typo, abbreviation"]:::code
     R6 -->|transition/animation property,<br/>focus-ring alias token,<br/>or brand-invariant constant<br/>already marked in source| E["EXEMPT —<br/>not a token candidate,<br/>informational only"]:::code
 
     V --> L["For each VIOLATION/GAP:<br/>reverse-lookup the value against<br/>Base.tokens.json's Alias layer"]:::code
     L -->|match found| M1["Propose that Alias as the<br/>new Component token's resolution"]:::code
     L -->|no match| M2["Propose creating a new Alias<br/>token — never default to Global"]:::code
 
-    M1 --> T
-    M2 --> T
-    G --> T
-    P --> T
-    N --> T
-    E --> T
+    M1 --> I
+    M2 --> I
+    G --> I
+    P --> I
+    N --> I
+    E --> I
 
-    T["Assemble report: a ToC table<br/>(Severity/Location/short Issue),<br/>a Figma Property Checklist matrix,<br/>then one detailed section per finding<br/>with a stated Fix"]:::code --> W["Write <family>.token-check.md<br/>next to the family owner's file"]:::code
+    I{"Impact of the stated Fix?"}:::code
+    I -->|any rendered value changes<br/>in any variant/state/brand| IV["VISUAL —<br/>breaking, listed first"]:::code
+    I -->|resolves to identical values| IN["NON-VISUAL —<br/>listed after"]:::code
+    IV --> T
+    IN --> T
+
+    T["Assemble report: VISUAL ToC table,<br/>then NON-VISUAL ToC table<br/>(Severity/Location/short Issue),<br/>a Figma Property Checklist matrix,<br/>then one detailed section per finding<br/>(same order) with a stated Fix"]:::code --> W["Write <family>.token-check.md<br/>next to the family owner's file"]:::code
 
     W --> H{{"Present summary to user"}}:::human
 
@@ -78,6 +89,32 @@ exists anywhere in this skill.
 
 ## Rules
 
+- MUST tag every finding with an **Impact**: `VISUAL` or `NON-VISUAL`. Judge the
+  finding's stated **Fix**, not the problem itself:
+  - `VISUAL` (breaking) — applying the Fix changes any computed value in any variant,
+    state or brand: a new value, a different Alias step (e.g. danger-5 → danger-4), a
+    padding snapped to the scale, a missing/typo token that currently resolves to nothing
+    and would start rendering, aligning with another component's look, a token defined
+    but not wired that would start applying.
+  - `NON-VISUAL` — the Fix resolves to the exact same value everywhere: wrapping a raw
+    Global/Alias in a new Component token pointing at an equal-value Alias, replacing a
+    literal with a token of the same value, renames, marker comments, `REVIEW`/`EXEMPT`
+    findings with no change.
+  - Resolve both sides to their final Global values before deciding. "Looks the same" isn't
+    enough. Compare the actual values.
+  - When a value-preserving fix exists, make it the primary **Fix** (→ `NON-VISUAL`) and put
+    any value-changing improvement on a separate **Optional (visual):** line. Classify a
+    finding as `VISUAL` only when no value-preserving fix exists, or when the finding
+    needs a design decision that will change rendering.
+- NEVER flag a typography token for a missing `font-` prefix (e.g. a standalone
+  `LineHeight`/`TextDecoration` leaf named `--ds-x-line-height` instead of
+  `--ds-x-font-line-height`). Typography belongs in a **composite** `typography` token
+  (`Typo`, with all seven fields: fontFamily, fontSize, fontWeight, lineHeight,
+  letterSpacing, textDecoration, textTransform). Its generated sub-names
+  (`--ds-<component>-…-typo-font-family`, `-typo-line-height`, `-typo-text-decoration`, …)
+  are canonical by construction, so there is nothing to rename.
+  - When proposing new typography tokens in a **Fix**, always propose one composite `Typo`
+    token, never individual `FontSize`/`LineHeight`/… leaves.
 - NEVER use a Global token directly in a component's own SCSS/TSX.
 - NEVER use an Alias or Device token directly in a component's own SCSS/TSX — Alias and
   Device values are legitimate _resolution targets_ for a Component token, but the
@@ -256,9 +293,9 @@ Read only what the current step needs:
   what each pass does and does not cover — in particular the "Known limitation" note on
   `disabled`/`loading` states living in the value position for some components (see
   "Figma Property Checklist" above).
-- [`naming-rules.js`](naming-rules.js) — the five ported naming-anatomy rules (font-
-  prefix, state-word typos, PascalCase casing, segment order, `Bg`→`Background`), each
-  with a comment on why a sixth rule from the original skill (`color-variant-order`) was
+- [`naming-rules.js`](naming-rules.js) — the four ported naming-anatomy rules (state-word
+  typos, PascalCase casing, segment order, `Bg`→`Background`). The original `font-`
+  prefix rule was dropped in favour of composite `Typo` tokens. `color-variant-order` was
   dropped as redundant with the general segment-order check.
 - [`packages/tokens/CONTEXT.md`](../../../packages/tokens/CONTEXT.md) — the four-layer
   architecture (Global → Alias → Device → Component), the "Token Naming Anatomy"
@@ -332,6 +369,12 @@ Before writing the report, confirm:
   rename it.
 - Every ToC row's `#` matches the heading number of its detail section below, and the
   ToC `Issue` text is a short title, not a restatement of the full recommendation.
+- Every finding has an Impact (`VISUAL`/`NON-VISUAL`), decided by resolving the current and
+  proposed values down to Global. Every `VISUAL` finding is numbered and listed before
+  every `NON-VISUAL` one. No finding is tagged `VISUAL` when a value-preserving fix exists;
+  the visual improvement goes on its **Optional (visual):** line instead.
+- No `NAMING` finding is about a missing `font-` prefix, and no Fix proposes standalone
+  typography leaves instead of a composite `Typo` token.
 - No `transition`/`animation` property was reported as `VIOLATION` or `GAP` — motion
   timing is always `EXEMPT` or omitted entirely, per the rule above.
 - Every unwired `letter-spacing`/`text-decoration`/`text-transform` Component token was
@@ -365,6 +408,7 @@ Before writing the report, confirm:
   `flex: 1` or `display: flex`) has been identified by reading the files.
 - Every one of the 9 Figma Property Checklist categories has a row for this family —
   found token, GAP, or explicit N/A.
+- Every finding is tagged `VISUAL` or `NON-VISUAL`, with all `VISUAL` findings first.
 - `<family>.token-check.md` has been written next to the family owner's file, left
   unstaged.
 - No other file was modified. There is no further action from this skill — fixing is a
@@ -384,9 +428,16 @@ language: say what's broken and what to do about it, skip the hedging.
 
 - The ToC table's `Issue` column is a short title only (≤ ~8 words) — the full
   explanation lives in that finding's section, not squeezed into the cell.
-- Number findings sequentially across all severities in the order they appear in the
-  file(s) (top to bottom), not grouped by severity — the ToC `#` is what the detail
-  section headings anchor back to.
+- Split findings by Impact: a **Visual changes (breaking)** ToC table first, then a
+  **Non-visual changes** table. If a group is empty, keep its heading with "None." so a
+  reader can see at a glance that nothing will change visually. The detail sections follow
+  the same two-group order under matching `##` headings.
+- Number findings sequentially: all `VISUAL` findings first (`1…n`), then `NON-VISUAL`
+  (`n+1…`). Within each group, use file order (top to bottom), not severity. The ToC `#` is
+  what the detail section headings anchor back to.
+- Each detail section states its Impact on the line after the heading (e.g.
+  `**Impact:** VISUAL — danger-4 → danger-5 on the thumb border`). A `VISUAL` finding says
+  what changes, from which value to which.
 - Every detail section MUST end with a **Fix** line: the concrete change (new token
   name, its resolution, or the specific edit) — never leave a finding without a stated
   next step, even a GAP that needs design input first (state what input is needed).
@@ -401,15 +452,23 @@ Scanned: tabs/, tab/, tab-panel/ · Component-layer keys checked: Tabs, TabPanel
 
 ## Table of contents
 
+### Visual changes (breaking)
+
+| #   | Severity | Location          | Issue                                   |
+| --- | -------- | ----------------- | --------------------------------------- |
+| 1   | GAP      | tabs.host.scss:61 | Reference to a token that doesn't exist |
+
+### Non-visual changes
+
 | #   | Severity  | Location           | Issue                                    |
 | --- | --------- | ------------------ | ---------------------------------------- |
-| 1   | VIOLATION | tab.host.scss:19   | Raw Global dimension used for min-height |
-| 2   | VIOLATION | tab.host.scss:20   | Raw Alias gap token used directly        |
-| 3   | REVIEW    | tabs.host.scss:55  | Borrows ds-button's text-color token     |
-| 4   | GAP       | tabs.host.scss:124 | Hardcoded hover background color         |
-| 5   | GAP       | tabs.host.scss:61  | Reference to a token that doesn't exist  |
+| 2   | VIOLATION | tab.host.scss:19   | Raw Global dimension used for min-height |
+| 3   | VIOLATION | tab.host.scss:20   | Raw Alias gap token used directly        |
+| 4   | REVIEW    | tabs.host.scss:55  | Borrows ds-button's text-color token     |
+| 5   | GAP       | tabs.host.scss:124 | Hardcoded hover background color         |
 | 6   | NAMING    | Base.tokens.json   | "Unselected" flagged as a typo           |
 
+Impact counts: 1 VISUAL · 5 NON-VISUAL
 Severity counts: 2 VIOLATION · 1 REVIEW · 2 GAP · 1 NAMING
 
 ## Figma Property Checklist
@@ -419,7 +478,7 @@ Variant dimensions: `color` (13 options) · `size` (sm, lg) — from `tab.tsx` `
 | Category   | Crossed by    | Status                                                                        |
 | ---------- | ------------- | ----------------------------------------------------------------------------- |
 | Border     | color × state | ✅ all 39 cells resolved                                                      |
-| Background | color × state | ⚠️ 1 missing — see finding #4                                                 |
+| Background | color × state | ⚠️ 1 missing — see finding #5                                                 |
 | Radius     | size          | ✅ all 2 cells resolved                                                       |
 | Typography | size          | ✅ all 8 cells resolved (family/weight/size/line-height)                      |
 | Text-Color | color × state | ✅ all 39 cells resolved                                                      |
@@ -432,10 +491,26 @@ Variant dimensions: `color` (13 options) · `size` (sm, lg) — from `tab.tsx` `
 `--ds-tab-color-disabled-*` namespace (not crossed per-color) — confirmed by hand, not
 by the generator (see "Known limitation" in SKILL.md).
 
-## Findings
+## Findings — Visual changes (breaking)
 
-### 1. VIOLATION — Raw Global dimension used for min-height
+### 1. GAP — Reference to a token that doesn't exist
 
+**Impact:** VISUAL — the property currently falls back to its initial value, and the fix
+makes `--ds-badge-size-sm-height` (1.25rem) apply.
+**Where:** `tabs.host.scss:61`
+**Current:** `var(--ds-badge-size-sm)`
+
+This token isn't in the compiled CSS — likely a typo or a token that was renamed/removed
+without updating this call site. Closest real token: `--ds-badge-size-sm-height`.
+
+**Fix:** this is a code bug, not a design gap — update the reference to
+`--ds-badge-size-sm-height` (confirm that's the intended value first).
+
+## Findings — Non-visual changes
+
+### 2. VIOLATION — Raw Global dimension used for min-height
+
+**Impact:** NON-VISUAL — the new Alias resolves to the same `size-40`.
 **Where:** `tab.host.scss:19`
 **Current:** `min-height: var(--ds-global-dimension-size-40);`
 
@@ -449,8 +524,9 @@ No existing Alias token matches `size-40` closely enough to reuse.
 don't resolve a new Component token straight to Global). Swap line 19 to
 `var(--ds-tab-min-height)`.
 
-### 2. VIOLATION — Raw Alias gap token used directly
+### 3. VIOLATION — Raw Alias gap token used directly
 
+**Impact:** NON-VISUAL — same Alias, new Component name in front.
 **Where:** `tab.host.scss:20`
 **Current:** `gap: var(--ds-alias-space-gap-xs);`
 
@@ -461,8 +537,9 @@ Alias tokens are resolution targets, not something a component references direct
 existing value is fine, it just needs a Component-layer name in front of it). Swap
 line 20 to `var(--ds-tab-gap)`.
 
-### 3. REVIEW — Borrows ds-button's text-color token
+### 4. REVIEW — Borrows ds-button's text-color token
 
+**Impact:** NON-VISUAL — a replacement token would resolve to the same value.
 **Where:** `tabs.host.scss:55`
 **Current:** `color: var(--ds-button-color-tertiary-base-text);`
 
@@ -474,8 +551,9 @@ decision rather than a silent pass.
 leave as-is (optionally add a comment noting it's deliberate). If no, create
 `--ds-tabs-scroll-btn-color-text` instead.
 
-### 4. GAP — Hardcoded hover background color
+### 5. GAP — Hardcoded hover background color
 
+**Impact:** NON-VISUAL — the new Alias carries the exact same `rgba(255, 255, 255, 0.12)`.
 **Where:** `tabs.host.scss:124`
 **Current:** `background: rgba(255, 255, 255, 0.12);`
 
@@ -486,19 +564,9 @@ A literal color value with no token behind it at all — this is a hard blocker 
 found for this translucent white — propose a new Alias token rather than defaulting to
 Global.
 
-### 5. GAP — Reference to a token that doesn't exist
-
-**Where:** `tabs.host.scss:61`
-**Current:** `var(--ds-badge-size-sm)`
-
-This token isn't in the compiled CSS — likely a typo or a token that was renamed/removed
-without updating this call site. Closest real token: `--ds-badge-size-sm-height`.
-
-**Fix:** this is a code bug, not a design gap — update the reference to
-`--ds-badge-size-sm-height` (confirm that's the intended value first).
-
 ### 6. NAMING — "Unselected" flagged as a typo
 
+**Impact:** NON-VISUAL — a rename only.
 **Where:** `Base.tokens.json`, key `--ds-tabs-indicator-default-unselected`
 
 The naming-anatomy rule's sibling-majority heuristic read `Unselected` as a misspelling

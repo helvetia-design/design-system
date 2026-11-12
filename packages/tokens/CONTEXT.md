@@ -193,6 +193,10 @@ _Avoid_: scaled line-height, line-height percent token (there is no second token
 A single token that describes how a piece of text looks, with seven required parts: font family, size, weight, line height, letter spacing, text decoration and text transform. It is one token for designers and developers, even though the Figma side shows each part as its own variable.
 _Avoid_: text style, font token (a font family or weight on its own is a primitive, not a typography token)
 
+**Text part**:
+One distinct piece of text inside a component (a label, a heading, a body, a description), styled by exactly one Component-layer typography token (which may alias a shared one, e.g. `Notification.Body → Text.Typo.Paragraph`) plus one separate color token. Loose per-property Component tokens without a typography token behind them do not count. Color is never a part of the typography token: it varies by state and variant, typography does not.
+_Avoid_: text slot (a slot is a DOM concept), font usage
+
 ## Key Concepts
 
 ### Responsive Tokens

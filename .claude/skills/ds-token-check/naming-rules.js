@@ -1,6 +1,7 @@
-// Naming-anatomy rules, ported from the retired ds-token-lint skill. Same five rules,
-// same logic — only the entry point changed: instead of taking one Component-layer key
-// chosen by the user on the CLI, ds-token-check's scan.js derives which key(s) a
+// Naming-anatomy rules, ported from the retired ds-token-lint skill. Four of the original
+// five rules, same logic (the "font-" prefix rule was dropped — see CATEGORY_WORDS).
+// Only the entry point changed: instead of taking one Component-layer key chosen by the
+// user on the CLI, ds-token-check's scan.js derives which key(s) a
 // family's CODE actually touches (see deriveComponentKeys in scan.js) and calls
 // checkNamingForKey once per derived key. See packages/tokens/CONTEXT.md "Token Naming
 // Anatomy" for the canonical order this enforces: component-variant-element-category-property-state.
@@ -10,14 +11,12 @@
 // the set is then flagged as a likely typo (e.g. "Hoverr", "Actve").
 const STATE_WORDS = new Set(['Base', 'Hover', 'Active', 'Disabled', 'Focus', 'Selected'])
 
-// Leaf keys that, when their value resolves through the Alias "🔤 Text" typography
-// category, should live under a "Font" grouping key per STYLE_GUIDE.md.
-const TYPOGRAPHY_LEAF_KEYS = new Set(['Family', 'Weight', 'LineHeight', 'Size'])
-
-// Closed vocabulary for the "category" segment in the canonical anatomy. "Font" is
-// deliberately excluded — Rule 1 owns grouping typography leaves under "Font"; letting
-// this set also treat "Font" as a category would make the two rules propose conflicting
-// restructurings in the same pass.
+// Closed vocabulary for the "category" segment in the canonical anatomy. Typography is
+// deliberately excluded: it belongs in a composite `typography` token (`Typo`), whose
+// generated sub-names (`-typo-font-family`, `-typo-line-height`, `-typo-text-decoration`,
+// …) are canonical by construction. A former "font- prefix" rule that renamed standalone
+// typography leaves (e.g. `LineHeight` → `Font.LineHeight`) was dropped for the same
+// reason — the fix for those is a composite token, not a rename.
 const CATEGORY_WORDS = new Set(['Color', 'Space'])
 
 // Disallowed abbreviations in any path segment, keyed by their lowercased word form,
@@ -50,39 +49,6 @@ function collectLeaves(node, jsonPath, out) {
     if (key.startsWith('$')) continue
     collectLeaves(val, [...jsonPath, key], out)
   }
-}
-
-function checkFontPrefix(componentKebab, leaves) {
-  const violations = []
-  for (const leaf of leaves) {
-    const markerIndex = leaf.jsonPath.findIndex(seg => TYPOGRAPHY_LEAF_KEYS.has(seg))
-    if (markerIndex === -1) continue
-    if (leaf.jsonPath.includes('Font')) continue
-
-    const resolvesThroughTypographyAlias =
-      typeof leaf.value === 'string' && /🔤 Text\.(Family|Weight|LineHeight|Size)/.test(leaf.value)
-    if (!resolvesThroughTypographyAlias) continue
-
-    const currentCssVar = deriveCssVar(componentKebab, leaf.jsonPath)
-
-    let proposedJsonPath
-    if (markerIndex > 0 && leaf.jsonPath[markerIndex - 1] === 'Text') {
-      proposedJsonPath = [...leaf.jsonPath]
-      proposedJsonPath[markerIndex - 1] = 'Font'
-    } else {
-      proposedJsonPath = [...leaf.jsonPath.slice(0, markerIndex), 'Font', ...leaf.jsonPath.slice(markerIndex)]
-    }
-
-    violations.push({
-      type: 'font-prefix-drift',
-      jsonPath: leaf.jsonPath,
-      proposedJsonPath,
-      currentCssVar,
-      proposedCssVar: deriveCssVar(componentKebab, proposedJsonPath),
-      message: `Typography token missing "font-" prefix (STYLE_GUIDE.md convention)`,
-    })
-  }
-  return violations
 }
 
 function levenshtein(a, b) {
@@ -281,7 +247,6 @@ function checkNamingForKey(componentKebab, componentNode) {
   collectLeaves(componentNode, [], leaves)
 
   return [
-    ...checkFontPrefix(componentKebab, leaves),
     ...checkStateVocabulary(componentKebab, componentNode, []),
     ...checkKeyCasing(componentKebab, componentNode, []),
     ...checkSegmentOrder(componentKebab, componentNode, leaves),

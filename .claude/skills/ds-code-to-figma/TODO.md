@@ -54,21 +54,21 @@
 | ⬜     | Toggle       | Forms      | -                                     | ⬜  | ⬜    |
 | ⬜     | Radio        | Forms      | -                                     | ⬜  | ⬜    |
 | ⬜     | Checkbox     | Forms      | -                                     | ⬜  | ⬜    |
-| ⬜     | Slider       | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Slider       | Forms      | -                                     | ✅  | ⬜    |
 | ⬜     | Select       | Forms      | -                                     | ⬜  | ⬜    |
-| ⬜     | Number Input | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Number Input | Forms      | -                                     | ✅  | ⬜    |
 | ⬜     | Phone Input  | Forms      | -                                     | ⬜  | ⬜    |
 | ⬜     | Steps        | Navigation | -                                     | ⬜  | ⬜    |
-| ⬜     | Tooltip      | Overlays   | -                                     | ⬜  | ⬜    |
-| ⬜     | Sheet        | Overlays   | -                                     | ⬜  | ⬜    |
-| ⬜     | Divider      | Structure  | -                                     | ⬜  | ⬜    |
-| ⬜     | Text         | Structure  | -                                     | ⬜  | ⬜    |
-| ⬜     | Heading      | Structure  | -                                     | ⬜  | ⬜    |
+| ⬜     | Tooltip      | Overlays   | -                                     | ✅  | ⬜    |
+| ⬜     | Sheet        | Overlays   | -                                     | ✅  | ⬜    |
+| ⬜     | Divider      | Structure  | -                                     | ✅  | ⬜    |
+| ⬜     | Text         | Structure  | -                                     | ✅  | ⬜    |
+| ⬜     | Heading      | Structure  | -                                     | ✅  | ⬜    |
 | ⬜     | Stack        | Structure  | -                                     | ⬜  | ⬜    |
 | ⬜     | Content      | Structure  | -                                     | ⬜  | ⬜    |
 | ⬜     | Data         | Structure  | -                                     | ⬜  | ⬜    |
 | ⬜     | List         | Structure  | -                                     | ⬜  | ⬜    |
-| ⬜     | Root         | Structure  | -                                     | ⬜  | ⬜    |
+| ⬜     | Root         | Structure  | -                                     | ✅  | ⬜    |
 | ⬜     | Card         | Structure  | -                                     | ⬜  | ⬜    |
 | ⬜     | Button       | Actions    | Brand Icon, Icon, Spinner             | ✅  | ⬜    |
 | ⬜     | Badge        | Indicators | Icon                                  | ✅  | ⬜    |
@@ -86,7 +86,7 @@
 | ⬜     | Drawer       | Overlays   | Close                                 | ⬜  | ⬜    |
 | ⬜     | Popup        | Overlays   | Close                                 | ⬜  | ⬜    |
 | ⬜     | Notification | Overlays   | Close                                 | ⬜  | ⬜    |
-| ⬜     | Tag          | Indicators | Close                                 | ⬜  | ⬜    |
+| ⬜     | Tag          | Indicators | Close                                 | ✅  | ⬜    |
 | ⬜     | Toast        | Overlays   | Button, Close, Icon                   | ⬜  | ⬜    |
 | ⬜     | Snackbar     | Overlays   | Brand Icon, Button, Close, Icon       | ⬜  | ⬜    |
 | ⬜     | Carousel     | Structure  | Icon, Pagination                      | ⬜  | ⬜    |
