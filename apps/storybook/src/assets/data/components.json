@@ -30515,6 +30515,14 @@
           "text": "invalid-text - Overrides the `invalidText` prop with custom markup, shown instead of the description when `invalid` is `true`."
         },
         {
+          "name": "slot",
+          "text": "start - Content placed before the native input inside the field, for example an icon or a button."
+        },
+        {
+          "name": "slot",
+          "text": "end - Content placed after the native input inside the field, for example an icon or a button."
+        },
+        {
           "name": "part",
           "text": "input - The native HTML input element."
         },
@@ -32211,8 +32219,16 @@
       ],
       "slots": [
         {
+          "name": "end",
+          "docs": "Content placed after the native input inside the field, for example an icon or a button."
+        },
+        {
           "name": "invalid-text",
           "docs": "Overrides the `invalidText` prop with custom markup, shown instead of the description when `invalid` is `true`."
+        },
+        {
+          "name": "start",
+          "docs": "Content placed before the native input inside the field, for example an icon or a button."
         }
       ],
       "parts": [

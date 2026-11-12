@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
 const USAGE_RE =
-  /<\/?bal-input(?:-date)?(?![\w-])|<\/?BalInput(?:Date)?\b|\bBalEvents\.BalInput(?!Slider|Stepper|Group)[A-Z]\w*|\bBalInput(?:Date)?(?:CustomEvent)?\b/g
+  /<\/?bal-input(?:-date|-group)?(?![\w-])|<\/?BalInput(?:Date|Group)?\b|\bBalEvents\.BalInput(?!Slider|Stepper|Group)[A-Z]\w*|\bBalInput(?:(?:Date)?(?:CustomEvent)?|Group)\b/g
 
 export function scanBalInput(rootDir, paths = []) {
   const found = []

@@ -51,7 +51,7 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'icon': { attention: 7, coverage: 0 },
   'input-slider': { attention: 9, coverage: 4 },
   'input-stepper': { attention: 8, coverage: 2 },
-  'input': { attention: 13, coverage: 2 },
+  'input': { attention: 15, coverage: 3 },
   'label': { attention: 5, coverage: 2 },
   'list': { attention: 26, coverage: 7 },
   'logo': { attention: 5, coverage: 0 },
