@@ -34,11 +34,13 @@
  * Deliberately tiered after the four-tier model in `docs/AEM-with-DS.md`: header,
  * hero, richtext, teaser grid and footer are plain markup styled by
  * `@helvetia-design/styles` (Style tier, zero JavaScript from the design system).
- * Only two things on this page are real components — `<ds-button>` and
- * `<ds-carousel>` (with the `<ds-carousel-item>` children its own API requires).
- * The FAQ accordion is deliberately NOT `<ds-accordion>`: it needs nothing `details`
- * does not already do natively — exclusive open-one-close-others grouping is the
- * native `name` attribute on `<details>` (baseline-supported since 2023), and
+ * Only three things on this page are real components — `<ds-button>`,
+ * `<ds-carousel>` (with the `<ds-carousel-item>` children its own API requires)
+ * and one `<ds-accordion>`, used only in the Stresstest section below to prove
+ * what it does and does not do to the native HTML inside it. The FAQ accordion
+ * is deliberately NOT `<ds-accordion>`: it needs nothing `details` does not
+ * already do natively — exclusive open-one-close-others grouping is the native
+ * `name` attribute on `<details>` (baseline-supported since 2023), and
  * `accordion.style.scss` already ships the matching `.ds-accordion` CSS-only look,
  * including the animated open/close, for exactly this case. Reach for the
  * component only once real behaviour is needed that `details` cannot provide.
@@ -253,6 +255,156 @@ ${entries
     </section>`
 
 /* ============================================================================
+ * Stresstest: natives HTML in einer Web Component
+ *
+ * Not a page pattern — a proof, for the CMS team specifically. Their worry: a
+ * web component "swallows" the native HTML slotted into it — pulls it into the
+ * shadow root, strips the global stylesheet from it, or makes a deeply nested
+ * author attribute unreachable for AEM's own tooling. One <ds-accordion>, ~15
+ * plain HTML children in its content slot (a list, a blockquote, a nested AEM
+ * text component), and a small inline script (`stressTestScript` below, run by
+ * `server.ts` after the design-system bundle) that measures the real DOM after
+ * hydration and prints the numbers — not a claim, a live-counted fact.
+ * ========================================================================== */
+
+const stressTest = (): string => `
+    <section class="demo-section" ${aemComponent('stresstest')}>
+      <div class="ds-container">
+        <div class="demo-prose">
+          <h2 class="ds-heading demo-section__heading">Stresstest: natives HTML in einer Web Component</h2>
+          <p class="ds-text">
+            Die Frage des CMS-Teams: Was passiert mit von AEM geliefertem Markup, wenn es tief in einer
+            Web Component liegt? Zieht die Komponente es in ihr Shadow DOM? Verliert es die globalen
+            Styles? Ist ein AEM-Attribut noch von aussen lesbar? Dieses eine <code>&lt;ds-accordion&gt;</code>
+            enthält absichtlich rund 15 native Elemente, darunter eine verschachtelte AEM-Textkomponente.
+          </p>
+          <ds-accordion summary-title marker="plus-minus" open>
+            <span slot="summary">Vollständige Informationen zum Schadenprozess</span>
+            <div slot="content" id="stress-content" class="ds-content py-base">
+              <h4 class="ds-title">Ablauf in vier Schritten</h4>
+              <p class="ds-text">
+                Der Schadenprozess ist bei allen Produkten gleich aufgebaut. Je vollständiger die
+                Erstmeldung, desto schneller die Bearbeitung.
+              </p>
+              <ol class="ds-text">
+                <li>Schaden melden — online, telefonisch oder über die Beratung</li>
+                <li>Prüfung der Deckung anhand Ihrer Police</li>
+                <li>Begutachtung, falls nötig durch eine Expertin vor Ort</li>
+                <li>Auszahlung oder Reparaturauftrag</li>
+              </ol>
+              <p class="ds-text" ${aemComponent('text-nested')}>
+                Noch Fragen? <a class="ds-link" id="stress-slotted-link" href="#beratung">Beratung kontaktieren</a>.
+              </p>
+              <blockquote class="ds-text">
+                <p>Bewahren Sie beschädigte Gegenstände auf, bis die Begutachtung abgeschlossen ist.</p>
+              </blockquote>
+              <ul class="ds-list">
+                <li class="ds-item">Checkliste Wasserschaden</li>
+                <li class="ds-item">Checkliste Feuerschaden</li>
+                <li class="ds-item">Checkliste Einbruchdiebstahl</li>
+              </ul>
+            </div>
+          </ds-accordion>
+          <a class="ds-link" id="stress-reference-link" href="#ref" style="position: absolute; left: -9999px">Referenz</a>
+          <div class="demo-proof" id="stress-proof" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>`
+
+/**
+ * Runs client-side, after the design-system bundle has hydrated the accordion above.
+ * Demo instrumentation only — not part of the design system, and not part of what AEM
+ * would actually ship. It reads out what really happened in the DOM; it changes nothing.
+ */
+export const stressTestScript = `
+(function () {
+  function render(rows) {
+    var host = document.getElementById('stress-proof')
+    if (!host) return
+    host.textContent = ''
+    rows.forEach(function (row) {
+      var ok = row[2]
+      var cls = ok === null ? '' : ok ? ' is-ok' : ' is-bad'
+      var mark = ok === null ? '\\u00b7' : ok ? '\\u2713' : '\\u2717'
+
+      var div = document.createElement('div')
+      div.className = 'demo-check' + cls
+
+      var markEl = document.createElement('span')
+      markEl.className = 'demo-check-mark'
+      markEl.textContent = mark
+
+      var labelEl = document.createElement('span')
+      labelEl.className = 'demo-check-label'
+      labelEl.textContent = row[0]
+
+      var valueEl = document.createElement('code')
+      valueEl.className = 'demo-check-value'
+      valueEl.textContent = String(row[1])
+
+      div.append(markEl, labelEl, valueEl)
+      host.append(div)
+    })
+  }
+
+  function run() {
+    var host = document.querySelector('ds-accordion')
+    var content = document.getElementById('stress-content')
+    if (!host || !content) return
+
+    var lightCount = content.querySelectorAll('*').length
+    var movedIntoShadow = Array.prototype.filter.call(content.querySelectorAll('*'), function (el) {
+      return el.getRootNode() !== document
+    }).length
+
+    var shadow = host.shadowRoot
+    var shadowCount = shadow ? shadow.querySelectorAll('*').length : 0
+
+    var slotted = document.getElementById('stress-slotted-link')
+    var reference = document.getElementById('stress-reference-link')
+    var slottedColor = slotted ? getComputedStyle(slotted).color : ''
+    var referenceColor = reference ? getComputedStyle(reference).color : ''
+    var cssReaches = !!slottedColor && slottedColor === referenceColor
+
+    var nested = content.querySelector('[data-cmp-is="text-nested"]')
+    var deepReadable = !!nested && nested.hasAttribute('data-cmp-data-layer')
+
+    render([
+      ['Native Elemente im Slot, von document aus zählbar', lightCount, lightCount >= 10],
+      ['Davon ins Shadow DOM verschoben', movedIntoShadow, movedIntoShadow === 0],
+      ['Elemente im Shadow Root (nur Komponenten-Chrome)', shadowCount, shadowCount > 0 && shadowCount < 15],
+      ['Globales DS-CSS greift im Slot (Linkfarbe = Referenz)', slottedColor || 'n/a', cssReaches],
+      ['Verschachteltes AEM-Attribut tief im Slot von aussen lesbar', deepReadable ? 'ja' : 'nein', deepReadable],
+    ])
+  }
+
+  function isReady() {
+    var host = document.querySelector('ds-accordion')
+    return !!(host && host.shadowRoot && host.matches(':defined'))
+  }
+
+  function waitUntil(predicate, timeout) {
+    var started = Date.now()
+    return new Promise(function (resolve) {
+      ;(function tick() {
+        if (predicate() || Date.now() - started > timeout) return resolve()
+        requestAnimationFrame(tick)
+      })()
+    })
+  }
+
+  if (window.customElements) {
+    customElements
+      .whenDefined('ds-accordion')
+      .then(function () {
+        return waitUntil(isReady, 5000)
+      })
+      .then(run)
+  }
+})()
+`
+
+/* ============================================================================
  * AEM component: Kontakt-Aufruf
  * ds-button next to the CSS-only <button class="ds-button">. Same source SCSS
  * compiled twice (hybrid component model), so they are visibly identical — one
@@ -312,7 +464,7 @@ ${col.links.map(l => `            <li><a href="${l.href}">${l.label}</a></li>`).
  * native ones.
  * ========================================================================== */
 
-const REAL_COMPONENTS = ['ds-button', 'ds-carousel'] as const
+const REAL_COMPONENTS = ['ds-button', 'ds-carousel', 'ds-accordion'] as const
 
 function countTag(html: string, tag: string): number {
   return (html.match(new RegExp(`<${tag}(?=[\\s/>])`, 'g')) ?? []).length
@@ -458,6 +610,7 @@ ${faqSection({
     },
   ],
 })}
+${stressTest()}
 ${cta({
   title: 'Bereit für den nächsten Schritt?',
   lead: 'Vereinbaren Sie ein unverbindliches Gespräch — online oder in der Geschäftsstelle in Ihrer Nähe.',

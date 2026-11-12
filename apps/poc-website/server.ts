@@ -1,7 +1,7 @@
 import compression from 'compression'
 import express from 'express'
 import { renderToString } from '@helvetia-design/core/hydrate'
-import { fragment } from './page.js'
+import { fragment, stressTestScript } from './page.js'
 
 /**
  * Stands in for AEM: one route, one page, rendered on the server. The browser receives a
@@ -45,6 +45,9 @@ async function renderPage(): Promise<string> {
   <body>
 ${html}
     <script type="module" src="/assets/design-system/design-system.esm.js"></script>
+    <!-- Demo instrumentation for the Stresstest section's live proof panel — not part of
+         the design system, and not something AEM would actually ship. -->
+    <script>${stressTestScript}</script>
   </body>
 </html>
 `
