@@ -475,6 +475,38 @@ describe('scanCleanup', () => {
     })
   })
 
+  it('is not blocked by the dropdown, form, table and time-input targets once they are migrated', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { 'react': '19.0.0', '@helvetia-design/react': '1.0.0' } })
+    write(
+      root,
+      'src/App.tsx',
+      [
+        '<form noValidate>',
+        '  <ds-select name="d">',
+        '    <ds-select-option value="a">A</ds-select-option>',
+        '  </ds-select>',
+        '  <input type="time" className="ds-time-input" name="t" />',
+        '  <table className="ds-table"></table>',
+        '</form>',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanCleanup(root)).toMatchObject({ status: 'nothing-to-clean-up' })
+  })
+
+  it('stays incomplete while a bal-table around an AG Grid is left', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { 'react': '19.0.0', '@helvetia-design/react': '1.0.0' } })
+    write(root, 'src/Grid.tsx', '<BalTable>\n  <AgGridReact rowData={rows} />\n</BalTable>\n')
+
+    expect(scanCleanup(root)).toEqual({
+      status: 'incomplete',
+      outstanding: { suggested: [{ name: 'table', total: 1 }], notYet: [], types: [], hidden: [] },
+    })
+  })
+
   it('skips node_modules, build output and lockfiles but keeps a dependency that tsconfig names', () => {
     const root = createScratchDir()
     writeManifest(root, { dependencies: { '@baloise/ds-core': '19.0.0' } })

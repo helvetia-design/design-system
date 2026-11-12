@@ -131,11 +131,13 @@ Every form component migration also removes the legacy field wrapper around the 
 
 - In the Rewrite step, apply its rules to every migrated control that sits inside `bal-field` or `bal-field-control`, or that a `bal-field-message` directly follows, in the same pass. Apply its Angular form binding row to every migrated Angular control bound with `formControlName`, `[formControl]` or `ngModel`, also outside a `bal-field`.
 - In the Report step, append the `F1.`, `F2.`, ... items from the Report section of `shared/field.md` to the checklist, after the component items and before the icon items.
+- `time-input` is the one exception. Its target is a native `<input>` that renders no field, so `components/time-input/migration.md` rewrites the `bal-field` itself and adds no `F` items.
 
 Every migrated form control whose `required` default is `true` and reaches the native control follows the required default rule. The legacy controls defaulted `required` to false, and `ds-*` forwards `required` to the native control, so native validation would apply to a control that was optional before.
 
 - **Covered controls** — `ds-input`, `ds-textarea`, `ds-datepicker`, `ds-number-input` and `ds-select`. When the legacy control omitted `required` and no `required` sits on the enclosing `bal-field` or `bal-field-label`, the migrated control gets an explicit `required="false"` (HTML), `[required]="false"` (Angular) or `required={false}` (React). A `required` that the control sets itself is copied as-is.
 - **Excluded controls** — `ds-counter`, `ds-radio-group`, `ds-checkbox-group`, `ds-segment` and `ds-slider`. Their `required` default is `true`, but it only drives the "(optional)" suffix of the component's own `label`. No native control receives it. The control migration adds no `required="false"` there, and `shared/field.md` decides `required` for them.
+- **Native targets** — the native `<input type="time">` of the `time-input` migration defaults `required` to false like the legacy control, so the rule does not apply to it.
 - **Order** — read the enclosing field first. When `shared/field.md` unwraps a field whose level sets `required`, it decides and the control never gets the added `false`. The control rule adds `false` when neither level carries `required`, and also when `shared/field.md` leaves the `bal-field` in place, because then nothing copies the field level onto the control.
 - **Batch and report** — the rule applies inside a batch too. Each component file reports every added `false` as a coverage item.
 
