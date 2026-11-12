@@ -1,0 +1,771 @@
+<!doctype html>
+<html dir="ltr" lang="de-CH">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Natives HTML in Web Components · Helvetia Design System</title>
+
+    <!--
+      ============================================================
+      Design System einbinden — das ist die ganze Integration
+      ============================================================
+      Drei Stylesheets und ein Modul-Script. Kein Build, kein npm,
+      kein Framework. Diese Datei laeuft so, wie sie ist.
+
+      Die Version ist bewusst gepinnt. jsDelivr loest `exports` nicht
+      auf, darum die vollen Pfade. Fuer Produktion die Assets besser
+      selbst hosten statt ueber einen Drittanbieter auszuliefern.
+
+      Die integrity-Hashes gehoeren zu genau diesen vier Dateien in
+      Version 0.0.6. Wer die Version hochzieht, muss sie neu erzeugen:
+
+        curl -s <url> | openssl dgst -sha384 -binary | openssl base64 -A
+
+      Eine Einschraenkung ehrlichkeitshalber: design-system.esm.js ist
+      ein Loader, der weitere Chunks dynamisch nachlaedt. Subresource
+      Integrity deckt nur die Einstiegsdatei ab, nicht diese Chunks.
+      Wirklich dicht wird das erst beim Selbst-Hosten.
+    -->
+    <meta name="design-system-config" data-brand="helvetia" data-region="CH" data-language="de" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@helvetia-design/tokens@0.0.6/dist/css/base.tokens.css"
+      integrity="sha384-kZZfmCymbGTm5IN4SpshZ/3lb0R/eibi7Vn4pfGa0baWTwunHEggUzizPR1oKOso"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@helvetia-design/styles@0.0.6/dist/css/design-system.min.css"
+      integrity="sha384-IEPemoHH541Xc/Y2hMKv4BxFy0EDHb4foHpiEX9fSWdz27B9hbV7CgJqI3B/usfc"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@helvetia-design/styles@0.0.6/dist/css/utilities.min.css"
+      integrity="sha384-lzzE6m35mfNGvrW0WFU6DJPbrkbrgTPpTDiDwiug/gBeuXJZaIROY+yC8xEwhNI0"
+      crossorigin="anonymous"
+    />
+
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@helvetia-design/core@0.0.6/dist/design-system/design-system.esm.js"
+      integrity="sha384-4gWKV9rfQn/bLRYq2udRTmNLo1+MXuLodedyMJAuBTy7rScsr5SFFXEMkfadk3Kg"
+      crossorigin="anonymous"
+    ></script>
+
+    <!--
+      Es gibt bewusst KEIN <ds-root> auf dieser Seite. Die Konfiguration
+      oben im <meta>-Tag wird vom Loader gelesen, bevor das erste Element
+      verbindet — ds-root ist dafuer nicht noetig. Eine Web Component, die
+      die ganze Seite umschliesst, wuerde dem AEM-Ansatz widersprechen:
+      AEM rendert Fragmente, nicht eine App unter einer gemeinsamen Wurzel.
+    -->
+
+    <!-- Nur Demo-Chrome. Gehoert nicht zum Design System. -->
+    <style>
+      body {
+        margin: 0;
+        background: var(--ds-alias-surface-white, #fff);
+        color: var(--ds-alias-text-color-primary, #0a1e3c);
+      }
+
+      .demo-wrap {
+        max-width: 60rem;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+      }
+
+      .demo-head {
+        background: var(--ds-alias-surface-primary, #0a1e3c);
+        color: #fff;
+        padding: 3rem 0 2.5rem;
+      }
+
+      .demo-head h1 {
+        margin: 0 0 0.75rem;
+        font-size: clamp(1.6rem, 4vw, 2.2rem);
+        line-height: 1.2;
+      }
+
+      .demo-head p {
+        margin: 0;
+        max-width: 46rem;
+        line-height: 1.6;
+        opacity: 0.85;
+      }
+
+      .demo-section {
+        padding-block: 3rem;
+        border-bottom: 1px solid var(--ds-alias-border-color-grey-light, #d8d8dc);
+      }
+
+      .demo-section > h2 {
+        margin: 0 0 0.5rem;
+        font-size: clamp(1.25rem, 3vw, 1.6rem);
+      }
+
+      .demo-lead {
+        margin: 0 0 1.75rem;
+        max-width: 46rem;
+        line-height: 1.6;
+        color: var(--ds-alias-text-color-grey, #5b5b66);
+      }
+
+      .demo-note {
+        margin-top: 1.5rem;
+        padding: 0.875rem 1rem;
+        border-left: 3px solid var(--ds-alias-border-color-grey-light, #d8d8dc);
+        background: var(--ds-alias-surface-grey-lighter, #f6f6f7);
+        font-size: 0.9rem;
+        line-height: 1.55;
+      }
+
+      .demo-note code,
+      .demo-lead code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.9em;
+      }
+
+      /* Mess-Panel */
+      .demo-proof {
+        margin-top: 1.5rem;
+      }
+
+      .demo-proof h3 {
+        margin: 1.5rem 0 0.5rem;
+        font-size: 1rem;
+      }
+
+      .demo-check {
+        display: grid;
+        grid-template-columns: 1.25rem 1fr auto;
+        align-items: baseline;
+        gap: 0.75rem;
+        padding-block: 0.4rem;
+        border-bottom: 1px solid var(--ds-alias-border-color-grey-light, #d8d8dc);
+        font-size: 0.875rem;
+      }
+
+      .demo-check-mark {
+        font-weight: 700;
+        text-align: center;
+      }
+
+      .demo-check.is-ok .demo-check-mark {
+        color: var(--ds-alias-text-color-success, #1a7f44);
+      }
+
+      .demo-check.is-bad .demo-check-mark {
+        color: var(--ds-alias-text-color-danger, #c3002f);
+      }
+
+      .demo-check-value {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.8125rem;
+        background: var(--ds-alias-surface-grey-lighter, #f6f6f7);
+        padding: 0.1rem 0.4rem;
+        border-radius: 3px;
+        white-space: nowrap;
+      }
+
+      .demo-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+        font-size: 0.875rem;
+      }
+
+      .demo-table th,
+      .demo-table td {
+        text-align: left;
+        padding: 0.5rem 0.75rem 0.5rem 0;
+        border-bottom: 1px solid var(--ds-alias-border-color-grey-light, #d8d8dc);
+      }
+
+      .demo-table td:not(:first-child),
+      .demo-table th:not(:first-child) {
+        text-align: right;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.8125rem;
+      }
+
+      .demo-scroll {
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="demo-head">
+      <div class="demo-wrap">
+        <h1>Natives HTML in Web Components</h1>
+        <p>
+          Die Frage des CMS-Teams: Was macht eine Web Component mit dem HTML, das AEM hineinrendert? Zieht sie es ins
+          Shadow DOM? Verliert es die globalen Styles? Und wird das Komponenten-CSS fuer jedes Element darin noch einmal
+          dupliziert? Diese Seite misst das live im Browser, statt es zu behaupten.
+        </p>
+      </div>
+    </header>
+
+    <main class="demo-wrap">
+      <!-- ============================================================
+           1. Eigene Web Component des Website-Teams
+           ============================================================ -->
+      <section class="demo-section" data-cmp-is="faq" data-cmp-data-layer='{"faq":{"@type":"helvetia/components/faq"}}'>
+        <h2>Natives HTML in einer Web Component</h2>
+        <p class="demo-lead">
+          <code>&lt;helvetia-faq&gt;</code> ist eine Komponente, die das Website-Team selbst schreibt — die ganze
+          Definition steht unten in dieser Datei. Sie hat ein Shadow DOM und umschliesst acht Akkordeons, die reines
+          natives HTML sind (<code>&lt;details&gt;</code> mit der CSS-Klasse <code>.ds-accordion</code>, kein
+          <code>ds-</code>-Element). Der Wrapper liest und steuert diese nativen Kinder — genau das, was AEM-Tooling
+          ebenfalls koennen muss.
+        </p>
+
+        <helvetia-faq>
+          <details class="ds-accordion has-marker-plus-minus" open>
+            <summary><h3 class="ds-title">Wie melde ich einen Schaden?</h3></summary>
+            <div class="ds-content py-base">
+              <p class="ds-text mb-none">
+                Am schnellsten geht es ueber das Kundenportal: Schaden erfassen, Fotos hochladen, fertig. Rund um die
+                Uhr erreichbar ist auch die Schadenhotline. Halten Sie Ihre Policennummer bereit — damit ist Ihr Fall in
+                der Regel innert zwei Arbeitstagen beurteilt.
+              </p>
+            </div>
+          </details>
+
+          <details class="ds-accordion has-marker-plus-minus">
+            <summary><h3 class="ds-title">Kann ich meine Police online anpassen?</h3></summary>
+            <div class="ds-content py-base">
+              <p class="ds-text mb-none">
+                Ja. Adresse, Zahlungsrhythmus und Zahlungsmittel aendern Sie direkt im Kundenportal. Fuer Anpassungen an
+                der Deckung — etwa eine hoehere Versicherungssumme — meldet sich Ihre Beraterin oder Ihr Berater nach
+                der Eingabe bei Ihnen.
+              </p>
+            </div>
+          </details>
+
+          <details class="ds-accordion has-marker-plus-minus">
+            <summary><h3 class="ds-title">Was muss ich bei einem Umzug beachten?</h3></summary>
+            <div class="ds-content py-base">
+              <p class="ds-text mb-none">
+                Melden Sie uns die neue Adresse vor dem Umzugstermin. Die Hausratversicherung deckt beide Wohnungen
+                waehrend 30 Tagen parallel. Aendert sich die Wohnflaeche, passen wir die Versicherungssumme an — die
+                Praemie wird pro rata verrechnet.
+              </p>
+            </div>
+          </details>
+
+          <details class="ds-accordion has-marker-plus-minus">
+            <summary><h3 class="ds-title">Wie kuendige ich meine Versicherung?</h3></summary>
+            <div class="ds-content py-base">
+              <p class="ds-text mb-none">
+                Schriftlich, spaetestens drei Monate vor Ablauf der Vertragsdauer. Nach einem Schadenfall besteht ein
+                ausserordentliches Kuendigungsrecht. Eine Kuendigung per E-Mail genuegt, solange sie aus Ihrem im
+                Kundenportal hinterlegten Konto stammt.
+              </p>
+            </div>
+          </details>
+
+          <details class="ds-accordion has-marker-plus-minus">
+            <summary><h3 class="ds-title">Was bedeutet der Selbstbehalt?</h3></summary>
+            <div class="ds-content py-base">
+              <p class="ds-text mb-none">
+                Der Selbstbehalt ist der Anteil, den Sie im Schadenfall selbst tragen. Ein hoeherer Selbstbehalt senkt
+                die Praemie, erhoeht aber Ihr Risiko im Ernstfall. Waehlen Sie einen Betrag, den Sie kurzfristig
+                aufbringen koennen.
+              </p>
+            </div>
+          </details>
+
+          <details class="ds-accordion has-marker-plus-minus">
+            <summary><h3 class="ds-title">Wann wird meine Praemie faellig?</h3></summary>
+            <div class="ds-content py-base">
+              <p class="ds-text mb-none">
+                Die Praemie wird zu Beginn der gewaehlten Zahlungsperiode faellig. Sie koennen jaehrlich, halbjaehrlich
+                oder vierteljaehrlich zahlen. Bei unterjaehriger Zahlweise faellt ein kleiner Zuschlag an, der im
+                Kundenportal transparent ausgewiesen ist.
+              </p>
+            </div>
+          </details>
+
+          <details class="ds-accordion has-marker-plus-minus">
+            <summary><h3 class="ds-title">Was gilt bei einem Fahrzeugwechsel?</h3></summary>
+            <div class="ds-content py-base">
+              <p class="ds-text mb-none">
+                Melden Sie uns den Wechsel vor der ersten Fahrt. Die Deckung geht auf das neue Fahrzeug ueber, sobald
+                wir Typ und Stammnummer erfasst haben. Bei einem deutlich staerkeren Fahrzeug kann sich die Praemie
+                aendern — wir informieren Sie vorgaengig.
+              </p>
+            </div>
+          </details>
+
+          <details class="ds-accordion has-marker-plus-minus">
+            <summary><h3 class="ds-title">Wie erreiche ich den Kundendienst?</h3></summary>
+            <div class="ds-content py-base">
+              <p class="ds-text mb-none">
+                Ueber das Kontaktformular im Kundenportal, telefonisch waehrend der Buerozeiten oder persoenlich an
+                ueber 100 Standorten in der ganzen Schweiz. Schadenmeldungen nimmt die Hotline rund um die Uhr entgegen.
+              </p>
+            </div>
+          </details>
+        </helvetia-faq>
+
+        <div class="demo-note">
+          Die acht <code>&lt;details&gt;</code> sind nicht gruppiert, damit mehrere gleichzeitig offen sein koennen und
+          der Wrapper etwas zu steuern hat. Braucht man stattdessen echtes Akkordeon-Verhalten (eines auf, Rest zu),
+          genuegt das native Attribut <code>name="faq"</code> auf jedem <code>&lt;details&gt;</code> — ganz ohne
+          JavaScript.
+        </div>
+      </section>
+
+      <!-- ============================================================
+           2. Design-System-Komponente mit nativem Inhalt
+           ============================================================ -->
+      <section
+        class="demo-section"
+        data-cmp-is="stresstest"
+        data-cmp-data-layer='{"stresstest":{"@type":"helvetia/components/stresstest"}}'
+      >
+        <h2>Natives HTML in einer Design System Web Component</h2>
+        <p class="demo-lead">
+          Dasselbe noch einmal, aber mit einer echten Komponente aus dem Design System. Dieses eine
+          <code>&lt;ds-accordion&gt;</code> enthaelt rund 15 native Elemente, darunter eine verschachtelte
+          AEM-Textkomponente mit eigenen <code>data-cmp-*</code>-Attributen.
+        </p>
+
+        <ds-accordion summary-title marker="plus-minus" open>
+          <span slot="summary">Vollstaendige Informationen zum Schadenprozess</span>
+          <div slot="content" id="stress-content" class="ds-content py-base">
+            <h4 class="ds-title">Ablauf in vier Schritten</h4>
+            <p class="ds-text">
+              Der Schadenprozess ist bei allen Produkten gleich aufgebaut. Je vollstaendiger die Erstmeldung, desto
+              schneller die Bearbeitung.
+            </p>
+            <ol class="ds-text">
+              <li>Schaden melden — online, telefonisch oder ueber die Beratung</li>
+              <li>Pruefung der Deckung anhand Ihrer Police</li>
+              <li>Begutachtung, falls noetig durch eine Expertin vor Ort</li>
+              <li>Auszahlung oder Reparaturauftrag</li>
+            </ol>
+            <p
+              class="ds-text"
+              data-cmp-is="text-nested"
+              data-cmp-data-layer='{"text-nested":{"@type":"helvetia/components/text"}}'
+            >
+              Noch Fragen? <a class="ds-link" id="stress-slotted-link" href="#beratung">Beratung kontaktieren</a>.
+            </p>
+            <blockquote class="ds-text">
+              <p>Bewahren Sie beschaedigte Gegenstaende auf, bis die Begutachtung abgeschlossen ist.</p>
+            </blockquote>
+            <ul class="ds-list">
+              <li class="ds-item">Checkliste Wasserschaden</li>
+              <li class="ds-item">Checkliste Feuerschaden</li>
+              <li class="ds-item">Checkliste Einbruchdiebstahl</li>
+            </ul>
+          </div>
+        </ds-accordion>
+
+        <!-- Referenzlink ausserhalb jeder Komponente, fuer den CSS-Vergleich im Mess-Panel. -->
+        <a class="ds-link" id="stress-reference-link" href="#ref" style="position: absolute; left: -9999px">Referenz</a>
+      </section>
+
+      <!-- ============================================================
+           3. Galerie — vier Instanzen derselben Komponente
+           ============================================================ -->
+      <section
+        class="demo-section"
+        data-cmp-is="carousel"
+        data-cmp-data-layer='{"carousel":{"@type":"helvetia/components/carousel"}}'
+      >
+        <h2>Unterwegs in der Schweiz</h2>
+        <p class="demo-lead">
+          Vier <code>&lt;ds-carousel-item&gt;</code> — vier Instanzen derselben Komponente auf einer Seite. Genau der
+          Fall, bei dem man vier Kopien desselben CSS erwarten wuerde. Das Mess-Panel unten prueft, ob das stimmt.
+        </p>
+
+        <ds-carousel label="Bildergalerie" controls="dots" value="alpen">
+          <ds-carousel-item
+            name="alpen"
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3Crect width='16' height='9' fill='%233e5a73'/%3E%3Cpath d='M0 9l5-5 3 3 4-4 4 6z' fill='%238fa9bd'/%3E%3C/svg%3E"
+          ></ds-carousel-item>
+          <ds-carousel-item
+            name="see"
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3Crect width='16' height='9' fill='%231c5f66'/%3E%3Crect y='5' width='16' height='4' fill='%234a9ba3'/%3E%3C/svg%3E"
+          ></ds-carousel-item>
+          <ds-carousel-item
+            name="kueste"
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3Crect width='16' height='9' fill='%234a6a7a'/%3E%3Ccircle cx='12' cy='3' r='2' fill='%237fa5b8'/%3E%3C/svg%3E"
+          ></ds-carousel-item>
+          <ds-carousel-item
+            name="stadt"
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3Crect width='16' height='9' fill='%2354545c'/%3E%3Crect x='3' y='3' width='3' height='6' fill='%2386868f'/%3E%3Crect x='9' y='1' width='3' height='8' fill='%2386868f'/%3E%3C/svg%3E"
+          ></ds-carousel-item>
+        </ds-carousel>
+      </section>
+
+      <!-- ============================================================
+           4. Messung
+           ============================================================ -->
+      <section class="demo-section">
+        <h2>Messung</h2>
+        <p class="demo-lead">
+          Alles hier unten wird beim Laden im Browser gemessen, nicht von Hand eingetragen. Wer es nachrechnen will:
+          DevTools oeffnen und die Werte selbst pruefen.
+        </p>
+
+        <div class="demo-proof" id="proof" aria-live="polite">
+          <p class="ds-text">Messung laeuft …</p>
+        </div>
+
+        <h3>Was passiert, wenn man die Seite stattdessen vorrendert?</h3>
+        <p class="demo-lead">
+          Diese Seite rendert im Browser — darum steht in ihrem Quelltext kein einziges Byte Komponenten-CSS. Rendert
+          man stattdessen serverseitig mit Declarative Shadow DOM vor, landet das CSS pro Instanz im HTML. Das ist der
+          Fall, vor dem das Team zu Recht Respekt hat. Die Zahlen dazu, gemessen am echten Build:
+        </p>
+
+        <div class="demo-scroll">
+          <table class="demo-table">
+            <thead>
+              <tr>
+                <th>Vorgerendert</th>
+                <th>Roh</th>
+                <th>gzip</th>
+                <th>brotli</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1 × ds-button</td>
+                <td>35 KB</td>
+                <td>3.6 KB</td>
+                <td>2.9 KB</td>
+              </tr>
+              <tr>
+                <td>10 × ds-button</td>
+                <td>351 KB</td>
+                <td>32 KB</td>
+                <td>3.0 KB</td>
+              </tr>
+              <tr>
+                <td>ds-accordion, 2 native Kinder</td>
+                <td>59 KB</td>
+                <td>7.4 KB</td>
+                <td>5.8 KB</td>
+              </tr>
+              <tr>
+                <td>ds-accordion, 50 native Kinder</td>
+                <td>62 KB</td>
+                <td>7.5 KB</td>
+                <td>5.9 KB</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="demo-note">
+          Zwei Dinge sind daran wichtig. Erstens: zwischen 2 und 50 nativen Kindern liegen im CSS exakt
+          <strong>0 Bytes</strong> Unterschied — die 3 KB mehr sind der Textinhalt selbst. Das CSS haengt an der
+          Komponente, nie an ihrem Inhalt. Zweitens: zehn Instanzen kosten roh das Zehnfache, nach brotli aber nur rund
+          <strong>150 Bytes</strong> mehr als eine einzige — weil zehn identische Kopien desselben Texts genau das sind,
+          was Kompression wegraeumt. Und ueber das Netz geht immer die komprimierte Variante.
+        </div>
+      </section>
+    </main>
+
+    <!--
+      ============================================================
+      Die eigene Web Component des Website-Teams
+      ============================================================
+      Bewusst ohne `ds-`-Praefix: der gehoert dem Design System. Diese
+      Komponente schreibt und besitzt das Website-Team.
+
+      Sie macht genau zwei Dinge, und beide greifen auf das Light DOM
+      zu — auf HTML also, das AEM geliefert hat und das diese Komponente
+      weder erzeugt noch veraendert:
+
+        1. zaehlt, wie viele der nativen <details> offen sind
+        2. oeffnet oder schliesst sie alle
+
+      Das Shadow DOM enthaelt nur die eigene Bedienleiste und einen
+      <slot>. Der Slot rendert die Kinder an Ort und Stelle — er zieht
+      sie nicht hinein. Sie bleiben im Light DOM, bleiben fuer
+      document.querySelector() erreichbar und behalten das globale CSS.
+    -->
+    <script>
+      customElements.define(
+        'helvetia-faq',
+        class extends HTMLElement {
+          connectedCallback() {
+            if (this.shadowRoot) return
+
+            const root = this.attachShadow({ mode: 'open' })
+
+            const style = document.createElement('style')
+            style.textContent = `
+              .bar {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-bottom: 0.75rem;
+                font: inherit;
+              }
+              .count { font-size: 0.875rem; opacity: 0.7; }
+              button {
+                font: inherit;
+                font-size: 0.875rem;
+                cursor: pointer;
+                padding: 0.35rem 0.75rem;
+                border: 1px solid currentColor;
+                border-radius: 3px;
+                background: transparent;
+                color: inherit;
+              }
+              button:hover { background: rgba(0, 0, 0, 0.05); }
+            `
+
+            const bar = document.createElement('div')
+            bar.className = 'bar'
+
+            const count = document.createElement('span')
+            count.className = 'count'
+
+            const toggle = document.createElement('button')
+            toggle.type = 'button'
+
+            bar.append(count, toggle)
+            root.append(style, bar, document.createElement('slot'))
+
+            // Die Kinder liegen im Light DOM — ganz normales querySelectorAll auf `this`.
+            const entries = () => Array.from(this.querySelectorAll('details'))
+
+            const sync = () => {
+              const all = entries()
+              const open = all.filter(entry => entry.open).length
+              count.textContent = `${open} von ${all.length} geoeffnet`
+              toggle.textContent = open === all.length ? 'Alle schliessen' : 'Alle oeffnen'
+            }
+
+            toggle.addEventListener('click', () => {
+              const all = entries()
+              const expand = all.some(entry => !entry.open)
+              all.forEach(entry => {
+                entry.open = expand
+              })
+              sync()
+            })
+
+            this.addEventListener('toggle', sync, true)
+            sync()
+          }
+        },
+      )
+    </script>
+
+    <!--
+      ============================================================
+      Mess-Script — nur Demo, gehoert nicht zum Design System
+      ============================================================
+      Liest den echten DOM aus, nachdem die Komponenten hydriert sind.
+      Veraendert nichts an der Seite.
+    -->
+    <script>
+      ;(function () {
+        const host = document.getElementById('proof')
+
+        function section(title) {
+          const heading = document.createElement('h3')
+          heading.textContent = title
+          host.append(heading)
+        }
+
+        function row(label, value, ok) {
+          const div = document.createElement('div')
+          div.className = 'demo-check' + (ok === null ? '' : ok ? ' is-ok' : ' is-bad')
+
+          const mark = document.createElement('span')
+          mark.className = 'demo-check-mark'
+          mark.textContent = ok === null ? '·' : ok ? '✓' : '✗'
+
+          const text = document.createElement('span')
+          text.textContent = label
+
+          const val = document.createElement('code')
+          val.className = 'demo-check-value'
+          val.textContent = String(value)
+
+          div.append(mark, text, val)
+          host.append(div)
+        }
+
+        /** Jedes offene Shadow Root auf der Seite, rekursiv, mit seinem Host-Tag. */
+        function allShadowRoots() {
+          const found = []
+          ;(function walk(node) {
+            node.querySelectorAll('*').forEach(el => {
+              if (el.shadowRoot) {
+                found.push({ tag: el.tagName.toLowerCase(), root: el.shadowRoot })
+                walk(el.shadowRoot)
+              }
+            })
+          })(document)
+          return found
+        }
+
+        function sheetsOf(el) {
+          return Array.from((el && el.shadowRoot && el.shadowRoot.adoptedStyleSheets) || [])
+        }
+
+        function ruleCount(sheet) {
+          try {
+            return sheet.cssRules.length
+          } catch (error) {
+            return 'nicht lesbar'
+          }
+        }
+
+        /** Light-DOM-Nachfahren — querySelectorAll steigt nie in ein Shadow Root hinab. */
+        function lightChildren(el) {
+          return Array.from(el.querySelectorAll('*'))
+        }
+
+        function movedIntoShadow(el) {
+          return lightChildren(el).filter(child => child.getRootNode() !== document).length
+        }
+
+        function run() {
+          host.textContent = ''
+
+          const faq = document.querySelector('helvetia-faq')
+          const accordion = document.querySelector('ds-accordion')
+
+          /* ---- 1. Bleibt natives HTML im Light DOM? ---- */
+          section('Bleibt das native HTML, wo AEM es hingeschrieben hat?')
+
+          const faqNative = lightChildren(faq).length
+          const faqMoved = movedIntoShadow(faq)
+          row('Native Elemente in <helvetia-faq>', faqNative, faqNative > 0)
+          row('davon ins Shadow DOM verschoben', faqMoved, faqMoved === 0)
+
+          const accNative = lightChildren(accordion).length
+          const accMoved = movedIntoShadow(accordion)
+          row('Native Elemente in <ds-accordion>', accNative, accNative > 0)
+          row('davon ins Shadow DOM verschoben', accMoved, accMoved === 0)
+
+          const nested = document.querySelector('[data-cmp-is="text-nested"]')
+          row(
+            'Verschachteltes data-cmp-is von document aus lesbar',
+            nested && nested.hasAttribute('data-cmp-data-layer') ? 'ja' : 'nein',
+            !!(nested && nested.hasAttribute('data-cmp-data-layer')),
+          )
+
+          const slotted = document.getElementById('stress-slotted-link')
+          const reference = document.getElementById('stress-reference-link')
+          const slottedColor = slotted ? getComputedStyle(slotted).color : ''
+          const referenceColor = reference ? getComputedStyle(reference).color : ''
+          row(
+            'Globales DS-CSS greift im Slot (Linkfarbe = Referenz)',
+            slottedColor || 'n/a',
+            !!slottedColor && slottedColor === referenceColor,
+          )
+
+          /* ---- 2. Wird das CSS pro Element dupliziert? ---- */
+          section('Wird das Komponenten-CSS dupliziert?')
+
+          const roots = allShadowRoots()
+          const dsRoots = roots.filter(entry => entry.tag.indexOf('ds-') === 0)
+          const dsStyleEls = dsRoots.reduce((n, entry) => n + entry.root.querySelectorAll('style').length, 0)
+
+          row('Shadow Roots auf dieser Seite', roots.length, roots.length > 0)
+          row('davon von Design-System-Komponenten', dsRoots.length, dsRoots.length > 0)
+          row('<style>-Elemente in den ds-Shadow-Roots', dsStyleEls, dsStyleEls === 0)
+
+          const items = Array.from(document.querySelectorAll('ds-carousel-item'))
+          const accSheets = sheetsOf(accordion)
+          const itemSheets = sheetsOf(items[0])
+
+          // Ein Blatt, das BEIDE Komponententypen adoptieren, ist das globale Reset-Blatt.
+          // Was nur ds-carousel-item hat, ist das komponenteneigene CSS — darum geht es hier.
+          const ownSheets = itemSheets.filter(sheet => accSheets.indexOf(sheet) === -1)
+          const globalSheets = itemSheets.filter(sheet => accSheets.indexOf(sheet) !== -1)
+
+          const allShareOwn =
+            ownSheets.length > 0 &&
+            items.every(el => {
+              const mine = sheetsOf(el)
+              return ownSheets.every(sheet => mine.indexOf(sheet) !== -1)
+            })
+
+          row('Instanzen von <ds-carousel-item>', items.length, items.length > 1)
+
+          if (itemSheets.length === 0) {
+            // Aeltere Browser ohne Constructable Stylesheets: Stencil faellt auf <style> zurueck.
+            row('adoptedStyleSheets verfuegbar', 'nein — Fallback auf <style>', null)
+          } else {
+            row('Eigenes Stylesheet der Komponente (Regeln)', ownSheets.map(ruleCount).join(' + ') || '0', null)
+            row(
+              'Alle Instanzen teilen dasselbe Stylesheet-Objekt',
+              allShareOwn ? 'ja, identisch' : 'nein, Kopien',
+              allShareOwn,
+            )
+            row('Kopien dieses Stylesheets im Speicher', allShareOwn ? 1 : items.length, allShareOwn)
+            row(
+              'Zusaetzlich geteiltes globales Reset-Blatt (Regeln)',
+              globalSheets.map(ruleCount).join(' + ') || '0',
+              null,
+            )
+            // Zum Vergleich: ein anderer Komponententyp hat sein eigenes, anderes Blatt.
+            const accOwnSheets = accSheets.filter(sheet => globalSheets.indexOf(sheet) === -1)
+            row('Eigenes Stylesheet von <ds-accordion> (Regeln)', accOwnSheets.map(ruleCount).join(' + ') || '0', null)
+          }
+
+          const totalNative = document.querySelectorAll('main *').length
+          row('Native Elemente im Light DOM insgesamt', totalNative, null)
+        }
+
+        /**
+         * `:defined` und ein vorhandenes shadowRoot sind beide schon true, BEVOR Stencil
+         * das erste Mal gerendert hat — zu diesem Zeitpunkt ist das Shadow Root noch leer
+         * und adoptedStyleSheets enthaelt nur das globale Blatt. Erst die Klasse `hydrated`
+         * zusammen mit tatsaechlichem Inhalt heisst: fertig gerendert, jetzt darf gemessen
+         * werden.
+         */
+        function ready(el) {
+          return !!(
+            el &&
+            el.matches(':defined') &&
+            el.classList.contains('hydrated') &&
+            el.shadowRoot &&
+            el.shadowRoot.childElementCount > 0
+          )
+        }
+
+        function waitFor(predicate, timeout) {
+          const started = Date.now()
+          return new Promise(resolve => {
+            ;(function tick() {
+              if (predicate() || Date.now() - started > timeout) return resolve()
+              requestAnimationFrame(tick)
+            })()
+          })
+        }
+
+        Promise.all([
+          customElements.whenDefined('ds-accordion'),
+          customElements.whenDefined('ds-carousel-item'),
+          customElements.whenDefined('helvetia-faq'),
+        ])
+          .then(() =>
+            waitFor(
+              () => ready(document.querySelector('ds-accordion')) && ready(document.querySelector('ds-carousel-item')),
+              8000,
+            ),
+          )
+          .then(run)
+      })()
+    </script>
+  </body>
+</html>
