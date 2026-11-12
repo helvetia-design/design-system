@@ -75,3 +75,46 @@ test.describe('server-rendered demo page', () => {
     expect(overflow).toBeLessThanOrEqual(0)
   })
 })
+
+/**
+ * The stress test answers the CMS team's actual question: when AEM renders a large,
+ * deep tree of native HTML *inside* a web component, is that markup left alone?
+ */
+test.describe('native markup inside a web component', () => {
+  test('survives the server render untouched', async ({ request }) => {
+    const html = await (await request.get('/')).text()
+
+    const stress = html.split('data-native-elements=')[1] ?? ''
+    expect(stress, 'stress-test section is on the page').not.toBe('')
+
+    // Everything after the component's own </template> is light DOM — the markup AEM sent.
+    const lightDom = stress.split('</template>').slice(1).join('</template>')
+
+    expect(lightDom.match(/<li class="ds-item">/g)).toHaveLength(12)
+    expect(lightDom.match(/<a class="ds-link" href="\/schaden\/\d+">/g)).toHaveLength(12)
+
+    // No shadow root is injected into the slotted children, at any depth.
+    expect(lightDom).not.toMatch(/<li[^>]*>\s*<template/)
+    expect(lightDom).not.toMatch(/<ul[^>]*>\s*<template/)
+  })
+
+  test('keeps the global design-system styles inside the slot', async ({ page }) => {
+    await page.goto('/')
+
+    // Same class, one inside a web component's slot, one in plain page markup.
+    const slotted = page.locator('ds-accordion a.ds-link').first()
+    const plain = page.locator('.demo-prose.ds-content a.ds-link').first()
+
+    const colorOf = (loc: typeof slotted) => loc.evaluate(el => getComputedStyle(el).color)
+
+    expect(await colorOf(slotted)).toBe(await colorOf(plain))
+  })
+
+  test('the slotted rows are actually rendered, not just present in the DOM', async ({ page }) => {
+    await page.goto('/')
+
+    const rows = page.locator('ds-accordion[group="stress"] li.ds-item')
+    await expect(rows).toHaveCount(12)
+    await expect(rows.first()).toBeVisible()
+  })
+})
