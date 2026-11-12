@@ -53,7 +53,7 @@ const expectedCounts: Record<string, { attention: number; coverage: number }> = 
   'icon': { attention: 7, coverage: 0 },
   'input-slider': { attention: 9, coverage: 4 },
   'input-stepper': { attention: 8, coverage: 2 },
-  'input': { attention: 13, coverage: 2 },
+  'input': { attention: 15, coverage: 3 },
   'label': { attention: 5, coverage: 2 },
   'list': { attention: 26, coverage: 7 },
   'logo': { attention: 5, coverage: 0 },
@@ -687,6 +687,31 @@ describe('shared/field.md Report', () => {
     expect(report).not.toContain('summary')
     expect(numbers.length).toBeGreaterThan(0)
     expect(numbers).toEqual(numbers.map((_, index) => index + 1))
+  })
+
+  it('reports every migrated bal-ng-error and every one left in place', () => {
+    const report = section(read('shared/field.md'), '## Report')
+    const { attention } = buckets(report.replace(/^- F(\d+)\. /gm, '$1. '))
+    const migrated = attention.filter(item => item.text.startsWith('Every migrated `bal-ng-error`'))
+    const left = attention.filter(item => item.text.startsWith('Every `bal-ng-error` left in place'))
+
+    expect(migrated).toHaveLength(1)
+    expect(migrated[0].text).toContain('template order')
+    expect(migrated[0].text).toContain('validator order')
+    expect(left).toHaveLength(1)
+    expect(left[0].text).toContain('`bal-field-message` left in place')
+    for (const reason of ['control cannot be resolved', 'legacy `bal-*` control', 'no `invalid-text` slot']) {
+      expect(left[0].text, reason).toContain(reason)
+    }
+    expect(migrated[0].text).toContain('`bal-ng-error` without `error`')
+  })
+
+  it('does not map a bal-field-message that only wraps bal-ng-error to description', () => {
+    const row = read('shared/field.md')
+      .split('\n')
+      .find(line => line.startsWith('| `bal-field-message` with `color=""`'))
+
+    expect(row).toContain('contains `bal-ng-error` follows the `bal-ng-error` row')
   })
 })
 

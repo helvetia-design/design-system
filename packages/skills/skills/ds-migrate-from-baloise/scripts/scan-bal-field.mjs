@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
 const USAGE_RE =
-  /<\/?bal-(?:field(?:-(?:label|control|message|hint))?|form-(?:grid|col))(?![\w-])|<\/?Bal(?:Field(?:Label|Control|Message|Hint)?|Form(?:Grid|Col))\b|\bBalEvents\.Bal(?:Field|FormGrid|FormCol)[A-Z]\w*|\bBal(?:Field(?:Label|Control|Message|Hint)?|Form(?:Grid|Col))(?:CustomEvent)?\b|\bBal(?:Field|FormGrid)Bundle\b/g
+  /<\/?bal-(?:field(?:-(?:label|control|message|hint))?|form-(?:grid|col)|ng-error)(?![\w-])|<\/?Bal(?:Field(?:Label|Control|Message|Hint)?|Form(?:Grid|Col))\b|\bBalEvents\.Bal(?:Field|FormGrid|FormCol)[A-Z]\w*|\bBal(?:Field(?:Label|Control|Message|Hint)?|Form(?:Grid|Col))(?:CustomEvent)?\b|\bBal(?:Field|FormGrid)Bundle\b|\bBalNgError\w*|\binvalidateOn(?=\s*:)/g
 
 export function scanBalField(rootDir, paths = []) {
   const found = []

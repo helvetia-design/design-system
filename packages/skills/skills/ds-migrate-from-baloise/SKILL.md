@@ -129,7 +129,7 @@ Every Report step writes to `ds-migration-report.md` as `shared/report.md` descr
 
 Every form component migration also removes the legacy field wrapper around the controls it migrates. Follow `shared/field.md` alongside the chosen file:
 
-- In the Rewrite step, apply its rules to every migrated control that sits inside `bal-field` or `bal-field-control`, or that a `bal-field-message` directly follows, in the same pass. Apply its Angular form binding row to every migrated Angular control bound with `formControlName`, `[formControl]` or `ngModel`, also outside a `bal-field`.
+- In the Rewrite step, apply its rules to every migrated control that sits inside `bal-field` or `bal-field-control`, or that a `bal-field-message` directly follows, in the same pass. Apply its Angular form binding row to every migrated Angular control bound with `formControlName`, `[formControl]` or `ngModel`, also outside a `bal-field`. Apply its `bal-ng-error` row to every migrated Angular control, also outside a `bal-field`.
 - In the Report step, append the `F1.`, `F2.`, ... items from the Report section of `shared/field.md` to the checklist, after the component items and before the icon items.
 - `time-input` is the one exception. Its target is a native `<input>` that renders no field, so `components/time-input/migration.md` rewrites the `bal-field` itself and adds no `F` items.
 
