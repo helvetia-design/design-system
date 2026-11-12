@@ -59,7 +59,9 @@ Run the migrations in this order. Structural parents first, because their `migra
 
 Skip every name the migration list does not contain.
 
-`field` runs after every form control migration. Each control migration removes the `bal-field` around its own controls, following `shared/field.md`. The `field` migration then handles the grid and every `bal-field` that is left.
+`field` runs after every form control migration. Each control migration removes the `bal-field` around its own controls, following `shared/field.md`. The `field` migration then handles the grid, every `bal-field` that is left and every `bal-ng-error` whose target is a `ds-*` control, also outside a `bal-field`.
+
+`dropdown`, `form`, `table` and `time-input` run in the alphabetical middle group. `time-input` rewrites the `bal-field` around its own native input to the CSS field markup, so it has to run before `field` too, which would leave a `bal-field` around a native input in place.
 
 ### Per migration
 

@@ -52,6 +52,8 @@ import {
  * Input renders a text input field with validation, masking, autocomplete, and optional help/error messaging.
  *
  * @slot invalid-text - Overrides the `invalidText` prop with custom markup, shown instead of the description when `invalid` is `true`.
+ * @slot start - Content placed before the native input inside the field, for example an icon or a button.
+ * @slot end - Content placed after the native input inside the field, for example an icon or a button.
  * @part input - The native HTML input element.
  * @part prefix - The prefix wrapper (if used).
  * @part suffix - The suffix wrapper (if used).

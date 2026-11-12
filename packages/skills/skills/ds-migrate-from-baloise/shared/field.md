@@ -6,7 +6,15 @@ The rules need the control to be `ds-*` already or to be migrated in the same pa
 
 ## Scan
 
-No separate scan. In a component migration, the Scan step of that file already lists the controls. Read the enclosing `bal-field` of each finding while you rewrite it.
+No separate scan for most rules. In a component migration, the Scan step of that file already lists the controls. Read the enclosing `bal-field` of each finding while you rewrite it.
+
+When a file of a migrated Angular control contains `bal-ng-error`, run the field scan once:
+
+```bash
+node <this-skill-directory>/scripts/scan-bal-field.mjs <project-root>
+```
+
+Read its `bal-ng-error` findings. The snippet of each opening tag carries `controlName`, `error` and `group`. Also read its `invalidateOn` findings. They come from the legacy config call and decide between `touched` and `dirty`.
 
 ## Rules
 
@@ -22,13 +30,14 @@ Apply these in order to one control and its enclosing `bal-field`. Static values
 | `loading` on `bal-field` or `bal-field-control` | `loading` on controls that have it (`ds-input`, `ds-datepicker`, `ds-file-upload`, `ds-checkbox-group`, `ds-radio-group`, `ds-segment`). Report it on any other control, including `ds-toggle`. |
 | `horizontal`, `inverted` on `bal-field` | Dropped. `ds-*` has no equivalent. Report every occurrence. |
 | `bal-field-control` | Removed. Its children stay. `iconLeft` becomes an icon with `slot="start"` and `iconRight` an icon with `slot="end"`, as a child of the control, with the name rule from `shared/icons.md`. In React write `<DsIcon slot="start" name="…" />` and import `DsIcon` from `@helvetia-design/react`. In Angular write `<ds-icon slot="start" name="…">` and add `DsIcon` to `imports: [...]`. In HTML write `<ds-icon slot="start" name="…">`. `expandedOnMobile` is dropped and reported. |
-| `bal-field-message` with `color="danger"`, or rendered only on an error | `invalidText` on the control. The message shows only while the control is `invalid`, so flag it when the control has no `invalid` binding. `{err && <BalFieldMessage>{err}</BalFieldMessage>}` becomes `invalidText={err}`. For an Angular control bound to a form, follow the Angular form binding row instead. |
-| `bal-field-message` with `color="success"` or `"warning"` | `description` on the control, plus `color` with the same value on the control. A message rendered only under a condition (`{tooLow && <BalFieldMessage color="warning">…</BalFieldMessage>}`) becomes a conditional binding on both props, for example `description={tooLow ? '…' : undefined}` and `color={tooLow ? 'warning' : undefined}`. Interpolated text is not markup and needs no slot. |
-| `bal-field-message` with `color=""` or no `color` | `description` on the control. |
-| Angular control bound with `[formControl]`, `formControlName` or `ngModel` | `@helvetia-design/angular` binds the control's validation state. While the control is touched and invalid it sets `invalid` and sets `invalidText` to the first error value when that is a string, otherwise to the error key (`required`, `minlength`, `email`). Otherwise it writes `''`. A plain `invalidText`, including one mapped from a danger `bal-field-message`, does not survive. Put a danger message in a child with `slot="invalid-text"` instead, which overrides the prop. Any non-empty child in that slot marks the control invalid, so the child keeps the condition the legacy message had, or gets `@if (<control>.touched && <control>.invalid)` (`*ngIf` in older templates) when the legacy message had none. When the app builds its message text in code, set `autoInvalidOff` and bind `[invalid]` and `[invalidText]` from the form control instead. When the control has a validator (a `required` or `[required]` true, `minlength`, `pattern`, `email`, or `Validators.*` in the component class) and no message at all, change nothing and report that the control shows the raw validator key as error text. |
+| `bal-field-message` with `color="danger"`, or rendered only on an error | `invalidText` on the control. The message shows only while the control is `invalid`, so flag it when the control has no `invalid` binding. `{err && <BalFieldMessage>{err}</BalFieldMessage>}` becomes `invalidText={err}`. For an Angular control bound to a form, follow the Angular form binding row instead. A `bal-field-message` that contains `bal-ng-error` follows the `bal-ng-error` row instead. |
+| `bal-field-message` with `color="success"` or `"warning"` | `description` on the control, plus `color` with the same value on the control. A message rendered only under a condition (`{tooLow && <BalFieldMessage color="warning">…</BalFieldMessage>}`) becomes a conditional binding on both props, for example `description={tooLow ? '…' : undefined}` and `color={tooLow ? 'warning' : undefined}`. Interpolated text is not markup and needs no slot. A `bal-field-message` that contains `bal-ng-error` follows the `bal-ng-error` row instead. |
+| `bal-field-message` with `color=""` or no `color` | `description` on the control. A `bal-field-message` that contains `bal-ng-error` follows the `bal-ng-error` row instead. |
+| Angular control bound with `[formControl]`, `formControlName` or `ngModel` | `@helvetia-design/angular` binds the control's validation state. While the control is touched and invalid it sets `invalid` and sets `invalidText` to the first error value when that is a string, otherwise to the error key (`required`, `minlength`, `email`). Otherwise it writes `''`. A plain `invalidText`, including one mapped from a danger `bal-field-message`, does not survive. Put a danger message in a child with `slot="invalid-text"` instead, which overrides the prop. Any non-empty child in that slot marks the control invalid, so the child keeps the condition the legacy message had, or gets `@if (<control>.touched && <control>.invalid)` (`*ngIf` in older templates) when the legacy message had none. When the app builds its message text in code, set `autoInvalidOff` and bind `[invalid]` and `[invalidText]` from the form control instead. When the control has a validator (a `required` or `[required]` true, `minlength`, `pattern`, `email`, or `Validators.*` in the component class) and no message at all, change nothing and report that the control shows the raw validator key as error text. A `bal-ng-error` is a message of its own and follows the `bal-ng-error` row. A control gets one `slot="invalid-text"` child at most. When a danger message and `bal-ng-error` both target one control, the `bal-ng-error` chain fills that child, and the danger message stays in place and is reported. Inside a `bal-field`, the whole `bal-field` stays in place, as the `bal-ng-error` row describes. |
+| `bal-ng-error` (Angular) | The target is the `ds-*` control whose `formControlName` matches `controlName` within the same `formGroup`, or the control bound to `<group>.get('<controlName>')` when `group` is set. `<control>` is `<group>.get('<controlName>')` when `group` is set. Otherwise it is `<form>.get('<path>')`, where `<form>` is the `[formGroup]` binding and `<path>` joins the enclosing `formGroupName` values and `controlName` with dots, for example `form.get('email')`. When an enclosing container is `formArrayName` or a bound `[formGroupName]` or `[formArrayName]`, build the path as an array instead, with each bound expression as its own element, for example `form.get(['items', i, 'name'])`. The legacy component resolved `controlName` against the nearest `ControlContainer`, so the path keeps its target. All `bal-ng-error` of one control become one child `<span slot="invalid-text">` of that control. Inside it, an `@if` / `@else if` chain has one branch per `bal-ng-error`, in template order, with the text unchanged. The chain shows one message at a time. The legacy system showed at most one `bal-ng-error` with `error` at a time, and a `bal-ng-error` without `error` showed next to it. The branch condition is `<control>?.touched && <control>?.hasError('<error>')`. A `bal-ng-error` without `error` gets `<control>?.touched && <control>?.invalid` and goes last in the chain. When the legacy config call sets `forms.invalidateOn: 'dirty'`, use `dirty` instead of `touched`. In templates without control flow, write one `ng-container *ngIf` per branch inside the span. Each condition also negates the `hasError` checks of every earlier branch, for example `form.get('email')?.touched && form.get('email')?.hasError('email') && !form.get('email')?.hasError('required')`, so that only one message shows. A `bal-field-message` that contains only `bal-ng-error` children is removed, whatever its `color`. It is an error message, not a `description`. A `bal-field-message` with other content next to `bal-ng-error` stays in place and is reported. A single `ds-checkbox` gets the span on its wrapping `ds-checkbox-group`, as in the single-checkbox row. Leave the `bal-ng-error`, and the `bal-field-message` around it, in place and report it when `controlName` does not resolve to a control in the template, when the target is still a legacy `bal-*` control, or when the target has no `invalid-text` slot (`ds-checkbox` without a group, `ds-radio`). When such a `bal-ng-error`, a `bal-field-message` with other content next to `bal-ng-error`, or a danger message next to a `bal-ng-error` chain is left in place inside a `bal-field`, leave the whole `bal-field` in place and report it, because a `bal-field` that is not empty around a `ds-*` control renders a second field. Outside a `bal-field`, only the message stays in place. Remove every `BalNgError*` symbol from the `@baloise/ds-angular` import and from `imports: [...]` once the file has no `bal-ng-error` left. A `...BalFormBundle` spread stays, because it is a multi-family bundle. |
 | `noReservedSpace`, and `disabled`, `invalid`, `valid`, `readonly` on a message | Dropped. |
-| message with markup content | A child with `slot="description"` or `slot="invalid-text"`. The prop of the same name must also be set, so flag it. |
-| more than one `bal-field-message` | Leave the whole `bal-field` in place and report it. |
+| message with markup content | A child with `slot="description"` or `slot="invalid-text"`. The prop of the same name must also be set, so flag it. A `bal-field-message` that contains `bal-ng-error` follows the `bal-ng-error` row instead. |
+| more than one `bal-field-message` | Leave the whole `bal-field` in place and report it. A `bal-field-message` that only wraps `bal-ng-error` does not count, because the `bal-ng-error` row removes it. |
 | `bal-field-hint` | `ds-hint` directly after the control: `subject` becomes its `label`, the content becomes its body. `closeLabel` copies as-is. `hideTitleOnDesktop` and `small` have no equivalent. Report them and flag the placement for visual review. Import `DsHint` from `@helvetia-design/react` or `@helvetia-design/angular`, and add `DsHint` to Angular `imports: [...]`. Do not follow the `BalHint`-only rules of `components/hint/migration.md` for the import, because a `bal-field-hint` has no `BalHint` symbol to move. |
 | a single `ds-checkbox` inside `bal-field` with a field label | Wrap it in `ds-checkbox-group` and put `label`, `description` and `invalidText` on the group. `ds-checkbox` only has its own text as `label`. Copy the checkbox's `invalid` binding to the group as well, because the group shows `invalidText` only while the group itself is `invalid`. When the checkbox has a forms binding (`formControlName`, `formControl` or `ngModel`), move the binding to the wrapping `ds-checkbox-group` and add `control`. Report the boolean-to-array type change as "Single checkbox with a forms binding (Angular)" in `components/checkbox/migration.md` describes. |
 | `ds-checkbox-group`, `ds-radio-group` | Same field props as the inputs (`label`, `description`, `invalidText`, `color`, `loading`, `required`). A single `ds-radio` never sits alone, it always has a group. |
@@ -38,7 +47,37 @@ Apply these in order to one control and its enclosing `bal-field`. Static values
 | `bal-field-message` outside a `bal-field` | A `bal-field-message` that is not inside a `bal-field` but directly follows a migrated control gets the same message mapping onto that control. It is often rendered conditionally, for example `{err && <BalFieldMessage color="danger">…</BalFieldMessage>}` after a `ds-checkbox`. A single `ds-checkbox` is wrapped in `ds-checkbox-group` as in the single-checkbox row. A message with no control before it stays in place and is reported. |
 | `bal-field` with more than one control, or with no form control | Leave it in place and report it. |
 
-Delete the `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` tags once they are empty. Delete the symbols `BalField`, `BalFieldLabel`, `BalFieldControl`, `BalFieldMessage` and `BalFieldHint` from the `@baloise/ds-react` and `@baloise/ds-angular` imports when the file has no usage left, and remove them from Angular `imports: [...]` arrays.
+A legacy field with two `bal-ng-error` for one control:
+
+```html
+<bal-field>
+  <bal-field-label>Email</bal-field-label>
+  <bal-field-control>
+    <bal-input formControlName="email"></bal-input>
+  </bal-field-control>
+  <bal-field-message>
+    <bal-ng-error controlName="email" error="required">Please enter an email</bal-ng-error>
+    <bal-ng-error controlName="email" error="email">Please enter a valid email</bal-ng-error>
+  </bal-field-message>
+</bal-field>
+```
+
+The migrated control, inside `<form [formGroup]="form">`:
+
+<!-- prettier-ignore -->
+```html
+<ds-input label="Email" formControlName="email" [required]="false">
+  <span slot="invalid-text">
+    @if (form.get('email')?.touched && form.get('email')?.hasError('required')) {
+      Please enter an email
+    } @else if (form.get('email')?.touched && form.get('email')?.hasError('email')) {
+      Please enter a valid email
+    }
+  </span>
+</ds-input>
+```
+
+Delete the `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` tags once they are empty. Delete the symbols `BalField`, `BalFieldLabel`, `BalFieldControl`, `BalFieldMessage`, `BalFieldHint` and `BalNgErrorComponent` from the `@baloise/ds-react` and `@baloise/ds-angular` imports when the file has no usage left, and remove them from Angular `imports: [...]` arrays.
 
 ## Report
 
@@ -46,7 +85,7 @@ These items follow the component's own checklist items and come before the `I` i
 
 Needs your attention when found:
 
-- F1. Every `bal-field` left in place, with the reason. For a legacy `bal-*` control, name the component migration to run first. For a native element, say so.
+- F1. Every `bal-field` left in place, with the reason. For a legacy `bal-*` control, name the component migration to run first. For a native element, say so. For a `bal-field` kept because a `bal-ng-error`, a `bal-field-message` next to it or a danger message stays in place inside it, name that part.
 - F2. Every `bal-field-message` outside a `bal-field` that has no control before it, left in place.
 - F3. Every message, `valid` state, `loading` or field label that the target control cannot carry, as lost, with the control.
 - F4. Every dynamic `valid` binding.
@@ -60,7 +99,9 @@ Needs your attention when found:
 - F12. Every dropped `size` and `weight` on `bal-field-label`.
 - F13. Every dropped `expandedOnMobile` on `bal-field-control`.
 - F14. Every Angular control bound with `formControlName`, `[formControl]` or `ngModel` that has a validator but no error message of its own, because `@helvetia-design/angular` shows the raw validator key (`required`, `minlength`, ...) as error text. Also every danger message moved into a `slot="invalid-text"` child and every control that got `autoInvalidOff`. Name file, line and control.
+- F15. Every migrated `bal-ng-error`, with file, line and control. Say that the messages now show in template order, while the legacy messages followed the validator order. Say that a validator which returns its message as a string makes the slot unnecessary. For a `bal-ng-error` without `error`, say that it showed next to the specific message in the legacy system and now shows only when no other branch matches.
+- F16. Every `bal-ng-error` left in place outside a `bal-field` because its control cannot be resolved, is still a legacy `bal-*` control or has no `invalid-text` slot. Also every `bal-field-message` left in place outside a `bal-field` because it has other content next to `bal-ng-error`, and every danger message left in place outside a `bal-field` because a `bal-ng-error` chain fills the slot of its control. Inside a `bal-field`, F1 reports these.
 
 Coverage only, written to the file:
 
-- F15. Every field wrapper that was removed.
+- F17. Every field wrapper that was removed.

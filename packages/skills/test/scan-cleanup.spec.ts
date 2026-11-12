@@ -475,6 +475,70 @@ describe('scanCleanup', () => {
     })
   })
 
+  it('stays incomplete while dropdown, form, table or time-input is left and completes once they are migrated', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { 'react': '19.0.0', '@helvetia-design/react': '1.0.0' } })
+    write(
+      root,
+      'src/App.tsx',
+      [
+        '<bal-form native>',
+        '  <bal-dropdown name="d">',
+        '    <bal-option-list>',
+        '      <bal-option value="a" label="A"></bal-option>',
+        '    </bal-option-list>',
+        '  </bal-dropdown>',
+        '  <bal-time-input name="t"></bal-time-input>',
+        '  <bal-table><table></table></bal-table>',
+        '</bal-form>',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanCleanup(root)).toEqual({
+      status: 'incomplete',
+      outstanding: {
+        suggested: [
+          { name: 'dropdown', total: 3 },
+          { name: 'form', total: 1 },
+          { name: 'table', total: 1 },
+          { name: 'time-input', total: 1 },
+        ],
+        notYet: [],
+        types: [],
+        hidden: [],
+      },
+    })
+
+    write(
+      root,
+      'src/App.tsx',
+      [
+        '<form noValidate>',
+        '  <ds-select name="d">',
+        '    <ds-select-option value="a">A</ds-select-option>',
+        '  </ds-select>',
+        '  <input type="time" className="ds-time-input" name="t" />',
+        '  <table className="ds-table"></table>',
+        '</form>',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanCleanup(root)).toMatchObject({ status: 'nothing-to-clean-up' })
+  })
+
+  it('stays incomplete while a bal-table is left, also one around an AG Grid that the table migration keeps', () => {
+    const root = createScratchDir()
+    writeManifest(root, { dependencies: { 'react': '19.0.0', '@helvetia-design/react': '1.0.0' } })
+    write(root, 'src/Grid.tsx', '<BalTable>\n  <AgGridReact rowData={rows} />\n</BalTable>\n')
+
+    expect(scanCleanup(root)).toEqual({
+      status: 'incomplete',
+      outstanding: { suggested: [{ name: 'table', total: 1 }], notYet: [], types: [], hidden: [] },
+    })
+  })
+
   it('skips node_modules, build output and lockfiles but keeps a dependency that tsconfig names', () => {
     const root = createScratchDir()
     writeManifest(root, { dependencies: { '@baloise/ds-core': '19.0.0' } })

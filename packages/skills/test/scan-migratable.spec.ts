@@ -338,6 +338,27 @@ describe('scanMigratable', () => {
     })
   })
 
+  it('folds bal-ng-error and BalNgErrorComponent into field instead of listing them as notYet', () => {
+    const root = createScratchDir()
+    write(root, 'app.component.html', '<bal-ng-error controlName="email">Required</bal-ng-error>\n')
+    write(
+      root,
+      'app.component.ts',
+      [
+        "import { BalNgErrorComponent } from '@baloise/ds-angular'",
+        '@Component({ imports: [BalNgErrorComponent] })',
+        'export class AppComponent {}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanMigratable(root)).toEqual({
+      suggested: [{ name: 'field', total: 3 }],
+      notYet: [],
+      types: [],
+    })
+  })
+
   it('counts bal-notices for toast instead of listing it as notYet', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-notices interface="toast"></bal-notices>\n')
@@ -386,7 +407,7 @@ describe('scanMigratable', () => {
     })
   })
 
-  it('suggests input, folding bal-input-date into it and leaving sibling components in notYet', () => {
+  it('suggests input, folding bal-input-date and bal-input-group into it', () => {
     const root = createScratchDir()
     write(
       root,
@@ -400,8 +421,63 @@ describe('scanMigratable', () => {
     )
 
     expect(scanMigratable(root)).toEqual({
+      suggested: [{ name: 'input', total: 3 }],
+      notYet: [],
+      types: [],
+    })
+  })
+
+  it('counts the React BalInputGroup import and tag for input', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'Search.tsx',
+      [
+        "import { BalInputGroup } from '@baloise/ds-react'",
+        'export const Search = () => <BalInputGroup></BalInputGroup>',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanMigratable(root)).toEqual({
       suggested: [{ name: 'input', total: 2 }],
-      notYet: [{ name: 'input-group', total: 1 }],
+      notYet: [],
+      types: [],
+    })
+  })
+
+  it('suggests dropdown, form, table and time-input and folds bal-option and bal-option-list into dropdown', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'index.html',
+      [
+        '<bal-form novalidate>',
+        '  <bal-dropdown name="d">',
+        '    <bal-option-list>',
+        '      <bal-option value="a" label="A"></bal-option>',
+        '    </bal-option-list>',
+        '  </bal-dropdown>',
+        '  <bal-time-input name="t"></bal-time-input>',
+        '  <bal-table><table></table></bal-table>',
+        '</bal-form>',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'src/options.ts',
+      "import { BalOption } from '@baloise/ds-core'\nexport const options: BalOption[] = []\n",
+    )
+
+    expect(scanMigratable(root)).toEqual({
+      suggested: [
+        { name: 'dropdown', total: 5 },
+        { name: 'form', total: 1 },
+        { name: 'table', total: 1 },
+        { name: 'time-input', total: 1 },
+      ],
+      notYet: [],
       types: [],
     })
   })

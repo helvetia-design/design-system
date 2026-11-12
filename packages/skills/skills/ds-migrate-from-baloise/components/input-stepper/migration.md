@@ -2,7 +2,7 @@
 
 Migrate every `bal-input-stepper` usage to `ds-counter`. Init has already added the `@helvetia-design/*` packages. This task rewrites usages only.
 
-The legacy folder has no consumer child tags. `bal-input`, `bal-input-group` and `bal-input-slider` are different components and are not part of this migration. The scan does not list them. The surrounding `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrapper is handled by `shared/field.md` in the Rewrite step, in the same pass.
+The legacy folder has no consumer child tags. `bal-input` and `bal-input-slider` are different components and are not part of this migration. The scan does not list them. The surrounding `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrapper is handled by `shared/field.md` in the Rewrite step, in the same pass.
 
 ## 1. Scan
 

@@ -2,9 +2,9 @@
 
 Migrate every `bal-form-grid` usage to `<div class="ds-form">` and every `bal-form-col` usage to `<div class="ds-form-col">`. Remove every `bal-field` wrapper that is left around a `ds-*` control. Init has already added the `@helvetia-design/*` packages. This task rewrites usages only.
 
-Every `ds-*` form control renders its own field: label, description, invalid text and the `start` and `end` slots. A `ds-*` control inside `bal-field` therefore renders a second field. The component migrations (`input`, `textarea`, `number-input`, `select`, `date`, `checkbox`, `radio`, `segment`, `input-slider`, `input-stepper`, `file-upload`) apply `shared/field.md` in the same pass as the control, so no run leaves a `ds-*` control inside `bal-field`. Run this migration after them. Running it first only converts the grid, and every `bal-field` around a legacy `bal-*` control stays unchanged.
+Every `ds-*` form control renders its own field: label, description, invalid text and the `start` and `end` slots. A `ds-*` control inside `bal-field` therefore renders a second field. The component migrations (`input`, `textarea`, `number-input`, `select`, `dropdown`, `date`, `checkbox`, `radio`, `segment`, `input-slider`, `input-stepper`, `file-upload`) apply `shared/field.md` in the same pass as the control, so no run leaves a `ds-*` control inside `bal-field`. The `time-input` migration rewrites the `bal-field` around its native input to the CSS field markup itself. Run this migration after them. Running it first only converts the grid, and every `bal-field` around a legacy `bal-*` control stays unchanged.
 
-The legacy folder has the child tags `bal-field-label`, `bal-field-control`, `bal-field-message`, `bal-field-hint`, `bal-form-grid` and `bal-form-col`. `bal-form`, the form element wrapper, is a different component and is not part of this migration. The scan does not list it.
+The legacy folder has the child tags `bal-field-label`, `bal-field-control`, `bal-field-message`, `bal-field-hint`, `bal-form-grid` and `bal-form-col`. The scan also lists the Angular `bal-ng-error`, which `shared/field.md` moves into the `invalid-text` slot of its control. `bal-form`, the form element wrapper, is a different component and is not part of this migration. The scan does not list it.
 
 ## 1. Scan
 
@@ -14,11 +14,11 @@ The legacy folder has the child tags `bal-field-label`, `bal-field-control`, `ba
 node <this-skill-directory>/scripts/scan-bal-field.mjs <project-root>
 ```
 
-The script prints one JSON object. `total` is the number of findings. `files` groups them by path. Each finding has `line` and `snippet`.
+The script prints one JSON object. `total` is the number of findings. `files` groups them by path. Each finding has `line` and `snippet`. An `invalidateOn` finding is the `forms` key of the legacy config call. Read it for the `bal-ng-error` rule in `shared/field.md` and do not rewrite it.
 
 Show that list to the user grouped by file (path, line, snippet) and end with the total count.
 
-Done when the user has seen every finding and the total. If `total` is 0, say there are no `bal-field` or `bal-form-grid` usages to migrate and stop.
+Done when the user has seen every finding and the total. If `total` is 0, or every finding is an `invalidateOn` line, say there are no `bal-field`, `bal-form-grid` or `bal-ng-error` usages to migrate and stop.
 
 ## 2. Confirm
 
@@ -57,7 +57,7 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Fields
 
-Apply every rule in `shared/field.md` to each remaining `bal-field`. That file covers the label, message, `required`, hints, icons, props without a target, a `bal-field` that stays in place and a `bal-field-message` that sits next to a control outside any `bal-field`. In this run, that last rule applies to every `bal-field-message` that directly follows a `ds-*` control and is not inside a `bal-field`.
+Apply every rule in `shared/field.md` to each remaining `bal-field`. That file covers the label, message, `required`, hints, icons, props without a target, a `bal-field` that stays in place and a `bal-field-message` that sits next to a control outside any `bal-field`. In this run, that last rule applies to every `bal-field-message` that directly follows a `ds-*` control and is not inside a `bal-field`. Apply the `bal-ng-error` row of `shared/field.md` to every `bal-ng-error` finding whose target is a `ds-*` control, also outside a `bal-field`.
 
 ### Types
 
