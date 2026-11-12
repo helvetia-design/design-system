@@ -11049,6 +11049,90 @@
         }
       }
     },
+    "Content": {
+      "Gap": {
+        "$type": "dimension",
+        "$value": "{🔗 Alias.↔️ Space.Gap.2XS}"
+      }
+    },
+    "Stack": {
+      "Gap": {
+        "3XS": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.3XS}"
+        },
+        "2XS": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.2XS}"
+        },
+        "XS": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.XS}"
+        },
+        "SM": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.SM}"
+        },
+        "Base": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.Base}"
+        },
+        "MD": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.MD}"
+        },
+        "LG": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.LG}"
+        },
+        "XL": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.XL}"
+        },
+        "2XL": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.2XL}"
+        }
+      },
+      "Padding": {
+        "3XS": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.3XS}"
+        },
+        "2XS": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.2XS}"
+        },
+        "XS": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.XS}"
+        },
+        "SM": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.SM}"
+        },
+        "Base": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.Base}"
+        },
+        "MD": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.MD}"
+        },
+        "LG": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.LG}"
+        },
+        "XL": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.XL}"
+        },
+        "2XL": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.2XL}"
+        }
+      }
+    },
     "Divider": {
       "Radius": {
         "$type": "dimension",

@@ -197,6 +197,14 @@ _Avoid_: text style, font token (a font family or weight on its own is a primiti
 One distinct piece of text inside a component (a label, a heading, a body, a description), styled by exactly one Component-layer typography token (which may alias a shared one, e.g. `Notification.Body → Text.Typo.Paragraph`) plus one separate color token. Loose per-property Component tokens without a typography token behind them do not count. Color is never a part of the typography token: it varies by state and variant, typography does not.
 _Avoid_: text slot (a slot is a DOM concept), font usage
 
+**Inline text part**:
+A text part that sits inside running text (e.g. a link in a paragraph) and takes its family, size and line height from that surrounding text. It still has a full typography token, but in code only weight, letter spacing, text decoration and text transform apply; the token's family, size and line height serve only as the Figma sample.
+_Avoid_: inherited text, partial typography
+
+**Part modifier**:
+A single-property Component token (e.g. `Text.Weight.Bold`) that overrides exactly one part of a text part's typography token, for a prop or state that changes only that one part (a weight prop, a selected day). A prop or state that changes two or more parts gets its own typography token instead.
+_Avoid_: partial typography token, override token
+
 ## Key Concepts
 
 ### Responsive Tokens

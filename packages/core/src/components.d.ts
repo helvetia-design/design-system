@@ -937,9 +937,10 @@ export namespace Components {
          */
         "layout"?: StackLayout;
         /**
-          * Defines the space between the child elements. Default is xx-small.
+          * Defines the space between the child elements. Default is 2xs.
+          * @default '2xs'
          */
-        "space"?: ContentSpace;
+        "space": ContentSpace;
         /**
           * Defines the text positioning like center, right or default to left.
          */
@@ -6109,7 +6110,8 @@ declare namespace LocalJSX {
          */
         "layout"?: StackLayout;
         /**
-          * Defines the space between the child elements. Default is xx-small.
+          * Defines the space between the child elements. Default is 2xs.
+          * @default '2xs'
          */
         "space"?: ContentSpace;
         /**
