@@ -18,21 +18,23 @@
  * @prop --toast-progress-duration: Duration of the progress bar animation.
  * @prop --toast-progress-bar-bg: Background color of the progress bar.
  * @prop --toast-progress-bg: Background color of the progress track.
+ * @prop --toast-progress-height: Thickness of the progress track and bar.
  * @prop --toast-p: Padding inside the toast.
  * @prop --toast-gap: Gap between content and close button.
  */
 
 :host {
   @include vars.base(toast);
-  @include vars.local(toast-shadow, var(--ds-alias-shadow-box-base));
+  @include vars.local(toast-shadow, var(--ds-toast-shadow));
   @include vars.local(toast-radius, var(--ds-toast-radius));
   @include vars.local(toast-bg, var(--ds-toast-primary-color-background));
   @include vars.local(toast-border, var(--ds-toast-primary-border));
   @include vars.local(toast-color, var(--ds-toast-primary-color-body));
 
   @include vars.local(toast-progress-duration, 0);
-  @include vars.local(toast-progress-bar-bg, var(--ds-toast-primary-progress-bar));
-  @include vars.local(toast-progress-bg, var(--ds-toast-primary-progress-background));
+  @include vars.local(toast-progress-bar-bg, var(--ds-toast-primary-progress-bar-color-background));
+  @include vars.local(toast-progress-bg, var(--ds-toast-primary-progress-track-color-background));
+  @include vars.local(toast-progress-height, var(--ds-toast-progress-height));
 
   @include vars.local(toast-heading-font-family, var(--ds-toast-heading-font-family));
   @include vars.local(toast-heading-font-weight, var(--ds-toast-heading-font-weight));
@@ -95,6 +97,7 @@
   // Icon
   // --------------------------------
   ds-icon:not([name]) {
+    // Deliberate reuse: the default status icon uses ds-icon's lg size
     --icon-size: var(--ds-icon-size-lg);
   }
 
@@ -207,7 +210,7 @@
     position: absolute;
     bottom: 0;
     left: 0;
-    height: 0.25rem;
+    height: var(--_toast-progress-height);
     width: 100%;
     content: '';
     background-color: var(--_toast-progress-bg);
@@ -220,7 +223,8 @@
     position: absolute;
     bottom: 0;
     left: 0;
-    height: 0.25rem;
+    height: var(--_toast-progress-height);
+    // ds-token-check: intentional — overwritten by progress keyframes
     width: 16px;
     content: '';
     background-color: var(--_toast-progress-bar-bg);
@@ -247,8 +251,8 @@ $colors: ('info', 'success', 'warning', 'danger');
     --mod-toast-bg: var(--ds-toast-#{$color}-color-background);
     --mod-toast-heading-color: var(--ds-toast-#{$color}-color-heading);
     --mod-toast-content-color: var(--ds-toast-#{$color}-color-body);
-    --mod-toast-progress-bar-bg: var(--ds-toast-#{$color}-progress-bar);
-    --mod-toast-progress-bg: var(--ds-toast-#{$color}-progress-background);
+    --mod-toast-progress-bar-bg: var(--ds-toast-#{$color}-progress-bar-color-background);
+    --mod-toast-progress-bg: var(--ds-toast-#{$color}-progress-track-color-background);
   }
 }
 
@@ -257,21 +261,6 @@ $colors: ('info', 'success', 'warning', 'danger');
   * --------------------------------
   * Define here the animations for the component.
   */
-
-:host(.has-progress-bar) {
-  &::after {
-    display: block;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 0.25rem;
-    width: 16px;
-    content: '';
-    background-color: var(--_toast-progress-bar-bg);
-    border-bottom-left-radius: var(--_toast-radius);
-    animation: progress var(--_toast-progress-duration) linear forwards;
-  }
-}
 
 :host(.is-paused) {
   &::after {
