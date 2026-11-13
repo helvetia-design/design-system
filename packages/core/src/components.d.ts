@@ -1257,7 +1257,7 @@ export namespace Components {
      * Drawer displays a panel that slides up from the bottom of the screen.
      * Uses the native dialog element for accessible top-layer rendering, built-in focus management,
      * and Escape-key handling.
-     * @attachment ds-close top-right - Close button rendered when `closable` is true, inset 1rem from the container's top-right corner.
+     * @attachment ds-close top-right - Close button rendered when `closable` is true, inset by `--drawer-close-inset` from the container's top-end corner.
      */
     interface DsDrawer {
         /**
@@ -1926,10 +1926,9 @@ export namespace Components {
          */
         "label": string;
         /**
-          * Width of the modal in pixels.
-          * @default 640
+          * Width of the modal in pixels. Overrides the `--modal-width` token (640px by default).
          */
-        "modalWidth": number;
+        "modalWidth"?: number;
         /**
           * If `true` the modal is open.
           * @default false
@@ -4313,7 +4312,7 @@ declare global {
      * Drawer displays a panel that slides up from the bottom of the screen.
      * Uses the native dialog element for accessible top-layer rendering, built-in focus management,
      * and Escape-key handling.
-     * @attachment ds-close top-right - Close button rendered when `closable` is true, inset 1rem from the container's top-right corner.
+     * @attachment ds-close top-right - Close button rendered when `closable` is true, inset by `--drawer-close-inset` from the container's top-end corner.
      */
     interface HTMLDsDrawerElement extends Components.DsDrawer, HTMLStencilElement {
         addEventListener<K extends keyof HTMLDsDrawerElementEventMap>(type: K, listener: (this: HTMLDsDrawerElement, ev: DsDrawerCustomEvent<HTMLDsDrawerElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -6463,7 +6462,7 @@ declare namespace LocalJSX {
      * Drawer displays a panel that slides up from the bottom of the screen.
      * Uses the native dialog element for accessible top-layer rendering, built-in focus management,
      * and Escape-key handling.
-     * @attachment ds-close top-right - Close button rendered when `closable` is true, inset 1rem from the container's top-right corner.
+     * @attachment ds-close top-right - Close button rendered when `closable` is true, inset by `--drawer-close-inset` from the container's top-end corner.
      */
     interface DsDrawer {
         /**
@@ -7168,8 +7167,7 @@ declare namespace LocalJSX {
          */
         "label"?: string;
         /**
-          * Width of the modal in pixels.
-          * @default 640
+          * Width of the modal in pixels. Overrides the `--modal-width` token (640px by default).
          */
         "modalWidth"?: number;
         /**
@@ -10161,7 +10159,7 @@ declare module "@stencil/core" {
              * Drawer displays a panel that slides up from the bottom of the screen.
              * Uses the native dialog element for accessible top-layer rendering, built-in focus management,
              * and Escape-key handling.
-             * @attachment ds-close top-right - Close button rendered when `closable` is true, inset 1rem from the container's top-right corner.
+             * @attachment ds-close top-right - Close button rendered when `closable` is true, inset by `--drawer-close-inset` from the container's top-end corner.
              */
             "ds-drawer": LocalJSX.IntrinsicElements["ds-drawer"] & JSXBase.HTMLAttributes<HTMLDsDrawerElement>;
             /**

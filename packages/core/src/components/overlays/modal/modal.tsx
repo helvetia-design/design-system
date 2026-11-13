@@ -71,11 +71,11 @@ export class Modal implements DsComponentInterface, DsConfigObserver {
   readonly closable: boolean = true
 
   /**
-   * Width of the modal in pixels.
+   * Width of the modal in pixels. Overrides the `--modal-width` token (640px by default).
    */
   @Prop()
   @Type('number')
-  readonly modalWidth: number = 640
+  readonly modalWidth?: number
 
   /**
    * If `true`, the modal covers the full viewport.
@@ -246,7 +246,7 @@ export class Modal implements DsComponentInterface, DsConfigObserver {
           'is-animated': this.animated,
           'is-fullscreen': this.fullscreen,
         }}
-        style={{ '--_modal-width': `${this.modalWidth}px` }}
+        style={this.modalWidth ? { '--_modal-width': `${this.modalWidth}px` } : undefined}
       >
         <dialog
           part="dialog"

@@ -134,6 +134,7 @@ $host-selector: ('#notification');
     color: var(--_notification-color-heading);
     forced-color-adjust: preserve-parent-color;
     position: absolute;
+    // Fixed icon size; --_notification-icon-size only sizes the icon column (brand icon sets it to 80px)
     height: var(--ds-notification-icon-size);
     width: var(--ds-notification-icon-size);
     // ds-token-check: intentional — icon position derived from padding
@@ -182,7 +183,7 @@ $host-selector: ('#notification');
 // --------------------------------
 // When a `ds-brand-icon` is placed in the default slot (together with `no-icon`),
 // reserve the icon column again and position it there instead of letting it flow
-// inline with the content text.
+// inline with the content text. The column deliberately reuses ds-brand-icon's base size.
 // ds-token-check: intentional — icon position derived from padding
 @mixin notification-brand-icon-position() {
   position: absolute;

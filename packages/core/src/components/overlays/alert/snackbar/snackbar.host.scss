@@ -21,7 +21,7 @@
 
 :host {
   @include vars.base(snackbar);
-  @include vars.local(snackbar-shadow, var(--ds-alias-shadow-box-base));
+  @include vars.local(snackbar-shadow, var(--ds-snackbar-shadow));
   @include vars.local(snackbar-radius, var(--ds-snackbar-radius));
   @include vars.local(snackbar-bg, var(--ds-snackbar-primary-color-background));
   @include vars.local(snackbar-border, var(--ds-snackbar-primary-border));
@@ -140,22 +140,24 @@
     ds-close,
     ds-button,
     .ds-button {
-      --button-mt: 1rem;
+      --button-mt: var(--ds-snackbar-action-margin);
+      // Deliberate reuse: action buttons match ds-button sm font size
       --button-font-size: var(--ds-button-size-sm-font-size);
-      --button-min-height: 2rem;
-      --button-min-width: 2rem;
-      --button-px: 0.75rem;
+      --button-min-height: var(--ds-snackbar-action-min-height);
+      --button-min-width: var(--ds-snackbar-action-min-width);
+      --button-px: var(--ds-snackbar-action-padding-x);
     }
   }
 
   ::slotted(ds-button),
   ::slotted(ds-close),
   ::slotted(ds-button-group) {
-    --button-mt: 1rem;
+    --button-mt: var(--ds-snackbar-action-margin);
+    // Deliberate reuse: action buttons match ds-button sm font size
     --button-font-size: var(--ds-button-size-sm-font-size);
-    --button-min-height: 2rem;
-    --button-min-width: 2rem;
-    --button-px: 0.75rem;
+    --button-min-height: var(--ds-snackbar-action-min-height);
+    --button-min-width: var(--ds-snackbar-action-min-width);
+    --button-px: var(--ds-snackbar-action-padding-x);
   }
 
   //

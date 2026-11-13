@@ -308,7 +308,7 @@ export class Pagination implements DsComponentInterface, DsBreakpointObserver {
     const hasBasicNavigationButtons = !hasValue(this.variant) || (isVariantDots && this.totalPages <= 5)
 
     const DotsWithText: FunctionalComponent = () => (
-      <span class="dots">
+      <span class="dots is-counter">
         <strong>{this.value}</strong>
         <span>/</span>
         <span>{this.totalPages}</span>
