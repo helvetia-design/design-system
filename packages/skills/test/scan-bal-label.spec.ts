@@ -320,8 +320,8 @@ describe('Detect', () => {
 
     expect(suggested).toEqual(
       expect.arrayContaining([
-        { name: 'label', total: 2 },
-        { name: 'data', total: 2 },
+        { name: 'label', total: 1 },
+        { name: 'data', total: 1 },
       ]),
     )
   })

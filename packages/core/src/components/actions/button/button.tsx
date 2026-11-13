@@ -242,6 +242,13 @@ export class Button implements DsComponentInterface {
   readonly a11yControls: string = ''
 
   /**
+   * A11y attributes for the native button element. Maps to `aria-current`, e.g. `page` for the current navigation entry.
+   */
+  @Prop({ mutable: true })
+  @Type('string')
+  a11yCurrent: string = ''
+
+  /**
    * A11y attributes for the native button element.
    */
   @Prop()
@@ -297,10 +304,16 @@ export class Button implements DsComponentInterface {
       'title',
       'aria-label',
       'aria-controls',
+      'aria-current',
       'aria-hidden',
       'tabindex',
       'aria-haspopup',
     ])
+
+    if (!this.a11yCurrent && this.inheritAttributes['aria-current']) {
+      this.a11yCurrent = this.inheritAttributes['aria-current']
+    }
+    delete this.inheritAttributes['aria-current']
 
     if (this.el.hasAttribute('ds-popup') && !this.a11yHaspopup) {
       this.a11yHaspopup = 'true'
@@ -429,6 +442,7 @@ export class Button implements DsComponentInterface {
       'aria-label':
         this.a11yLabel || this.inheritAttributes['aria-label'] || this.a11yTitle || this.inheritAttributes['title'],
       'aria-controls': this.a11yControls || this.inheritAttributes['aria-controls'],
+      'aria-current': this.a11yCurrent || undefined,
       'aria-haspopup': this.a11yHaspopup || this.inheritAttributes['aria-haspopup'],
     }
 

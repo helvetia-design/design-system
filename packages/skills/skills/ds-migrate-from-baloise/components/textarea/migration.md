@@ -4,6 +4,8 @@ Migrate every `bal-textarea` usage to `ds-textarea`. Init has already added the 
 
 The legacy folder has no child tags. `bal-textarea` is the only tag in this migration.
 
+A surrounding `bal-field`, `bal-field-label`, `bal-field-control` and `bal-field-message` wrapper is handled by `shared/field.md` in the Rewrite step, in the same pass. `components/field/migration.md` migrates `bal-form-grid` and `bal-form-col`.
+
 ## 1. Scan
 
 `<project-root>` is the consumer project root that contains the app lockfile. When the skill is invoked from that root, use the current directory.
@@ -34,15 +36,14 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props of `bal-textarea` → `ds-textarea`
 
-| old (`bal-textarea`)                                                                                                                                                                                          | new (`ds-textarea`)                            | handling                                                                                                                                                                                                                                                                                                                    |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`, `invalid`, `autocapitalize`, `autocomplete`, `autofocus`, `debounce`, `placeholder`, `maxLength`, `minLength`, `disabled`, `readonly`, `cols`, `rows`, `wrap`, `inputmode`, `value`, `autoInvalidOff` | same                                           | Copy as-is, in every form (`disabled`, `disabled="true"`, `[disabled]="x"`, `disabled={x}`). Keep form bindings such as `[(ngModel)]`, `formControlName`, and `[formControl]` unchanged. The `wrap` values (`hard`, `soft`, `off`) are the same.                                                                            |
-| `required` set                                                                                                                                                                                                | `required`                                     | Copy as-is.                                                                                                                                                                                                                                                                                                                 |
-| `required` omitted                                                                                                                                                                                            | `required` set to false                        | The default flipped. `bal-textarea` was optional, `ds-textarea` is required. Add `required="false"` (HTML), `[required]="false"` (Angular), or `required={false}` (React) so the field stays optional. Report each file where this was added.                                                                               |
-| `clickable`                                                                                                                                                                                                   | _(no equivalent prop)_                         | Leave the attribute in place, do not drop it. It has no effect after the migration, and in strictly typed React or Angular templates it may not compile. The click is now reported by the new `dsClick` event, so the consumer can replace the pattern, but do not do it yourself. Flag every occurrence for manual review. |
-| _(none)_                                                                                                                                                                                                      | `label`, `description`, `color`, `invalidText` | New props. Nothing to migrate from. Leave them unset.                                                                                                                                                                                                                                                                       |
-
-The default of `autocapitalize` changed from `none` to `off`. Both are valid HTML values with the same effect, so copy a set value as-is and do not add one.
+| old (`bal-textarea`) | new (`ds-textarea`) | handling |
+| --- | --- | --- |
+| `name`, `invalid`, `autocapitalize`, `autocomplete`, `autofocus`, `debounce`, `placeholder`, `maxLength`, `minLength`, `disabled`, `readonly`, `cols`, `rows`, `wrap`, `inputmode`, `value`, `autoInvalidOff` | same | Copy as-is, in every form (`disabled`, `disabled="true"`, `[disabled]="x"`, `disabled={x}`). Keep form bindings such as `[(ngModel)]`, `formControlName`, and `[formControl]` unchanged. The `wrap` values (`hard`, `soft`, `off`) are the same. |
+| `required` set | `required` | Copy as-is. |
+| `required` omitted | `required` set to false | Follow the required default rule in `SKILL.md`. Report each file where this was added. |
+| `clickable` | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). It has no effect after the migration. The click is now reported by the new `dsClick` event, so the consumer can replace the pattern, but do not do it yourself. |
+| _(none)_ | `label`, `description`, `color`, `invalidText` | New props. Nothing to migrate from. Leave them unset. |
+| The default of `autocapitalize` changed from `none` to `off`. Both are valid HTML values with the same effect, so copy a set value as-is and do not add one. |
 
 ### Slots
 
@@ -53,47 +54,52 @@ The legacy default slot was rendered as the text content of the native `<textare
 ### Tags and imports
 
 - **HTML**: `<bal-textarea>` becomes `<ds-textarea>`, including the closing tag.
-- **Angular**: the same tag rename in `.html` templates and in inline `template:` strings, including the closing tag. When a file imports `BalTextarea` from `@baloise/ds-angular`, move only that symbol to `import { DsTextarea } from '@helvetia-design/angular'` and leave the other symbols on the `@baloise` import. Rename it in `imports: [...]` as well. `DsTextarea` brings its own `ControlValueAccessor`, so `ngModel` and reactive forms keep working.
+- **Angular**: the same tag rename in `.html` templates and in inline `template:` strings, including the closing tag. When a file imports `BalTextarea` from `@baloise/ds-angular`, move only that symbol to `import { DsTextarea } from '@helvetia-design/angular'` and leave the other symbols on the `@baloise` import. Rename it in `imports: [...]` as well. `DsTextarea` brings its own `ControlValueAccessor`, so `ngModel` and reactive forms keep working. `bal-textarea` has no own bundle. Only multi-family bundles such as `BalFormBundle` or `BalComponentBundle` hold it. They stay, and `DsTextarea` is added next to them, as `SKILL.md` "Legacy types and bundles" describes.
 - **React**: `<BalTextarea>` becomes `<DsTextarea>`, including the closing tag. Import it from `@helvetia-design/react`. When the existing `@baloise/ds-react` import also binds other symbols, move only `BalTextarea` and leave the others on the `@baloise` import. If the file already imports from `@helvetia-design/react`, add to that import instead of creating a second one.
 
 ### Events
 
 `ds-textarea` emits the same five events, and adds `dsClick`.
 
-| old           | new          | handling                                                                                                                                                            |
-| ------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balChange`   | `dsChange`   | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. |
-| `balInput`    | `dsInput`    | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms.                                                                   |
-| `balBlur`     | `dsBlur`     | Same shapes.                                                                                                                                                        |
-| `balFocus`    | `dsFocus`    | Same shapes.                                                                                                                                                        |
-| `balKeyPress` | `dsKeyPress` | Same shapes.                                                                                                                                                        |
+| old | new | handling |
+| --- | --- | --- |
+| `balChange` | `dsChange` | HTML: `addEventListener('balChange'` becomes `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. Detail: `string \| null`, legacy `string \| undefined`. |
+| `balInput` | `dsInput` | Same shapes: `(balInput)`, `onBalInput`, and `addEventListener('balInput'` become the `ds` forms. Detail: `string \| null`. |
+| `balBlur` | `dsBlur` | Same shapes. |
+| `balFocus` | `dsFocus` | Same shapes. |
+| `balKeyPress` | `dsKeyPress` | Same shapes. |
 
 Rewrite only handlers that are attached to the element being migrated. `balChange`, `balInput`, `balBlur`, and `balFocus` are emitted by many other legacy components, so never rewrite a handler on another element, and never rename them by search and replace across the file.
 
 When the value in `balChange` or `balInput` is read, note that it is `string | undefined` in legacy and `string | null` in `ds-textarea`. A cleared field now yields `null`. Do not edit the handler, report it.
 
-The detail types `BalEvents.BalTextarea*Detail` and the wrapper type `BalTextareaCustomEvent` are not rewritten. List each use as "type needs manual rework".
+Retype handler parameters and refs as `SKILL.md` "Legacy types and bundles" describes. `BalEvents.BalTextarea*` and the wrapper type `BalTextareaCustomEvent` become `DsTextareaCustomEvent`. Write a detail alias such as `BalEvents.BalTextareaChangeDetail` out as the new detail type, `string | null` for `dsChange` and `dsInput`. `HTMLBalTextareaElement` becomes `HTMLDsTextareaElement`. The scan lists the `BalEvents.*` and `Bal*CustomEvent` types. It does not list `BalProps.*` or `HTMLBal*Element`, so search for them yourself in each file with a finding.
 
 ### Methods
 
-`setFocus()`, `setBlur()` and `getInputElement()` keep their names. `setAriaForm()` on `bal-textarea` was `@internal` and never part of the public API. Drop any reference silently, without a summary mention.
+`setFocus()`, `setBlur()` and `getInputElement()` keep their names. `setAriaForm()` on `bal-textarea` was `@internal` and never part of the public API. Drop any reference silently, without a mention in the report.
 
 Angular splits a component across `x.component.html` and `x.component.ts`, and the class file often calls these methods through `@ViewChild` or `viewChild` without naming the tag, so the scan cannot see it. For every `.html` finding, open the same-basename `.ts` file beside it and check it for `setAriaForm` calls and for `balChange`, `balInput`, `balBlur`, `balFocus`, and `balKeyPress`. React and plain HTML callers hold the element in a ref or a query result, so look for calls on that variable in the same file.
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `required` that was set to false, every event handler that was renamed, and every handler, slot content, type, and unsupported prop (`clickable`) that needs manual rework.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Report this logic change the scan cannot see, so the consumer can check it:
+Needs your attention when found:
 
-- **Empty value**: a cleared field now yields `null` where legacy yielded `undefined`. Code that checks `=== undefined` needs review. List each handler or form binding that reads the value.
+1. Every handler that needs manual rework.
+2. Every piece of slot content that needs manual rework.
+3. Every legacy type left or written out and every bundle kept, as `SKILL.md` "Legacy types and bundles" describes: each `BalProps.BalTextarea*` type left in place, each detail alias such as `BalEvents.BalTextareaChangeDetail` written out, and each multi-family bundle such as `BalFormBundle` or `BalComponentBundle` kept with `DsTextarea` added next to it.
+4. Every unsupported `clickable`, with its Unmapped props and handlers outcome.
+5. Every handler or form binding that reads the value. A cleared field now yields `null` where legacy yielded `undefined`. Code that checks `=== undefined` needs review.
+6. One-time note: `ds-textarea` has `label`, `description` and `color`. Fields may need a `label` now. Do not add one yourself, and do not add attributes to compensate.
+7. Every selector that targeted the legacy element and that the scan cannot see (classes starting with `bal-textarea` and the `bal-textarea-input` test id). Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.
 
-Also report the rendering difference, so the consumer can check it. Do not add attributes to compensate:
+Coverage only, written to the file:
 
-- `ds-textarea` has `label`, `description`, and `color`. Fields may need a `label` now. Do not add one yourself.
+8. Every `required` that was set to false.
+9. Every event handler that was renamed.
 
-Also list every selector that targeted the legacy element and that the scan cannot see (classes starting with `bal-textarea` and the `bal-textarea-input` test id). Tests and styles that query them break. Do not rewrite those selectors yourself. Report them.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
-
-Done when the summary is printed and the working tree is still unstaged.
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

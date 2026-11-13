@@ -416,3 +416,94 @@ describe('card migration.md', () => {
     }
   })
 })
+
+describe('scanBalCard line numbers and speed', () => {
+  it('reports the line and snippet of a tag after emoji in a comment, an attribute value and text', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'a.html',
+      [
+        '<!-- \u{1F600} note -->',
+        '<p title="\u{1F600}\u{1F600}">\u{1F680} text</p>',
+        '<bal-card class="a">x</bal-card>',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalCard(root).files).toEqual([
+      {
+        file: 'a.html',
+        findings: [
+          { line: 3, snippet: '<bal-card class="a">' },
+          { line: 3, snippet: '</bal-card>' },
+        ],
+      },
+    ])
+  })
+
+  it('reports the line and snippet of a JSX tag after emoji in a comment, an attribute value and text', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'a.tsx',
+      [
+        'export const A = () => (',
+        '  <div>',
+        '    {/* \u{1F600} */}',
+        '    // \u{1F600} note',
+        '    <p title="\u{1F600}\u{1F600}">\u{1F680} text</p>',
+        '    <bal-card color="primary">x</bal-card>',
+        '  </div>',
+        ')',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalCard(root).files).toEqual([
+      {
+        file: 'a.tsx',
+        findings: [
+          { line: 6, snippet: '<bal-card color="primary">' },
+          { line: 6, snippet: '</bal-card>' },
+        ],
+      },
+    ])
+  })
+
+  it('scans a 540 KB html file with 15000 tags in under a second', () => {
+    const root = createScratchDir()
+    const count = 15000
+    let text = ''
+    for (let i = 0; i < count; i++) text += `<bal-card class="c${i}">x</bal-card>\n`
+    expect(text.length).toBeGreaterThanOrEqual(540000)
+    write(root, 'big.html', text)
+
+    const started = performance.now()
+    const result = scanBalCard(root)
+    const elapsed = performance.now() - started
+
+    expect(elapsed).toBeLessThan(1000)
+    expect(result.total).toBe(count * 2)
+    expect(result.files[0].findings.at(-1)).toEqual({ line: count, snippet: '</bal-card>' })
+  })
+
+  it('scans four identical 540 KB html files in under a second', () => {
+    const root = createScratchDir()
+    const count = 15000
+    const copies = ['a.html', 'b.html', 'c.html', 'd.html']
+    let text = ''
+    for (let i = 0; i < count; i++) text += `<bal-card class="c${i}">x</bal-card>\n`
+    for (const name of copies) write(root, name, text)
+
+    const started = performance.now()
+    const result = scanBalCard(root)
+    const elapsed = performance.now() - started
+
+    expect(elapsed).toBeLessThan(1000)
+    expect(result.total).toBe(count * 2 * copies.length)
+    expect(result.files.map(file => file.findings.at(-1))).toEqual(
+      copies.map(() => ({ line: count, snippet: '</bal-card>' })),
+    )
+  })
+})

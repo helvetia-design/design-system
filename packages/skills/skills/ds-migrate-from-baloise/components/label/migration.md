@@ -2,7 +2,7 @@
 
 Migrate every `bal-label` usage to `ds-label`. Init has already added the `@helvetia-design/*` packages. This task rewrites usages only.
 
-The legacy folder has one element and no child tags. `bal-field`, `bal-field-label` and `bal-data-label` are different components and are not part of this migration.
+The legacy folder has one element and no child tags. `bal-field`, `bal-field-label` and `bal-data-label` are different components and are not part of this migration. A `bal-label` inside `bal-field-label`, or a direct child of `bal-field`, is skipped only when its `bal-field` is unwrapped in the same pass. `shared/field.md` then folds its text into the `label` prop of the control.
 
 `ds-label` renders in shadow DOM and behaves differently by default. `bal-label` was single-line (`white-space: pre`) and only wrapped with `multiline`. `ds-label` wraps by default and `noWrap` truncates with an ellipsis. It is also `display: block` where `bal-label` was inline. No markup change is needed for this. Mention it once in the report.
 
@@ -36,19 +36,19 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-label`)    | new (`ds-label`)       | handling                                                                                                                                                                                                                            |
-| -------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `htmlFor`            | `htmlFor`              | Copy as-is, including bindings.                                                                                                                                                                                                     |
-| `htmlId`             | `htmlId`               | Copy as-is, including bindings.                                                                                                                                                                                                     |
-| `required`           | `required`             | Copy as-is, including `required="false"` and `required={false}`. The default is still `true`.                                                                                                                                       |
-| `noWrap`             | `noWrap`               | Copy as-is, including bindings.                                                                                                                                                                                                     |
-| `valid`, `invalid`   | `valid`, `invalid`     | Copy as-is, including bindings.                                                                                                                                                                                                     |
-| `disabled`           | `disabled`             | Copy as-is, including bindings.                                                                                                                                                                                                     |
-| `readonly`           | `disabled`             | `bal-label` styled `readonly` like `disabled`. Rename to `disabled`, keeping the value or binding. When `disabled` is already on the same element, drop `readonly`. List every rename for the summary.                              |
-| `multiline`          | _(now the default)_    | Drop the attribute, since `ds-label` wraps by default. When the value is a binding (`[multiline]`, `multiline={x}`), drop it too and flag the occurrence, because a binding that resolved to `false` now wraps.                     |
-| `size="small"`       | `size="sm"`            | Rewrite static values: `small` to `sm`, `large` to `lg`, `x-large` to `xl`, `xx-large` to `2xl`, `xxx-large` to `3xl`. Drop `size=""`. Leave bindings (`[size]`, `size={x}`) unchanged and flag them, the value set is different.   |
-| `weight`             | _(no equivalent prop)_ | Leave the attribute in place, do not drop it. `ds-label` has no weight, so `weight="regular"` has no effect after the migration. In strictly typed React or Angular templates it may not compile. Flag every occurrence for review. |
-| `hovered`, `pressed` | _(internal)_           | Were `@internal`, not a consumer API. Leave them in place and flag them.                                                                                                                                                            |
+| old (`bal-label`) | new (`ds-label`) | handling |
+| --- | --- | --- |
+| `htmlFor` | `htmlFor` | Copy as-is, including bindings. |
+| `htmlId` | `htmlId` | Copy as-is, including bindings. |
+| `required` | `required` | Copy as-is, including `required="false"` and `required={false}`. The default is still `true`. |
+| `noWrap` | `noWrap` | Copy as-is, including bindings. |
+| `valid`, `invalid` | `valid`, `invalid` | Copy as-is, including bindings. |
+| `disabled` | `disabled` | Copy as-is, including bindings. |
+| `readonly` | `disabled` | `bal-label` styled `readonly` like `disabled`. Rename to `disabled`, keeping the value or binding. When `disabled` is already on the same element, drop `readonly`. List every rename for the report. |
+| `multiline` | _(now the default)_ | Drop the attribute, since `ds-label` wraps by default. When the value is a binding (`[multiline]`, `multiline={x}`), drop it too and flag the occurrence, because a binding that resolved to `false` now wraps. |
+| `size="small"` | `size="sm"` | Rewrite static values: `small` to `sm`, `large` to `lg`, `x-large` to `xl`, `xx-large` to `2xl`, `xxx-large` to `3xl`. Drop `size=""`. A binding (`[size]`, `size={x}`): HTML keeps it and flags it, because the value set is different. React and Angular keep it when the expression's type only admits `sm`, `lg`, `xl`, `2xl` or `3xl`. Otherwise apply Unmapped props and handlers (`SKILL.md`). |
+| `weight` | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). `ds-label` has no weight. |
+| `hovered`, `pressed` | _(internal)_ | Were `@internal`, not a consumer API. Apply Unmapped props and handlers (`SKILL.md`). |
 
 ### Tags and imports
 
@@ -64,20 +64,32 @@ Neither `bal-label` nor `ds-label` has a public event. Nothing to rewrite.
 
 `setAriaForm()` and `configChanged()` were `@internal` and are not a consumer API. `ds-label` has no `setAriaForm()`.
 
-### Lost linking inside `bal-field`
+### Inside `bal-field`
 
-A `bal-label` inside `bal-field` got its `for` and `id` from the field. `ds-label` is not linked by a parent, so it needs an explicit `htmlFor` that matches the control's `id`. Do not add it: the scan cannot see the control. For every migrated label without `htmlFor`, list it in the summary.
+A `bal-label` inside `bal-field-label`, or a direct child of `bal-field`, got its `for` and `id` from the field. Two cases apply.
+
+- The `bal-field` is unwrapped in the same pass, because its control is already `ds-*` or migrated now. Skip the `bal-label`. `shared/field.md` turns its text into the `label` prop of the control, and `ds-*` links its own label.
+- The `bal-field` stays in place, because its control is still a legacy `bal-*` tag. Migrate the `bal-label` to `ds-label` as usual and list it in the report as "inside a `bal-field` that stays until `<control>` is migrated".
+
+A `bal-label` outside any `bal-field` is migrated as above.
 
 ## 4. Report
 
-Print a per-file summary of what changed. End with the items below, each with file and line:
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-- every `readonly` renamed to `disabled`
-- every `multiline` binding that was dropped
-- every dynamic `size` binding left unchanged
-- every `weight`, `hovered` and `pressed` left for manual review
-- every migrated label without `htmlFor`, which may have been linked by `bal-field`
+Needs your attention when found:
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+1. Every `multiline` binding that was dropped. A binding that resolved to `false` now wraps.
+2. Every dynamic `size` binding, kept or removed (Unmapped). The value set is different.
+3. Every `weight`, with its Unmapped props and handlers outcome.
+4. Every `hovered` or `pressed`, with its Unmapped props and handlers outcome.
+5. Every migrated label inside a `bal-field` that stays until its control is migrated, as "inside a `bal-field` that stays until `<control>` is migrated". It stays unlinked until then.
 
-Done when the summary is printed and the working tree is still unstaged.
+Coverage only, written to the file:
+
+6. Every `readonly` renamed to `disabled`.
+7. One-time note: `ds-label` wraps by default, `noWrap` truncates with an ellipsis, and it is `display: block` where `bal-label` was inline.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

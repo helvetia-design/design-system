@@ -109,7 +109,102 @@ describe('scanBalApp', () => {
     })
   })
 
-  it('does not match a longer name that merely starts with BalApp, or the CSS height variable', () => {
+  it('finds the Angular provideBaloiseDesignSystem config call', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/app.config.ts',
+      [
+        "import { provideBaloiseDesignSystem } from '@baloise/ds-angular'",
+        "export const appConfig = { providers: [provideBaloiseDesignSystem({ defaults: { region: 'BE' } })] }",
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalApp(root)).toEqual({
+      total: 2,
+      files: [
+        {
+          file: 'src/app.config.ts',
+          findings: [
+            { line: 1, snippet: "import { provideBaloiseDesignSystem } from '@baloise/ds-angular'" },
+            {
+              line: 2,
+              snippet:
+                "export const appConfig = { providers: [provideBaloiseDesignSystem({ defaults: { region: 'BE' } })] }",
+            },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('finds the NgModule BaloiseDesignSystemModule.forRoot config call', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/app/app.module.ts',
+      [
+        "import { BaloiseDesignSystemModule } from '@baloise/ds-angular-legacy'",
+        '@NgModule({',
+        "  imports: [BrowserModule, BaloiseDesignSystemModule.forRoot({ defaults: { region: 'BE' } })],",
+        '})',
+        'export class AppModule {}',
+        'const BaloiseDesignSystemModuleFoo = 1',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalApp(root)).toEqual({
+      total: 2,
+      files: [
+        {
+          file: 'src/app/app.module.ts',
+          findings: [
+            { line: 1, snippet: "import { BaloiseDesignSystemModule } from '@baloise/ds-angular-legacy'" },
+            {
+              line: 3,
+              snippet: "imports: [BrowserModule, BaloiseDesignSystemModule.forRoot({ defaults: { region: 'BE' } })],",
+            },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('finds updateBalLanguage calls and imports in a class that never names the component', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'src/app/app.component.ts',
+      [
+        "import { updateBalLanguage, BalLanguage } from '@baloise/ds-angular'",
+        'export class AppComponent {',
+        '  // updateBalLanguage(language) also ran here',
+        '  changeLanguage(language: BalLanguage) {',
+        '    updateBalLanguage(language)',
+        '  }',
+        '}',
+        'const updateBalLanguageFoo = 1',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalApp(root)).toEqual({
+      total: 2,
+      files: [
+        {
+          file: 'src/app/app.component.ts',
+          findings: [
+            { line: 1, snippet: "import { updateBalLanguage, BalLanguage } from '@baloise/ds-angular'" },
+            { line: 5, snippet: 'updateBalLanguage(language)' },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('does not match a longer name that merely starts with BalApp or a config call, or the CSS height variable', () => {
     const root = createScratchDir()
     write(
       root,
@@ -119,6 +214,7 @@ describe('scanBalApp', () => {
         'const BalAppliance = 1',
         "const height = 'var(--bal-app-height)'",
         "const other = 'initializeDesignSystem'",
+        'const provideBaloiseDesignSystemFoo = 1',
         '',
       ].join('\n'),
     )
@@ -336,8 +432,31 @@ describe('app migration.md', () => {
       'same name and a `.ts` extension',
       'per-file summary',
       'git commit',
+      'provideBaloiseDesignSystem',
+      'BaloiseDesignSystemModule.forRoot(config)',
+      'add it to the `providers` of the NgModule whose `imports` hold that call',
+      'unchanged, in every framework',
+      'shared/legacy-config.md',
+      'Keep the `useBaloiseDesignSystem()` call and its import specifier unchanged',
+      'Remove only `BalApp` from the `@baloise/ds-react` import',
+      'updateBalLanguage',
+      'DsConfigService',
+      'updateDsLanguage',
+      'provideDesignSystem()',
+      'DsLanguage',
     ]) {
       expect(migration, phrase).toContain(phrase)
+    }
+    for (const phrase of [
+      'Move the legacy config values',
+      'delete the `useBaloiseDesignSystem()` call',
+      'keeps only its `icons` entry',
+      'when its call was deleted',
+      'Drop it. The option no longer exists',
+      'It stays in the legacy call',
+      'call was kept unchanged until the last `bal-*` component is migrated',
+    ]) {
+      expect(migration, phrase).not.toContain(phrase)
     }
   })
 })

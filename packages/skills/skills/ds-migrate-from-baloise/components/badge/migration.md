@@ -34,27 +34,27 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-badge`)                                           | new (`ds-badge`)     | handling                                                                                                                                                                          |
-| ----------------------------------------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `icon`                                                      | `icon`               | Copy as-is, including `icon=""` and the `'...'` form.                                                                                                                             |
-| `size` omitted or `size=""`                                 | omit `size`          | Leave `size` unset. Both render the base size.                                                                                                                                    |
-| `size="small"` / `small` (boolean)                          | `size="sm"`          | Rewrite to the short value. HTML and Angular: write `size="sm"`. React: write `size="sm"`. Also rewrite `size='small'`, `size={"small"}`, and `size={'small'}`.                   |
-| `size="large"` / `large` (boolean)                          | `size="lg"`          | Rewrite to the short value, same forms as above.                                                                                                                                  |
-| `color` omitted or `color=""`                               | omit `color`         | Leave `color` unset. Both render the same default background, which is visually identical to `danger` (same token value on both sides).                                           |
-| `color="grey"`                                              | `color="disabled"`   | Rename. `ds-badge`'s own stylesheet documents `disabled` as the same grey-on-light-grey palette `grey` used. Also rewrite `color='grey'`, `color={"grey"}`, and `color={'grey'}`. |
-| `color="danger"` / `color="red"`                            | `color="danger"`     | Both were aliases for the same background token in the legacy component. Collapse either spelling to `danger`.                                                                    |
-| `color="warning"` / `color="yellow"`                        | `color="warning"`    | Same as above: `yellow` was an alias for `warning`. Collapse to `warning`.                                                                                                        |
-| `color="success"` / `color="green"`                         | `color="success"`    | Same as above: `green` was an alias for `success`. Collapse to `success`.                                                                                                         |
-| `color="purple"`                                            | _(no equivalent)_    | Legacy used `purple` as its only "info"-like accent. `ds-badge` has no purple or info color. Drop the attribute and mention each one in the summary.                              |
-| `color` not a string literal                                | leave the expression | Do not guess a runtime color. Say in the summary that `disabled`, `danger`, `warning`, and `success` are the only styled colors now.                                              |
-| `position="card"` / `position="button"` / `position="tabs"` | same                 | Copy as-is, including the `'...'`, `{"..."}`, and `{'...'}` forms. All three values are unchanged.                                                                                |
-| _(none)_                                                    | `pulse`              | New prop. Nothing to migrate from. Leave it unset.                                                                                                                                |
+| old (`bal-badge`) | new (`ds-badge`) | handling |
+| --- | --- | --- |
+| `icon` | `icon` | Copy as-is, including `icon=""` and the `'...'` form, then apply the icon name rule from `shared/icons.md` to a non-empty literal. |
+| `size` omitted or `size=""` | omit `size` | Leave `size` unset. Both render the base size. |
+| `size="small"` / `small` (boolean) | `size="sm"` | Rewrite to the short value. HTML and Angular: write `size="sm"`. React: write `size="sm"`. Also rewrite `size='small'`, `size={"small"}`, and `size={'small'}`. |
+| `size="large"` / `large` (boolean) | `size="lg"` | Rewrite to the short value, same forms as above. |
+| `color` omitted or `color=""` | omit `color` | Leave `color` unset. Both render the same default background, which is visually identical to `danger` (same token value on both sides). |
+| `color="grey"` | `color="disabled"` | Rename. `ds-badge`'s own stylesheet documents `disabled` as the same grey-on-light-grey palette `grey` used. Also rewrite `color='grey'`, `color={"grey"}`, and `color={'grey'}`. |
+| `color="danger"` / `color="red"` | `color="danger"` | Both were aliases for the same background token in the legacy component. Collapse either spelling to `danger`. |
+| `color="warning"` / `color="yellow"` | `color="warning"` | Same as above: `yellow` was an alias for `warning`. Collapse to `warning`. |
+| `color="success"` / `color="green"` | `color="success"` | Same as above: `green` was an alias for `success`. Collapse to `success`. |
+| `color="purple"` | _(no equivalent)_ | Legacy used `purple` as its only "info"-like accent. `ds-badge` has no purple or info color. Drop the attribute and mention each one in the report. |
+| `color` not a string literal | see handling | Do not guess a runtime color. HTML: leave the expression. React and Angular: keep it when the expression's type only admits `disabled`, `danger`, `warning` or `success`. Otherwise apply Unmapped props and handlers (`SKILL.md`). Say in the report that these are the only styled colors now. |
+| `position="card"` / `position="button"` / `position="tabs"` | same | Copy as-is, including the `'...'`, `{"..."}`, and `{'...'}` forms. All three values are unchanged. |
+| _(none)_ | `pulse` | New prop. Nothing to migrate from. Leave it unset. |
 
 ### Icon and text now render together
 
 Legacy `bal-badge` hid the slotted text whenever `icon` was set — the component doc comment says so directly ("If a icon is present text should be hidden"), and at `size="small"` it hid both the icon and the text, showing an empty dot. `ds-badge` has no such hiding logic: the slot content and the icon always render side by side, except at `size="sm"`, which hides everything (matching the old `small` dot).
 
-So for every finding where `icon` is set and the size is not `small`/`sm`, the migrated badge will show the slotted text next to the icon where before only the icon was visible. Do not invent a hidden-span workaround to restore the old look. Rewrite the tag and props as described above, and mention every one of these findings in the summary so the consumer can decide whether to remove the now-visible text.
+So for every finding where `icon` is set and the size is not `small`/`sm`, the migrated badge will show the slotted text next to the icon where before only the icon was visible. Do not invent a hidden-span workaround to restore the old look. Rewrite the tag and props as described above, and mention every one of these findings in the report so the consumer can decide whether to remove the now-visible text.
 
 ### Tags and imports
 
@@ -72,6 +72,20 @@ Neither component has any public methods.
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `color="grey"` renamed to `color="disabled"`, every `color="red"` / `"yellow"` / `"green"` collapsed to `"danger"` / `"warning"` / `"success"`, every dropped `color="purple"`, every `size="small"` / `"large"` rewritten to `"sm"` / `"lg"`, and every badge where slotted text now renders next to its icon where only the icon showed before. Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Done when the summary is printed and the working tree is still unstaged.
+Needs your attention when found:
+
+1. Every dropped `color="purple"`.
+2. Every badge with an `icon` whose slotted text now renders next to the icon, where only the icon showed before. The consumer decides whether to remove the now visible text.
+3. Every `color` left as a non-literal expression, with the framework outcome (left in HTML, kept or removed (Unmapped) in React and Angular) and the note that `disabled`, `danger`, `warning`, and `success` are the only styled colors now.
+
+Coverage only, written to the file:
+
+4. Every `color="grey"` renamed to `color="disabled"`.
+5. Every `color="red"`, `"yellow"` or `"green"` collapsed to `"danger"`, `"warning"` or `"success"`.
+6. Every `size="small"` or `"large"` rewritten to `"sm"` or `"lg"`.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

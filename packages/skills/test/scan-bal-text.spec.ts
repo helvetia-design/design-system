@@ -332,7 +332,7 @@ describe('text migration.md', () => {
       'size="lead"',
       'size="block"',
       'color="white"',
-      'color="inverted"',
+      'Do **not** write `color="inverted"`',
       'inverted="true"',
       'color="blue"',
       'color="primary"',
@@ -354,5 +354,7 @@ describe('text migration.md', () => {
     ]) {
       expect(migration, phrase).toContain(phrase)
     }
+    expect(migration).not.toMatch(/(?<!not\*\* )write `color="inverted"`/)
+    expect(migration).not.toContain('rewritten to `color="inverted"`')
   })
 })

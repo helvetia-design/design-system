@@ -2,19 +2,28 @@
 import { realpathSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
+import { lineAt, lineText, readTag, scanSourceFilesWithSetValue, toSnippet } from './source-scan.mjs'
 
 const USAGE_RE =
-  /<\/?bal-radio(?:-group|-icon)?(?![\w-])|<\/?BalRadio(?:Group|Icon)?\b|\bBalRadio(?:Group|Icon)?\b|\bnewBalRadioOption\b/g
+  /<\/?bal-radio(?:-group|-icon)?(?![\w-])|<\/?BalRadio(?:Group|Icon)?\b|\bBalEvents\.BalRadio[A-Z]\w*|\bBalRadio(?:Group|Icon)?(?:CustomEvent)?\b|\bBalRadioBundle\b|\bnewBalRadioOption\b/g
 
-export function scanBalRadio(rootDir) {
+export function scanBalRadio(rootDir, paths = []) {
   const found = []
-  scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found))
-  return group(found)
+  const unmatched = scanSourceFilesWithSetValue(
+    rootDir,
+    ({ file, masked, text }) => collect(file, text, masked, found),
+    {
+      paths,
+      elementType: 'HTMLBalRadioGroupElement',
+      found,
+    },
+  )
+  const result = group(found)
+  return unmatched.length > 0 ? { ...result, unmatched } : result
 }
 
-export function run(rootDir, stdout) {
-  stdout.write(`${JSON.stringify(scanBalRadio(rootDir), null, 2)}\n`)
+export function run(rootDir, stdout, paths = []) {
+  stdout.write(`${JSON.stringify(scanBalRadio(rootDir, paths), null, 2)}\n`)
   return 0
 }
 
@@ -30,7 +39,7 @@ function group(found) {
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([file, findings]) => ({
       file,
-      findings: findings.sort((a, b) => a.index - b.index).map(({ line, snippet }) => ({ line, snippet })),
+      findings: findings.sort((a, b) => a.index - b.index).map(({ file: _file, index: _index, ...finding }) => finding),
     }))
 
   return {
@@ -62,7 +71,7 @@ function isMainModule() {
 if (isMainModule()) {
   const root = process.argv[2] ? resolve(process.argv[2]) : process.cwd()
   try {
-    process.exit(run(root, process.stdout))
+    process.exit(run(root, process.stdout, process.argv.slice(3)))
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
     process.exit(1)

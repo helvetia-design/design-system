@@ -1,0 +1,22 @@
+{
+  "renamed": {
+    "account": "user",
+    "add-user": "user-add",
+    "contact": "message",
+    "delete": "trash",
+    "duplicate": "copy",
+    "nav-back": "back",
+    "nav-go-down": "caret-down",
+    "nav-go-left": "caret-left",
+    "nav-go-right": "caret-right",
+    "nav-go-up": "caret-up",
+    "read-only": "eye",
+    "twitter": "x"
+  },
+  "approximated": {
+    "arrow-down": "caret-down"
+  },
+  "lost": ["arrow-right-down", "arrow-right-up", "reply", "star-shape"],
+  "changed": ["message"],
+  "renameTargets": ["message"]
+}

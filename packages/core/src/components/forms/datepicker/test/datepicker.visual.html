@@ -17,7 +17,12 @@
       <!-- Basic -->
       <section data-testid="basic">
         <span>Basic</span>
-        <ds-datepicker label="Date of birth" description="Enter your date of birth" required="false"></ds-datepicker>
+        <ds-datepicker
+          label="Date of birth"
+          description="Enter your date of birth"
+          required="false"
+          default-date="2020-06-15"
+        ></ds-datepicker>
       </section>
 
       <!-- Form -->
@@ -36,8 +41,15 @@
           description="2024-01-04 - 2024-12-24"
           min="2024-01-04"
           max="2024-12-24"
+          default-date="2024-06-15"
         ></ds-datepicker>
-        <ds-datepicker label="Label" description="2027 - 2028" min-year="2027" max-year="2028"></ds-datepicker>
+        <ds-datepicker
+          label="Label"
+          description="2027 - 2028"
+          min-year="2027"
+          max-year="2028"
+          default-date="2027-06-15"
+        ></ds-datepicker>
       </section>
 
       <!-- Free Solo -->
@@ -59,6 +71,7 @@
           id="allowed-dates-input"
           label="Label"
           description="Only allow round number days"
+          default-date="2020-06-15"
         ></ds-datepicker>
         <script>
           const date = document.querySelector('#allowed-dates-input')
@@ -199,7 +212,7 @@
       <!-- Inline -->
       <section data-testid="inline">
         <span>Inline</span>
-        <ds-datepicker label="Label 1" description="Description 1" inline></ds-datepicker>
+        <ds-datepicker label="Label 1" description="Description 1" inline default-date="2020-06-15"></ds-datepicker>
         <ds-datepicker disabled label="Label 1" description="Description 1" inline value="2026-09-13"></ds-datepicker>
       </section>
     </main>

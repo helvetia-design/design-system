@@ -34,24 +34,24 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-content`)                  | new (`ds-content`)       | handling                                                                                                                                                                                           |
-| ------------------------------------ | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `layout="horizontal"`                | `direction="row"`        | Rename the prop and the value. Also rewrite `layout='horizontal'`, `layout={"horizontal"}`, and `layout={'horizontal'}`.                                                                           |
-| `layout="vertical"`                  | `direction="column"`     | Rename the prop and the value. Also rewrite `layout='vertical'`, `layout={"vertical"}`, and `layout={'vertical'}`.                                                                                 |
-| `layout=""` or `layout` omitted      | omit `direction`         | Drop `layout`. Leave `direction` unset.                                                                                                                                                            |
-| `[layout]="x"`, `layout={x}`         | `direction`              | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line in the summary for manual review: the new prop is `direction` with `row` and `column`.             |
-| `direction`, `alignment`             | `direction`, `alignment` | Undocumented legacy props with the same name and values. Copy as-is.                                                                                                                               |
-| `align="start"`, `"center"`, `"end"` | `align`                  | Copy as-is, including the `'...'`, `{"..."}`, and `{'...'}` forms. The value set is unchanged. See the text alignment note in the report step.                                                     |
-| `[align]="x"`, `align={x}`           | `align`                  | Copy as-is.                                                                                                                                                                                        |
-| `space="none"`                       | `space="none"`           | Copy as-is.                                                                                                                                                                                        |
-| `space="xxx-small"`                  | `space="3xs"`            | Rewrite to the short value. Also rewrite the `'...'`, `{"..."}`, and `{'...'}` forms.                                                                                                              |
-| `space="xx-small"`                   | `space="2xs"`            | Same.                                                                                                                                                                                              |
-| `space="x-small"`                    | `space="xs"`             | Same.                                                                                                                                                                                              |
-| `space="small"`                      | `space="sm"`             | Same.                                                                                                                                                                                              |
-| `space="normal"`                     | `space="base"`           | Same.                                                                                                                                                                                              |
-| `space=""` or `space` omitted        | omit `space`             | Drop `space`. Leave it unset. The default gap is the same `0.25rem` in both components.                                                                                                            |
-| `[space]="x"`, `space={x}`           | `space`                  | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line in the summary for manual review: the new values are `none`, `3xs`, `2xs`, `xs`, `sm`, and `base`. |
-| _(none)_                             | `textAlign`              | New prop (`left`, `center`, `right`). Nothing to migrate from. Leave it unset.                                                                                                                     |
+| old (`bal-content`) | new (`ds-content`) | handling |
+| --- | --- | --- |
+| `layout="horizontal"` | `direction="row"` | Rename the prop and the value. Also rewrite `layout='horizontal'`, `layout={"horizontal"}`, and `layout={'horizontal'}`. |
+| `layout="vertical"` | `direction="column"` | Rename the prop and the value. Also rewrite `layout='vertical'`, `layout={"vertical"}`, and `layout={'vertical'}`. |
+| `layout=""` or `layout` omitted | omit `direction` | Drop `layout`. Leave `direction` unset. |
+| `[layout]="x"`, `layout={x}` | `layout` (deprecated) | Dynamic value. Do not guess the mapping. `ds-content` still accepts the deprecated `layout` with `horizontal`, `vertical`, `horizontal-reverse` and `vertical-reverse`, so the binding keeps its name. HTML: copy the binding unchanged and list the file and line in the report for manual review. React and Angular: copy it when the expression's type only admits those four values. Otherwise apply Unmapped props and handlers (`SKILL.md`). The report says that `layout` is deprecated and that the consumer moves it to `direction` by hand: `horizontal` becomes `row` and `vertical` becomes `column`. |
+| `direction`, `alignment` | `direction`, `alignment` | Undocumented legacy props with the same name and values. Copy as-is. |
+| `align="start"`, `"center"`, `"end"` | `align` | Copy as-is, including the `'...'`, `{"..."}`, and `{'...'}` forms. The value set is unchanged. See the text alignment note in the report step. |
+| `[align]="x"`, `align={x}` | `align` | Copy as-is. |
+| `space="none"` | `space="none"` | Copy as-is. |
+| `space="xxx-small"` | `space="3xs"` | Rewrite to the short value. Also rewrite the `'...'`, `{"..."}`, and `{'...'}` forms. |
+| `space="xx-small"` | `space="2xs"` | Same. |
+| `space="x-small"` | `space="xs"` | Same. |
+| `space="small"` | `space="sm"` | Same. |
+| `space="normal"` | `space="base"` | Same. |
+| `space=""` or `space` omitted | omit `space` | Drop `space`. Leave it unset. The default gap is the same `0.25rem` in both components. |
+| `[space]="x"`, `space={x}` | `space` | Dynamic value. Do not guess the mapping. HTML: copy the binding unchanged and list the file and line in the report for manual review. React and Angular: copy it when the expression's type only admits `none`, `3xs`, `2xs`, `xs`, `sm` or `base`. Otherwise apply Unmapped props and handlers (`SKILL.md`). The report names the value mapping from the rows above. |
+| _(none)_ | `textAlign` | New prop (`left`, `center`, `right`). Nothing to migrate from. Leave it unset. |
 
 ### Tags and imports
 
@@ -69,15 +69,20 @@ Neither component has a public method a consumer calls. There is no sibling-file
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `layout` rewritten to `direction`, every `space` value shortened, and every dynamic `layout` or `space` binding left for manual review.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Also report the rendering differences the scan cannot see, so the consumer can check them. Do not add attributes to compensate:
+Needs your attention when found:
 
-- The legacy `align="center"` and `align="end"` also set `text-align` to `center` and `right`. `ds-content` `align` only positions the children, so the text alignment is no longer set. The new `textAlign` prop (`left`, `center`, `right`) restores it. List every `align` usage that was not `start`.
-- The legacy `bal-content` with `layout="horizontal"` keeps `align-items: flex-start`. `ds-content` with `direction="row"` centers the children vertically. List every file that was rewritten to `direction="row"`.
+1. Every dynamic `layout` or `space` binding, with the framework outcome (copied in HTML, copied or removed (Unmapped) in React and Angular).
+2. Every `align` that was not `start`. The legacy `align="center"` and `align="end"` also set `text-align` to `center` and `right`. `ds-content` `align` only positions the children, so the text alignment is no longer set. The new `textAlign` prop (`left`, `center`, `right`) restores it. Do not add it yourself.
+3. Every file rewritten to `direction="row"`. The legacy `bal-content` with `layout="horizontal"` keeps `align-items: flex-start`, and `ds-content` with `direction="row"` centers the children vertically. Do not add attributes to compensate.
+4. Every selector that targets the legacy host and that the scan cannot see. The legacy `bal-content` set the classes `bal-content`, `bal-content--layout-*`, `bal-content--align-*`, and `bal-content--space-*` on the host. `ds-content` sets `ds-stack-content`, `as-row`, `as-col`, `align-*`, `text-*`, and `has-space-*` instead. Tests and styles that query the old classes break. Do not rewrite those selectors yourself. Report them.
 
-Also list every selector that targeted the legacy host and that the scan cannot see. The legacy `bal-content` set the classes `bal-content`, `bal-content--layout-*`, `bal-content--align-*`, and `bal-content--space-*` on the host. `ds-content` sets `ds-stack-content`, `as-row`, `as-col`, `align-*`, `text-*`, and `has-space-*` instead. Tests and styles that query the old classes break. Do not rewrite those selectors yourself. Report them.
+Coverage only, written to the file:
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+5. Every `layout` rewritten to `direction`.
+6. Every `space` value shortened.
 
-Done when the summary is printed and the working tree is still unstaged.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

@@ -126,6 +126,95 @@ describe('scanBalPopup', () => {
     })
   })
 
+  it('lists setAttribute calls with a literal bal-popup name', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'trigger.ts',
+      [
+        "trigger.setAttribute('bal-popup', 'a')",
+        'trigger.setAttribute("bal-popup", "b")',
+        'trigger.setAttribute(`bal-popup`, id)',
+        "trigger.setAttribute('bal-popup-placement', 'top')",
+        "ref.current?.setAttribute('bal-popup', popupId)",
+        'el.setAttribute(',
+        "  'bal-popup-backdrop-dismiss',",
+        "  'true',",
+        ')',
+      ].join('\n'),
+    )
+
+    expect(scanBalPopup(root)).toEqual({
+      total: 6,
+      files: [
+        {
+          file: 'trigger.ts',
+          findings: [
+            { line: 1, snippet: "trigger.setAttribute('bal-popup', 'a')" },
+            { line: 2, snippet: 'trigger.setAttribute("bal-popup", "b")' },
+            { line: 3, snippet: 'trigger.setAttribute(`bal-popup`, id)' },
+            { line: 4, snippet: "trigger.setAttribute('bal-popup-placement', 'top')" },
+            { line: 5, snippet: "ref.current?.setAttribute('bal-popup', popupId)" },
+            { line: 6, snippet: 'el.setAttribute(' },
+          ],
+        },
+      ],
+    })
+  })
+
+  it.each(['variant', 'closable', 'backdrop-dismiss', 'backdrop', 'placement', 'arrow', 'reference', 'offset'])(
+    'lists setAttribute calls with the bal-popup-%s override',
+    override => {
+      const root = createScratchDir()
+      const line = `el.setAttribute('bal-popup-${override}', 'x')`
+      write(root, 'trigger.ts', `${line}\n`)
+
+      expect(scanBalPopup(root)).toEqual({
+        total: 1,
+        files: [{ file: 'trigger.ts', findings: [{ line: 1, snippet: line }] }],
+      })
+    },
+  )
+
+  it('lists a setAttribute call after an astral character in a string or comment', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'trigger.ts',
+      ['// \u{1F680} launch', "const s = '\u{1F600} hi'", "trigger.setAttribute('bal-popup', 'a')"].join('\n'),
+    )
+
+    expect(scanBalPopup(root)).toEqual({
+      total: 1,
+      files: [{ file: 'trigger.ts', findings: [{ line: 3, snippet: "trigger.setAttribute('bal-popup', 'a')" }] }],
+    })
+  })
+
+  it('does not list other setAttribute names, other methods, or calls in comments', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'trigger.ts',
+      [
+        "el.setAttribute('data-popup', 'a')",
+        "el.setAttribute('bal-popupx', 'a')",
+        "el.setAttribute('bal-popup-unknown', 'a')",
+        "el.setAttribute(`bal-popup-${name}`, 'a')",
+        "el.setAttribute(name, 'bal-popup')",
+        "el.setAttribute('bal-popup' + suffix, 'a')",
+        'const snippet = `',
+        "  el.setAttribute('bal-popup', 'a')",
+        '`',
+        "el.getAttribute('bal-popup')",
+        "el.removeAttribute('bal-popup')",
+        "// el.setAttribute('bal-popup', 'a')",
+        "/* el.setAttribute('bal-popup', 'a') */",
+      ].join('\n'),
+    )
+
+    expect(scanBalPopup(root)).toEqual({ total: 0, files: [] })
+  })
+
   it('lists the trigger attribute and its overrides in a file that never names the tag', () => {
     const root = createScratchDir()
     const line = '<bal-button bal-popup="p1" bal-popup-placement="right"></bal-button>'
@@ -292,17 +381,17 @@ describe('Detect', () => {
     const root = createScratchDir()
     write(root, 'index.html', '<bal-popup id="p1"></bal-popup>\n')
 
-    expect(scanMigratable(root).suggested).toEqual([{ name: 'popup', total: 2 }])
+    expect(scanMigratable(root).suggested).toEqual([{ name: 'popup', total: 1 }])
   })
 
-  it('does not suggest popup from a trigger attribute alone', () => {
+  it('suggests popup from a trigger attribute alone', () => {
     const root = createScratchDir()
     write(root, 'trigger.html', '<bal-button bal-popup="p1"></bal-button>\n')
 
-    const result = scanMigratable(root)
-
-    expect(JSON.stringify(result)).not.toContain('popup')
-    expect(result.suggested).toEqual([{ name: 'button', total: 2 }])
+    expect(scanMigratable(root).suggested).toEqual([
+      { name: 'button', total: 1 },
+      { name: 'popup', total: 1 },
+    ])
   })
 })
 
@@ -322,6 +411,8 @@ describe('popup migration.md', () => {
       '@helvetia-design/angular',
       '@helvetia-design/react',
       'data-popup',
+      'setAttribute calls',
+      'eight `bal-popup-*` override attributes',
       'bal-popup-placement',
       'bal-popup-reference',
       'variant="drawer"',

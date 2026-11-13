@@ -4,17 +4,28 @@ import { resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
-const USAGE_RE =
-  /<\/?bal-popup(?![\w-])|\bbal-popup(?:-(?:backdrop-dismiss|backdrop|variant|closable|placement|arrow|reference|offset))?(?![\w-])|<\/?BalPopup\b|\bBalPopup\b|\bbalPopupIs(?:Open|Closed)\b/g
+const TRIGGER_ATTRIBUTE = String.raw`bal-popup(?:-(?:backdrop-dismiss|backdrop|variant|closable|placement|arrow|reference|offset))?`
 
-export function scanBalPopup(rootDir) {
+const USAGE_RE = new RegExp(
+  String.raw`<\/?bal-popup(?![\w-])|\b${TRIGGER_ATTRIBUTE}(?![\w-])|<\/?BalPopup\b|\bBalPopup\b|\bbalPopupIs(?:Open|Closed)\b`,
+  'g',
+)
+
+const SET_ATTRIBUTE_CALL_RE = /\bsetAttribute\s*\(/g
+const TRIGGER_NAME_ARGUMENT_RE = new RegExp(
+  String.raw`\bsetAttribute\s*\(\s*(['"\x60])${TRIGGER_ATTRIBUTE}\1\s*[,)]`,
+  'y',
+)
+
+export function scanBalPopup(rootDir, paths = []) {
   const found = []
-  scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found))
-  return group(found)
+  const unmatched = scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found), { paths })
+  const result = group(found)
+  return unmatched.length > 0 ? { ...result, unmatched } : result
 }
 
-export function run(rootDir, stdout) {
-  stdout.write(`${JSON.stringify(scanBalPopup(rootDir), null, 2)}\n`)
+export function run(rootDir, stdout, paths = []) {
+  stdout.write(`${JSON.stringify(scanBalPopup(rootDir, paths), null, 2)}\n`)
   return 0
 }
 
@@ -47,6 +58,12 @@ function collect(file, text, masked, found) {
     const raw = match[0].startsWith('<') ? readTag(text, index) : lineText(text, index)
     found.push({ file, index, line: lineAt(text, index), snippet: toSnippet(raw) })
   }
+
+  for (const { index } of masked.matchAll(SET_ATTRIBUTE_CALL_RE)) {
+    TRIGGER_NAME_ARGUMENT_RE.lastIndex = index
+    if (!TRIGGER_NAME_ARGUMENT_RE.test(text)) continue
+    found.push({ file, index, line: lineAt(text, index), snippet: toSnippet(lineText(text, index)) })
+  }
 }
 
 function isMainModule() {
@@ -62,7 +79,7 @@ function isMainModule() {
 if (isMainModule()) {
   const root = process.argv[2] ? resolve(process.argv[2]) : process.cwd()
   try {
-    process.exit(run(root, process.stdout))
+    process.exit(run(root, process.stdout, process.argv.slice(3)))
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
     process.exit(1)

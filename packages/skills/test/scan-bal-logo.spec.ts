@@ -250,7 +250,7 @@ describe('Detect', () => {
 
     const { suggested } = scanMigratable(root)
 
-    expect(suggested).toEqual(expect.arrayContaining([{ name: 'logo', total: 2 }]))
+    expect(suggested).toEqual(expect.arrayContaining([{ name: 'logo', total: 1 }]))
   })
 })
 

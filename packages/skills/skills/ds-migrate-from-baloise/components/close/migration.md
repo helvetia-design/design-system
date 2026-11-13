@@ -34,16 +34,16 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-close`)                           | new (`ds-close`)            | handling                                                                                                                                                            |
-| ------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `size="small"`                              | `size="sm"`                 | Rewrite to the short value. Also rewrite `size='small'`, `size={"small"}`, and `size={'small'}`.                                                                    |
-| `size="medium"`                             | `size="md"`                 | Rewrite to the short value. Also rewrite `size='medium'`, `size={"medium"}`, and `size={'medium'}`.                                                                 |
-| `size=""` or `size` omitted                 | omit `size`                 | Drop `size`. Leave it unset.                                                                                                                                        |
-| `[size]="x"`, `[attr.size]="x"`, `size={x}` | `size`                      | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line in the summary for manual review: the new values are `sm` and `md`. |
-| `inverted`                                  | `inverted`                  | Copy as-is, including `inverted="true"`, `inverted={true}`, and `[inverted]="x"`.                                                                                   |
-| _(none)_                                    | `disabled`                  | New prop. Nothing to migrate from. Leave it unset.                                                                                                                  |
-| _(none)_                                    | `button`                    | New prop. Nothing to migrate from. Leave it unset.                                                                                                                  |
-| _(none)_                                    | `buttonColor`, `buttonSize` | New props, only applicable with `button`. Nothing to migrate from. Leave them unset.                                                                                |
+| old (`bal-close`) | new (`ds-close`) | handling |
+| --- | --- | --- |
+| `size="small"` | `size="sm"` | Rewrite to the short value. Also rewrite `size='small'`, `size={"small"}`, and `size={'small'}`. |
+| `size="medium"` | `size="md"` | Rewrite to the short value. Also rewrite `size='medium'`, `size={"medium"}`, and `size={'medium'}`. |
+| `size=""` or `size` omitted | omit `size` | Drop `size`. Leave it unset. |
+| `[size]="x"`, `[attr.size]="x"`, `size={x}` | `size` | Dynamic value. Do not guess the mapping. HTML: copy the binding unchanged and list the file and line in the report for manual review. React and Angular: copy it when the expression's type only admits `sm` or `md`. Otherwise apply Unmapped props and handlers (`SKILL.md`). The report says that `small` is now `sm` and `medium` is now `md`. |
+| `inverted` | `inverted` | Copy as-is, including `inverted="true"`, `inverted={true}`, and `[inverted]="x"`. |
+| _(none)_ | `disabled` | New prop. Nothing to migrate from. Leave it unset. |
+| _(none)_ | `button` | New prop. Nothing to migrate from. Leave it unset. |
+| _(none)_ | `buttonColor`, `buttonSize` | New props, only applicable with `button`. Nothing to migrate from. Leave them unset. |
 
 ### Tags and imports
 
@@ -61,10 +61,17 @@ Neither component has a public method a consumer calls. There is no sibling-file
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every `size="small"` / `"medium"` rewritten to `"sm"` / `"md"` and every dynamic `size` binding left for manual review.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Also list every selector that targeted the legacy internals and that the scan cannot see, so the consumer can fix it. The legacy `bal-close` rendered `data-testid="bal-close"`, the BEM classes `bal-close__button` and `bal-close__button__icon`, and a nested `bal-icon`. `ds-close` renders its button inside shadow DOM as `<button id="close" part="button">`, so tests that query `data-testid="bal-close"` or those classes break, and styles for them need `ds-close::part(button)`. Do not rewrite those selectors yourself. Report them.
+Needs your attention when found:
 
-Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+1. Every dynamic `size` binding, with the framework outcome (copied in HTML, copied or removed (Unmapped) in React and Angular).
+2. Every selector that targets the legacy internals and that the scan cannot see. The legacy `bal-close` rendered `data-testid="bal-close"`, the BEM classes `bal-close__button` and `bal-close__button__icon`, and a nested `bal-icon`. `ds-close` renders its button inside shadow DOM as `<button id="close" part="button">`. Tests that query the test id or those classes break, and styles for them need `ds-close::part(button)`. Do not rewrite those selectors yourself. Report them.
 
-Done when the summary is printed and the working tree is still unstaged.
+Coverage only, written to the file:
+
+3. Every `size="small"` or `"medium"` rewritten to `"sm"` or `"md"`.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

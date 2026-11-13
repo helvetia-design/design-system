@@ -32,17 +32,17 @@ Edit each finding yourself, using the mapping below. Read the whole element when
 
 ### Props
 
-| old (`bal-spinner`)                       | new (`ds-spinner`)                                 | handling                                                                                                                                                                                                                   |
-| ----------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `deactivated`                             | `deactivated`                                      | Copy as-is, including `deactivated="false"` and `deactivated={false}`.                                                                                                                                                     |
-| `variation="logo"` / `variation="circle"` | same                                               | Copy as-is.                                                                                                                                                                                                                |
-| `inverted`                                | `inverted`                                         | Copy as-is.                                                                                                                                                                                                                |
-| `small`, `small="true"`, `small={true}`   | `size="sm"`                                        | Rewrite to `size="sm"`.                                                                                                                                                                                                    |
-| `small="false"`, `small={false}`          | omit `size`                                        | Drop `small`. Leave `size` unset.                                                                                                                                                                                          |
-| `color="blue"`                            | _(no equivalent prop)_                             | Drop `color`. Default rendering already matches blue. Also drop `color='blue'`, `color={"blue"}`, and `color={'blue'}`.                                                                                                    |
-| `color="white"`                           | `inverted`                                         | HTML and Angular: write `inverted="true"`. React: write `inverted`. Also rewrite `color='white'`, `color={"white"}`, and `color={'white'}`. When `inverted` is already present, drop `color` and keep a single `inverted`. |
-| _(none)_                                  | `label`                                            | New prop. Nothing to migrate from. Leave it unset.                                                                                                                                                                         |
-| _(none)_                                  | `labelPosition="right"` / `labelPosition="bottom"` | New prop. Nothing to migrate from. Leave `labelPosition` unset.                                                                                                                                                            |
+| old (`bal-spinner`) | new (`ds-spinner`) | handling |
+| --- | --- | --- |
+| `deactivated` | `deactivated` | Copy as-is, including `deactivated="false"` and `deactivated={false}`. |
+| `variation="logo"` / `variation="circle"` | same | Copy as-is. |
+| `inverted` | `inverted` | Copy as-is. |
+| `small`, `small="true"`, `small={true}` | `size="sm"` | Rewrite to `size="sm"`. |
+| `small="false"`, `small={false}` | omit `size` | Drop `small`. Leave `size` unset. |
+| `color="blue"` | _(no equivalent prop)_ | Drop `color`. Default rendering already matches blue. Also drop `color='blue'`, `color={"blue"}`, and `color={'blue'}`. |
+| `color="white"` | `inverted` | HTML and Angular: write `inverted="true"`. React: write `inverted`. Also rewrite `color='white'`, `color={"white"}`, and `color={'white'}`. When `inverted` is already present, drop `color` and keep a single `inverted`. |
+| _(none)_ | `label` | New prop. Nothing to migrate from. Leave it unset. |
+| _(none)_ | `labelPosition="right"` / `labelPosition="bottom"` | New prop. Nothing to migrate from. Leave `labelPosition` unset. |
 
 ### Tags and imports
 
@@ -56,6 +56,12 @@ There are no event changes. Neither `bal-spinner` nor `ds-spinner` emits a custo
 
 ## 4. Report
 
-Print a per-file summary of what changed. Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Done when the summary is printed and the working tree is still unstaged.
+Coverage only, written to the file:
+
+1. Every `bal-spinner` tag rewritten to `ds-spinner`, with its count.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

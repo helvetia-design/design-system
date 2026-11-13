@@ -1,6 +1,6 @@
 {
   "name": "@helvetia-design/assets",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "The Helvetia Design System is an open source project for styling awesome web applications that follow the Helvetia corporate styling guidelines.",
   "repository": {
     "type": "git",
@@ -23,7 +23,8 @@
     "./dist": {
       "import": "./dist/src/index.js",
       "types": "./dist/src/index.d.ts"
-    }
+    },
+    "./fonts/scss": "./src/fonts/scss/fonts.scss"
   },
   "files": [
     "dist/",

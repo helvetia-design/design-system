@@ -480,3 +480,36 @@ export const ResponsiveThirds = Story({
   ),
 })
 ResponsiveThirds.storyName = '🌍 Responsive Thirds'
+
+export const WebComponents = Story({
+  ...withRender(
+    () => `
+<div class="ds-form">
+  <div class="ds-form-col desktop:is-3">
+    <ds-input label="PLZ" placeholder="4000"></ds-input>
+  </div>
+
+  <div class="ds-form-col desktop:is-9">
+    <ds-input label="Ort" placeholder="Basel"></ds-input>
+  </div>
+
+  <div class="ds-form-col desktop:is-6">
+    <ds-select label="Country" description="Select your country">
+      <ds-select-option value="ch">Switzerland</ds-select-option>
+      <ds-select-option value="de">Germany</ds-select-option>
+      <ds-select-option value="at">Austria</ds-select-option>
+    </ds-select>
+  </div>
+
+  <div class="ds-form-col desktop:is-6">
+    <ds-datepicker label="Date of birth"></ds-datepicker>
+  </div>
+
+  <div class="ds-form-col">
+    <ds-input label="Email" type="email" invalid invalid-text="Enter a valid email address" value="jane@"></ds-input>
+  </div>
+</div>
+  `,
+  ),
+})
+WebComponents.storyName = '🌍 Web Components'

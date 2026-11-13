@@ -456,4 +456,21 @@ describe('accordion migration.md', () => {
       expect(migration, phrase).toContain(phrase)
     }
   })
+
+  it('drops the card prop without wrapping the accordion in ds-card', () => {
+    const migration = readFileSync(
+      join(
+        dirname(fileURLToPath(import.meta.url)),
+        '../skills/ds-migrate-from-baloise/components/accordion/migration.md',
+      ),
+      'utf8',
+    )
+    const cardRow = migration.split('\n').find(line => line.startsWith('| `bal-accordion` `card`'))
+
+    expect(cardRow).toBeDefined()
+    expect(cardRow).not.toContain('ds-card-content')
+    expect(cardRow).toContain('Do not add a wrapper element')
+    expect(cardRow).toContain('Mention each dropped `card` in the report')
+    expect(migration).toContain('the consumer may add `ds-card` themselves if a real card was intended')
+  })
 })

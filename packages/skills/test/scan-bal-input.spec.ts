@@ -102,13 +102,100 @@ describe('scanBalInput', () => {
     })
   })
 
+  it('lists bal-input-group tags and BalInputGroup symbols', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'index.html',
+      [
+        '<bal-input-group invalid>',
+        '  <bal-icon name="search"></bal-icon>',
+        '  <bal-input name="q"></bal-input>',
+        '</bal-input-group>',
+        '',
+      ].join('\n'),
+    )
+    write(
+      root,
+      'Search.tsx',
+      [
+        "import { BalIcon, BalInput, BalInputGroup } from '@baloise/ds-react'",
+        'export const Search = () => (',
+        '  <BalInputGroup disabled>',
+        '    <BalIcon name="search" />',
+        '    <BalInput name="q" />',
+        '  </BalInputGroup>',
+        ')',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalInput(root)).toEqual({
+      total: 9,
+      files: [
+        {
+          file: 'index.html',
+          findings: [
+            { line: 1, snippet: '<bal-input-group invalid>' },
+            { line: 3, snippet: '<bal-input name="q">' },
+            { line: 3, snippet: '</bal-input>' },
+            { line: 4, snippet: '</bal-input-group>' },
+          ],
+        },
+        {
+          file: 'Search.tsx',
+          findings: [
+            { line: 1, snippet: "import { BalIcon, BalInput, BalInputGroup } from '@baloise/ds-react'" },
+            { line: 1, snippet: "import { BalIcon, BalInput, BalInputGroup } from '@baloise/ds-react'" },
+            { line: 3, snippet: '<BalInputGroup disabled>' },
+            { line: 5, snippet: '<BalInput name="q" />' },
+            { line: 6, snippet: '</BalInputGroup>' },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('lists BalInputGroup in Angular imports and bal-input-group in inline templates, skipping comments', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'search.component.ts',
+      [
+        "import { BalInput, BalInputGroup } from '@baloise/ds-angular'",
+        '@Component({',
+        '  imports: [BalInput, BalInputGroup],',
+        '  template: `',
+        '    <!-- <bal-input-group> -->',
+        '    <bal-input-group [disabled]="d">',
+        '      <bal-input></bal-input>',
+        '    </bal-input-group>',
+        '  `,',
+        '})',
+        'export class SearchComponent {}',
+        '',
+      ].join('\n'),
+    )
+
+    const lines = scanBalInput(root).files[0].findings.map(finding => [finding.line, finding.snippet])
+    expect(lines).toEqual([
+      [1, "import { BalInput, BalInputGroup } from '@baloise/ds-angular'"],
+      [1, "import { BalInput, BalInputGroup } from '@baloise/ds-angular'"],
+      [3, 'imports: [BalInput, BalInputGroup],'],
+      [3, 'imports: [BalInput, BalInputGroup],'],
+      [6, '<bal-input-group [disabled]="d">'],
+      [7, '<bal-input>'],
+      [7, '</bal-input>'],
+      [8, '</bal-input-group>'],
+    ])
+  })
+
   it('does not match sibling components or longer names that merely start with BalInput', () => {
     const root = createScratchDir()
     write(
       root,
       'index.html',
       [
-        '<bal-input-group></bal-input-group>',
         '<bal-input-slider></bal-input-slider>',
         '<bal-input-stepper></bal-input-stepper>',
         '<bal-number-input></bal-number-input>',
@@ -120,7 +207,7 @@ describe('scanBalInput', () => {
       'types.ts',
       [
         'class BalInputValueAccessor {}',
-        'const BalInputGroup = 1',
+        'const BalInputGroupValueAccessor = 1',
         'const BalInputSlider = 1',
         'const BalInputStepper = 1',
         'type BalInputInputType = string',
@@ -335,6 +422,47 @@ describe('scanBalInput', () => {
           findings: [
             { line: 1, snippet: '<bal-input name="a">' },
             { line: 1, snippet: '</bal-input>' },
+          ],
+        },
+      ],
+    })
+  })
+
+  it('lists BalEvents types and the bare CustomEvent once per occurrence, but not slider, stepper or group types', () => {
+    const root = createScratchDir()
+    write(
+      root,
+      'application.component.ts',
+      [
+        "import { BalFormBundle } from '@baloise/ds-angular'",
+        '@Component({ imports: [...BalFormBundle] })',
+        'export class ApplicationComponent {',
+        '  onName(event: BalEvents.BalInputCustomEvent<string>) {}',
+        '  onBirthday(event: BalEvents.BalInputDateCustomEvent<string>) {}',
+        '  onBare(event: BalInputCustomEvent<string>) {}',
+        '  detail?: BalEvents.BalInputChangeDetail',
+        '  both(a: BalEvents.BalInputBlur, b: BalInputDateCustomEvent<string>) {}',
+        '  onSlider(event: BalEvents.BalInputSliderCustomEvent<number>) {}',
+        '  onStepper(event: BalEvents.BalInputStepperChange) {}',
+        '  onGroup(event: BalEvents.BalInputGroupCustomEvent<string>) {}',
+        '  autocomplete?: BalProps.BalInputAutocomplete',
+        '}',
+        '',
+      ].join('\n'),
+    )
+
+    expect(scanBalInput(root)).toEqual({
+      total: 6,
+      files: [
+        {
+          file: 'application.component.ts',
+          findings: [
+            { line: 4, snippet: 'onName(event: BalEvents.BalInputCustomEvent<string>) {}' },
+            { line: 5, snippet: 'onBirthday(event: BalEvents.BalInputDateCustomEvent<string>) {}' },
+            { line: 6, snippet: 'onBare(event: BalInputCustomEvent<string>) {}' },
+            { line: 7, snippet: 'detail?: BalEvents.BalInputChangeDetail' },
+            { line: 8, snippet: 'both(a: BalEvents.BalInputBlur, b: BalInputDateCustomEvent<string>) {}' },
+            { line: 8, snippet: 'both(a: BalEvents.BalInputBlur, b: BalInputDateCustomEvent<string>) {}' },
           ],
         },
       ],

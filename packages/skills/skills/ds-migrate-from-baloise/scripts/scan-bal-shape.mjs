@@ -6,14 +6,15 @@ import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-
 
 const USAGE_RE = /<\/?bal-shape(?![\w-])|<\/?BalShape\b|\bBalShape\b/g
 
-export function scanBalShape(rootDir) {
+export function scanBalShape(rootDir, paths = []) {
   const found = []
-  scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found))
-  return group(found)
+  const unmatched = scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found), { paths })
+  const result = group(found)
+  return unmatched.length > 0 ? { ...result, unmatched } : result
 }
 
-export function run(rootDir, stdout) {
-  stdout.write(`${JSON.stringify(scanBalShape(rootDir), null, 2)}\n`)
+export function run(rootDir, stdout, paths = []) {
+  stdout.write(`${JSON.stringify(scanBalShape(rootDir, paths), null, 2)}\n`)
   return 0
 }
 
@@ -61,7 +62,7 @@ function isMainModule() {
 if (isMainModule()) {
   const root = process.argv[2] ? resolve(process.argv[2]) : process.cwd()
   try {
-    process.exit(run(root, process.stdout))
+    process.exit(run(root, process.stdout, process.argv.slice(3)))
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
     process.exit(1)

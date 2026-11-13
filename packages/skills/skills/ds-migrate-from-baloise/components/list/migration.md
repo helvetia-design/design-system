@@ -102,52 +102,52 @@ An accordion item keeps its head content under the normal icon and content rules
 
 ### Props (`bal-list` to `ds-list`)
 
-| old (`bal-list`)                                 | new (`ds-list`)         | handling                                                                                                                                                                                                                              |
-| ------------------------------------------------ | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `background="light"`, `background=""`, omitted   | omit                    | Default on both sides. Drop the attribute.                                                                                                                                                                                            |
-| `background="dark"`                              | `inverted`              | HTML and Angular: write `inverted="true"`. React: write `inverted`. `ds-list` paints no background of its own, it only recolours text, borders, and focus for a dark surface. Report each one so the consumer supplies that surface.  |
-| `background="color"`                             | _(no equivalent value)_ | Drop `background`. Legacy painted a branded background on the list itself and `inverted` is not that. Do not pick a substitute. Report each one by file, line, and old value.                                                         |
-| `size="large"`                                   | `size="lg"`             | Rename the value. Also rewrite `size='large'`, `size={"large"}`, and `size={'large'}`.                                                                                                                                                |
-| `size="small"`                                   | _(no equivalent value)_ | Drop `size`. `ds-list` has only `lg` and the unset default. Do not pick a substitute. Report each one by file, line, and old value.                                                                                                   |
-| `size=""`, omitted                               | omit                    | Default. Drop the attribute.                                                                                                                                                                                                          |
-| `border`, `border="true"`, `border={true}`       | _(no equivalent prop)_  | Drop it in every form. `ds-item` always draws a bottom divider. Report each dropped `border` as a rendering difference: lists that had none now show dividers.                                                                        |
-| `disabled`                                       | _(no equivalent prop)_  | Drop it. The legacy prop only suppressed hover on the rows. `ds-item` `disabled` greys the row out and blocks the link or button, so it means something else, so do not map it. Report each dropped `disabled`.                       |
-| `accordionOneLevel` / `accordion-one-level`      | `accordionGroup`        | See Accordion groups below.                                                                                                                                                                                                           |
-| `[background]`, `[size]`, `[border]`, `size={x}` | leave the binding       | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line in the summary for manual review: the new props are `inverted` (boolean), `ordered` (boolean), and `size` with the single value `lg`. |
-| _(none)_                                         | `ordered`               | New prop. `bal-list` always rendered an unordered list, so leave `ordered` unset.                                                                                                                                                     |
+| old (`bal-list`) | new (`ds-list`) | handling |
+| --- | --- | --- |
+| `background="light"`, `background=""`, omitted | omit | Default on both sides. Drop the attribute. |
+| `background="dark"` | `inverted` | HTML and Angular: write `inverted="true"`. React: write `inverted`. `ds-list` paints no background of its own, it only recolours text, borders, and focus for a dark surface. Report each one so the consumer supplies that surface. |
+| `background="color"` | _(no equivalent value)_ | Drop `background`. Legacy painted a branded background on the list itself and `inverted` is not that. Do not pick a substitute. Report each one by file, line, and old value. |
+| `size="large"` | `size="lg"` | Rename the value. Also rewrite `size='large'`, `size={"large"}`, and `size={'large'}`. |
+| `size="small"` | _(no equivalent value)_ | Drop `size`. `ds-list` has only `lg` and the unset default. Do not pick a substitute. Report each one by file, line, and old value. |
+| `size=""`, omitted | omit | Default. Drop the attribute. |
+| `border`, `border="true"`, `border={true}` | _(no equivalent prop)_ | Drop it in every form. `ds-item` always draws a bottom divider. Report each dropped `border` as a rendering difference: lists that had none now show dividers. |
+| `disabled` | _(no equivalent prop)_ | Drop it. The legacy prop only suppressed hover on the rows. `ds-item` `disabled` greys the row out and blocks the link or button, so it means something else, so do not map it. Report each dropped `disabled`. |
+| `accordionOneLevel` / `accordion-one-level` | `accordionGroup` | See Accordion groups below. |
+| `[background]`, `[size]`, `[border]`, `size={x}` | see handling | Dynamic value. Do not guess the mapping. HTML: leave the binding unchanged and list the file and line in the report for manual review. React and Angular: `background` has no target with the same value type, because `inverted` is a boolean, and `border` has no target at all. Apply Unmapped props and handlers (`SKILL.md`) to both. Copy a `size` binding when the expression's type only admits `lg`. Otherwise apply Unmapped props and handlers (`SKILL.md`). The report names the new props: `inverted` (boolean), `ordered` (boolean), and `size` with the single value `lg`. |
+| _(none)_ | `ordered` | New prop. `bal-list` always rendered an unordered list, so leave `ordered` unset. |
 
 ### Props (`bal-list-item` to `ds-item`)
 
-| old (`bal-list-item`)                             | new (`ds-item`)        | handling                                                                                                                                                                                                                                                                                |
-| ------------------------------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `href` non-empty                                  | `href`                 | Copy the value and write `variant="link"`. See Shape.                                                                                                                                                                                                                                   |
-| `href=""`, omitted                                | omit                   | Legacy rendered a link for any non-undefined `href`, including the empty string. `ds-item` needs `variant`, so an empty `href` becomes a plain item. Report each `href=""`.                                                                                                             |
-| `target="_self"`, omitted                         | omit                   | Same default on both sides.                                                                                                                                                                                                                                                             |
-| `target="_blank"` / `"_parent"` / `"_top"`        | `target`               | Copy as-is. Both sides accept the same four values.                                                                                                                                                                                                                                     |
-| `rel`                                             | `rel`                  | Copy as-is.                                                                                                                                                                                                                                                                             |
-| `download`                                        | `download`             | Copy as-is, including the bare attribute form. Consider `action-icon="download"` per the icon rules below.                                                                                                                                                                              |
-| `clickable` without `href`                        | `variant="button"`     | See Shape.                                                                                                                                                                                                                                                                              |
-| `clickable` together with `href`                  | `variant="link"`       | `href` wins, as it did in the legacy render. Report each dropped `clickable`.                                                                                                                                                                                                           |
-| `disabled`                                        | `disabled`             | Copy as-is, in every form. Unlike `bal-list` `disabled`, this one means the same thing on both sides.                                                                                                                                                                                   |
-| `accordion`                                       | `variant="accordion"`  | See Shape.                                                                                                                                                                                                                                                                              |
-| `selected`                                        | _(no equivalent prop)_ | Leave the attribute in place, do not drop it. `ds-item` has no selected state, so it has no effect after the migration, and in strictly typed React or Angular templates it may not compile. Flag every occurrence for manual review.                                                   |
-| `subAccordionItem` / `sub-accordion-item`         | _(no equivalent prop)_ | Leave the attribute in place, do not drop it. Nesting is now a `ds-list` inside `slot="accordion-content"`, so it has no effect after the migration, and in strictly typed React or Angular templates it may not compile. Flag every occurrence for manual review.                      |
-| `[href]`, `[disabled]`, `[clickable]`, `href={x}` | leave the binding      | Dynamic value. Do not guess the mapping. A bound `clickable` or `href` cannot be resolved to a static `variant` at scan time. Leave the binding unchanged and list the file and line in the summary for manual review: the new values are `default`, `link`, `button`, and `accordion`. |
-| _(none)_                                          | `inverted`             | New per-item prop. `ds-list` `inverted` already cascades to its items, so leave it unset.                                                                                                                                                                                               |
+| old (`bal-list-item`) | new (`ds-item`) | handling |
+| --- | --- | --- |
+| `href` non-empty | `href` | Copy the value and write `variant="link"`. See Shape. |
+| `href=""`, omitted | omit | Legacy rendered a link for any non-undefined `href`, including the empty string. `ds-item` needs `variant`, so an empty `href` becomes a plain item. Report each `href=""`. |
+| `target="_self"`, omitted | omit | Same default on both sides. |
+| `target="_blank"` / `"_parent"` / `"_top"` | `target` | Copy as-is. Both sides accept the same four values. |
+| `rel` | `rel` | Copy as-is. |
+| `download` | `download` | Copy as-is, including the bare attribute form. Consider `action-icon="download"` per the icon rules below. |
+| `clickable` without `href` | `variant="button"` | See Shape. |
+| `clickable` together with `href` | `variant="link"` | `href` wins, as it did in the legacy render. Report each dropped `clickable`. |
+| `disabled` | `disabled` | Copy as-is, in every form. Unlike `bal-list` `disabled`, this one means the same thing on both sides. |
+| `accordion` | `variant="accordion"` | See Shape. |
+| `selected` | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). `ds-item` has no selected state. |
+| `subAccordionItem` / `sub-accordion-item` | _(no equivalent prop)_ | Apply Unmapped props and handlers (`SKILL.md`). Nesting is now a `ds-list` inside `slot="accordion-content"`. |
+| `[href]`, `[disabled]`, `[clickable]`, `href={x}` | see handling | Dynamic value. Do not guess the mapping. A bound `clickable` or `href` cannot be resolved to a static `variant` at scan time. HTML: leave the binding unchanged and list the file and line in the report for manual review. React and Angular: copy an `href` binding when the expression's type only admits a string, and a `disabled` binding when it only admits a boolean. `clickable` has no `ds-item` prop. Apply Unmapped props and handlers (`SKILL.md`) to it and to every binding whose type does not fit. The report says that the consumer sets `variant` by hand: `default`, `link`, `button`, or `accordion`. |
+| _(none)_ | `inverted` | New per-item prop. `ds-list` `inverted` already cascades to its items, so leave it unset. |
 
 ### Props (`bal-list-item-title` to `label`)
 
-| old (`bal-list-item-title`)                                                     | new (on `ds-item`)                                       | handling                                                                                                                                                                                                                                    |
-| ------------------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| static text child                                                               | `label="…"`                                              | Lift the text onto the enclosing `ds-item` and drop the element. Collapse surrounding whitespace, keep the text otherwise verbatim.                                                                                                         |
-| interpolation, a binding, or nested markup                                      | _(not lifted)_                                           | Leave the element untouched as a child of `ds-item` and report file and line. The label must be set by hand.                                                                                                                                |
-| two or more titles in one item                                                  | _(ambiguous)_                                            | `ds-item` has one `label`. Report, do not rewrite.                                                                                                                                                                                          |
-| `level="h5"`, omitted                                                           | omit `labelLevel`                                        | Same default on both sides: `ds-item` renders `h5` when `labelLevel` is unset.                                                                                                                                                              |
-| `level="h1"` to `"h4"`                                                          | `labelLevel`                                             | Copy the value onto the enclosing `ds-item`.                                                                                                                                                                                                |
-| `visualLevel="h1"` to `"h5"`                                                    | `labelSize`                                              | Copy the value onto the enclosing `ds-item`.                                                                                                                                                                                                |
-| `visualLevel="xxx-large"` / `"xx-large"` / `"x-large"` / `"large"` / `"normal"` | `labelSize="3xl"` / `"2xl"` / `"xl"` / `"lg"` / `"base"` | Rename the token, the same renames `components/heading/migration.md` applies to `visualLevel`.                                                                                                                                              |
-| `visualLevel="xxxxx-large"` / `"xxxx-large"` / `"medium"`                       | _(no equivalent value)_                                  | `labelSize` has no `5xl`, `4xl`, or `md`. Drop it. Do not pick a neighbouring size. Report each one by file, line, and old value.                                                                                                           |
-| `[level]`, `[visualLevel]`, `level={x}`                                         | leave the binding                                        | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line in the summary for manual review: `labelLevel` takes `h1` to `h5` and `labelSize` takes `h1` to `h5`, `3xl`, `2xl`, `xl`, `lg`, and `base`. |
+| old (`bal-list-item-title`) | new (on `ds-item`) | handling |
+| --- | --- | --- |
+| static text child | `label="…"` | Lift the text onto the enclosing `ds-item` and drop the element. Collapse surrounding whitespace, keep the text otherwise verbatim. |
+| interpolation, a binding, or nested markup | _(not lifted)_ | Leave the element untouched as a child of `ds-item` and report file and line. The label must be set by hand. |
+| two or more titles in one item | _(ambiguous)_ | `ds-item` has one `label`. Report, do not rewrite. |
+| `level="h5"`, omitted | omit `labelLevel` | Same default on both sides: `ds-item` renders `h5` when `labelLevel` is unset. |
+| `level="h1"` to `"h4"` | `labelLevel` | Copy the value onto the enclosing `ds-item`. |
+| `visualLevel="h1"` to `"h5"` | `labelSize` | Copy the value onto the enclosing `ds-item`. |
+| `visualLevel="xxx-large"` / `"xx-large"` / `"x-large"` / `"large"` / `"normal"` | `labelSize="3xl"` / `"2xl"` / `"xl"` / `"lg"` / `"base"` | Rename the token, the same renames `components/heading/migration.md` applies to `visualLevel`. |
+| `visualLevel="xxxxx-large"` / `"xxxx-large"` / `"medium"` | _(no equivalent value)_ | `labelSize` has no `5xl`, `4xl`, or `md`. Drop it. Do not pick a neighbouring size. Report each one by file, line, and old value. |
+| `[level]`, `[visualLevel]`, `level={x}` | `labelLevel` / `labelSize` on the item | Dynamic value. Do not guess the mapping. When the title is lifted, rename the binding, keep the expression and move it onto the enclosing `ds-item`: `level` becomes `labelLevel` and `visualLevel` becomes `labelSize`. HTML: write the renamed binding and list the file and line in the report for manual review. React and Angular: write it when the expression's type only admits the new values. `labelLevel` takes `h1` to `h5`. `labelSize` takes `h1` to `h5`, `3xl`, `2xl`, `xl`, `lg`, and `base`. Otherwise apply Unmapped props and handlers (`SKILL.md`). The report names the value mapping for `labelSize`: `xxx-large` to `3xl`, `xx-large` to `2xl`, `x-large` to `xl`, `large` to `lg`, `normal` to `base`, and no value for `xxxxx-large`, `xxxx-large` and `medium`. |
 
 ### Props (`bal-list-item-subtitle` to `description`)
 
@@ -155,41 +155,41 @@ An accordion item keeps its head content under the normal icon and content rules
 
 ### Props (`bal-list-item-icon` to `slot="icon"`)
 
-| old (`bal-list-item-icon`)                                                         | new (on `ds-item`)       | handling                                                                                                                                                                                                                                               |
-| ---------------------------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| the element, without `right`                                                       | `slot="icon"`            | Move the children into the icon slot and drop the element. One element child takes the `slot` attribute; text or several children get a `div`.                                                                                                         |
-| `right` holding exactly one `<bal-icon name="download">`, on a link or button item | `action-icon="download"` | Delete the element and write the prop. This is the only trailing icon that maps mechanically.                                                                                                                                                          |
-| `right` in any other form                                                          | _(no trailing slot)_     | `ds-item` has no trailing slot. Report, do not rewrite: leave the element as a child of `ds-item` and name the file, the line, and the icon.                                                                                                           |
-| `[right]="x"`, `right={x}`                                                         | leave the binding        | Dynamic value. Do not guess the mapping. Leave the binding unchanged and list the file and line in the summary for manual review: a leading icon is `slot="icon"` and the only trailing values are `default`, `link`, `link-external`, and `download`. |
+| old (`bal-list-item-icon`) | new (on `ds-item`) | handling |
+| --- | --- | --- |
+| the element, without `right` | `slot="icon"` | Move the children into the icon slot and drop the element. One element child takes the `slot` attribute; text or several children get a `div`. |
+| `right` holding exactly one `<bal-icon name="download">`, on a link or button item | `action-icon="download"` | Delete the element and write the prop. This is the only trailing icon that maps mechanically. |
+| `right` in any other form | _(no trailing slot)_ | `ds-item` has no trailing slot. Report, do not rewrite: leave the element as a child of `ds-item` and name the file, the line, and the icon. |
+| `[right]="x"`, `right={x}` | see handling | Dynamic value. Do not guess the mapping. `right` has no `ds-item` target. HTML: leave the element and its binding unchanged as a child of `ds-item`, the same as `right` in any other form. React and Angular: migrate the element to `slot="icon"` like an element without `right`, and apply Unmapped props and handlers (`SKILL.md`) to the `right` binding. List the file and line in the report for manual review: a leading icon is `slot="icon"` and the only trailing values are `default`, `link`, `link-external`, and `download`. |
 
 ### Props (`bal-list-item-content` to `slot="content"`)
 
-| old (`bal-list-item-content`)                    | new (on `ds-item`) | handling                                                                                                                                   |
-| ------------------------------------------------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| the element                                      | `slot="content"`   | Titles and subtitles inside it follow their own rules first. Every remaining child moves into the content slot and the element is dropped. |
-| `contentAlignment` / `content-alignment`         | _(no equivalent)_  | Drop it. `ds-item` has no alignment prop. Mention each dropped `contentAlignment` in the summary.                                          |
-| markup interleaved around the title and subtitle | _(ambiguous)_      | Splitting it between `label`, `description`, and `slot="content"` is a judgement call. Report, do not rewrite.                             |
-| two or more content elements in one item         | _(ambiguous)_      | Report, do not rewrite.                                                                                                                    |
+| old (`bal-list-item-content`) | new (on `ds-item`) | handling |
+| --- | --- | --- |
+| the element | `slot="content"` | Titles and subtitles inside it follow their own rules first. Every remaining child moves into the content slot and the element is dropped. |
+| `contentAlignment` / `content-alignment` | _(no equivalent)_ | Drop it. `ds-item` has no alignment prop. Mention each dropped `contentAlignment` in the report. |
+| markup interleaved around the title and subtitle | _(ambiguous)_ | Splitting it between `label`, `description`, and `slot="content"` is a judgement call. Report, do not rewrite. |
+| two or more content elements in one item | _(ambiguous)_ | Report, do not rewrite. |
 
 ### Props (`bal-list-item-accordion-head`)
 
-| old (`bal-list-item-accordion-head`)      | new (on `ds-item`)        | handling                                                                                                                                                                        |
-| ----------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| the element                               | `variant="accordion"`     | Drop the element. Its children follow the icon, title, subtitle, and content rules.                                                                                             |
-| `accordionOpen`, `accordion-open="true"`  | `accordionOpen`           | HTML and Angular: write `accordion-open="true"`. React: write `accordionOpen`.                                                                                                  |
-| `accordionOpen="false"`, omitted          | omit                      | Default on both sides.                                                                                                                                                          |
-| `icon="plus"` **or the attribute absent** | `accordionMarker="plus"`  | The legacy default was `plus` and the new default marker is a caret, so write `accordion-marker="plus"` even when the attribute was absent. Report the ones that were implicit. |
-| `icon="nav-go-down"`                      | omit `accordionMarker`    | That is the new default caret. Write nothing.                                                                                                                                   |
-| _(none)_                                  | `accordionMarkerPosition` | New prop. Legacy always put the marker on the right and so does the new default. Leave it unset.                                                                                |
+| old (`bal-list-item-accordion-head`) | new (on `ds-item`) | handling |
+| --- | --- | --- |
+| the element | `variant="accordion"` | Drop the element. Its children follow the icon, title, subtitle, and content rules. |
+| `accordionOpen`, `accordion-open="true"` | `accordionOpen` | HTML and Angular: write `accordion-open="true"`. React: write `accordionOpen`. |
+| `accordionOpen="false"`, omitted | omit | Default on both sides. |
+| `icon="plus"` **or the attribute absent** | `accordionMarker="plus"` | The legacy default was `plus` and the new default marker is a caret, so write `accordion-marker="plus"` even when the attribute was absent. Report the ones that were implicit. |
+| `icon="nav-go-down"` | omit `accordionMarker` | That is the new default caret. Write nothing. |
+| _(none)_ | `accordionMarkerPosition` | New prop. Legacy always put the marker on the right and so does the new default. Leave it unset. |
 
 ### Props (`bal-list-item-accordion-body`)
 
-| old (`bal-list-item-accordion-body`) | new (on `ds-item`)         | handling                                                                                                                    |
-| ------------------------------------ | -------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| the element                          | `slot="accordion-content"` | Drop the element and slot its children. One element child takes the `slot` attribute; text or several children get a `div`. |
-| `accordionGroup` / `accordion-group` | `accordionGroup`           | Hoist the value unchanged onto the enclosing `ds-item`.                                                                     |
-| `contentSpace` / `content-space`     | _(no equivalent)_          | Drop it. `ds-item` spaces slotted content itself. Mention each dropped `contentSpace` in the summary.                       |
-| `contentAlignment`                   | _(no equivalent)_          | Drop it. Mention each dropped `contentAlignment` in the summary.                                                            |
+| old (`bal-list-item-accordion-body`) | new (on `ds-item`) | handling |
+| --- | --- | --- |
+| the element | `slot="accordion-content"` | Drop the element and slot its children. One element child takes the `slot` attribute; text or several children get a `div`. |
+| `accordionGroup` / `accordion-group` | `accordionGroup` | Hoist the value unchanged onto the enclosing `ds-item`. |
+| `contentSpace` / `content-space` | _(no equivalent)_ | Drop it. `ds-item` spaces slotted content itself. Mention each dropped `contentSpace` in the report. |
+| `contentAlignment` | _(no equivalent)_ | Drop it. Mention each dropped `contentAlignment` in the report. |
 
 ### Accordion groups
 
@@ -209,30 +209,30 @@ Never invent a group name. The group is page-global, so two unrelated lists give
 
 Rewrite only handlers that are attached to the `bal-list` or `bal-list-item` element being migrated. Never rewrite a handler on another element, and never rename these by search and replace across the file.
 
-| old                                 | new                                      | handling                                                                                                                                                                                                                  |
-| ----------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balNavigate` on a `clickable` item | `dsClick`                                | Rewrite `addEventListener('balNavigate'` to `addEventListener('dsClick'`. Angular: `(balNavigate)` becomes `(dsClick)`. React: `onBalNavigate` becomes `onDsClick`. Both details are a `MouseEvent`.                      |
-| `balNavigate` on an `href` item     | _(no equivalent)_                        | `ds-item` wires `dsClick` only for `variant="button"`, so the handler would never fire on a link. Do not rewrite or remove the handler. List each one by file and line as "event no longer emitted, needs manual rework". |
-| `balAccordionChange`                | `dsAccordionToggle`                      | Same shapes, and move the listener from the head onto the `ds-item`.                                                                                                                                                      |
-| event `detail`                      | object                                   | Legacy sent the new open state as a boolean. `ds-item` sends `{ group, id, open }`. Every handler that used the value directly must read `.detail.open`. Report each handler.                                             |
-| `balGroupStateChanged`              | _(no equivalent)_                        | Removed. Do not rewrite or remove the handler. List each one by file and line as "event no longer emitted, needs manual rework".                                                                                          |
-| `balWillAnimate`                    | _(no equivalent)_                        | Removed. `ds-item` emits nothing before the transition. Drop the binding and report it.                                                                                                                                   |
-| `balDidAnimate`                     | _(no equivalent)_                        | Removed. `ds-item` emits nothing after the transition. Drop the binding and report it.                                                                                                                                    |
-| _(none)_                            | `dsAccordionOpened`, `dsAccordionClosed` | New events. Nothing to migrate from.                                                                                                                                                                                      |
+| old | new | handling |
+| --- | --- | --- |
+| `balNavigate` on a `clickable` item | `dsClick` | Rewrite `addEventListener('balNavigate'` to `addEventListener('dsClick'`. Angular: `(balNavigate)` becomes `(dsClick)`. React: `onBalNavigate` becomes `onDsClick`. Both details are a `MouseEvent`. |
+| `balNavigate` on an `href` item | _(no equivalent)_ | `ds-item` wires `dsClick` only for `variant="button"`, so the handler would never fire on a link. Apply Unmapped props and handlers (`SKILL.md`). |
+| `balAccordionChange` | `dsAccordionToggle` | Same shapes, and move the listener from the head onto the `ds-item`. |
+| event `detail` | object | Legacy sent the new open state as a boolean. `ds-item` sends `{ group, id, open }`. Every handler that used the value directly must read `.detail.open`. Report each handler. |
+| `balGroupStateChanged` | _(no equivalent)_ | Removed. Apply Unmapped props and handlers (`SKILL.md`). |
+| `balWillAnimate` | _(no equivalent)_ | Removed. `ds-item` emits nothing before the transition. Drop the binding and report it. |
+| `balDidAnimate` | _(no equivalent)_ | Removed. `ds-item` emits nothing after the transition. Drop the binding and report it. |
+| _(none)_ | `dsAccordionOpened`, `dsAccordionClosed` | New events. Nothing to migrate from. |
 
 ### Methods
 
 `present()`, `dismiss()`, and `toggle()` do not exist on `ds-item`. Calling them throws at runtime.
 
-| old            | new                                    |
-| -------------- | -------------------------------------- |
-| `el.present()` | `el.accordionOpen = true`              |
-| `el.dismiss()` | `el.accordionOpen = false`             |
-| `el.toggle()`  | `el.accordionOpen = !el.accordionOpen` |
+| old | new |
+| --- | --- |
+| `el.present()` | `el.accordionOpen = true` |
+| `el.dismiss()` | `el.accordionOpen = false` |
+| `el.toggle()` | `el.accordionOpen = !el.accordionOpen` |
 
 Unlike the legacy methods, assigning `accordionOpen` emits no event. When the surrounding code relied on `balAccordionChange` firing afterwards, call the handler directly and report it.
 
-`dismiss(true)` and `dismiss(false)` lose the `ignoreNested` argument: nested items keep their own state. `configChanged()` was `@internal` and is not a consumer API. For both, list each call by file and line as "method no longer available, needs manual rework".
+`dismiss(true)` and `dismiss(false)` have no counterpart. `ds-item` has no `dismiss()` method, and `accordionOpen` has no `ignoreNested` equivalent: nested items keep their own state. `configChanged()` was `@internal` and has no counterpart either. For both, apply Unmapped props and handlers (`SKILL.md`).
 
 ### Files to edit beyond the scan
 
@@ -244,23 +244,47 @@ The scan does not list a file that only listens or only calls a method and never
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every lifted `label` and `description`, every title or subtitle left in place because it was not static text, every `clickable` or `href` turned into a variant, every dropped `clickable` and `href=""`, every trailing icon turned into `action-icon="download"` and every one left in place, every implicit `accordion-marker="plus"` written out, every hoisted `accordion-group`, every `background="dark"` turned into `inverted`, every dropped `border`, `disabled`, `contentAlignment`, and `contentSpace`, every flagged `selected` and `subAccordionItem`, every dynamic binding left for the caller, every renamed and every orphaned event handler, and every rewritten method call.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Also list each loss:
+Needs your attention when found:
 
-- every dropped `background="color"`, `size="small"`, and unmappable `visualLevel` token, with its file, line, and old value
-- every `accordionOneLevel` dropped with no group name available, with the list that needs one
-- every type reference such as `BalProps.BalListSize` or `BalEvents.BalListAccordionChangeDetail` that the scan cannot see. These resolve from the ambient namespaces and stop compiling once `@baloise/ds-core` is removed from the project
+1. Every title or subtitle left in place because it was not static text. The label must be set by hand.
+2. Every dropped `href=""`. The item is now a plain item, not a link.
+3. Every trailing icon left in place, with its file, line, and icon. `ds-item` has no trailing slot.
+4. Every `background="dark"` turned into `inverted`. The consumer supplies the dark surface.
+5. Every dropped `border`.
+6. Every dropped `disabled`. The legacy prop only suppressed hover on the rows.
+7. Every dropped `contentAlignment`.
+8. Every `selected`, with its Unmapped props and handlers outcome.
+9. Every `subAccordionItem`, with its Unmapped props and handlers outcome.
+10. Every dynamic binding, with the framework outcome (copied, renamed or left in HTML, copied, renamed or removed (Unmapped) in React and Angular).
+11. Every renamed event handler. A `balAccordionChange` handler that used the detail directly must now read `.detail.open`.
+12. Every orphaned `balNavigate` or `balGroupStateChanged` handler, with its Unmapped props and handlers outcome.
+13. Every rewritten `present()`, `dismiss()` or `toggle()` call. Assigning `accordionOpen` emits no event.
+14. Every `dismiss(true)`, `dismiss(false)` or `configChanged()` call, with its Unmapped props and handlers outcome.
+15. Every dropped `background="color"`, with its file, line, and old value.
+16. Every dropped `size="small"`, with its file, line, and old value.
+17. Every unmappable `visualLevel` token, with its file, line, and old value.
+18. Every `accordionOneLevel` dropped with no group name available, with the list that needs one.
+19. Every type reference such as `BalProps.BalListSize` or `BalEvents.BalListAccordionChangeDetail` that the scan cannot see. These resolve from the ambient namespaces and stop compiling once `@baloise/ds-core` is removed from the project.
+20. One-time note: `ds-item` always draws a bottom divider. Lists that had no `border` now show them.
+21. Every migrated `clickable` or `href` item, which gains a trailing icon it did not have. A `link` or `button` item always renders a trailing icon, defaulting to `caret-right`, and no value switches it off.
+22. Every list that relied on `background="dark"` or `background="color"`. `inverted` recolours text, borders, and focus but paints no background, so the list now needs that surface from the page.
+23. One-time note: `ds-list` renders a real `ul` or `ol` in shadow DOM and `ds-item` carries the matching role, so only `ds-item` belongs as a direct child. Anything else slotted there changes the list semantics.
+24. Every accordion whose head had no visible text and now has no accessible name. The legacy accordion head carried a localised open and close `title` from its own translations in eleven languages, and `ds-item` has no translations.
+25. Every selector that targets the legacy elements and that the scan cannot see. `ds-list` uses shadow DOM and exposes only `part="list"`. `ds-item` exposes the `part` values `item`, `label`, `description`, `accordion`, `accordion-content`, and `action-icon`. The legacy components rendered in the light DOM and set the classes `bal-list`, `bal-list--nested`, `bal-list--disabled`, `bal-list--border`, `bal-list--size-*`, `bal-list--background-*`, `bal-list__item` with its `disabled`, `selected`, `clickable`, `accordion`, `sub-accordion`, `animated`, `active`, `expanding`, `expanded`, `collapsing`, and `collapsed` modifiers, `bal-list__item__title`, `bal-list__item__subtitle`, `bal-list__item__icon`, `bal-list__item__icon--right`, `bal-list__item__content`, `bal-list__item__accordion-head`, `bal-list__item__accordion-head__icon`, `bal-list__item__accordion-body`, and `bal-list__item__accordion-body__content`. Styles and tests that query any of them break. Do not rewrite those selectors yourself. Report them.
+26. One-time note: files which only listen or only call a method, and have no scanned `.html` of the same name beside them, were not scanned.
 
-Also report these rendering differences, so the consumer can check them. Do not add attributes to compensate:
+Coverage only, written to the file:
 
-- **Dividers.** `ds-item` always draws a bottom divider. Lists that had no `border` now show them.
-- **Trailing caret.** A `link` or `button` item always renders a trailing icon, defaulting to `caret-right`. There is no value that switches it off, so every migrated `clickable` or `href` item gains an icon it did not have.
-- **No surface.** `inverted` recolours text, borders, and focus but paints no background. A list that relied on `background="dark"` or `background="color"` now needs that surface from the page.
-- **List semantics.** `ds-list` renders a real `ul` or `ol` in shadow DOM and `ds-item` carries the matching role, so only `ds-item` belongs as a direct child. Anything else slotted there changes the list semantics.
-- **Accessible name.** The legacy accordion head carried a localised open and close `title` from its own translations in eleven languages. `ds-item` has no translations, so an accordion whose head had no visible text now has no accessible name. Report every one of these.
-- **Lost selectors.** `ds-list` uses shadow DOM and exposes only `part="list"`; `ds-item` exposes `part` values `item`, `label`, `description`, `accordion`, `accordion-content`, and `action-icon`. The legacy components rendered in the light DOM and set the classes `bal-list`, `bal-list--nested`, `bal-list--disabled`, `bal-list--border`, `bal-list--size-*`, `bal-list--background-*`, `bal-list__item` with its `disabled`, `selected`, `clickable`, `accordion`, `sub-accordion`, `animated`, `active`, `expanding`, `expanded`, `collapsing`, and `collapsed` modifiers, `bal-list__item__title`, `bal-list__item__subtitle`, `bal-list__item__icon`, `bal-list__item__icon--right`, `bal-list__item__content`, `bal-list__item__accordion-head`, `bal-list__item__accordion-head__icon`, `bal-list__item__accordion-body`, and `bal-list__item__accordion-body__content`. Styles and tests that query any of them break. Do not rewrite those selectors yourself. Report them.
+27. Every lifted `label` and `description`.
+28. Every `clickable` or `href` turned into a variant.
+29. Every dropped `clickable`.
+30. Every trailing icon turned into `action-icon="download"`.
+31. Every implicit `accordion-marker="plus"` written out.
+32. Every hoisted `accordion-group`.
+33. Every dropped `contentSpace`.
 
-End with the note that files which only listen or only call a method, and have no scanned `.html` of the same name beside them, were not scanned. Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
 
-Done when the summary is printed and the working tree is still unstaged.
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

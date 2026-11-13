@@ -362,7 +362,7 @@ describe('Detect', () => {
       ].join('\n'),
     )
 
-    expect(scanMigratable(root).suggested).toEqual([{ name: 'list', total: 16 }])
+    expect(scanMigratable(root).suggested).toEqual([{ name: 'list', total: 8 }])
   })
 
   it('does not list BalListBundle as its own unmigratable component', () => {
@@ -421,8 +421,7 @@ describe('list migration.md', () => {
       'present()',
       'dismiss(',
       'toggle()',
-      'event no longer emitted, needs manual rework',
-      'method no longer available, needs manual rework',
+      'Apply Unmapped props and handlers',
       'report, do not rewrite',
       'per-file summary',
       'git commit',

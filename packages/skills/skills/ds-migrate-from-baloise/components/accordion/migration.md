@@ -72,40 +72,53 @@ When the summary or the details has exactly one element child, put the `slot` at
 </bal-accordion>
 
 <!-- after -->
-<ds-accordion button button-label-open="Show more" button-label-close="Show less">
+<ds-accordion button button-label-close="Show more" button-label-open="Show less">
   <div slot="content"><p>Content</p></div>
 </ds-accordion>
 ```
 
 ### Props
 
-| old                                                        | new (`ds-accordion`)                                                      | handling                                                                                                                                                                                                                                                                                                                   |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bal-accordion` `active`, `active="true"`, `active={true}` | `open`                                                                    | HTML and Angular: write `open="true"`. React: write `open`. Also rewrite `active='true'`, `active={"true"}`, and `active={'true'}`.                                                                                                                                                                                        |
-| `bal-accordion` `active="false"`, `active={false}`         | omit `open`                                                               | Drop `active`. Default `open` is false.                                                                                                                                                                                                                                                                                    |
-| `bal-accordion` `debounce`                                 | _(no equivalent prop)_                                                    | Drop `debounce`, including every value. `ds-accordion` does not debounce `dsToggle`. Mention each dropped `debounce` in the summary.                                                                                                                                                                                       |
-| `bal-accordion` `card`                                     | _(no equivalent prop)_                                                    | Drop `card`. Wrap the accordion in `ds-card` and `ds-card-content` instead. Mention each dropped `card` in the summary.                                                                                                                                                                                                    |
-| `bal-accordion` `version`                                  | _(no equivalent prop)_                                                    | Drop `version`, including every value. The v1 and v2 rendering switch is gone. Use the shape rules above instead. Mention each dropped `version` in the summary.                                                                                                                                                           |
-| `bal-accordion` `openLabel` / `open-label`                 | `buttonLabelOpen` / `button-label-open`                                   | Shape 1 only. Rename and keep the value.                                                                                                                                                                                                                                                                                   |
-| `bal-accordion` `closeLabel` / `close-label`               | `buttonLabelClose` / `button-label-close`                                 | Shape 1 only. Rename and keep the value.                                                                                                                                                                                                                                                                                   |
-| `bal-accordion` `openIcon` / `open-icon`                   | `buttonIconOpen` / `button-icon-open`                                     | Shape 1 only. Rename and keep the value. The legacy default was `plus` and the new default is empty, so write `button-icon-open="plus"` when the attribute was absent and a marker is still wanted. Mention that in the summary.                                                                                           |
-| `bal-accordion` `closeIcon` / `close-icon`                 | `buttonIconClose` / `button-icon-close`                                   | Shape 1 only. Rename and keep the value. The legacy default was `close` and the new default is empty. Mention that in the summary.                                                                                                                                                                                         |
-| `bal-accordion-summary` `trigger`                          | _(no equivalent prop)_                                                    | Drop it. The whole summary row is always the button now. Nested `a`, `button`, `input`, `ds-toggle`, and `ds-checkbox` keep working.                                                                                                                                                                                       |
-| `bal-accordion-summary` `active` / `state`                 | _(internal)_                                                              | Drop both. They were `@internal` and set by the parent.                                                                                                                                                                                                                                                                    |
-| `bal-accordion-trigger` `button`                           | `button`                                                                  | Move onto `ds-accordion`. The legacy prop was deprecated; the new one is not.                                                                                                                                                                                                                                              |
-| `bal-accordion-trigger` `variant="button"`                 | `button`                                                                  | Move onto `ds-accordion` as `button`.                                                                                                                                                                                                                                                                                      |
-| `bal-accordion-trigger` `variant="icon"` or absent         | _(default)_                                                               | Write nothing. The caret marker is the default.                                                                                                                                                                                                                                                                            |
-| `bal-accordion-trigger` `variant="text"`                   | `marker="none"`                                                           | Move onto `ds-accordion` as `marker="none"` and put the open and close wording in the summary slot inside `<span class="is-closed">` and `<span class="is-open">`. Mention each one in the summary.                                                                                                                        |
-| `bal-accordion-trigger` `expanded`                         | `buttonWide` / `button-wide`                                              | The legacy default was `true` and the new default is `false`. Write `button-wide` unless the legacy attribute was explicitly `expanded="false"` or `expanded={false}`. Mention each one in the summary.                                                                                                                    |
-| `bal-accordion-trigger` `color="info"` or absent           | `buttonColor` / `button-color`                                            | `info` does not exist on `ds-accordion`. Leave `button-color` unset so it falls back to `primary`. Mention each remapped `info` in the summary.                                                                                                                                                                            |
-| `bal-accordion-trigger` `color` (other values)             | `buttonColor` / `button-color`                                            | Move onto `ds-accordion` for `primary`, `secondary`, `success`, `warning`, and `danger`. Any other value has no equivalent: drop it and mention it in the summary.                                                                                                                                                         |
-| `bal-accordion-trigger` `size="small"`                     | `buttonSize="sm"` / `button-size="sm"`                                    | Move onto `ds-accordion` and rewrite the value. `ds-accordion` accepts `sm`, `lg`, and `xl` only. Drop `size=""`.                                                                                                                                                                                                          |
-| `bal-accordion-trigger` `openLabel` / `closeLabel`         | `button-label-open` / `button-label-close`                                | Move onto `ds-accordion` and rename.                                                                                                                                                                                                                                                                                       |
-| `bal-accordion-trigger` `openIcon` / `closeIcon`           | `button-icon-open` / `button-icon-close`                                  | Move onto `ds-accordion` and rename. The legacy `openIcon` default was `caret-down`, which is now the implicit default marker, so do not write it out when the attribute was absent.                                                                                                                                       |
-| `bal-accordion-trigger` with no label props                | `summary` slot content                                                    | Legacy filled the accessible name from its own translations (`Mehr anzeigen` / `Weniger anzeigen` and nine more languages). `ds-accordion` has no translations. The button has **no accessible name** unless the summary slot has text or `button-label-open` and `button-label-close` are set. Report every one of these. |
-| `bal-accordion-details` `state` / `active` / `animated`    | _(internal)_                                                              | Drop all three. They were `@internal`.                                                                                                                                                                                                                                                                                     |
-| _(none)_                                                   | `summaryLevel` / `summary-level`                                          | See the heading rule below.                                                                                                                                                                                                                                                                                                |
-| _(none)_                                                   | `group`, `summaryVisualLevel`, `summaryTitle`, `marker`, `markerPosition` | New props. Nothing to migrate from. Leave them unset.                                                                                                                                                                                                                                                                      |
+Legacy "open" names the action, so `openLabel` is shown while the accordion is closed. `ds-accordion` "open" names the state, so `buttonLabelOpen` is shown while it is open. The label and icon swap below is intentional. Do not correct it back.
+
+| old | new (`ds-accordion`) | handling |
+| --- | --- | --- |
+| `bal-accordion` `active`, `active="true"`, `active={true}` | `open` | HTML and Angular: write `open="true"`. React: write `open`. Also rewrite `active='true'`, `active={"true"}`, and `active={'true'}`. |
+| `bal-accordion` `active="false"`, `active={false}` | omit `open` | Drop `active`. Default `open` is false. |
+| `bal-accordion` bound `active` (`[active]="x"`, `active={x}`) | `open` | Angular: write `[open]="x"`. React: write `open={x}`. Keep the expression unchanged. |
+| `bal-accordion` `debounce` | _(no equivalent prop)_ | Drop `debounce`, including every value. `ds-accordion` does not debounce `dsToggle`. Mention each dropped `debounce` in the report. |
+| `bal-accordion` `card` | _(no equivalent prop)_ | Drop `card` and add nothing in its place. Do not add a wrapper element. The legacy `card` only adjusted spacing for an accordion already placed inside a separate card, and drew no border or shadow. If the consumer wants a real card, they add `ds-card` themselves. Mention each dropped `card` in the report. |
+| `bal-accordion` `version` | _(no equivalent prop)_ | Drop `version`, including every value. The v1 and v2 rendering switch is gone. Use the shape rules above instead. Mention each dropped `version` in the report. |
+| `bal-accordion` `openLabel` / `open-label` | `buttonLabelClose` / `button-label-close` | Shape 1 only. Rename and keep the value. |
+| `bal-accordion` `closeLabel` / `close-label` | `buttonLabelOpen` / `button-label-open` | Shape 1 only. Rename and keep the value. |
+| `bal-accordion` `openIcon` / `open-icon` | `buttonIconClose` / `button-icon-close` | Shape 1 only. Rename, keep the value, then apply the icon name rule from `shared/icons.md`. The legacy default was `plus` and the new default is empty. See Icons below the table. |
+| `bal-accordion` `closeIcon` / `close-icon` | `buttonIconOpen` / `button-icon-open` | Shape 1 only. Rename, keep the value, then apply the icon name rule from `shared/icons.md`. The legacy default was `close` and the new default is empty. See Icons below the table. |
+| `bal-accordion-summary` `trigger` | _(no equivalent prop)_ | Drop it. The whole summary row is always the button now. Nested `a`, `button`, `input`, `ds-toggle`, and `ds-checkbox` keep working. |
+| `bal-accordion-summary` `active` / `state` | _(internal)_ | Drop both. They were `@internal` and set by the parent. |
+| `bal-accordion-trigger` `button` | `button` | Move onto `ds-accordion`. The legacy prop was deprecated; the new one is not. |
+| `bal-accordion-trigger` `variant="button"` | `button` | Move onto `ds-accordion` as `button`. |
+| `bal-accordion-trigger` `variant="icon"` or absent | _(default)_ | Write nothing. The caret marker is the default. |
+| `bal-accordion-trigger` `variant="text"` | `marker="none"` | Move onto `ds-accordion` as `marker="none"` and put the wording in the `summary` slot. Put the legacy `openLabel`, or the legacy default open text, in `<span class="is-closed">`. Put the legacy `closeLabel`, or the legacy default close text, in `<span class="is-open">`. The legacy defaults are the translations listed in the row about triggers with no label props. Mention each one in the report. |
+| `bal-accordion-trigger` `expanded` | `buttonWide` / `button-wide` | The legacy default was `true` and the new default is `false`. Write `button-wide` unless the legacy attribute was explicitly `expanded="false"` or `expanded={false}`. Mention each one in the report. |
+| `bal-accordion-trigger` `color="info"` or absent | `buttonColor` / `button-color` | `info` does not exist on `ds-accordion`. Leave `button-color` unset so it falls back to `primary`. Mention each remapped `info` in the report. |
+| `bal-accordion-trigger` `color` (other values) | `buttonColor` / `button-color` | Move onto `ds-accordion` for `primary`, `secondary`, `success`, `warning`, and `danger`. Any other value has no equivalent: drop it and mention it in the report. |
+| `bal-accordion-trigger` `size="small"` | `buttonSize="sm"` / `button-size="sm"` | Move onto `ds-accordion` and rewrite the value. `ds-accordion` accepts `sm`, `lg`, and `xl` only. Drop `size=""`. |
+| `bal-accordion-trigger` `openLabel` / `closeLabel` | `button-label-close` / `button-label-open` | Move onto `ds-accordion` and rename. `openLabel` becomes `button-label-close` and `closeLabel` becomes `button-label-open`. |
+| `bal-accordion-trigger` `openIcon` / `closeIcon` | `button-icon-close` / `button-icon-open` | Move onto `ds-accordion`, rename, then apply the icon name rule from `shared/icons.md`. `openIcon` becomes `button-icon-close` and `closeIcon` becomes `button-icon-open`. See Icons below the table for the defaults and the single-icon cases. |
+| `bal-accordion-trigger` with no label props | `summary` slot content | Legacy filled the accessible name from its own translations (`Mehr anzeigen` / `Weniger anzeigen` and nine more languages). `ds-accordion` has no translations. The button has **no accessible name** unless the summary slot has text or `button-label-open` and `button-label-close` are set. Report every one of these. |
+| `bal-accordion-details` `state` / `active` / `animated` | _(internal)_ | Drop all three. They were `@internal`. |
+| _(none)_ | `summaryLevel` / `summary-level` | See the heading rule below. |
+| _(none)_ | `group`, `summaryVisualLevel`, `summaryTitle`, `marker`, `markerPosition` | New props. Nothing to migrate from. Leave them unset. |
+
+### Icons
+
+`ds-accordion` renders an icon as soon as `button-icon-close` or `button-icon-open` is set. When only one of them is set, the other state shows an empty `ds-icon`. Write both or neither.
+
+- **Shape 1, neither icon set.** Write neither. The `button` variant shows its default caret marker instead of the legacy `plus` and `close`. Report it under the `openIcon` and `closeIcon` items.
+- **Shape 1, one icon set.** Also write the legacy default of the other one: `plus` for `button-icon-close`, `close` for `button-icon-open`.
+- **Trigger, neither icon set.** Write neither. The legacy `openIcon` default `caret-down` is now the default marker.
+- **Trigger, `openIcon` set and `closeIcon` empty or absent.** The legacy `closeIcon` default is empty, so legacy showed `openIcon` in both states and rotated it. Write the same value to both `button-icon-close` and `button-icon-open`. `ds-accordion` does not rotate a button icon, so report each one.
+- **Trigger, `closeIcon` set and `openIcon` absent.** Legacy showed its default `caret-down` while closed. Write `button-icon-close` with the `caret-down` name, after the icon name rule.
 
 ### Headings
 
@@ -123,13 +136,13 @@ Report every accordion that now renders a heading, so the consumer can check the
 
 ### Events
 
-| old              | new                    | handling                                                                                                                                                                               |
-| ---------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `balChange`      | `dsToggle`             | Rewrite `addEventListener('balChange'` to `addEventListener('dsToggle'`. Angular: `(balChange)` becomes `(dsToggle)`. React: `onBalChange` becomes `onDsToggle`.                       |
-| event `detail`   | object                 | Legacy sent the new `active` value as a boolean. `ds-accordion` sends `{ id, group, open }`. Every handler that used the value directly must read `.detail.open`. Report each handler. |
-| `balWillAnimate` | _(no equivalent)_      | Removed. `ds-accordion` emits nothing before the transition. Drop the binding and report it.                                                                                           |
-| `balDidAnimate`  | _(no equivalent)_      | Removed. `ds-accordion` emits nothing after the transition. Drop the binding and report it.                                                                                            |
-| _(none)_         | `dsOpened`, `dsClosed` | New events. Nothing to migrate from.                                                                                                                                                   |
+| old | new | handling |
+| --- | --- | --- |
+| `balChange` | `dsToggle` | Rewrite `addEventListener('balChange'` to `addEventListener('dsToggle'`. Angular: `(balChange)` becomes `(dsToggle)`. React: `onBalChange` becomes `onDsToggle`. |
+| event `detail` | object | Legacy sent the new `active` value as a boolean. `ds-accordion` sends `{ id, group, open }`. Every handler that used the value directly must read `.detail.open`. Report each handler. |
+| `balWillAnimate` | _(no equivalent)_ | Removed. `ds-accordion` emits nothing before the transition. Drop the binding and report it. |
+| `balDidAnimate` | _(no equivalent)_ | Removed. `ds-accordion` emits nothing after the transition. Drop the binding and report it. |
+| _(none)_ | `dsOpened`, `dsClosed` | New events. Nothing to migrate from. |
 
 Legacy emitted `balChange` only from real user interaction, and so does `dsToggle`. Setting `open` in code emits nothing, exactly as setting `active` emitted nothing.
 
@@ -137,11 +150,11 @@ Legacy emitted `balChange` only from real user interaction, and so does `dsToggl
 
 `present()`, `dismiss()`, and `toggle()` do not exist on `ds-accordion`. Calling them throws at runtime.
 
-| old            | new                  |
-| -------------- | -------------------- |
-| `el.present()` | `el.open = true`     |
-| `el.dismiss()` | `el.open = false`    |
-| `el.toggle()`  | `el.open = !el.open` |
+| old | new |
+| --- | --- |
+| `el.present()` | `el.open = true` |
+| `el.dismiss()` | `el.open = false` |
+| `el.toggle()` | `el.open = !el.open` |
 
 Unlike the legacy methods, assigning `open` emits no event. When the surrounding code relied on `balChange` firing afterwards, call the handler directly and report it.
 
@@ -155,6 +168,30 @@ The scan does not list a file that only listens or only calls a method and never
 
 ## 4. Report
 
-Print a per-file summary of what changed, including every accordion that now renders a heading, every trigger that lost its automatic translations and still needs an accessible name, every dropped `debounce`, `card`, and `version`, every `expanded` turned into `button-wide`, every `color="info"` left to fall back to `primary`, every other dropped `color`, every `openIcon` or `closeIcon` whose default changed, every `variant="text"` turned into `marker="none"`, every handler whose event detail is now an object, every dropped `balWillAnimate` and `balDidAnimate` binding, and every `present()`, `dismiss()`, or `toggle()` call rewritten. End with the note that files which only listen or only call a method, and have no scanned `.html` of the same name beside them, were not scanned. Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Done when the summary is printed and the working tree is still unstaged.
+Needs your attention when found:
+
+1. Every accordion that now renders a heading. The consumer checks the page outline.
+2. Every trigger that lost its automatic translations and still needs an accessible name.
+3. Every dropped `debounce`.
+4. Every `color="info"` left to fall back to `primary`.
+5. Every other dropped `color`.
+6. Every `openIcon` whose default changed from `plus` to empty.
+7. Every `closeIcon` whose default changed from `close` to empty.
+8. Every single-icon trigger whose icon no longer rotates in the open state.
+9. Every `variant="text"` turned into `marker="none"`.
+10. Every handler whose event detail is now an object.
+11. Every dropped `balWillAnimate` and `balDidAnimate` binding.
+12. Every `present()`, `dismiss()` or `toggle()` call rewritten.
+13. One-time note: files which only listen or only call a method, and have no scanned `.html` of the same name beside them, were not scanned.
+
+Coverage only, written to the file:
+
+14. Every dropped `card`, with the note that the consumer may add `ds-card` themselves if a real card was intended.
+15. Every dropped `version`.
+16. Every `expanded` turned into `button-wide`.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.

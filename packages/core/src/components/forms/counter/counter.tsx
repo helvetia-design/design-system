@@ -50,6 +50,8 @@ const VALUE_ANIMATION_MS = 260
  * @part value - The span rendering the current value.
  * @part decrease - The decrease (`-`) button.
  * @part increase - The increase (`+`) button.
+ *
+ * @slot invalid-text - Overrides the `invalidText` prop with custom markup, shown instead of the description when `invalid` is `true`.
  */
 @Component({
   tag: 'ds-counter',

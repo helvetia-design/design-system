@@ -5,16 +5,20 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import { lineAt, lineText, readTag, scanSourceFiles, toSnippet } from './source-scan.mjs'
 
 const USAGE_RE =
-  /<\/?bal-snackbar(?![\w-])|<\/?BalSnackbar\b|\b(?:balSnackbarController|BalSnackbarController|BalSnackbarService|BalSnackbarOptions|BalSnackbar)\b/g
+  /<\/?bal-snackbar(?![\w-])|<\/?BalSnackbar\b|\b(?:balSnackbarController|BalSnackbarController|BalSnackbarService|BalSnackbarOptions|BalSnackbar)\b|<\/?bal-notices(?![\w-])|<\/?BalNotices\b|\b(?:BalNotices|defineBalNotices)\b/g
 
-export function scanBalSnackbar(rootDir) {
+const NOTICES_IMPORT_RE =
+  /(?:\bfrom|\bimport\s*\(?|\brequire\s*\()\s*['"]@baloise\/ds-core\/(?:dist\/)?components\/bal-notices(?:\.js)?['"]/g
+
+export function scanBalSnackbar(rootDir, paths = []) {
   const found = []
-  scanSourceFiles(rootDir, ({ file, masked, text }) => collect(file, text, masked, found))
-  return group(found)
+  const unmatched = scanSourceFiles(rootDir, source => collect(source, found), { paths })
+  const result = group(found)
+  return unmatched.length > 0 ? { ...result, unmatched } : result
 }
 
-export function run(rootDir, stdout) {
-  stdout.write(`${JSON.stringify(scanBalSnackbar(rootDir), null, 2)}\n`)
+export function run(rootDir, stdout, paths = []) {
+  stdout.write(`${JSON.stringify(scanBalSnackbar(rootDir, paths), null, 2)}\n`)
   return 0
 }
 
@@ -39,13 +43,25 @@ function group(found) {
   }
 }
 
-function collect(file, text, masked, found) {
+function collect({ file, text, masked, comments }, found) {
+  const lines = new Set()
   USAGE_RE.lastIndex = 0
   let match
   while ((match = USAGE_RE.exec(masked)) !== null) {
     const index = match.index
     const raw = match[0].startsWith('<') ? readTag(text, index) : lineText(text, index)
-    found.push({ file, index, line: lineAt(text, index), snippet: toSnippet(raw) })
+    const line = lineAt(text, index)
+    lines.add(line)
+    found.push({ file, index, line, snippet: toSnippet(raw) })
+  }
+  if (!text.includes('bal-notices')) return
+  // The import path is a string literal, which `masked` blanks, so it is read from the comment-masked text.
+  NOTICES_IMPORT_RE.lastIndex = 0
+  while ((match = NOTICES_IMPORT_RE.exec(comments)) !== null) {
+    const line = lineAt(text, match.index)
+    if (lines.has(line)) continue
+    lines.add(line)
+    found.push({ file, index: match.index, line, snippet: toSnippet(lineText(text, match.index)) })
   }
 }
 
@@ -62,7 +78,7 @@ function isMainModule() {
 if (isMainModule()) {
   const root = process.argv[2] ? resolve(process.argv[2]) : process.cwd()
   try {
-    process.exit(run(root, process.stdout))
+    process.exit(run(root, process.stdout, process.argv.slice(3)))
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
     process.exit(1)

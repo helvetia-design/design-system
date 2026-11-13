@@ -40,7 +40,7 @@ Legacy `value` on `bal-carousel` is a 0-based slide **index**. `ds-carousel`'s `
 
 - A literal numeric `value` (`value="1"`, `value={1}`, a plain number) becomes the synthesized name at that position: index `0` → `item-1`, index `1` → `item-2`, and so on.
 - No `value` attribute, or `value="0"` / `value={0}` (the legacy default): omit `value` entirely on `ds-carousel`. It already defaults to the first item's name, same effective behavior as the legacy default index.
-- A `value` bound to a variable, prop, or expression cannot be resolved to a position at scan time. Leave the expression untouched, and report it: the surrounding state must now hold the item's **name** (string), not an index, and must stay in sync with the synthesized names above.
+- A `value` bound to a variable, prop, or expression cannot be resolved to a position at scan time. Do not guess the mapping. HTML: leave the expression untouched, and report it. React and Angular: keep it when the expression's type only admits strings or `null`. A legacy index state of type `number` does not fit. Otherwise apply Unmapped props and handlers (`SKILL.md`). The report says that the surrounding state must now hold the item's **name** (string), not an index, and must stay in sync with the synthesized names above.
 
 ```html
 <!-- before -->
@@ -82,50 +82,50 @@ When there is no `href` but `elementType`, `name` (the button's form name — di
 
 ### `controls`
 
-| old                | new (`ds-carousel`) | handling                                                                                                                                                                                        |
-| ------------------ | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `controls="dots"`  | `controls="dots"`   | Copy as-is.                                                                                                                                                                                     |
-| `controls="large"` | `controls="large"`  | Copy as-is.                                                                                                                                                                                     |
-| `controls="none"`  | `controls="none"`   | Copy as-is.                                                                                                                                                                                     |
-| `controls="small"` | `controls="large"`  | `ds-carousel` has only one arrow-button size. Rewrite to `large`, the nearest shape (prev/next arrow buttons). Mention the size change in the summary.                                          |
-| `controls="tabs"`  | _(no equivalent)_   | `ds-carousel` has no tab-style pagination (a row of buttons showing each item's label). Drop the attribute — it falls back to the `dots` default — and flag every occurrence for manual review. |
+| old | new (`ds-carousel`) | handling |
+| --- | --- | --- |
+| `controls="dots"` | `controls="dots"` | Copy as-is. |
+| `controls="large"` | `controls="large"` | Copy as-is. |
+| `controls="none"` | `controls="none"` | Copy as-is. |
+| `controls="small"` | `controls="large"` | `ds-carousel` has only one arrow-button size. Rewrite to `large`, the nearest shape (prev/next arrow buttons). Mention the size change in the report. |
+| `controls="tabs"` | _(no equivalent)_ | `ds-carousel` has no tab-style pagination (a row of buttons showing each item's label). Drop the attribute — it falls back to the `dots` default — and flag every occurrence for manual review. |
 
 ### `interface` → `variant`
 
-| old (`interface`)       | new (`variant`)  | handling                                                                                                                                                                                                                                                                                        |
-| ----------------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| omitted, `interface=""` | omit `variant`   | `slide` is the default on both sides.                                                                                                                                                                                                                                                           |
-| `interface="image"`     | omit `variant`   | `slide` is the nearest match (one item visible at a time, scroll-snap). The legacy `aspectRatio` prop enforced a fixed image aspect ratio via padding; `ds-carousel-item` has no such prop — the `<img>` now sizes by its natural content. Mention every `aspectRatio` found (see Props below). |
-| `interface="card"`      | `variant="tile"` | `tile` is the nearest match (multiple items, horizontal scroll, edge-fade on overflow). The legacy bleed-margin and shadow styling is superseded by the new tile styling — nothing for the consumer to do, just mention the visual change in the summary.                                       |
-| `interface="product"`   | `variant="tile"` | Same as `card`. The legacy fixed-width colored product buttons are superseded by the new tile + item `color` styling (see Props below) — mention the visual change in the summary.                                                                                                              |
+| old (`interface`) | new (`variant`) | handling |
+| --- | --- | --- |
+| omitted, `interface=""` | omit `variant` | `slide` is the default on both sides. |
+| `interface="image"` | omit `variant` | `slide` is the nearest match (one item visible at a time, scroll-snap). The legacy `aspectRatio` prop enforced a fixed image aspect ratio via padding; `ds-carousel-item` has no such prop — the `<img>` now sizes by its natural content. Mention every `aspectRatio` found (see Props below). |
+| `interface="card"` | `variant="tile"` | `tile` is the nearest match (multiple items, horizontal scroll, edge-fade on overflow). The legacy bleed-margin and shadow styling is superseded by the new tile styling — nothing for the consumer to do, just mention the visual change in the report. |
+| `interface="product"` | `variant="tile"` | Same as `card`. The legacy fixed-width colored product buttons are superseded by the new tile + item `color` styling (see Props below) — mention the visual change in the report. |
 
 ### Other `bal-carousel` props
 
-| old                                      | new (`ds-carousel`)               | handling                                                                                                                                                                       |
-| ---------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `steps`                                  | `steps`                           | Copy as-is.                                                                                                                                                                    |
-| `itemsPerView` / `items-per-view`        | `itemsPerView` / `items-per-view` | Copy as-is. Legacy accepted `'auto' \| 1 \| 2 \| 3 \| 4`; new accepts `'auto' \| number`, a superset — any legacy value is still valid.                                        |
-| `controlsOverflow` / `controls-overflow` | _(no equivalent)_                 | Drop it. Controls always overlay the track now, matching the legacy `controlsOverflow={true}` look regardless of the old value. Mention each dropped occurrence.               |
-| `inverted`                               | _(no equivalent)_                 | Drop it. `ds-carousel` has no dark-background variant. Mention each dropped occurrence.                                                                                        |
-| `fullHeight` / `full-height`             | _(no equivalent)_                 | Drop it. Mention each dropped occurrence.                                                                                                                                      |
-| `aspectRatio` / `aspect-ratio`           | _(no equivalent)_                 | Drop it. See the `interface="image"` note above. Mention each dropped occurrence.                                                                                              |
-| `controlsSticky` / `controls-sticky`     | _(no equivalent)_                 | Drop it. Only ever had an effect together with `controls="tabs"`, itself dropped. Mention each dropped occurrence.                                                             |
-| `scrollY` / `scroll-y`                   | _(no equivalent)_                 | Drop only when explicitly `false` (blocked vertical touch scrolling) and mention it — the default `true` matches current behavior, nothing to report.                          |
-| `border`                                 | _(no equivalent)_                 | Drop it. `ds-carousel` has no bottom-border variant. Mention each dropped occurrence.                                                                                          |
-| `htmlRole` / `html-role`                 | _(no equivalent)_                 | Drop it. Already `@deprecated` in the legacy component; ARIA roles are automatic now. Mention each dropped occurrence.                                                         |
-| `space`                                  | _(no public prop)_                | Drop it. Track gap is customizable only through the `--carousel-gap` CSS custom property, not a component prop. Mention each dropped occurrence and point at the CSS variable. |
+| old | new (`ds-carousel`) | handling |
+| --- | --- | --- |
+| `steps` | `steps` | Copy as-is. |
+| `itemsPerView` / `items-per-view` | `itemsPerView` / `items-per-view` | Copy as-is. Legacy accepted `'auto' \| 1 \| 2 \| 3 \| 4`; new accepts `'auto' \| number`, a superset — any legacy value is still valid. |
+| `controlsOverflow` / `controls-overflow` | _(no equivalent)_ | Drop it. Controls always overlay the track now, matching the legacy `controlsOverflow={true}` look regardless of the old value. Mention each dropped occurrence. |
+| `inverted` | _(no equivalent)_ | Drop it. `ds-carousel` has no dark-background variant. Mention each dropped occurrence. |
+| `fullHeight` / `full-height` | _(no equivalent)_ | Drop it. Mention each dropped occurrence. |
+| `aspectRatio` / `aspect-ratio` | _(no equivalent)_ | Drop it. See the `interface="image"` note above. Mention each dropped occurrence. |
+| `controlsSticky` / `controls-sticky` | _(no equivalent)_ | Drop it. Only ever had an effect together with `controls="tabs"`, itself dropped. Mention each dropped occurrence. |
+| `scrollY` / `scroll-y` | _(no equivalent)_ | Drop only when explicitly `false` (blocked vertical touch scrolling) and mention it — the default `true` matches current behavior, nothing to report. |
+| `border` | _(no equivalent)_ | Drop it. `ds-carousel` has no bottom-border variant. Mention each dropped occurrence. |
+| `htmlRole` / `html-role` | _(no equivalent)_ | Drop it. Already `@deprecated` in the legacy component; ARIA roles are automatic now. Mention each dropped occurrence. |
+| `space` | _(no public prop)_ | Drop it. Track gap is customizable only through the `--carousel-gap` CSS custom property, not a component prop. Mention each dropped occurrence and point at the CSS variable. |
 
 ### `bal-carousel-item` props
 
-| old                                                                                               | new (`ds-carousel-item`) | handling                                                                                                                                                                                                                                                                                                                                                                        |
-| ------------------------------------------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src`                                                                                             | `src`                    | Copy as-is.                                                                                                                                                                                                                                                                                                                                                                     |
-| `color="green"` / `"yellow"` / `"red"` / `"purple"`                                               | same value               | Copy as-is.                                                                                                                                                                                                                                                                                                                                                                     |
-| `color="white"`                                                                                   | _(no equivalent)_        | Drop it. `ds-carousel-item`'s `color` has no `white` value. Mention each dropped occurrence.                                                                                                                                                                                                                                                                                    |
-| `svg`                                                                                             | _(no equivalent prop)_   | Drop it. The new pattern is slotting a `<ds-brand-icon src="...">` component instead of inline SVG markup. Do not attempt to auto-generate that markup from the raw SVG string — flag every occurrence for manual rewrite.                                                                                                                                                      |
-| `label`                                                                                           | slot text, or dropped    | When the item has no other slotted content (the typical product-tile usage), move the `label` value into the slot as plain text and drop the attribute. When the item already has slotted content (typical image usage, `label` was only the aria-label), drop `label` and report the lost custom aria-label — image items now get an automatic `aria-label="Slide N"` instead. |
-| `htmlRole` / `html-role`                                                                          | _(no equivalent)_        | Drop it. Already `@deprecated`. Mention each dropped occurrence.                                                                                                                                                                                                                                                                                                                |
-| `elementType`, item `name` (form name), `value` (form value), `href`, `target`, `rel`, `download` | —                        | Handled under Shape above, not here — these determine whether the item becomes a wrapped `<a>` or `<button>`.                                                                                                                                                                                                                                                                   |
+| old | new (`ds-carousel-item`) | handling |
+| --- | --- | --- |
+| `src` | `src` | Copy as-is. |
+| `color="green"` / `"yellow"` / `"red"` / `"purple"` | same value | Copy as-is. |
+| `color="white"` | _(no equivalent)_ | Drop it. `ds-carousel-item`'s `color` has no `white` value. Mention each dropped occurrence. |
+| `svg` | _(no equivalent prop)_ | Drop it. The new pattern is slotting a `<ds-brand-icon src="...">` component instead of inline SVG markup. Do not attempt to auto-generate that markup from the raw SVG string — flag every occurrence for manual rewrite. |
+| `label` | slot text, or dropped | When the item has no other slotted content (the typical product-tile usage), move the `label` value into the slot as plain text and drop the attribute. When the item already has slotted content (typical image usage, `label` was only the aria-label), drop `label` and report the lost custom aria-label — image items now get an automatic `aria-label="Slide N"` instead. |
+| `htmlRole` / `html-role` | _(no equivalent)_ | Drop it. Already `@deprecated`. Mention each dropped occurrence. |
+| `elementType`, item `name` (form name), `value` (form value), `href`, `target`, `rel`, `download` | — | Handled under Shape above, not here — these determine whether the item becomes a wrapped `<a>` or `<button>`. |
 
 ### Tags and imports
 
@@ -135,19 +135,19 @@ When there is no `href` but `elementType`, `name` (the button's form name — di
 
 ### Events
 
-| old            | new                 | handling                                                                                                                                                                                                                                                           |
-| -------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `balChange`    | `dsChange`          | Rewrite `addEventListener('balChange'` to `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`.                                                                                                   |
-| event `detail` | `{ value: string }` | Legacy sent the new slide index as a number. `ds-carousel` sends the active item's name. Every handler that read `.detail` directly as a number must read `.detail.value` instead. Report each handler.                                                            |
-| `balNavigate`  | `click`             | Only applies to items rewritten into a wrapped `<a>`/`<button>` per the Shape section. Move the listener onto that element: `addEventListener('balNavigate'` → `addEventListener('click'`, Angular `(balNavigate)` → `(click)`, React `onBalNavigate` → `onClick`. |
-| `balFocus`     | `focus`             | Same rule as `balNavigate`, targeting `focus`.                                                                                                                                                                                                                     |
-| `balBlur`      | `blur`              | Same rule as `balNavigate`, targeting `blur`.                                                                                                                                                                                                                      |
+| old | new | handling |
+| --- | --- | --- |
+| `balChange` | `dsChange` | Rewrite `addEventListener('balChange'` to `addEventListener('dsChange'`. Angular: `(balChange)` becomes `(dsChange)`. React: `onBalChange` becomes `onDsChange`. |
+| event `detail` | `{ value: string }` | Legacy sent the new slide index as a number. `ds-carousel` sends the active item's name (`item-N`). When the handler body is in the same file (inline arrow, named function, Angular class method bound by `(balChange)`, `addEventListener` callback), rewrite every `.detail` read to `.detail.value`, for example `({ detail }) => f(detail)` becomes `({ detail }) => f(detail.value)`. When the handler uses the read as a number (`Number(...)`, arithmetic, a numeric state setter), `.detail.value` alone gives `'item-2'` or `NaN`. Convert the synthesized name back to the 0-based index instead: `setSlide(event.detail)` becomes `setSlide(Number(event.detail.value.slice('item-'.length)) - 1)`. A parameter typed `CustomEvent<number>` becomes `CustomEvent<{ value: string }>`. Report each rewritten handler, because the bound `value` must now hold the name, not the index. A handler in another file, one whose body you cannot see, or one also bound to an element you did not migrate stays as it is and is reported. |
+| `balNavigate` | `click` | Only applies to items rewritten into a wrapped `<a>`/`<button>` per the Shape section. Move the listener onto that element: `addEventListener('balNavigate'` → `addEventListener('click'`, Angular `(balNavigate)` → `(click)`, React `onBalNavigate` → `onClick`. |
+| `balFocus` | `focus` | Same rule as `balNavigate`, targeting `focus`. |
+| `balBlur` | `blur` | Same rule as `balNavigate`, targeting `blur`. |
 
 ### Methods
 
-`previous()` and `next()` do not exist on `ds-carousel`. Calling them throws at runtime, and there is no direct replacement — scrolling to a slide only happens from real user interaction (arrow click, drag, keyboard, or clicking a tile) inside the component. Setting `el.value = 'item-N'` updates the active dot/highlight, but does not scroll the track into view. Flag every `previous()`/`next()` call site for manual review.
+`previous()` and `next()` do not exist on `ds-carousel`, and there is no direct replacement. Calling them throws at runtime. Scrolling to a slide only happens from real user interaction inside the component: an arrow click, a drag, the keyboard, or a click on a tile. Setting `el.value = 'item-N'` updates the active dot and highlight, but does not scroll the track into view. Apply Unmapped props and handlers (`SKILL.md`) to every `previous()` and `next()` call. A standalone call becomes the TODO comment. A used result gets the placeholder, and its type is `void`, the legacy return type without the `Promise`. Name the `el.value` option in the report.
 
-`setFocus()` on `bal-carousel-item` does not exist on `ds-carousel-item`. Flag every call for manual review.
+`setFocus()` on `bal-carousel-item` does not exist on `ds-carousel-item`. Apply Unmapped props and handlers (`SKILL.md`) to every call, the same way.
 
 ### Files to edit beyond the scan
 
@@ -159,6 +159,41 @@ The scan does not list a file that only listens or only calls a method and never
 
 ## 4. Report
 
-Print a per-file summary of what changed, including: every synthesized `ds-carousel-item` name; every `value` rewritten from an index to a name, and every `value` left as a non-literal expression needing a name-based state change; every `controls="small"` rewritten to `large`; every dropped `controls="tabs"`; every `interface`→`variant` collapse and its associated visual-detail note (aspect ratio, card bleed styling, product button styling); every dropped `controlsOverflow`, `inverted`, `fullHeight`, `aspectRatio`, `controlsSticky`, `scrollY`, `border`, `htmlRole`, and `space`; every item rewritten into a wrapped `<a>` (with `navigation` added) or `<button>` (flagged for review); every dropped `color="white"`; every dropped `svg` with the `ds-brand-icon` guidance; every `label` moved into slot text versus dropped; every `balNavigate`/`balFocus`/`balBlur` rewritten to native events; every handler whose event detail changed from a number to `{ value }`; and every `previous()`, `next()`, or `setFocus()` call flagged as having no replacement. End with the note that files which only listen or only call a method, and have no scanned `.html` of the same name beside them, were not scanned. Leave every change unstaged for the consumer to review. Stop. Do not run `git add` or `git commit`.
+Write the report as `shared/report.md` describes, with the per-file summary under Files changed. Every item below gets its own line in the coverage checklist, found or none found.
 
-Done when the summary is printed and the working tree is still unstaged.
+Needs your attention when found:
+
+1. Every non-literal `value`, with its outcome: left (HTML), kept because its type only admits strings or `null`, or removed (Unmapped). The surrounding state must now hold the item name, not an index.
+2. Every `controls="small"` rewritten to `large`.
+3. Every dropped `controls="tabs"`.
+4. Every `interface="image"` collapsed to the default `variant`, with the note that the images lost their fixed aspect ratio.
+5. Every `interface="card"` collapsed to `variant="tile"`, with the note that the card bleed styling changed.
+6. Every `interface="product"` collapsed to `variant="tile"`, with the note that the product button styling changed.
+7. Every dropped `controlsOverflow`.
+8. Every dropped `inverted`.
+9. Every dropped `fullHeight`.
+10. Every dropped `aspectRatio`.
+11. Every dropped `scrollY` that was `false`.
+12. Every dropped `border`.
+13. Every dropped `space`, with a pointer to the `--carousel-gap` CSS custom property.
+14. Every item rewritten into a wrapped `<button>`, flagged for visual and behaviour review.
+15. Every dropped `color="white"`.
+16. Every dropped `svg`, with the guidance to slot a `ds-brand-icon` instead.
+17. Every `label` dropped because the item already had slotted content. The custom aria-label is lost.
+18. Every `balNavigate`, `balFocus` or `balBlur` rewritten to a native event on the wrapped element.
+19. Every handler whose `detail` read was rewritten to `detail.value`. The value is now the item name (`item-N`), not a 0-based index, so state that stores an index must change. Also every handler left as it is because its body is in another file, named by file and line.
+20. Every `previous()`, `next()` or `setFocus()` call, with its Unmapped props and handlers outcome. For `previous()` and `next()`, name the `el.value = 'item-N'` option, which moves the active dot but does not scroll.
+21. One-time note: files which only listen or only call a method, and have no scanned `.html` of the same name beside them, were not scanned.
+
+Coverage only, written to the file:
+
+22. Every synthesized `ds-carousel-item` name.
+23. Every `value` rewritten from an index to a name.
+24. Every dropped `controlsSticky`.
+25. Every dropped `htmlRole`.
+26. Every item rewritten into a wrapped `<a>`, with `navigation` added.
+27. Every `label` moved into the slot as plain text.
+
+Leave every change unstaged for the consumer to review, including `ds-migration-report.md`. Stop. Do not run `git add` or `git commit`.
+
+Done when every numbered item has its line in `ds-migration-report.md`, the chat shows only the attention items and the pointer line, and the working tree is still unstaged.
