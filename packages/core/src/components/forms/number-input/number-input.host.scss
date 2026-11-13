@@ -73,7 +73,7 @@
 // --------------------------------
 :host(.is-danger) {
   --mod-form-container-border: var(--ds-form-danger-container-border);
-  --mod-form-description-color: var(--ds-form-danger-description-color);
+  --mod-form-description-color: var(--ds-form-danger-color-description);
   --mod-form-container-hover-border: var(--ds-form-danger-container-border);
   --mod-form-container-active-border: var(--ds-form-danger-container-border);
 }
@@ -83,7 +83,7 @@
 // --------------------------------
 :host(.is-success) {
   --mod-form-container-border: var(--ds-form-success-container-border);
-  --mod-form-description-color: var(--ds-form-success-description-color);
+  --mod-form-description-color: var(--ds-form-success-color-description);
   --mod-form-container-hover-border: var(--ds-form-success-container-border);
   --mod-form-container-active-border: var(--ds-form-success-container-border);
 }
@@ -93,7 +93,7 @@
 // --------------------------------
 :host(.is-warning) {
   --mod-form-container-border: var(--ds-form-warning-container-border);
-  --mod-form-description-color: var(--ds-form-warning-description-color);
+  --mod-form-description-color: var(--ds-form-warning-color-description);
   --mod-form-container-hover-border: var(--ds-form-warning-container-border);
   --mod-form-container-active-border: var(--ds-form-warning-container-border);
 }
@@ -112,9 +112,9 @@
 
   --mod-form-container-background: var(--ds-form-disabled-container-background);
   --mod-form-container-border: var(--ds-form-disabled-container-border);
-  --mod-form-label-color: var(--ds-form-disabled-label-color);
-  --mod-form-description-color: var(--ds-form-disabled-description-color);
+  --mod-form-label-color: var(--ds-form-disabled-color-label);
+  --mod-form-description-color: var(--ds-form-disabled-color-description);
 
-  --mod-input-color: var(--ds-form-disabled-control-value-color);
-  --mod-input-placeholder: var(--ds-form-disabled-control-placeholder-color);
+  --mod-input-color: var(--ds-form-disabled-control-color-value);
+  --mod-input-placeholder: var(--ds-form-disabled-control-color-placeholder);
 }

@@ -111,10 +111,10 @@ $select-icon-search: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' xmlns='h
   @include vars.local(select-option-selected-icon-color, var(--ds-select-option-color-icon-selected));
   @include vars.local(select-option-selected-text-color, var(--ds-select-option-color-text-selected));
   @include vars.local(select-option-selected-background-color, var(--ds-select-option-color-background-selected));
-  @include vars.local(select-option-hover-text-color, var(--ds-select-option-color-text-highlight));
+  @include vars.local(select-option-hover-text-color, var(--ds-select-option-text-color-highlight));
   @include vars.local(select-option-hover-background-color, var(--ds-select-option-color-background-hover));
-  @include vars.local(select-option-highlight-text-color, var(--ds-select-option-color-text-highlight));
-  @include vars.local(select-option-highlight-background-color, var(--ds-select-option-color-background-highlight));
+  @include vars.local(select-option-highlight-text-color, var(--ds-select-option-text-color-highlight));
+  @include vars.local(select-option-highlight-background-color, var(--ds-select-option-background-color-highlight));
   @include vars.local(select-option-disabled-text-color, var(--ds-select-option-color-text-disabled));
   @include vars.local(select-option-disabled-background-color, var(--ds-select-option-color-background-disabled));
 
@@ -211,21 +211,21 @@ $select-icon-search: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' xmlns='h
 
 :host(.is-danger) {
   --mod-form-container-border: var(--ds-form-danger-container-border);
-  --mod-form-description-color: var(--ds-form-danger-description-color);
+  --mod-form-description-color: var(--ds-form-danger-color-description);
   --mod-form-container-hover-border: var(--ds-form-danger-container-border);
   --mod-form-container-active-border: var(--ds-form-danger-container-border);
 }
 
 :host(.is-success) {
   --mod-form-container-border: var(--ds-form-success-container-border);
-  --mod-form-description-color: var(--ds-form-success-description-color);
+  --mod-form-description-color: var(--ds-form-success-color-description);
   --mod-form-container-hover-border: var(--ds-form-success-container-border);
   --mod-form-container-active-border: var(--ds-form-success-container-border);
 }
 
 :host(.is-warning) {
   --mod-form-container-border: var(--ds-form-warning-container-border);
-  --mod-form-description-color: var(--ds-form-warning-description-color);
+  --mod-form-description-color: var(--ds-form-warning-color-description);
   --mod-form-container-hover-border: var(--ds-form-warning-container-border);
   --mod-form-container-active-border: var(--ds-form-warning-container-border);
 }
@@ -236,11 +236,11 @@ $select-icon-search: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' xmlns='h
 
   --mod-form-container-background: var(--ds-form-disabled-container-background);
   --mod-form-container-border: var(--ds-form-disabled-container-border);
-  --mod-form-label-color: var(--ds-form-disabled-label-color);
-  --mod-form-description-color: var(--ds-form-disabled-description-color);
+  --mod-form-label-color: var(--ds-form-disabled-color-label);
+  --mod-form-description-color: var(--ds-form-disabled-color-description);
 
-  --mod-select-text-color: var(--ds-form-disabled-control-value-color);
-  --mod-select-placeholder-color: var(--ds-form-disabled-control-placeholder-color);
+  --mod-select-text-color: var(--ds-form-disabled-control-color-value);
+  --mod-select-placeholder-color: var(--ds-form-disabled-control-color-placeholder);
 
   // slim-select's own base stylesheet paints `.ss-main.ss-disabled` with a hard-coded
   // background-color (mapped from --ss-disabled-color, which we in turn map from a
@@ -254,17 +254,17 @@ $select-icon-search: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' xmlns='h
     background: none;
 
     .ss-arrow {
-      background-color: var(--ds-form-disabled-control-value-color);
+      background-color: var(--ds-form-disabled-control-color-value);
     }
 
     // Disabled chips read as inert tags, not editable form values: flatten them to the
     // standard disabled-tag look (dark-grey fill, white text) and drop the delete button
     // entirely — there's nothing to remove while the control is disabled.
     .ss-values .ss-value {
-      background-color: var(--ds-tag-disabled-color-background);
+      background-color: var(--ds-select-chip-disabled-color-background);
 
       .ss-value-text {
-        color: var(--ds-tag-disabled-color-text);
+        color: var(--ds-select-chip-disabled-color-text);
       }
 
       .ss-value-delete {
@@ -317,7 +317,7 @@ $select-icon-search: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' xmlns='h
     top: calc(100% + 4px);
     left: -4px;
     width: calc(100% + 8px);
-    z-index: var(--ds-alias-z-index-popup);
+    z-index: var(--ds-select-content-z-index);
 
     min-height: 0;
     max-height: 300px;
@@ -342,14 +342,16 @@ $select-icon-search: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' xmlns='h
     }
 
     &::-webkit-scrollbar-track {
+      // ds-token-check: intentional — scrollbar track must stay invisible by construction, never a themeable value
       background: transparent;
     }
 
     &::-webkit-scrollbar-thumb {
       background-color: var(--_select-option-border-color);
       background-clip: padding-box;
+      // ds-token-check: intentional — transparent spacer border for the background-clip trick, not a themeable value
       border: 2px solid transparent;
-      border-radius: 9999px;
+      border-radius: var(--ds-select-scrollbar-radius);
     }
   }
 }
@@ -421,7 +423,7 @@ $select-icon-search: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' xmlns='h
     color: var(--_select-option-text-color);
     background-color: var(--_select-option-background-color);
     border-left: none !important;
-    border-radius: var(--ds-alias-radius-base);
+    border-radius: var(--ds-select-radius);
     margin: 0 var(--_select-content-padding);
 
     &::after {
@@ -545,19 +547,20 @@ $select-icon-search: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' xmlns='h
   .ss-main .ss-values .ss-value {
     @include unselectable();
 
-    min-height: 1.5rem;
-    padding-block: var(--ds-tag-size-sm-padding-y);
-    padding-inline: var(--ds-tag-size-sm-padding-x);
-    border-radius: var(--ds-tag-radius);
+    min-height: var(--ds-select-control-height);
+    padding-block: var(--ds-select-chip-size-sm-padding-y);
+    padding-inline: var(--ds-select-chip-size-sm-padding-x);
+    border-radius: var(--ds-select-chip-radius);
 
     background-color: var(--_select-tag-background-color);
 
     .ss-value-text {
       color: var(--_select-tag-text-color);
       font-family: var(--_select-tag-family);
+      // ds-token-check: intentional — single-line height reset, not a themeable typography value
       line-height: 1;
-      font-size: var(--ds-tag-size-sm-font-size);
-      font-weight: var(--ds-tag-size-sm-font-weight);
+      font-size: var(--ds-select-chip-size-sm-font-size);
+      font-weight: var(--ds-select-chip-size-sm-font-weight);
       padding: 0;
     }
 
@@ -567,7 +570,7 @@ $select-icon-search: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' xmlns='h
       --close-size-icon: 20px;
       --close-color-focus: var(--_select-focus-ring-color);
 
-      margin: 0 -0.5rem 0 0.25rem;
+      margin: 0 calc(-1 * var(--ds-select-chip-delete-margin-end)) 0 var(--ds-select-chip-delete-margin-start);
       padding: 0;
       box-sizing: border-box;
 
@@ -603,7 +606,7 @@ $select-icon-search: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' xmlns='h
         content: '';
         border: 2px solid var(--_select-checkbox-border-color);
         border-radius: var(--_select-radius);
-        margin-right: 0.5rem;
+        margin-right: var(--ds-select-checkbox-margin-end);
         flex-shrink: 0;
       }
 

@@ -93,7 +93,7 @@
  */
 
 @mixin vars-label() {
-  @include vars.local(form-label-color, var(--ds-form-default-label-color));
+  @include vars.local(form-label-color, var(--ds-form-default-color-label));
   @include vars.local(form-label-family, var(--ds-form-default-label-typo-font-family));
   @include vars.local(form-label-weight, var(--ds-form-default-label-typo-font-weight));
   @include vars.local(form-label-line-height, var(--ds-form-default-label-typo-line-height));
@@ -139,7 +139,7 @@
  */
 
 @mixin vars-description() {
-  @include vars.local(form-description-color, var(--ds-form-default-description-color));
+  @include vars.local(form-description-color, var(--ds-form-default-color-description));
   @include vars.local(form-description-family, var(--ds-form-default-description-typo-font-family));
   @include vars.local(form-description-weight, var(--ds-form-default-description-typo-font-weight));
   @include vars.local(form-description-line-height, var(--ds-form-default-description-typo-line-height));

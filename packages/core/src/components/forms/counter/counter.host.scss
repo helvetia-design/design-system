@@ -33,11 +33,11 @@
   @include form.vars-label();
   @include form.vars-description();
 
-  @include vars.local(counter-gap, 0.125rem);
-  @include vars.local(counter-value-min-width, 3rem);
-  @include vars.local(counter-value-font-weight, var(--ds-alias-text-weight-bold));
-  @include vars.local(counter-value-font-family, var(--ds-alias-text-family-text));
-  @include vars.local(counter-value-color, var(--ds-form-default-label-color));
+  @include vars.local(counter-gap, var(--ds-counter-gap));
+  @include vars.local(counter-value-min-width, var(--ds-counter-value-min-width));
+  @include vars.local(counter-value-font-weight, var(--ds-counter-value-typo-font-weight));
+  @include vars.local(counter-value-font-family, var(--ds-counter-value-typo-font-family));
+  @include vars.local(counter-value-color, var(--ds-form-default-color-label));
   // Must match VALUE_ANIMATION_MS in counter.tsx, which clears the outgoing digit from the DOM once
   // the animation finishes.
   @include vars.local(counter-value-animation-duration, 260ms);
@@ -157,31 +157,31 @@
 // Invalid or Color Danger
 // --------------------------------
 :host(.is-danger) {
-  --mod-form-description-color: var(--ds-form-danger-description-color);
-  --mod-counter-value-color: var(--ds-alias-text-color-danger);
+  --mod-form-description-color: var(--ds-form-danger-color-description);
+  --mod-counter-value-color: var(--ds-counter-value-color-danger);
 }
 
 //
 // Valid or Color Success
 // --------------------------------
 :host(.is-success) {
-  --mod-form-description-color: var(--ds-form-success-description-color);
+  --mod-form-description-color: var(--ds-form-success-color-description);
 }
 
 //
 // Color Warning
 // --------------------------------
 :host(.is-warning) {
-  --mod-form-description-color: var(--ds-form-warning-description-color);
+  --mod-form-description-color: var(--ds-form-warning-color-description);
 }
 
 //
 // Disabled (also covers `readonly`, treated as equivalent at the field level — see counter.tsx)
 // --------------------------------
 :host(.is-disabled) {
-  --mod-form-label-color: var(--ds-form-disabled-label-color);
-  --mod-form-description-color: var(--ds-form-disabled-description-color);
-  --mod-counter-value-color: var(--ds-form-disabled-label-color);
+  --mod-form-label-color: var(--ds-form-disabled-color-label);
+  --mod-form-description-color: var(--ds-form-disabled-color-description);
+  --mod-counter-value-color: var(--ds-form-disabled-color-label);
 
   &,
   #label,

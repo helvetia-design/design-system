@@ -42,10 +42,11 @@
       min-width: 0;
       outline: none;
       appearance: none;
+      // ds-token-check: intentional — native <select> background reset, not a themeable value
       background: transparent;
       border: none;
-      height: 1.5rem;
-      padding-inline-end: 1.5rem;
+      height: var(--ds-select-control-height);
+      padding-inline-end: var(--ds-select-control-icon-space);
       font: inherit;
       cursor: pointer;
 

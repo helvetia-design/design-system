@@ -51,6 +51,11 @@
 - [] Re-triage `spinner.figma.md` measurements (still the old flat per-option list) on its next run.
 - [] Build vs. clone review (do together with the Measurements rework). Go through all phases and `conventions/*` and list every spot where the skill builds something from scratch that already exists in the template or on `🧰 Annotations` (e.g. Measurements cards, `Spec/*` annotations, Copy me content, the "🖼️ names" section for asset components). For each: would cloning a prototype and changing only text and positions be simpler and keep the look in one place? Keep in the skill only what can't be cloned (calculated positions and sizes, per-component counts, text formatting that resets on text change).
 
+## Gery
+
+- [ ] Check all components if they render how the visual says
+- [ ] Fix all typo composite tokens
+
 # Components to test
 
 | Status | Component    | Category   | Nested                                | Gap | Figma |
@@ -68,9 +73,9 @@
 | ⬜     | Radio        | Forms      | -                                     | ✅  | ⬜    |
 | ⬜     | Checkbox     | Forms      | -                                     | ✅  | ⬜    |
 | ⬜     | Slider       | Forms      | -                                     | ✅  | ⬜    |
-| ⬜     | Select       | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Select       | Forms      | -                                     | ✅  | ⬜    |
 | ⬜     | Number Input | Forms      | -                                     | ✅  | ⬜    |
-| ⬜     | Phone Input  | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Phone Input  | Forms      | -                                     | ✅  | ⬜    |
 | ⬜     | Steps        | Navigation | -                                     | ✅  | ⬜    |
 | ⬜     | Tooltip      | Overlays   | -                                     | ✅  | ⬜    |
 | ⬜     | Sheet        | Overlays   | -                                     | ✅  | ⬜    |
@@ -85,23 +90,23 @@
 | ⬜     | Card         | Structure  | -                                     | ✅  | ⬜    |
 | ⬜     | Button       | Actions    | Brand Icon, Icon, Spinner             | ✅  | ⬜    |
 | ⬜     | Badge        | Indicators | Icon                                  | ✅  | ⬜    |
-| ⬜     | Segment      | Forms      | Icon                                  | ⬜  | ⬜    |
-| ⬜     | Datepicker   | Forms      | Icon                                  | ⬜  | ⬜    |
-| ⬜     | App Navbar   | Navigation | Icon                                  | ⬜  | ⬜    |
+| ⬜     | Segment      | Forms      | Icon                                  | ✅  | ⬜    |
+| ⬜     | Datepicker   | Forms      | Icon                                  | ✅  | ⬜    |
+| ⬜     | App Navbar   | Navigation | Icon                                  | ✅  | ⬜    |
 | ⬜     | Tabs         | Navigation | Icon                                  | ✅  | ⬜    |
 | ⬜     | Accordion    | Structure  | Icon                                  | ✅  | ⬜    |
-| ⬜     | App Footer   | Structure  | Divider, Icon, Logo                   | ⬜  | ⬜    |
+| ⬜     | App Footer   | Structure  | Divider, Icon, Logo                   | ✅  | ⬜    |
 | ⬜     | Close        | Actions    | Button                                | ✅  | ⬜    |
-| ⬜     | Counter      | Forms      | Button                                | ⬜  | ⬜    |
-| ⬜     | File Upload  | Forms      | Button, Content, Icon, Spinner, Stack | ⬜  | ⬜    |
-| ⬜     | Pagination   | Navigation | Icon, Button                          | ⬜  | ⬜    |
-| ⬜     | Modal        | Overlays   | Close                                 | ⬜  | ⬜    |
-| ⬜     | Drawer       | Overlays   | Close                                 | ⬜  | ⬜    |
-| ⬜     | Popup        | Overlays   | Close                                 | ⬜  | ⬜    |
+| ⬜     | Counter      | Forms      | Button                                | ✅  | ⬜    |
+| ⬜     | File Upload  | Forms      | Button, Content, Icon, Spinner, Stack | ✅  | ⬜    |
+| ⬜     | Pagination   | Navigation | Icon, Button                          | ✅  | ⬜    |
+| ⬜     | Modal        | Overlays   | Close                                 | ✅  | ⬜    |
+| ⬜     | Drawer       | Overlays   | Close                                 | ✅  | ⬜    |
+| ⬜     | Popup        | Overlays   | Close                                 | ✅  | ⬜    |
 | ⬜     | Notification | Overlays   | Close                                 | ✅  | ⬜    |
 | ⬜     | Tag          | Indicators | Close                                 | ✅  | ⬜    |
-| ⬜     | Toast        | Overlays   | Button, Close, Icon                   | ⬜  | ⬜    |
-| ⬜     | Snackbar     | Overlays   | Brand Icon, Button, Close, Icon       | ⬜  | ⬜    |
-| ⬜     | Carousel     | Structure  | Icon, Pagination                      | ⬜  | ⬜    |
-| ⬜     | Hint         | Indicators | Icon, Button, Close, Drawer, Popup    | ⬜  | ⬜    |
-| ⬜     | Alert        | Overlays   | Snackbar, Toast                       | ⬜  | ⬜    |
+| ⬜     | Toast        | Overlays   | Button, Close, Icon                   | ✅  | ⬜    |
+| ⬜     | Snackbar     | Overlays   | Brand Icon, Button, Close, Icon       | ✅  | ⬜    |
+| ⬜     | Carousel     | Structure  | Icon, Pagination                      | ✅  | ⬜    |
+| ⬜     | Hint         | Indicators | Icon, Button, Close, Drawer, Popup    | ✅  | ⬜    |
+| ⬜     | Alert        | Overlays   | Snackbar, Toast                       | ✅  | ⬜    |

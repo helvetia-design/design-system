@@ -68,7 +68,7 @@
 }
 
 :host(.is-invalid) {
-  --mod-form-description-color: var(--ds-form-danger-description-color);
+  --mod-form-description-color: var(--ds-form-danger-color-description);
 }
 
 /**

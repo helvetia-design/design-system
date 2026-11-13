@@ -203,7 +203,7 @@
 // Invalid or Color Danger
 // --------------------------------
 :host(.is-danger) {
-  --mod-form-description-color: var(--ds-form-danger-description-color);
+  --mod-form-description-color: var(--ds-form-danger-color-description);
 
   --mod-slider-connect-color: var(--ds-slider-danger-connect-color-background);
   --mod-slider-thumb-border-color: var(--ds-slider-danger-thumb-color-border);
@@ -213,7 +213,7 @@
 // Valid or Color Success
 // --------------------------------
 :host(.is-success) {
-  --mod-form-description-color: var(--ds-form-success-description-color);
+  --mod-form-description-color: var(--ds-form-success-color-description);
 
   --mod-slider-connect-color: var(--ds-slider-success-connect-color-background);
   --mod-slider-thumb-border-color: var(--ds-slider-success-thumb-color-border);
@@ -223,7 +223,7 @@
 // Color Warning
 // --------------------------------
 :host(.is-warning) {
-  --mod-form-description-color: var(--ds-form-warning-description-color);
+  --mod-form-description-color: var(--ds-form-warning-color-description);
 
   --mod-slider-connect-color: var(--ds-slider-warning-connect-color-background);
   --mod-slider-thumb-border-color: var(--ds-slider-warning-thumb-color-border);
@@ -251,8 +251,8 @@
     cursor: default;
   }
 
-  --mod-form-label-color: var(--ds-form-disabled-label-color);
-  --mod-form-description-color: var(--ds-form-disabled-description-color);
+  --mod-form-label-color: var(--ds-form-disabled-color-label);
+  --mod-form-description-color: var(--ds-form-disabled-color-description);
 
   --mod-slider-track-color: var(--ds-slider-disabled-track-color-background);
   --mod-slider-connect-color: var(--ds-slider-disabled-connect-color-background);

@@ -1688,6 +1688,11 @@
           "com.figma.variableId": "VariableID:137:273"
         }
       },
+      "XS": {
+        "$type": "dimension",
+        "$value": "{🌐 Global.📏 Dimension.Radius.2}",
+        "$description": "Tight radius for small inline elements such as a flag thumbnail (2px at 16px root)."
+      },
       "Base": {
         "$type": "dimension",
         "$value": "{🌐 Global.📏 Dimension.Radius.4}",
@@ -1952,6 +1957,11 @@
           "$type": "color",
           "$value": "{🌐 Global.🌈 Color.Danger.4}",
           "$description": "One step lighter than Danger; used where invalid text sits on a danger-tinted surface."
+        },
+        "DangerDarker": {
+          "$type": "color",
+          "$value": "{🌐 Global.🌈 Color.Danger.6}",
+          "$description": "One step darker than Danger; used for the active state of invalid unselected text."
         }
       },
       "Shadow": {
@@ -10979,113 +10989,7 @@
               "com.figma.variableId": "VariableID:137:1413"
             }
           },
-          "DayActive": {
-            "Background": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🎨 Surface.Sky}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1414"
-              }
-            }
-          },
-          "DaySelected": {
-            "Background": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🎨 Surface.PrimaryDark}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1415"
-              }
-            }
-          },
-          "DaySelectedHover": {
-            "Background": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🎨 Surface.PrimaryHover}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1416"
-              }
-            }
-          },
-          "DayHover": {
-            "Background": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🎨 Surface.Highlight}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1417"
-              }
-            }
-          }
-        },
-        "Day": {
-          "Weight": {
-            "Base": {
-              "$type": "string",
-              "$value": "{🔗 Alias.🔤 Text.Weight.Regular}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1418"
-              }
-            },
-            "Selected": {
-              "$type": "string",
-              "$value": "{🔗 Alias.🔤 Text.Weight.Bold}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:1419"
-              }
-            }
-          }
-        },
-        "DayName": {
-          "Family": {
-            "$type": "fontFamily",
-            "$value": "{🔗 Alias.🔤 Text.Family.Heading}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:1420"
-            }
-          },
-          "Weight": {
-            "$type": "fontWeight",
-            "$value": "{🔗 Alias.🔤 Text.Weight.Bold}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:1421"
-            }
-          }
-        },
-        "Nav": {
-          "Radius": {
-            "$type": "dimension",
-            "$value": "{🔗 Alias.🔵 Radius.Base}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:1422"
-            }
-          },
-          "Color": {
+          "Nav": {
             "Base": {
               "$type": "color",
               "$value": "{🔗 Alias.🔤 Text.Color.Primary}",
@@ -11126,6 +11030,140 @@
                 "com.figma.variableId": "VariableID:137:1426"
               }
             }
+          }
+        },
+        "BorderWidth": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.▭ Border.Width.Base}"
+        },
+        "Padding": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Padding.XS}"
+        },
+        "DayActive": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.Sky}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:1414"
+              }
+            }
+          }
+        },
+        "DaySelected": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.PrimaryDark}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:1415"
+              }
+            }
+          }
+        },
+        "DaySelectedHover": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.PrimaryHover}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:1416"
+              }
+            }
+          }
+        },
+        "DayHover": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.Highlight}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:1417"
+              }
+            }
+          }
+        },
+        "Day": {
+          "Weight": {
+            "Base": {
+              "$type": "string",
+              "$value": "{🔗 Alias.🔤 Text.Weight.Regular}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:1418"
+              }
+            },
+            "Selected": {
+              "$type": "string",
+              "$value": "{🔗 Alias.🔤 Text.Weight.Bold}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:1419"
+              }
+            }
+          },
+          "Gap": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.↔️ Space.Gap.2XS}"
+          }
+        },
+        "DayName": {
+          "Family": {
+            "$type": "fontFamily",
+            "$value": "{🔗 Alias.🔤 Text.Family.Heading}",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ],
+              "com.figma.variableId": "VariableID:137:1420"
+            }
+          },
+          "Weight": {
+            "$type": "fontWeight",
+            "$value": "{🔗 Alias.🔤 Text.Weight.Bold}",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ],
+              "com.figma.variableId": "VariableID:137:1421"
+            }
+          }
+        },
+        "Nav": {
+          "Radius": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.🔵 Radius.Base}",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ],
+              "com.figma.variableId": "VariableID:137:1422"
+            }
+          },
+          "Gap": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.↔️ Space.Gap.XS}"
+          },
+          "ActionMargin": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.↔️ Space.Gap.XS}"
           }
         },
         "Family": {
@@ -11181,6 +11219,10 @@
               "com.figma.variableId": "VariableID:137:1429"
             }
           }
+        },
+        "Radius": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.🔵 Radius.Base}"
         }
       },
       "Popup": {
@@ -12132,16 +12174,6 @@
                 "textTransform": "VariableID:2826:10067"
               }
             }
-          },
-          "Color": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🔤 Text.Color.Primary}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:1507"
-            }
           }
         },
         "Control": {
@@ -12171,8 +12203,8 @@
               }
             }
           },
-          "Value": {
-            "Color": {
+          "Color": {
+            "Value": {
               "$type": "color",
               "$value": "{🔗 Alias.🔤 Text.Color.Primary}",
               "$extensions": {
@@ -12181,10 +12213,8 @@
                 ],
                 "com.figma.variableId": "VariableID:137:1512"
               }
-            }
-          },
-          "Placeholder": {
-            "Color": {
+            },
+            "Placeholder": {
               "$type": "color",
               "$value": "{🔗 Alias.🔤 Text.Color.Placeholder}",
               "$extensions": {
@@ -12222,8 +12252,20 @@
                 "textTransform": "VariableID:2826:10081"
               }
             }
+          }
+        },
+        "Color": {
+          "Label": {
+            "$type": "color",
+            "$value": "{🔗 Alias.🔤 Text.Color.Primary}",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ],
+              "com.figma.variableId": "VariableID:137:1507"
+            }
           },
-          "Color": {
+          "Description": {
             "$type": "color",
             "$value": "{🔗 Alias.🔤 Text.Color.Hint}",
             "$extensions": {
@@ -12340,8 +12382,8 @@
             }
           }
         },
-        "Description": {
-          "Color": {
+        "Color": {
+          "Description": {
             "$type": "color",
             "$value": "{🔗 Alias.🔤 Text.Color.Success}",
             "$extensions": {
@@ -12374,8 +12416,8 @@
             }
           }
         },
-        "Description": {
-          "Color": {
+        "Color": {
+          "Description": {
             "$type": "color",
             "$value": "{🔗 Alias.🔤 Text.Color.Warning}",
             "$extensions": {
@@ -12408,8 +12450,8 @@
             }
           }
         },
-        "Description": {
-          "Color": {
+        "Color": {
+          "Description": {
             "$type": "color",
             "$value": "{🔗 Alias.🔤 Text.Color.Danger}",
             "$extensions": {
@@ -12474,16 +12516,6 @@
                 "textTransform": "VariableID:2826:10151"
               }
             }
-          },
-          "Color": {
-            "$type": "color",
-            "$value": "{🔗 Alias.🔤 Text.Color.Disabled}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:1599"
-            }
           }
         },
         "Control": {
@@ -12513,8 +12545,8 @@
               }
             }
           },
-          "Value": {
-            "Color": {
+          "Color": {
+            "Value": {
               "$type": "color",
               "$value": "{🔗 Alias.🔤 Text.Color.Disabled}",
               "$extensions": {
@@ -12523,10 +12555,8 @@
                 ],
                 "com.figma.variableId": "VariableID:137:1604"
               }
-            }
-          },
-          "Placeholder": {
-            "Color": {
+            },
+            "Placeholder": {
               "$type": "color",
               "$value": "{🔗 Alias.🔤 Text.Color.Disabled}",
               "$extensions": {
@@ -12564,8 +12594,20 @@
                 "textTransform": "VariableID:2826:10165"
               }
             }
+          }
+        },
+        "Color": {
+          "Label": {
+            "$type": "color",
+            "$value": "{🔗 Alias.🔤 Text.Color.Disabled}",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ],
+              "com.figma.variableId": "VariableID:137:1599"
+            }
           },
-          "Color": {
+          "Description": {
             "$type": "color",
             "$value": "{🔗 Alias.🔤 Text.Color.Disabled}",
             "$extensions": {
@@ -12574,6 +12616,45 @@
               ],
               "com.figma.variableId": "VariableID:137:1610"
             }
+          }
+        }
+      }
+    },
+    "Counter": {
+      "Gap": {
+        "$type": "dimension",
+        "$value": "{🔗 Alias.↔️ Space.Gap.3XS}",
+        "$description": "Gap between the step buttons and the value display."
+      },
+      "Value": {
+        "MinWidth": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.📏 Size.Control.Base}",
+          "$description": "Minimum width of the value display so single- and multi-digit values render at the same widget width."
+        },
+        "Typo": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
+            "fontSize": "{📱 Device.🔤 Text.Size.Base}",
+            "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
+          },
+          "$description": "Typography of the counter value display. Only fontFamily and fontWeight are applied in code; fontSize/lineHeight stay inherited from context.",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        },
+        "Color": {
+          "Danger": {
+            "$type": "color",
+            "$value": "{🔗 Alias.🔤 Text.Color.Danger}",
+            "$description": "Text color of the value display when the counter is in the danger/invalid state."
           }
         }
       }
@@ -18136,8 +18217,8 @@
             "com.figma.variableId": "VariableID:137:2224"
           }
         },
-        "Unselected": {
-          "Color": {
+        "Color": {
+          "Unselected": {
             "Hover": {
               "$type": "color",
               "$value": "{🔗 Alias.🎬 Action.Primary.Text.Hover}",
@@ -18168,10 +18249,8 @@
                 "com.figma.variableId": "VariableID:137:2230"
               }
             }
-          }
-        },
-        "Selected": {
-          "Color": {
+          },
+          "Selected": {
             "Hover": {
               "$type": "color",
               "$value": "{🔗 Alias.🎬 Action.Primary.Text.Hover}",
@@ -18202,7 +18281,9 @@
                 "com.figma.variableId": "VariableID:137:2234"
               }
             }
-          },
+          }
+        },
+        "Selected": {
           "Background": {
             "$type": "color",
             "$value": "{🔗 Alias.🎨 Surface.Selected}",
@@ -18268,6 +18349,10 @@
             ],
             "com.figma.variableId": "VariableID:137:2227"
           }
+        },
+        "VerticalGap": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.SM}"
         }
       },
       "Gap": {
@@ -18310,7 +18395,15 @@
             ],
             "com.figma.variableId": "VariableID:137:2237"
           }
+        },
+        "Radius": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.🔵 Radius.Rounded}"
         }
+      },
+      "ContentGap": {
+        "$type": "dimension",
+        "$value": "{🔗 Alias.↔️ Space.Gap.2XS}"
       }
     },
     "Checkbox": {
@@ -19728,36 +19821,81 @@
       "Invalid": {
         "Label": {
           "Color": {
-            "Base": { "$type": "color", "$value": "{🔗 Alias.🔤 Text.Color.DangerDark}" },
-            "Hover": { "$type": "color", "$value": "{🔗 Alias.🔤 Text.Color.Danger}" },
-            "Active": { "$type": "color", "$value": "{🔗 Alias.🎬 Action.Danger.Text.Base}" }
+            "Base": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🔤 Text.Color.DangerDark}"
+            },
+            "Hover": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🔤 Text.Color.Danger}"
+            },
+            "Active": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎬 Action.Danger.Text.Base}"
+            }
           }
         },
         "Unchecked": {
           "Color": {
             "Background": {
-              "Base": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerLighter}" },
-              "Hover": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerLighter}" },
-              "Active": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerLighter}" }
+              "Base": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerLighter}"
+              },
+              "Hover": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerLighter}"
+              },
+              "Active": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerLighter}"
+              }
             },
             "Tick": {
-              "Base": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerDark}" },
-              "Hover": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerDarker}" },
-              "Active": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerDarkest}" }
+              "Base": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerDark}"
+              },
+              "Hover": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerDarker}"
+              },
+              "Active": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerDarkest}"
+              }
             }
           }
         },
         "Checked": {
           "Color": {
             "Background": {
-              "Base": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerDark}" },
-              "Hover": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerDarker}" },
-              "Active": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerDarkest}" }
+              "Base": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerDark}"
+              },
+              "Hover": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerDarker}"
+              },
+              "Active": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerDarkest}"
+              }
             },
             "Tick": {
-              "Base": { "$type": "color", "$value": "{🔗 Alias.🔤 Text.Color.White}" },
-              "Hover": { "$type": "color", "$value": "{🔗 Alias.🔤 Text.Color.White}" },
-              "Active": { "$type": "color", "$value": "{🔗 Alias.🔤 Text.Color.White}" }
+              "Base": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🔤 Text.Color.White}"
+              },
+              "Hover": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🔤 Text.Color.White}"
+              },
+              "Active": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🔤 Text.Color.White}"
+              }
             }
           }
         }
@@ -22591,8 +22729,32 @@
                 ],
                 "com.figma.variableId": "VariableID:137:2557"
               }
+            },
+            "Disabled": {
+              "$type": "color",
+              "$value": "{🧩 Component.Button.Color.Disabled.Base.Text}"
             }
+          },
+          "Width": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.▭ Border.Width.Base}"
+          },
+          "Style": {
+            "$type": "string",
+            "$value": "{🔗 Alias.▭ Border.Style.Dashed}"
           }
+        },
+        "Radius": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.🔵 Radius.Base}"
+        },
+        "Gap": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.Base}"
+        },
+        "Padding": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Padding.Base}"
         },
         "Text": {
           "Color": {
@@ -22674,6 +22836,16 @@
         }
       },
       "FileName": {
+        "Font": {
+          "Weight": {
+            "$type": "fontWeight",
+            "$value": "{🔗 Alias.🔤 Text.Weight.Bold}"
+          },
+          "Size": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.🔤 Text.Size.Base}"
+          }
+        },
         "Text": {
           "Color": {
             "$type": "color",
@@ -22814,7 +22986,7 @@
             }
           },
           "Color": {
-            "Base": {
+            "Default": {
               "$type": "color",
               "$value": "{🔗 Alias.🔤 Text.Color.Hint}",
               "$extensions": {
@@ -22869,9 +23041,47 @@
               "com.figma.variableId": "VariableID:137:2581"
             }
           }
+        },
+        "Text": {
+          "Color": {
+            "Disabled": {
+              "$type": "color",
+              "$value": "{🧩 Component.Button.Color.Disabled.Base.Text}"
+            }
+          }
+        },
+        "Gap": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.XS}"
+        },
+        "MarginBlock": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.Base}"
+        },
+        "Item": {
+          "Radius": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.🔵 Radius.Base}"
+          },
+          "Padding": {
+            "Block": {
+              "$type": "dimension",
+              "$value": "{🔗 Alias.↔️ Space.Padding.XS}"
+            },
+            "Inline": {
+              "$type": "dimension",
+              "$value": "{🔗 Alias.↔️ Space.Padding.Base}"
+            }
+          }
         }
       },
       "FileSize": {
+        "Font": {
+          "Size": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.🔤 Text.Size.XS}"
+          }
+        },
         "Text": {
           "Color": {
             "$type": "color",
@@ -22883,6 +23093,12 @@
               "com.figma.variableId": "VariableID:137:2582"
             }
           }
+        }
+      },
+      "Spinner": {
+        "Color": {
+          "$type": "color",
+          "$value": "{🔗 Alias.🎨 Surface.GreyDark}"
         }
       }
     },
@@ -23427,17 +23643,9 @@
     "PhoneInput": {
       "Flag": {
         "Radius": {
-          "Empty": {
-            "$type": "dimension",
-            "$value": "{🔗 Alias.🔵 Radius.Base}",
-            "$description": "Border radius of the country flag placeholder when no country is selected.",
-            "$extensions": {
-              "com.figma.variableId": "VariableID:2648:11767",
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ]
-            }
-          }
+          "$type": "dimension",
+          "$value": "{🔗 Alias.🔵 Radius.XS}",
+          "$description": "Border radius of the country flag."
         },
         "Background": {
           "Color": {
@@ -23453,6 +23661,16 @@
               }
             }
           }
+        },
+        "Width": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Size.24}",
+          "$description": "Width of the country flag."
+        },
+        "Height": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Size.16}",
+          "$description": "Height of the country flag."
         }
       },
       "Popup": {
@@ -23505,6 +23723,11 @@
               "ALL_SCOPES"
             ]
           }
+        },
+        "ZIndex": {
+          "$type": "number",
+          "$value": "{🔗 Alias.🗂️ ZIndex.Popup}",
+          "$description": "Stack order of the country picker popup."
         }
       },
       "Filter": {
@@ -23520,6 +23743,11 @@
               ]
             }
           }
+        },
+        "IconSize": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Size.14}",
+          "$description": "Size of the search icon in the country filter."
         }
       },
       "Scrollbar": {
@@ -23555,6 +23783,11 @@
               "ALL_SCOPES"
             ]
           }
+        },
+        "Width": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Space.8}",
+          "$description": "Width of the country list scrollbar."
         }
       },
       "Option": {
@@ -23568,6 +23801,51 @@
               "ALL_SCOPES"
             ]
           }
+        },
+        "Gap": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.XS}",
+          "$description": "Gap between the flag and name in a country option."
+        },
+        "Padding": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Padding.XS}",
+          "$description": "Padding of a country option."
+        }
+      },
+      "FocusRing": {
+        "Width": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.▭ Border.Width.Base}",
+          "$description": "Width of the focus ring inset offset."
+        }
+      },
+      "Input": {
+        "PaddingX": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Padding.XS}",
+          "$description": "Horizontal padding of the number input segment."
+        }
+      },
+      "Trigger": {
+        "Gap": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.XS}",
+          "$description": "Gap between the flag and calling code in the country trigger."
+        }
+      },
+      "NoResults": {
+        "Padding": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Padding.XS}",
+          "$description": "Padding of the no-results message."
+        }
+      },
+      "Chevron": {
+        "Size": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.📏 Size.Icon.XS}",
+          "$description": "Size of the trigger chevron icon."
         }
       }
     }
@@ -23614,6 +23892,13 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": "VariableID:137:2637"
+          }
+        },
+        "2": {
+          "$type": "dimension",
+          "$value": {
+            "value": 0.125,
+            "unit": "rem"
           }
         },
         "4": {

@@ -30,8 +30,8 @@
   @include vars.local(#{$prefix}-line-height, var(--ds-form-default-control-typo-line-height));
   @include vars.local(#{$prefix}-size, var(--ds-form-default-control-typo-font-size));
 
-  @include vars.local(#{$prefix}-color, var(--ds-form-default-control-value-color));
-  @include vars.local(#{$prefix}-placeholder, var(--ds-form-default-control-placeholder-color));
+  @include vars.local(#{$prefix}-color, var(--ds-form-default-control-color-value));
+  @include vars.local(#{$prefix}-placeholder, var(--ds-form-default-control-color-placeholder));
 }
 
 @mixin style($prefix, $selector: '#input') {
