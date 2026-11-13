@@ -12801,6 +12801,16 @@
           "com.figma.variableId": "VariableID:137:1611"
         }
       },
+      "ScrollbarRadius": {
+        "$type": "dimension",
+        "$value": "{🔗 Alias.🔵 Radius.Rounded}",
+        "$description": "Radius of the custom options-scrollbar thumb.",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
       "Container": {
         "Radius": {
           "$type": "dimension",
@@ -13181,6 +13191,16 @@
             ],
             "com.figma.variableId": "VariableID:137:1642"
           }
+        },
+        "Height": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.📏 Size.Control.Indicator}",
+          "$description": "Minimum height of a selected-option chip row.",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
         }
       },
       "Description": {
@@ -13308,6 +13328,104 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": "VariableID:137:1656"
+          }
+        },
+        "Radius": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.🔵 Radius.Rounded}",
+          "$description": "Border radius of a selected-option chip, matching Tag.",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        },
+        "Size": {
+          "SM": {
+            "Padding": {
+              "X": {
+                "$type": "dimension",
+                "$value": "{🔗 Alias.↔️ Space.Padding.SM}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              },
+              "Y": {
+                "$type": "dimension",
+                "$value": "{🔗 Alias.↔️ Space.Padding.None}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              }
+            },
+            "FontWeight": {
+              "$type": "fontWeight",
+              "$value": "{🔗 Alias.🔤 Text.Weight.Regular}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
+              }
+            },
+            "FontSize": {
+              "$type": "dimension",
+              "$value": "{🔗 Alias.🔤 Text.Size.SM}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
+              }
+            }
+          }
+        },
+        "DeleteMargin": {
+          "End": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.↔️ Space.Gap.XS}",
+            "$description": "Outer end-margin of a chip's delete button.",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          },
+          "Start": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.↔️ Space.Gap.2XS}",
+            "$description": "Outer start-margin of a chip's delete button.",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          }
+        },
+        "Disabled": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🔤 Text.Color.Grey}",
+              "$description": "Matches Tag's disabled fill.",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
+              }
+            },
+            "Text": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🔤 Text.Color.White}",
+              "$description": "Matches Tag's disabled text.",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
+              }
+            }
           }
         }
       },
@@ -13491,6 +13609,16 @@
           "$value": "{🔗 Alias.↔️ Space.Padding.2XS}",
           "$extensions": {
             "com.figma.variableId": "VariableID:2648:11756",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        },
+        "ZIndex": {
+          "$type": "number",
+          "$value": "{🔗 Alias.🗂️ ZIndex.Popup}",
+          "$description": "Stack order of the options popup.",
+          "$extensions": {
             "com.figma.scopes": [
               "ALL_SCOPES"
             ]
@@ -13746,6 +13874,16 @@
                 "com.figma.variableId": "VariableID:137:1698"
               }
             }
+          }
+        },
+        "MarginEnd": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.XS}",
+          "$description": "End margin between an option's checkbox and its label.",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
           }
         }
       }
@@ -18717,11 +18855,20 @@
           "com.figma.scopes": [
             "ALL_SCOPES"
           ],
-          "com.figma.variableId": "VariableID:137:2238"
+          "com.figma.variableId": "VariableID:137:2264"
         }
       },
       "Label": {
         "Color": {
+          "Base": {
+            "$type": "color",
+            "$value": "{🔗 Alias.🔤 Text.Color.Primary}",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          },
           "Hover": {
             "$type": "color",
             "$value": "{🔗 Alias.🎬 Action.Primary.Text.Hover}",
@@ -18729,7 +18876,7 @@
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
-              "com.figma.variableId": "VariableID:137:2241"
+              "com.figma.variableId": "VariableID:137:2267"
             }
           },
           "Active": {
@@ -18739,7 +18886,7 @@
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
-              "com.figma.variableId": "VariableID:137:2242"
+              "com.figma.variableId": "VariableID:137:2268"
             }
           },
           "Disabled": {
@@ -18749,8 +18896,25 @@
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
-              "com.figma.variableId": "VariableID:2648:11757"
+              "com.figma.variableId": "VariableID:2648:11759"
             }
+          }
+        },
+        "Typo": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
+            "fontSize": "{📱 Device.🔤 Text.Size.Base}",
+            "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
+          },
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
           }
         }
       },
@@ -18762,7 +18926,7 @@
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
-            "com.figma.variableId": "VariableID:137:2243"
+            "com.figma.variableId": "VariableID:137:2269"
           }
         }
       },
@@ -18774,7 +18938,7 @@
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
-            "com.figma.variableId": "VariableID:137:2244"
+            "com.figma.variableId": "VariableID:137:2270"
           }
         }
       },
@@ -18786,7 +18950,7 @@
             "com.figma.scopes": [
               "ALL_SCOPES"
             ],
-            "com.figma.variableId": "VariableID:137:2245"
+            "com.figma.variableId": "VariableID:137:2271"
           }
         },
         "Border": {
@@ -18797,64 +18961,163 @@
               "com.figma.scopes": [
                 "ALL_SCOPES"
               ],
-              "com.figma.variableId": "VariableID:137:2246"
+              "com.figma.variableId": "VariableID:137:2272"
             }
           }
         },
         "Color": {
-          "Base": {
-            "Border": {
+          "Border": {
+            "Base": {
               "$type": "color",
               "$value": "{🔗 Alias.▭ Border.Color.Grey}",
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
                 ],
-                "com.figma.variableId": "VariableID:137:2247"
+                "com.figma.variableId": "VariableID:137:2273"
               }
-            }
-          },
-          "Hover": {
-            "Border": {
+            },
+            "Hover": {
               "$type": "color",
               "$value": "{🔗 Alias.▭ Border.Color.PrimaryHover}",
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
                 ],
-                "com.figma.variableId": "VariableID:137:2248"
+                "com.figma.variableId": "VariableID:137:2274"
               }
             },
-            "Background": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🎨 Surface.Hover}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:2249"
-              }
-            }
-          },
-          "Active": {
-            "Border": {
+            "Active": {
               "$type": "color",
               "$value": "{🔗 Alias.▭ Border.Color.PrimaryActive}",
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
                 ],
-                "com.figma.variableId": "VariableID:137:2250"
+                "com.figma.variableId": "VariableID:137:2276"
               }
-            },
-            "Background": {
+            }
+          },
+          "Background": {
+            "Hover": {
               "$type": "color",
               "$value": "{🔗 Alias.🎨 Surface.Hover}",
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
                 ],
-                "com.figma.variableId": "VariableID:137:2251"
+                "com.figma.variableId": "VariableID:137:2275"
+              }
+            },
+            "Active": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.Hover}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2277"
+              }
+            }
+          },
+          "Icon": {
+            "Disabled": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🔤 Text.Color.Grey}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
+              }
+            }
+          }
+        },
+        "Padding": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Padding.Base}",
+          "$description": "Padding inside a tile, and the inset of its hint badge.",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        },
+        "Gutter": {
+          "$type": "dimension",
+          "$value": "{📱 Device.↔️ Space.Base}",
+          "$description": "Gutter between tile columns in a multi-column group.",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        },
+        "Default": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.PrimaryLighter}",
+              "$description": "Fill of a checked tile in the default variant (base, hover and active share it).",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
+              }
+            }
+          }
+        },
+        "Green": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.GreenLighter}",
+              "$description": "Fill of a checked tile in the green variant (base, hover and active share it).",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
+              }
+            }
+          }
+        },
+        "Red": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.RedLighter}",
+              "$description": "Fill of a checked tile in the red variant (base, hover and active share it).",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
+              }
+            }
+          }
+        },
+        "Yellow": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.YellowLighter}",
+              "$description": "Fill of a checked tile in the yellow variant (base, hover and active share it).",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
+              }
+            }
+          }
+        },
+        "Purple": {
+          "Color": {
+            "Background": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.PurpleLighter}",
+              "$description": "Fill of a checked tile in the purple variant (base, hover and active share it).",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
               }
             }
           }
@@ -18862,71 +19125,76 @@
       },
       "Unchecked": {
         "Color": {
-          "Base": {
-            "Border": {
+          "Border": {
+            "Base": {
               "$type": "color",
               "$value": "{🔗 Alias.▭ Border.Color.Primary}",
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
                 ],
-                "com.figma.variableId": "VariableID:137:2252"
+                "com.figma.variableId": "VariableID:137:2278"
               }
-            }
-          },
-          "Hover": {
-            "Border": {
+            },
+            "Hover": {
               "$type": "color",
               "$value": "{🔗 Alias.▭ Border.Color.PrimaryHover}",
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
                 ],
-                "com.figma.variableId": "VariableID:137:2253"
+                "com.figma.variableId": "VariableID:137:2279"
               }
             },
-            "Background": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🎨 Surface.Hover}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:2254"
-              }
-            }
-          },
-          "Active": {
-            "Border": {
+            "Active": {
               "$type": "color",
               "$value": "{🔗 Alias.▭ Border.Color.PrimaryActive}",
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
                 ],
-                "com.figma.variableId": "VariableID:137:2255"
+                "com.figma.variableId": "VariableID:137:2281"
               }
             },
-            "Background": {
+            "Disabled": {
               "$type": "color",
-              "$value": "{🔗 Alias.🎨 Surface.Hover}",
+              "$value": "{🔗 Alias.▭ Border.Color.Disabled}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
+              }
+            }
+          },
+          "Background": {
+            "Hover": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.GreyLight}",
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
                 ],
-                "com.figma.variableId": "VariableID:137:2256"
+                "com.figma.variableId": "VariableID:137:2280"
               }
-            }
-          },
-          "Disabled": {
-            "Background": {
+            },
+            "Active": {
               "$type": "color",
               "$value": "{🔗 Alias.🎨 Surface.Grey}",
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
                 ],
-                "com.figma.variableId": "VariableID:2648:11758"
+                "com.figma.variableId": "VariableID:137:2282"
+              }
+            },
+            "Disabled": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.Grey}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:2648:11760"
               }
             }
           }
@@ -18934,102 +19202,387 @@
       },
       "Checked": {
         "Color": {
-          "Base": {
-            "Border": {
+          "Border": {
+            "Base": {
               "$type": "color",
               "$value": "{🔗 Alias.▭ Border.Color.Primary}",
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
                 ],
-                "com.figma.variableId": "VariableID:137:2257"
+                "com.figma.variableId": "VariableID:137:2283"
               }
             },
-            "Icon": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🔤 Text.Color.White}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:2258"
-              }
-            },
-            "Background": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🎨 Surface.Primary}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:2259"
-              }
-            }
-          },
-          "Hover": {
-            "Border": {
+            "Hover": {
               "$type": "color",
               "$value": "{🔗 Alias.▭ Border.Color.PrimaryHover}",
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
                 ],
-                "com.figma.variableId": "VariableID:137:2260"
+                "com.figma.variableId": "VariableID:137:2286"
               }
             },
-            "Background": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🎨 Surface.PrimaryHover}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:2261"
-              }
-            }
-          },
-          "Active": {
-            "Border": {
+            "Active": {
               "$type": "color",
               "$value": "{🔗 Alias.▭ Border.Color.PrimaryActive}",
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
                 ],
-                "com.figma.variableId": "VariableID:137:2262"
+                "com.figma.variableId": "VariableID:137:2288"
               }
             },
-            "Background": {
+            "Disabled": {
+              "$type": "color",
+              "$value": "{🔗 Alias.▭ Border.Color.Disabled}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
+              }
+            }
+          },
+          "Icon": {
+            "Base": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🔤 Text.Color.White}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2284"
+              }
+            }
+          },
+          "Background": {
+            "Base": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.Primary}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2285"
+              }
+            },
+            "Hover": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.PrimaryHover}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ],
+                "com.figma.variableId": "VariableID:137:2287"
+              }
+            },
+            "Active": {
               "$type": "color",
               "$value": "{🔗 Alias.🎨 Surface.PrimaryActive}",
               "$extensions": {
                 "com.figma.scopes": [
                   "ALL_SCOPES"
                 ],
-                "com.figma.variableId": "VariableID:137:2263"
+                "com.figma.variableId": "VariableID:137:2289"
+              }
+            },
+            "Disabled": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎨 Surface.GreyDark}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
               }
             }
           }
         }
       },
-      "FontFamily": {
-        "$type": "fontFamily",
-        "$value": "{🔗 Alias.🔤 Text.Family.Text}",
+      "Gap": {
+        "$type": "dimension",
+        "$value": "{🔗 Alias.↔️ Space.Gap.XS}",
+        "$description": "Space between the checkbox control and its label.",
         "$extensions": {
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ],
-          "com.figma.variableId": "VariableID:137:2239"
+          ]
         }
       },
-      "LineHeight": {
-        "$type": "number",
-        "$value": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+      "MinHeight": {
+        "$type": "dimension",
+        "$value": "{🔗 Alias.📏 Size.Control.Base}",
+        "$description": "Minimum height of the checkbox row, keeping the touch target large enough.",
         "$extensions": {
           "com.figma.scopes": [
             "ALL_SCOPES"
-          ],
-          "com.figma.variableId": "VariableID:2826:10401"
+          ]
+        }
+      },
+      "Size": {
+        "$type": "dimension",
+        "$value": "{🔗 Alias.📏 Size.Control.Indicator}",
+        "$description": "Width and height of the checkbox control.",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "Padding": {
+        "Block": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Padding.2XS}",
+          "$description": "Vertical padding of the checkbox row.",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        }
+      },
+      "Invalid": {
+        "Color": {
+          "Label": {
+            "Base": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🔤 Text.Color.DangerDark}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
+              }
+            },
+            "Hover": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🔤 Text.Color.Danger}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
+              }
+            },
+            "Active": {
+              "$type": "color",
+              "$value": "{🔗 Alias.🎬 Action.Danger.Text.Base}",
+              "$extensions": {
+                "com.figma.scopes": [
+                  "ALL_SCOPES"
+                ]
+              }
+            }
+          }
+        },
+        "Unchecked": {
+          "Color": {
+            "Border": {
+              "Base": {
+                "$type": "color",
+                "$value": "{🔗 Alias.▭ Border.Color.Danger}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              },
+              "Hover": {
+                "$type": "color",
+                "$value": "{🔗 Alias.▭ Border.Color.DangerHover}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              },
+              "Active": {
+                "$type": "color",
+                "$value": "{🔗 Alias.▭ Border.Color.DangerActive}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              }
+            },
+            "Background": {
+              "Hover": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerLighter}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              },
+              "Active": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerLighter}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "Checked": {
+          "Color": {
+            "Background": {
+              "Base": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerDark}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              },
+              "Hover": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerDarker}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              },
+              "Active": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerDarkest}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              }
+            },
+            "Border": {
+              "Base": {
+                "$type": "color",
+                "$value": "{🔗 Alias.▭ Border.Color.Danger}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              },
+              "Hover": {
+                "$type": "color",
+                "$value": "{🔗 Alias.▭ Border.Color.DangerHover}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              },
+              "Active": {
+                "$type": "color",
+                "$value": "{🔗 Alias.▭ Border.Color.DangerActive}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "Tile": {
+          "Color": {
+            "Background": {
+              "Hover": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerLighter}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              },
+              "Active": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎨 Surface.DangerLighter}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              }
+            },
+            "Border": {
+              "Hover": {
+                "$type": "color",
+                "$value": "{🔗 Alias.▭ Border.Color.DangerHover}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              },
+              "Active": {
+                "$type": "color",
+                "$value": "{🔗 Alias.▭ Border.Color.DangerActive}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              }
+            },
+            "Icon": {
+              "Base": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🔤 Text.Color.DangerDark}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              },
+              "Hover": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🔤 Text.Color.Danger}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              },
+              "Active": {
+                "$type": "color",
+                "$value": "{🔗 Alias.🎬 Action.Danger.Text.Base}",
+                "$extensions": {
+                  "com.figma.scopes": [
+                    "ALL_SCOPES"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "Group": {
+        "Gap": {
+          "Stacked": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.↔️ Space.Gap.2XS}",
+            "$description": "Gap between stacked checkboxes in a group.",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          },
+          "Inline": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.↔️ Space.Gap.Base}",
+            "$description": "Gap between checkboxes laid out in a row from tablet up.",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          }
         }
       }
     },

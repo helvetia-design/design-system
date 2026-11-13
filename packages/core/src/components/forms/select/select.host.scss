@@ -111,10 +111,10 @@ $select-icon-search: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' xmlns='h
   @include vars.local(select-option-selected-icon-color, var(--ds-select-option-color-icon-selected));
   @include vars.local(select-option-selected-text-color, var(--ds-select-option-color-text-selected));
   @include vars.local(select-option-selected-background-color, var(--ds-select-option-color-background-selected));
-  @include vars.local(select-option-hover-text-color, var(--ds-select-option-text-color-highlight));
+  @include vars.local(select-option-hover-text-color, var(--ds-select-option-color-text-highlight));
   @include vars.local(select-option-hover-background-color, var(--ds-select-option-color-background-hover));
-  @include vars.local(select-option-highlight-text-color, var(--ds-select-option-text-color-highlight));
-  @include vars.local(select-option-highlight-background-color, var(--ds-select-option-background-color-highlight));
+  @include vars.local(select-option-highlight-text-color, var(--ds-select-option-color-text-highlight));
+  @include vars.local(select-option-highlight-background-color, var(--ds-select-option-color-background-highlight));
   @include vars.local(select-option-disabled-text-color, var(--ds-select-option-color-text-disabled));
   @include vars.local(select-option-disabled-background-color, var(--ds-select-option-color-background-disabled));
 
