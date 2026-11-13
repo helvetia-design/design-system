@@ -14975,7 +14975,7 @@
           "$type": "typography",
           "$value": {
             "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
-            "fontSize": "{📱 Device.🔤 Text.Size.Base}",
+            "fontSize": "{📱 Device.🔤 Text.Size.XS}",
             "fontWeight": "{🔗 Alias.🔤 Text.Weight.Bold}",
             "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
             "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
@@ -22767,10 +22767,39 @@
               "com.figma.variableId": "VariableID:137:2450"
             }
           }
+        },
+        "Gap": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Gap.2XS}",
+          "$description": "Space between a circle and the connector line leaving it.",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        },
+        "Radius": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.🔵 Radius.Rounded}",
+          "$description": "Corner radius of the connector line.",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
         }
       },
       "Step": {
         "Color": {
+          "Invalid": {
+            "$type": "color",
+            "$value": "{🔗 Alias.🔤 Text.Color.Danger}",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          },
           "Selected": {
             "$type": "color",
             "$value": "{🔗 Alias.🔤 Text.Color.Primary}",
@@ -22867,6 +22896,64 @@
               }
             }
           }
+        },
+        "Opacity": {
+          "Disabled": {
+            "$type": "number",
+            "$value": "0.4",
+            "$description": "Opacity of step labels in the disabled state.",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          }
+        },
+        "Gap": {
+          "Base": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.↔️ Space.Gap.XS}",
+            "$description": "Space between the circle and its label (horizontal layout).",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          },
+          "Vertical": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.↔️ Space.Gap.SM}",
+            "$description": "Space between the circle and its label (vertical layout).",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          }
+        },
+        "Padding": {
+          "Y": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.↔️ Space.Padding.XS}",
+            "$description": "Vertical padding of a step in the vertical layout.",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          }
+        },
+        "Radius": {
+          "Focus": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.🔵 Radius.Base}",
+            "$description": "Corner radius of the focus ring on navigation links.",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          }
         }
       },
       "Color": {
@@ -22912,8 +22999,8 @@
         }
       },
       "Circle": {
-        "Color": {
-          "Default": {
+        "Default": {
+          "Color": {
             "Text": {
               "$type": "color",
               "$value": "{🔗 Alias.🎨 Surface.OnGrey}",
@@ -22934,8 +23021,10 @@
                 "com.figma.variableId": "VariableID:137:2468"
               }
             }
-          },
-          "Selected": {
+          }
+        },
+        "Selected": {
+          "Color": {
             "Text": {
               "$type": "color",
               "$value": "{🔗 Alias.🎨 Surface.OnPrimary}",
@@ -22956,8 +23045,10 @@
                 "com.figma.variableId": "VariableID:137:2470"
               }
             }
-          },
-          "Done": {
+          }
+        },
+        "Done": {
+          "Color": {
             "Text": {
               "$type": "color",
               "$value": "{🔗 Alias.🎨 Surface.OnPrimary}",
@@ -22978,8 +23069,10 @@
                 "com.figma.variableId": "VariableID:137:2472"
               }
             }
-          },
-          "Disabled": {
+          }
+        },
+        "Disabled": {
+          "Color": {
             "Background": {
               "$type": "color",
               "$value": "{🔗 Alias.🎨 Surface.Grey}",
@@ -23001,7 +23094,19 @@
               }
             }
           },
-          "Invalid": {
+          "Opacity": {
+            "$type": "number",
+            "$value": "0.5",
+            "$description": "Opacity of the circle in the disabled state.",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          }
+        },
+        "Invalid": {
+          "Color": {
             "Text": {
               "$type": "color",
               "$value": "{🔗 Alias.🎨 Surface.OnDangerDarker}",
@@ -23045,6 +23150,16 @@
               "com.figma.variableId": "VariableID:137:2478"
             }
           }
+        },
+        "Radius": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.🔵 Radius.Rounded}",
+          "$description": "Corner radius of the step circle.",
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
         }
       },
       "Panel": {
@@ -23079,6 +23194,26 @@
             "ALL_SCOPES"
           ],
           "com.figma.variableId": "VariableID:137:2481"
+        }
+      },
+      "PaddingX": {
+        "$type": "dimension",
+        "$value": "{📱 Device.↔️ Space.None}",
+        "$description": "Horizontal padding inside the step panel.",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
+        }
+      },
+      "PaddingY": {
+        "$type": "dimension",
+        "$value": "{📱 Device.↔️ Space.Base}",
+        "$description": "Vertical padding inside the step panel.",
+        "$extensions": {
+          "com.figma.scopes": [
+            "ALL_SCOPES"
+          ]
         }
       }
     },
