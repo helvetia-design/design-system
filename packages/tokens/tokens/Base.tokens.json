@@ -1573,6 +1573,11 @@
           "$type": "dimension",
           "$value": "{🌐 Global.📏 Dimension.Space.24}",
           "$description": "Default inline icon/spinner size (24px at 16px root)."
+        },
+        "XS": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Space.12}",
+          "$description": "Small glyph rendered inside a control, such as a toggle's checkmark (12px at 16px root)."
         }
       },
       "Track": {
@@ -1580,6 +1585,16 @@
           "$type": "dimension",
           "$value": "{🌐 Global.📏 Dimension.Space.12}",
           "$description": "Thickness of a track/rail such as a slider track (12px at 16px root)."
+        },
+        "Switch": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Space.40}",
+          "$description": "Width of a switch/toggle track (40px at 16px root)."
+        },
+        "Thumb": {
+          "$type": "dimension",
+          "$value": "{🌐 Global.📏 Dimension.Space.16}",
+          "$description": "Size of the thumb that travels along a switch/toggle track (16px at 16px root)."
         }
       }
     },
@@ -1853,6 +1868,11 @@
             ],
             "com.figma.variableId": "VariableID:137:298"
           }
+        },
+        "DangerDark": {
+          "$type": "color",
+          "$value": "{🌐 Global.🌈 Color.Danger.4}",
+          "$description": "One step lighter than Danger; used where invalid text sits on a danger-tinted surface."
         }
       },
       "Shadow": {
@@ -18855,8 +18875,87 @@
           "com.figma.variableId": "VariableID:137:2290"
         }
       },
+      "Gap": {
+        "$type": "dimension",
+        "$value": "{🔗 Alias.↔️ Space.Gap.XS}",
+        "$description": "Space between the switch and its label."
+      },
+      "Width": {
+        "$type": "dimension",
+        "$value": "{🔗 Alias.📏 Size.Track.Switch}",
+        "$description": "Width of the switch track."
+      },
+      "Height": {
+        "$type": "dimension",
+        "$value": "{🔗 Alias.📏 Size.Control.Indicator}",
+        "$description": "Height of the switch track."
+      },
+      "MinHeight": {
+        "$type": "dimension",
+        "$value": "{🔗 Alias.📏 Size.Control.Base}",
+        "$description": "Minimum height of the whole toggle row, keeping the touch target large enough."
+      },
+      "Padding": {
+        "Base": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Padding.2XS}",
+          "$description": "Inset between the switch track and the thumb."
+        },
+        "Block": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.↔️ Space.Padding.2XS}",
+          "$description": "Vertical padding of the toggle row."
+        }
+      },
+      "Tick": {
+        "Size": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.📏 Size.Track.Thumb}",
+          "$description": "Size of the thumb that travels across the switch."
+        }
+      },
+      "Dense": {
+        "MinHeight": {
+          "$type": "dimension",
+          "$value": "{🔗 Alias.📏 Size.Control.SM}",
+          "$description": "Minimum height of the toggle row in dense mode."
+        },
+        "Padding": {
+          "Block": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.↔️ Space.Padding.None}",
+            "$description": "Vertical padding of the toggle row in dense mode."
+          }
+        }
+      },
       "Label": {
+        "Typo": {
+          "$type": "typography",
+          "$value": {
+            "fontFamily": "{🔗 Alias.🔤 Text.Family.Text}",
+            "fontSize": "{📱 Device.🔤 Text.Size.Base}",
+            "fontWeight": "{🔗 Alias.🔤 Text.Weight.Regular}",
+            "lineHeight": "{🔗 Alias.🔤 Text.LineHeight.Text}",
+            "letterSpacing": "{🔗 Alias.🔤 Text.LetterSpacing.Text}",
+            "textDecoration": "{🔗 Alias.🔤 Text.TextDecoration.None}",
+            "textTransform": "{🔗 Alias.🔤 Text.TextTransform.None}"
+          },
+          "$extensions": {
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ]
+          }
+        },
         "Color": {
+          "Base": {
+            "$type": "color",
+            "$value": "{🔗 Alias.🔤 Text.Color.Primary}",
+            "$extensions": {
+              "com.figma.scopes": [
+                "ALL_SCOPES"
+              ]
+            }
+          },
           "Hover": {
             "$type": "color",
             "$value": "{🔗 Alias.🎬 Action.Primary.Text.Hover}",
@@ -18889,18 +18988,6 @@
           }
         }
       },
-      "Border": {
-        "Width": {
-          "$type": "dimension",
-          "$value": "{🔗 Alias.▭ Border.Width.Base}",
-          "$extensions": {
-            "com.figma.scopes": [
-              "ALL_SCOPES"
-            ],
-            "com.figma.variableId": "VariableID:137:2295"
-          }
-        }
-      },
       "Focus": {
         "Color": {
           "$type": "color",
@@ -18910,88 +18997,6 @@
               "ALL_SCOPES"
             ],
             "com.figma.variableId": "VariableID:137:2296"
-          }
-        }
-      },
-      "Tile": {
-        "Radius": {
-          "$type": "dimension",
-          "$value": "{🔗 Alias.🔵 Radius.Base}",
-          "$extensions": {
-            "com.figma.scopes": [
-              "ALL_SCOPES"
-            ],
-            "com.figma.variableId": "VariableID:137:2297"
-          }
-        },
-        "Border": {
-          "Width": {
-            "$type": "dimension",
-            "$value": "{🔗 Alias.▭ Border.Width.Base}",
-            "$extensions": {
-              "com.figma.scopes": [
-                "ALL_SCOPES"
-              ],
-              "com.figma.variableId": "VariableID:137:2298"
-            }
-          }
-        },
-        "Color": {
-          "Base": {
-            "Border": {
-              "$type": "color",
-              "$value": "{🔗 Alias.▭ Border.Color.Grey}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:2299"
-              }
-            }
-          },
-          "Hover": {
-            "Border": {
-              "$type": "color",
-              "$value": "{🔗 Alias.▭ Border.Color.PrimaryHover}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:2300"
-              }
-            },
-            "Background": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🎨 Surface.Grey}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:2301"
-              }
-            }
-          },
-          "Active": {
-            "Border": {
-              "$type": "color",
-              "$value": "{🔗 Alias.▭ Border.Color.PrimaryActive}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:2302"
-              }
-            },
-            "Background": {
-              "$type": "color",
-              "$value": "{🔗 Alias.🎨 Surface.Grey}",
-              "$extensions": {
-                "com.figma.scopes": [
-                  "ALL_SCOPES"
-                ],
-                "com.figma.variableId": "VariableID:137:2303"
-              }
-            }
           }
         }
       },
@@ -19187,26 +19192,50 @@
               }
             }
           }
+        },
+        "Icon": {
+          "Size": {
+            "$type": "dimension",
+            "$value": "{🔗 Alias.📏 Size.Icon.XS}",
+            "$description": "Size of the checkmark glyph revealed in the checked state."
+          }
         }
       },
-      "FontFamily": {
-        "$type": "fontFamily",
-        "$value": "{🔗 Alias.🔤 Text.Family.Text}",
-        "$extensions": {
-          "com.figma.scopes": [
-            "ALL_SCOPES"
-          ],
-          "com.figma.variableId": "VariableID:137:2291"
-        }
-      },
-      "LineHeight": {
-        "$type": "number",
-        "$value": "{🔗 Alias.🔤 Text.LineHeight.Text}",
-        "$extensions": {
-          "com.figma.scopes": [
-            "ALL_SCOPES"
-          ],
-          "com.figma.variableId": "VariableID:2826:10403"
+      "Invalid": {
+        "Label": {
+          "Color": {
+            "Base": { "$type": "color", "$value": "{🔗 Alias.🔤 Text.Color.DangerDark}" },
+            "Hover": { "$type": "color", "$value": "{🔗 Alias.🔤 Text.Color.Danger}" },
+            "Active": { "$type": "color", "$value": "{🔗 Alias.🎬 Action.Danger.Text.Base}" }
+          }
+        },
+        "Unchecked": {
+          "Color": {
+            "Background": {
+              "Base": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerLighter}" },
+              "Hover": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerLighter}" },
+              "Active": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerLighter}" }
+            },
+            "Tick": {
+              "Base": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerDark}" },
+              "Hover": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerDarker}" },
+              "Active": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerDarkest}" }
+            }
+          }
+        },
+        "Checked": {
+          "Color": {
+            "Background": {
+              "Base": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerDark}" },
+              "Hover": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerDarker}" },
+              "Active": { "$type": "color", "$value": "{🔗 Alias.🎨 Surface.DangerDarkest}" }
+            },
+            "Tick": {
+              "Base": { "$type": "color", "$value": "{🔗 Alias.🔤 Text.Color.White}" },
+              "Hover": { "$type": "color", "$value": "{🔗 Alias.🔤 Text.Color.White}" },
+              "Active": { "$type": "color", "$value": "{🔗 Alias.🔤 Text.Color.White}" }
+            }
+          }
         }
       }
     },

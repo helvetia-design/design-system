@@ -51,7 +51,7 @@
 | ⬜     | Label        | Forms      | -                                     | ✅  | ⬜    |
 | ⬜     | Input        | Forms      | -                                     | ✅  | ⬜    |
 | ⬜     | Textarea     | Forms      | -                                     | ✅  | ⬜    |
-| ⬜     | Toggle       | Forms      | -                                     | ⬜  | ⬜    |
+| ⬜     | Toggle       | Forms      | -                                     | ✅  | ⬜    |
 | ⬜     | Radio        | Forms      | -                                     | ⬜  | ⬜    |
 | ⬜     | Checkbox     | Forms      | -                                     | ⬜  | ⬜    |
 | ⬜     | Slider       | Forms      | -                                     | ✅  | ⬜    |
@@ -85,7 +85,7 @@
 | ⬜     | Modal        | Overlays   | Close                                 | ⬜  | ⬜    |
 | ⬜     | Drawer       | Overlays   | Close                                 | ⬜  | ⬜    |
 | ⬜     | Popup        | Overlays   | Close                                 | ⬜  | ⬜    |
-| ⬜     | Notification | Overlays   | Close                                 | ⬜  | ⬜    |
+| ⬜     | Notification | Overlays   | Close                                 | ✅  | ⬜    |
 | ⬜     | Tag          | Indicators | Close                                 | ✅  | ⬜    |
 | ⬜     | Toast        | Overlays   | Button, Close, Icon                   | ⬜  | ⬜    |
 | ⬜     | Snackbar     | Overlays   | Brand Icon, Button, Close, Icon       | ⬜  | ⬜    |
