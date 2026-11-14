@@ -264,6 +264,24 @@ Each component directory contains:
 - `component.style.scss` — shared styles (both modes)
 - `test/` — unit tests (spec), interaction tests (.component.play.ts), visual tests (.visual.play.ts), a11y tests (.a11y.play.ts)
 
+### Component Relationships — Language
+
+**Sub-component**:
+A DS component with no Storybook page of its own, documented under a sibling in the same component folder — its documentation owner (e.g. `ds-tab`, `ds-tab-panel` → `ds-tabs`; `ds-button-group` → `ds-button`). Whether it sits inside or wraps the owner doesn't matter.
+_Avoid_: child component, companion
+
+**Documentation owner**:
+The component in a family folder that has its own Storybook page (`doc-config.ts`) and documents its sub-components on that page. One Storybook page = one documentation unit, in Storybook and in Figma alike.
+_Avoid_: parent (ambiguous — the owner may be the inner element, as `ds-button` is to `ds-button-group`)
+
+**Nested component**:
+An independent DS component, with its own component folder, that another component uses (e.g. `ds-icon` inside `ds-button`).
+_Avoid_: child component, inner component
+
+**Attachment**:
+An optional nested component that its host positions out of flow on the host's own box, e.g. `ds-badge` on the top-right corner of `ds-button`, `ds-tab` or `ds-card`. Optional means it can be present or absent — slotted by the consumer, or rendered by the host behind a prop. The host owns the placement; the attachment owns only its own look. Declared on the host with an `@attachment` JSDoc tag. A nested component that is always present at a fixed place is not an attachment.
+_Avoid_: anchor, overlay, positioned slot, badge slot
+
 ### Usage-Category Taxonomy
 
 Every component directory lives under a lowercase-plural **category** folder:

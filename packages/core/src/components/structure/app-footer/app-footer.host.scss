@@ -16,13 +16,23 @@
  * @prop --app-footer-line-height: Line height of the app-footer text.
  *
  * @prop --app-footer-gap: Gap between the app-footer elements.
+ * @prop --app-footer-gap-sm: Tight gap between related inline items (language picker, link list rows).
+ * @prop --app-footer-px: Horizontal padding of the app-footer.
  * @prop --app-footer-py: Vertical padding of the app-footer.
+ *
+ * @prop --app-footer-max-width: Max width of the app-footer (default container).
+ * @prop --app-footer-max-width-fluid: Max width of the app-footer in fluid container mode.
+ * @prop --app-footer-max-width-compact: Max width of the app-footer in compact container mode.
+ *
+ * @prop --app-footer-language-font-weight: Font weight of the language picker.
+ * @prop --app-footer-language-line-height: Line height of the language picker select.
  *
  * @prop --app-footer-link-color: Text color of the app-footer links.
  * @prop --app-footer-link-color-hover: Text color of the app-footer links on hover.
  * @prop --app-footer-link-color-active: Text color of the app-footer links when active.
  *
  * @prop --app-footer-social-icon-size: Size of the social link icons in the app-footer.
+ * @prop --app-footer-social-icon-color: Color of the social link icons in the app-footer.
  */
 
 :host {
@@ -36,13 +46,23 @@
   @include vars.local(app-footer-line-height, var(--ds-app-footer-typo-line-height));
 
   @include vars.local(app-footer-gap, var(--ds-app-footer-gap));
+  @include vars.local(app-footer-gap-sm, var(--ds-app-footer-gap-sm));
+  @include vars.local(app-footer-px, var(--ds-app-footer-padding-x));
   @include vars.local(app-footer-py, var(--ds-app-footer-padding-y));
+
+  @include vars.local(app-footer-max-width, var(--ds-app-footer-width-default));
+  @include vars.local(app-footer-max-width-fluid, var(--ds-app-footer-width-fluid));
+  @include vars.local(app-footer-max-width-compact, var(--ds-app-footer-width-compact));
+
+  @include vars.local(app-footer-language-font-weight, var(--ds-app-footer-language-typo-font-weight));
+  @include vars.local(app-footer-language-line-height, var(--ds-app-footer-language-typo-line-height));
 
   @include vars.local(app-footer-link-color, var(--ds-app-footer-link-color-text-base));
   @include vars.local(app-footer-link-color-hover, var(--ds-app-footer-link-color-text-hover));
   @include vars.local(app-footer-link-color-active, var(--ds-app-footer-link-color-text-active));
 
   @include vars.local(app-footer-social-icon-size, var(--ds-app-footer-social-icon-size));
+  @include vars.local(app-footer-social-icon-color, var(--ds-app-footer-social-icon-color));
 }
 
 :host {
@@ -52,18 +72,19 @@
   color: var(--_app-footer-color-text);
   background: var(--_app-footer-color-background);
 
+  // ds-token-check: intentional — layout centering, not a design value
   margin: 0 auto;
   padding-block: var(--_app-footer-py);
-  padding-inline: var(--_container-px, var(--ds-device-container-space));
+  padding-inline: var(--_container-px, var(--_app-footer-px));
   width: 100%;
-  max-width: var(--_container-max-width, var(--ds-alias-container-width-default));
+  max-width: var(--_container-max-width, var(--_app-footer-max-width));
 
   &.is-fluid {
-    max-width: var(--ds-alias-container-width-fluid);
+    max-width: var(--_app-footer-max-width-fluid);
   }
 
   &.is-compact {
-    max-width: var(--ds-alias-container-width-compact);
+    max-width: var(--_app-footer-max-width-compact);
   }
 }
 
@@ -103,21 +124,24 @@ footer {
     align-items: center;
     border: 0;
     display: inline-flex;
-    color: var(--_app-footer-color);
-    font-weight: var(--ds-alias-text-weight-bold);
-    gap: calc(var(--_app-footer-gap) / 2);
+    color: var(--_app-footer-color-text);
+    font-weight: var(--_app-footer-language-font-weight);
+    gap: var(--_app-footer-gap-sm);
+    // ds-token-check: intentional — pushes the picker to the end, not a design value
     margin: 0 0 0 auto;
     max-width: 100%;
     width: auto;
   }
 
   .language-picker ds-icon {
+    // ds-token-check: intentional — inherits the picker text color
     --icon-color: currentColor;
     flex-shrink: 0;
   }
 
   .language-picker select {
     appearance: auto;
+    // ds-token-check: intentional — native select background reset
     background: transparent;
     border: 0;
     border-radius: 0;
@@ -125,7 +149,7 @@ footer {
     cursor: pointer;
     flex: 0 0 auto;
     font: inherit;
-    line-height: 1.3;
+    line-height: var(--_app-footer-language-line-height);
     min-width: auto;
     padding: 0;
     outline: none;
@@ -156,7 +180,7 @@ footer {
     align-items: center;
     display: flex;
     flex-wrap: wrap;
-    gap: calc(var(--_app-footer-gap) / 2) calc(var(--_app-footer-gap));
+    gap: var(--_app-footer-gap-sm) var(--_app-footer-gap);
     margin: 0;
     padding: 0;
   }
@@ -175,18 +199,21 @@ footer {
   .links a:hover,
   ::slotted([slot='links']:hover) {
     color: var(--_app-footer-link-color-hover);
+    // ds-token-check: intentional — no Alias TextDecoration underline option
     text-decoration: underline;
   }
 
   .links a:active,
   ::slotted([slot='links']:active) {
     color: var(--_app-footer-link-color-active);
+    // ds-token-check: intentional — no Alias TextDecoration underline option
     text-decoration: underline;
   }
 
   .social a,
   ::slotted([slot='social-links']) {
-    --icon-color: var(--ds-alias-text-color-white);
+    --icon-color: var(--_app-footer-social-icon-color);
+    // Intentional reuse: social glyphs follow ds-icon's sm scale.
     --icon-size: var(--ds-icon-size-sm);
     align-items: center;
     color: var(--_app-footer-link-color);

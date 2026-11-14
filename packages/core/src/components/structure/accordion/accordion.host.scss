@@ -9,8 +9,11 @@
  * Define here the css variables for the component to be able to use it in host or non-host mode
  * These variables can be used in the component styles below and later on be overridden in themes.
  *
- * @prop --accordion-marker-size: Size of the expand/collapse marker icon.
+ * @prop --accordion-header-min-height: Minimum height of the header row.
+ * @prop --accordion-marker-size: Height and minimum width of the expand/collapse marker icon.
+ * @prop --accordion-marker-width: Width of the expand/collapse marker box.
  * @prop --accordion-summary-color: Text color of the summary label.
+ * @prop --accordion-summary-gap: Gap between the summary label and the marker.
  * @prop --accordion-summary-font-family: Font family of the summary label.
  * @prop --accordion-summary-font-weight: Font weight of the summary label.
  * @prop --accordion-summary-font-line-height: Line height of the summary label.
@@ -22,9 +25,12 @@
 
 :host {
   @include vars.focus(accordion);
-  @include vars.local(accordion-marker-size, 1rem);
+  @include vars.local(accordion-header-min-height, var(--ds-accordion-header-min-height));
+  @include vars.local(accordion-marker-size, var(--ds-accordion-marker-size));
+  @include vars.local(accordion-marker-width, var(--ds-accordion-marker-width));
 
   @include vars.local(accordion-summary-color, var(--ds-accordion-summary-color-base));
+  @include vars.local(accordion-summary-gap, var(--ds-accordion-summary-gap));
   @include vars.local(accordion-summary-font-family, var(--ds-accordion-summary-typo-font-family));
   @include vars.local(accordion-summary-font-weight, var(--ds-accordion-summary-typo-font-weight));
   @include vars.local(accordion-summary-font-line-height, var(--ds-accordion-summary-typo-line-height));
@@ -50,7 +56,7 @@
 //
 // Header
 :host #header {
-  min-height: 2.5rem;
+  min-height: var(--_accordion-header-min-height);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -65,7 +71,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--_accordion-summary-gap);
   background: inherit;
   border: none;
   width: 100%;
@@ -136,46 +142,48 @@
 }
 
 :host(.is-title) {
-  --mod-accordion-summary-font-family: var(--ds-alias-text-family-heading);
-  --mod-accordion-summary-font-weight: var(--ds-alias-text-weight-bold);
-  --mod-accordion-summary-font-line-height: var(--ds-alias-text-line-height-heading);
+  --mod-accordion-summary-font-family: var(--ds-accordion-summary-title-typo-font-family);
+  --mod-accordion-summary-font-weight: var(--ds-accordion-summary-title-typo-font-weight);
+  --mod-accordion-summary-font-line-height: var(--ds-accordion-summary-title-typo-line-height);
 }
 
 :host(.is-h1) {
-  --mod-accordion-summary-font-size: var(--ds-heading-level-1-font-size);
+  --mod-accordion-summary-font-size: var(--ds-accordion-summary-level-1-font-size);
 }
 
 :host(.is-h2) {
-  --mod-accordion-summary-font-size: var(--ds-heading-level-2-font-size);
+  --mod-accordion-summary-font-size: var(--ds-accordion-summary-level-2-font-size);
 }
 
 :host(.is-h3) {
-  --mod-accordion-summary-font-size: var(--ds-heading-level-3-font-size);
+  --mod-accordion-summary-font-size: var(--ds-accordion-summary-level-3-font-size);
 }
 
 :host(.is-h4) {
-  --mod-accordion-summary-font-size: var(--ds-heading-level-4-font-size);
+  --mod-accordion-summary-font-size: var(--ds-accordion-summary-level-4-font-size);
 }
 
 :host(.is-h5) {
-  --mod-accordion-summary-font-size: var(--ds-heading-level-5-font-size);
+  --mod-accordion-summary-font-size: var(--ds-accordion-summary-level-5-font-size);
 }
 
 //
 // Summary Marker
 :host(:not(.is-button)) #marker {
   min-width: var(--_accordion-marker-size);
-  width: 1.5rem;
+  width: var(--_accordion-marker-width);
   height: var(--_accordion-marker-size);
   cursor: pointer;
 }
 
 :host(:not(.is-button)[open]:not([open=' false '])) {
   #marker {
+    // ds-token-check: intentional — fixed marker geometry, not brand-themeable
     transform: rotate(180deg);
   }
 
   #marker.has-marker-plus {
+    // ds-token-check: intentional — fixed marker geometry, not brand-themeable
     transform: rotate(45deg);
   }
 }

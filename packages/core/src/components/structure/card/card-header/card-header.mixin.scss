@@ -5,8 +5,8 @@
 @mixin style() {
   // --heading-line-height: 32px;
 
-  // Only use small buttons in the card header
-  // to have the same height as the title
+  // Intentional reuse: ds-button small-size scale, so header buttons
+  // have the same height as the title
   --button-font-family: var(--ds-button-size-sm-font-family);
   --button-font-weight: var(--ds-button-size-sm-font-weight);
   --button-font-size: var(--ds-button-size-sm-font-size);
@@ -18,7 +18,7 @@
   --button-px: var(--ds-button-size-sm-padding-x);
 
   --tags-display: flex;
-  --tags-mt: 0.25rem;
+  --tags-mt: var(--ds-card-header-tags-margin-top);
 
   @include tablet() {
     --buttons-wrap: nowrap;
@@ -26,6 +26,7 @@
     --tags-mt: 0;
   }
 
+  // ds-token-check: intentional — derived from --_card-gap (layout ratio)
   column-gap: calc(var(--_card-gap) / 2);
   display: grid;
   align-items: start;
@@ -49,7 +50,7 @@
   ::slotted(ds-tag),
   ::slotted(ds-tag-group) {
     grid-area: tag;
-    margin-bottom: 1rem;
+    margin-bottom: var(--ds-card-header-tags-margin-bottom);
   }
 
   .ds-title,

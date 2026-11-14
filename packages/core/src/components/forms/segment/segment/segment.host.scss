@@ -43,7 +43,7 @@
 
   #inner {
     display: grid;
-    gap: 0.25rem;
+    gap: var(--_segment-content-gap);
     position: relative;
   }
 

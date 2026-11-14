@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": ["Edit(/.claude/skills/ds-code-to-figma/**)"]
+  },
+  "enabledPlugins": {
+    "ponytail@ponytail": true
+  }
+}

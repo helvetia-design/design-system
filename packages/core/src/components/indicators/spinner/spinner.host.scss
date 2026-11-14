@@ -12,6 +12,15 @@
  * @prop --spinner-circle-thickness: Border width of the spinner circle.
  * @prop --spinner-circle-background-color: Background color of the circle border.
  * @prop --spinner-circle-progress-color: Progress/animation color of the circle border.
+ * @prop --spinner-circle-border-style: Border style of the circle border.
+ * @prop --spinner-label-gap: Gap between the spinner animation and its label (right position).
+ * @prop --spinner-label-gap-bottom: Gap between the spinner animation and its label (bottom position).
+ * @prop --spinner-label-font-family: Font family of the visible label.
+ * @prop --spinner-label-line-height: Line height of the visible label.
+ * @prop --spinner-label-font-size: Font size of the visible label.
+ * @prop --spinner-label-font-weight: Font weight of the visible label.
+ * @prop --spinner-label-color-text: Text color of the visible label.
+ * @prop --spinner-logo-color: Overrides the animated logo's fill color (read via JS, not CSS cascade — see spinner.tsx getColor()).
  * @prop --spinner-animation-duration: Duration of the spinner animation.
  * @prop --spinner-animation-easing: Easing function of the spinner animation.
  */
@@ -24,6 +33,14 @@
   @include vars.local(spinner-circle-thickness, var(--ds-spinner-circle-thickness-md));
   @include vars.local(spinner-circle-background-color, var(--ds-spinner-circle-primary-background));
   @include vars.local(spinner-circle-progress-color, var(--ds-spinner-circle-primary-progress));
+  @include vars.local(spinner-circle-border-style, var(--ds-spinner-circle-border-style));
+  @include vars.local(spinner-label-gap, var(--ds-spinner-label-gap));
+  @include vars.local(spinner-label-gap-bottom, var(--ds-spinner-label-gap-bottom));
+  @include vars.local(spinner-label-font-family, var(--ds-spinner-label-font-family));
+  @include vars.local(spinner-label-line-height, var(--ds-spinner-label-line-height));
+  @include vars.local(spinner-label-font-size, var(--ds-spinner-label-font-size));
+  @include vars.local(spinner-label-font-weight, var(--ds-spinner-label-font-weight));
+  @include vars.local(spinner-label-color-text, var(--ds-spinner-label-color-primary));
 }
 
 /**
@@ -53,8 +70,9 @@
 }
 
 :host(.is-circle) #inner {
+  // ds-token-check: intentional — 50% is a structural circle radius, not a themeable value
   border-radius: 50%;
-  border-style: solid;
+  border-style: var(--_spinner-circle-border-style);
   border-width: var(--_spinner-circle-thickness);
   border-color: var(--_spinner-circle-background-color);
   border-top-color: var(--_spinner-circle-progress-color);
@@ -81,6 +99,7 @@
 :host(.is-inverted) {
   --mod-spinner-circle-background-color: var(--ds-spinner-circle-inverted-background);
   --mod-spinner-circle-progress-color: var(--ds-spinner-circle-inverted-progress);
+  --mod-spinner-label-color-text: var(--ds-spinner-label-color-inverted);
 }
 
 /**
@@ -91,20 +110,23 @@
 :host(.is-label-right) {
   flex-direction: row;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--_spinner-label-gap);
   width: auto;
 }
 
 :host(.is-label-bottom) {
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--_spinner-label-gap-bottom);
   width: auto;
 }
 
 ::part(label) {
-  font-family: var(--ds-alias-text-family-text);
-  line-height: var(--ds-alias-text-line-height-text);
+  font-family: var(--_spinner-label-font-family);
+  line-height: var(--_spinner-label-line-height);
+  font-size: var(--_spinner-label-font-size);
+  font-weight: var(--_spinner-label-font-weight);
+  color: var(--_spinner-label-color-text);
 }
 
 /**

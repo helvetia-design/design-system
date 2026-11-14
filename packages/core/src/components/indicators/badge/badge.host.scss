@@ -84,6 +84,12 @@
   }
 }
 
+#badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--_badge-gap);
+}
+
 /**
   * Variants and States
   * --------------------------------
@@ -157,6 +163,7 @@ $colors: (
   animation: pulse 2s infinite;
 }
 
+// ds-token-check: intentional — pulse animation geometry
 @keyframes pulse {
   0% {
     box-shadow: 0 0 0 0 var(--_badge-pulse-color);

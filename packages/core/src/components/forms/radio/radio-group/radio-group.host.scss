@@ -36,7 +36,7 @@
   #inner {
     position: relative;
     display: grid;
-    gap: 0.25rem;
+    gap: var(--ds-radio-group-gap-stacked);
   }
 
   @include form.label('legend');
@@ -57,7 +57,7 @@
 // Invalid or Color Danger
 // --------------------------------
 :host(.is-danger) {
-  --mod-radio-group-description-color: var(--ds-form-danger-description-color);
+  --mod-form-description-color: var(--ds-form-danger-color-description);
 }
 
 //
@@ -72,8 +72,8 @@
     cursor: default;
   }
 
-  --mod-radio-group-label-color: var(--ds-form-disabled-label-color);
-  --mod-radio-group-description-color: var(--ds-form-disabled-description-color);
+  --mod-form-label-color: var(--ds-form-disabled-color-label);
+  --mod-form-description-color: var(--ds-form-disabled-color-description);
 }
 
 //

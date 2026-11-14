@@ -35,11 +35,10 @@ $host-selector: ('#notification');
   @include vars.local(notification-icon, var(--ds-notification-default-icon));
   @include vars.local(notification-icon-display, block);
 
-  @include vars.local(notification-p, var(--ds-card-padding-base, 1.5rem));
-  @include vars.local(notification-icon-size, 1.5rem);
+  @include vars.local(notification-p, var(--ds-notification-padding-base));
+  @include vars.local(notification-icon-size, var(--ds-notification-icon-size));
 
-  @include vars.local(notification-close-offset, 2rem); // extra space reserved when a close button is present
-  @include vars.local(notification-gap, 0.125rem);
+  @include vars.local(notification-gap, var(--ds-notification-gap));
 
   // Close
   @include vars.local(notification-close-position, absolute);
@@ -109,8 +108,8 @@ $host-selector: ('#notification');
   &:has(ds-close) > h2::before {
     content: '';
     float: right;
-    width: 24px;
-    height: calc(var(--_notification-heading-line-height) * 16px); /* height of one line */
+    width: var(--ds-notification-close-size);
+    height: calc(var(--_notification-heading-line-height) * var(--_notification-content-size)); /* height of one line */
   }
 
   //
@@ -130,12 +129,15 @@ $host-selector: ('#notification');
   // --------------------------------
   &::before {
     display: var(--_notification-icon-display);
+    // ds-token-check: intentional — mask icon fill follows tokenized color
     background-color: currentColor;
     color: var(--_notification-color-heading);
     forced-color-adjust: preserve-parent-color;
     position: absolute;
-    height: 1.5rem;
-    width: 1.5rem;
+    // Fixed icon size; --_notification-icon-size only sizes the icon column (brand icon sets it to 80px)
+    height: var(--ds-notification-icon-size);
+    width: var(--ds-notification-icon-size);
+    // ds-token-check: intentional — icon position derived from padding
     left: calc(var(--_notification-p) / 4 * -1);
     top: var(--_notification-p);
     transform: translateX(var(--_notification-p));
@@ -181,7 +183,8 @@ $host-selector: ('#notification');
 // --------------------------------
 // When a `ds-brand-icon` is placed in the default slot (together with `no-icon`),
 // reserve the icon column again and position it there instead of letting it flow
-// inline with the content text.
+// inline with the content text. The column deliberately reuses ds-brand-icon's base size.
+// ds-token-check: intentional — icon position derived from padding
 @mixin notification-brand-icon-position() {
   position: absolute;
   top: calc(var(--_notification-p) / 2);
@@ -267,7 +270,7 @@ $colors: (
 $sizes: ('sm');
 
 @mixin notification-sizes($size) {
-  --mod-notification-p: var(--ds-card-padding-#{$size});
+  --mod-notification-p: var(--ds-notification-padding-#{$size});
 }
 
 @include hybrid.styles($css-selector, $use-host) {
